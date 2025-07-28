@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debt Relief Recommendation Service</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-bg {
+            background-color: #111827; /* gray-900 */
+        }
+        /* Custom Slider Styles from survey*/
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #4b5563; /* gray-600 */
+            border-radius: 5px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -10px;
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(59, 130, 246, 0.7);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl font-bold text-blue-600">Your Path to Debt Relief</h1>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main>
+        <div class="hero-bg text-white">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+                <h2 class="text-4xl font-extrabold tracking-tight sm:text-5xl">Feeling Overwhelmed by Debt?</h2>
+                <p class="mt-4 text-xl text-gray-300">We've researched the top debt settlement companies so you don't have to. Find out if you qualify for our top-rated partner in under 60 seconds.</p>
+                <div class="mt-8">
+                    <a href="#survey" class="inline-block bg-blue-600 text-white font-bold text-lg py-3 px-8 rounded-lg hover:bg-blue-700 transition">
+                        See If You Qualify Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- How We Help Section -->
+        <div class="bg-white py-16">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h3 class="text-3xl font-bold mb-4">We Found a Better Way to Debt Relief</h3>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">The debt relief industry can be confusing. That's why we've done the heavy lifting to identify a trusted, performance-based partner. We only recommend companies with a proven track record of helping people like you.</p>
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="p-6">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 mx-auto">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h4 class="mt-5 text-xl font-semibold">No Upfront Fees</h4>
+                        <p class="mt-2 text-gray-600">Our recommended partner works on a performance basis. They only get paid if they successfully settle your debt.</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 mx-auto">
+                           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        </div>
+                        <h4 class="mt-5 text-xl font-semibold">Pay Back Less</h4>
+                        <p class="mt-2 text-gray-600">They negotiate directly with your creditors to reduce your principal balance, saving you money.</p>
+                    </div>
+                    <div class="p-6">
+                         <div class="flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 mx-auto">
+                           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                        </div>
+                        <h4 class="mt-5 text-xl font-semibold">One Simple Payment</h4>
+                        <p class="mt-2 text-gray-600">Combine your debts into a single, manageable monthly program payment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Embedded Survey Section -->
+        <div id="survey" class="bg-gray-900 text-white py-16">
+             <div class="survey-container max-w-md mx-auto flex flex-col p-4">
+        
+                <!-- Progress Bar -->
+                <div class="w-full bg-gray-700 rounded-full h-1.5 mb-4">
+                    <div id="progress-bar" class="bg-blue-500 h-1.5 rounded-full" style="width: 0%"></div>
+                </div>
+
+                <!-- Survey Steps Container -->
+                <div class="flex-grow flex flex-col justify-center">
+                    
+                    <!-- Step 1: Debt Amount -->
+                    <div id="step-1" class="text-center">
+                        <h2 class="text-xl font-semibold text-gray-300 mb-2">Free Debt Relief Consultation. See If You Qualify In 1 Minute.</h2>
+                        <h1 class="text-3xl font-bold mb-4">Select Amount Of Credit Card & Personal Loan Debts</h1>
+                        <p id="debt-amount-display" class="text-5xl font-bold text-blue-400 my-8">$10,000</p>
+                        <div class="px-4">
+                             <input type="range" id="debt-slider" min="1000" max="100000" value="10000" step="1000" class="w-full">
+                        </div>
+                        <div class="mt-12">
+                             <button onclick="checkDebtAmount()" class="w-full bg-red-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-red-700 transition duration-300">Continue</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Debt Type -->
+                    <div id="step-2" class="hidden text-center">
+                        <h1 class="text-3xl font-bold mb-8">What type of debt do you have?</h1>
+                        <div class="space-y-4">
+                            <button onclick="nextStep(3)" class="w-full bg-blue-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-blue-700 transition">Credit Card Debt</button>
+                            <button onclick="nextStep(3)" class="w-full bg-blue-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-blue-700 transition">Unsecured Debt</button>
+                            <button onclick="disqualify()" class="w-full bg-gray-700 text-white font-bold text-lg py-4 rounded-lg hover:bg-gray-600 transition">Other</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Income -->
+                    <div id="step-3" class="hidden text-center">
+                        <h1 class="text-3xl font-bold mb-8">Do you have a steady source of income?</h1>
+                        <div class="space-y-4">
+                            <button onclick="showQualificationMessage()" class="w-full bg-blue-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-blue-700 transition">Yes</button>
+                            <button onclick="disqualify()" class="w-full bg-gray-700 text-white font-bold text-lg py-4 rounded-lg hover:bg-gray-600 transition">No</button>
+                        </div>
+                    </div>
+
+                    <!-- Qualified Message -->
+                    <div id="qualified-message" class="hidden text-center">
+                        <img src="https://www.curadebt.com/wp-content/uploads/2023/11/CuraDebt-logo-1.png" alt="CuraDebt Logo" class="h-12 mx-auto mb-6" onerror="this.style.display='none'">
+                        <div class="bg-green-500 rounded-full h-24 w-24 flex items-center justify-center mx-auto mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <h2 class="text-3xl font-bold mb-3">We've Found a Potential Solution!</h2>
+                        <p class="text-lg text-gray-300 mb-4">
+                            Based on your answers, we've matched you with <strong>CuraDebt</strong>, one of the nation's leading debt relief companies. They specialize in negotiating with creditors to lower what you owe on unsecured debts, like credit cards.
+                        </p>
+                        <p class="text-lg text-gray-400">You will be automatically redirected in <span id="countdown" class="font-bold text-white">15</span> seconds...</p>
+                        <div class="mt-6">
+                            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+                        </div>
+                    </div>
+
+                    <!-- Disqualified Message -->
+                    <div id="disqualified-message" class="hidden text-center flex flex-col items-center justify-center">
+                         <div class="bg-red-500 rounded-full h-24 w-24 flex items-center justify-center mx-auto mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </div>
+                        <h2 class="text-3xl font-bold mb-3">Thanks for your interest.</h2>
+                        <p class="text-lg text-gray-300">This program doesn't seem to be a fit for your current needs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-400">
+            <p>&copy; 2025 Your Company Name. All Rights Reserved.</p>
+            <p class="mt-2 text-sm">Disclaimer: We are an independent service that researches and recommends financial solutions. We may be compensated by the partners we recommend.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+        const progressBar = document.getElementById('progress-bar');
+        const debtSlider = document.getElementById('debt-slider');
+        const debtAmountDisplay = document.getElementById('debt-amount-display');
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(value);
+        }
+
+        if (debtSlider) {
+            debtSlider.addEventListener('input', () => {
+                let amount = parseInt(debtSlider.value);
+                if (amount >= 100000) {
+                     debtAmountDisplay.textContent = formatCurrency(amount) + '+';
+                } else {
+                     debtAmountDisplay.textContent = formatCurrency(amount);
+                }
+            });
+        }
+        
+        function updateProgress() {
+            if (!progressBar) return;
+            const progress = (currentStep -1) / totalSteps * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        function checkDebtAmount() {
+            const amount = parseInt(debtSlider.value);
+            if (amount >= 10000) {
+                nextStep(2);
+            } else {
+                disqualify();
+            }
+        }
+
+        function showStep(stepNumber) {
+            const currentStepEl = document.getElementById(`step-${currentStep}`);
+            const nextStepEl = document.getElementById(`step-${stepNumber}`);
+            
+            if(currentStepEl) currentStepEl.classList.add('hidden');
+            if(nextStepEl) nextStepEl.classList.remove('hidden');
+
+            currentStep = stepNumber;
+            updateProgress();
+        }
+
+        function nextStep(stepNumber) {
+            showStep(stepNumber);
+        }
+
+        function showQualificationMessage() {
+            if(progressBar) progressBar.style.width = '100%';
+
+            const currentStepEl = document.getElementById(`step-${currentStep}`);
+            const qualifiedMessageEl = document.getElementById('qualified-message');
+
+            if(currentStepEl) currentStepEl.classList.add('hidden');
+            if(qualifiedMessageEl) qualifiedMessageEl.classList.remove('hidden');
+
+            let seconds = 15;
+            const countdownElement = document.getElementById('countdown');
+            
+            if(countdownElement) {
+                const countdownInterval = setInterval(() => {
+                    seconds--;
+                    countdownElement.textContent = seconds;
+                    
+                    if (seconds <= 0) {
+                        clearInterval(countdownInterval);
+                        window.location.href = 'https://www.curadebt.com';
+                    }
+                }, 1000);
+            }
+        }
+
+        function disqualify() {
+            const step1El = document.getElementById('step-1');
+            const currentStepEl = document.getElementById(`step-${currentStep}`);
+            const disqualifiedMessageEl = document.getElementById('disqualified-message');
+
+            if(step1El) step1El.classList.add('hidden');
+            if(currentStepEl) currentStepEl.classList.add('hidden');
+            if(disqualifiedMessageEl) disqualifiedMessageEl.classList.remove('hidden');
+        }
+
+        // Initial setup
+        if (debtSlider) {
+             updateProgress();
+             debtAmountDisplay.textContent = formatCurrency(debtSlider.value);
+        }
+
+    </script>
+
+</body>
+</html>

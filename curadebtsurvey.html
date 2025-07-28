@@ -73,13 +73,11 @@
             
             <!-- Step 1: Debt Amount -->
             <div id="step-1" class="text-center">
-                <h1 class="text-2xl font-bold mb-2">Free Debt Relief Consultation</h1>
-                <p class="text-lg text-gray-400 mb-8">See if you qualify in under 1 minute.</p>
-                
-                <h2 class="text-xl font-semibold mb-4">Select Amount Of Your Debt</h2>
-                <p id="debt-amount-display" class="text-5xl font-bold text-blue-400 my-8">$15,000</p>
+                <h2 class="text-xl font-semibold text-gray-300 mb-2">Free Debt Relief Consultation. See If You Qualify In 1 Minute.</h2>
+                <h1 class="text-3xl font-bold mb-4">Select Amount Of Credit Card & Personal Loan Debts</h1>
+                <p id="debt-amount-display" class="text-5xl font-bold text-blue-400 my-8">$10,000</p>
                 <div class="px-4">
-                     <input type="range" id="debt-slider" min="1000" max="100000" value="15000" step="1000" class="w-full">
+                     <input type="range" id="debt-slider" min="1000" max="100000" value="10000" step="1000" class="w-full">
                 </div>
                 <div class="mt-12">
                      <button onclick="checkDebtAmount()" class="w-full bg-red-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-red-700 transition duration-300">Continue</button>
@@ -117,7 +115,7 @@
                 <p class="text-lg text-gray-300 mb-4">
                     Based on your answers, we've matched you with <strong>CuraDebt</strong>, one of the nation's leading debt relief companies. They specialize in negotiating with creditors to lower what you owe on unsecured debts, like credit cards.
                 </p>
-                <p class="text-lg text-gray-400">You will be automatically redirected in <span id="countdown" class="font-bold text-white">30</span> seconds...</p>
+                <p class="text-lg text-gray-400">You will be automatically redirected in <span id="countdown" class="font-bold text-white">15</span> seconds...</p>
                 <div class="mt-6">
                     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
                 </div>
@@ -164,7 +162,7 @@
         
         function checkDebtAmount() {
             const amount = parseInt(debtSlider.value);
-            if (amount >= 15000) {
+            if (amount >= 10000) {
                 nextStep(2);
             } else {
                 disqualify();
@@ -187,7 +185,7 @@
             document.getElementById(`step-${currentStep}`).classList.add('hidden');
             document.getElementById('qualified-message').classList.remove('hidden');
 
-            let seconds = 30;
+            let seconds = 15;
             const countdownElement = document.getElementById('countdown');
             
             const countdownInterval = setInterval(() => {
@@ -202,7 +200,6 @@
         }
 
         function disqualify() {
-            document.getElementById(`step-1`).classList.add('hidden');
             document.getElementById(`step-${currentStep}`).classList.add('hidden');
             document.getElementById('disqualified-message').classList.remove('hidden');
         }
@@ -215,3 +212,4 @@
 
 </body>
 </html>
+

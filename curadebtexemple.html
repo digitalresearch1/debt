@@ -76,37 +76,37 @@
         <main>
             <!-- Hero Section with Estimator -->
             <section id="estimator" class="bg-white py-16 md:py-24">
-                <div class="container mx-auto px-6">
-                    <div class="grid md:grid-cols-2 gap-12 items-center">
-                        <!-- Left Column: Text and Form -->
-                        <div class="text-center md:text-left">
-                            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">See Your Potential Savings In Under 60 Seconds</h2>
-                            <p class="mt-4 text-lg text-gray-600">Our free, no-obligation estimator can show you how much you could save with a personalized debt relief program.</p>
-                            <div class="mt-8 max-w-lg mx-auto md:mx-0 bg-gray-100 rounded-2xl shadow-lg p-8">
-                                <label for="debt-slider" class="text-xl font-semibold text-gray-700">Select Your Total Debt Amount</label>
-                                <p id="debt-amount-display" class="text-6xl font-bold text-blue-600 my-4">$25,000</p>
-                                <input type="range" id="debt-slider" min="5000" max="100000" value="25000" step="1000" class="w-full slider-thumb">
-                                <div class="flex justify-between text-sm text-gray-500 mt-2 px-2">
-                                    <span>$5,000</span>
-                                    <span>$100,000+</span>
-                                </div>
-                                <form id="lead-form" class="mt-8">
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                                        <input type="text" id="first-name" placeholder="First Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
-                                        <input type="text" id="last-name" placeholder="Last Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
-                                    </div>
-                                    <input type="email" id="email" placeholder="Email Address" required class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-blue-500 transition">
-                                    <input type="tel" id="phone" placeholder="Phone Number" required class="w-full p-3 border border-gray-300 rounded-md mb-6 focus:ring-2 focus:ring-blue-500 transition">
-                                    <button type="submit" class="w-full bg-red-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105">
-                                        See My Savings Estimate →
-                                    </button>
-                                </form>
+                <div class="container mx-auto px-6 text-center">
+                    <div class="max-w-3xl mx-auto">
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">See Your Potential Savings In Under 60 Seconds</h2>
+                        <p class="mt-4 text-lg text-gray-600">Our free, no-obligation estimator can show you how much you could save with a personalized debt relief program. Take the first step towards financial freedom today.</p>
+                    </div>
+
+                    <div class="mt-12 max-w-2xl mx-auto bg-gray-100 rounded-2xl shadow-lg p-8">
+                        <label for="debt-slider" class="text-xl font-semibold text-gray-700">Select Your Total Debt Amount</label>
+                        <p id="debt-amount-display" class="text-6xl font-bold text-blue-600 my-4">$25,000</p>
+                        <input type="range" id="debt-slider" min="5000" max="100000" value="25000" step="1000" class="w-full slider-thumb">
+                        <div class="flex justify-between text-sm text-gray-500 mt-2 px-2">
+                            <span>$5,000</span>
+                            <span>$100,000+</span>
+                        </div>
+                        
+                        <form id="lead-form" class="mt-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <input type="text" id="first-name" placeholder="First Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
+                                <input type="text" id="last-name" placeholder="Last Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
                             </div>
-                        </div>
-                        <!-- Right Column: Image -->
-                        <div class="hidden md:block">
-                            <img src="https://placehold.co/600x700/e0f2fe/3b82f6?text=Financial+Freedom" alt="A person feeling relieved and happy about their financial future" class="rounded-2xl shadow-xl w-full h-auto object-cover">
-                        </div>
+                            <input type="email" id="email" placeholder="Email Address" required class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-blue-500 transition">
+                             <select id="state" name="state" required class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-blue-500 transition bg-white">
+                                <option value="" disabled selected>Select Your State</option>
+                                <!-- States will be populated by JavaScript -->
+                            </select>
+                            <input type="tel" id="phone" placeholder="Phone Number" required class="w-full p-3 border border-gray-300 rounded-md mb-6 focus:ring-2 focus:ring-blue-500 transition">
+                            <button type="submit" class="w-full bg-red-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105">
+                                See My Savings Estimate →
+                            </button>
+                            <div id="form-error" class="text-red-600 font-semibold mt-4 text-center hidden"></div>
+                        </form>
                     </div>
                 </div>
             </section>
@@ -246,12 +246,22 @@
         const debtAmountDisplay = document.getElementById('debt-amount-display');
         const chatWindow = document.getElementById('chat-window');
         const chatInputArea = document.getElementById('chat-input-area');
+        const stateSelect = document.getElementById('state');
+        const formError = document.getElementById('form-error');
 
         let userDetails = {};
         const excludedStates = ['NH', 'MI', 'MN', 'CO', 'VA', 'IA', 'WA', 'PA', 'IL', 'KS', 'OR', 'TN', 'UT', 'VI', 'WV', 'RI'];
-
+        const allStates = [ "AK", "AL", "AR", "AS", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "GU", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "PR", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VI", "VT", "WA", "WI", "WV", "WY"];
 
         // --- Initializer Functions ---
+
+        // Populate state dropdown
+        allStates.forEach(state => {
+            const option = document.createElement('option');
+            option.value = state;
+            option.textContent = state;
+            stateSelect.appendChild(option);
+        });
 
         // Function to format currency
         const formatCurrency = (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amount);
@@ -268,12 +278,32 @@
         // Handle form submission to transition to chatbot
         leadForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            formError.classList.add('hidden'); // Hide error on new submission
+
+            const debtAmount = parseInt(debtSlider.value);
+            const selectedState = stateSelect.value;
+
+            // Validation Check
+            if (debtAmount < 10000) {
+                formError.textContent = 'Minimum debt of $10,000 is required to qualify.';
+                formError.classList.remove('hidden');
+                return;
+            }
+
+            if (excludedStates.includes(selectedState)) {
+                formError.textContent = 'Unfortunately, we do not service your state at this time.';
+                formError.classList.remove('hidden');
+                return;
+            }
+
+            // If validation passes, proceed
             userDetails = {
                 firstName: document.getElementById('first-name').value,
                 lastName: document.getElementById('last-name').value,
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
-                debtAmount: debtSlider.value
+                state: selectedState,
+                debtAmount: debtAmount
             };
             
             // Fade out landing page and fade in chatbot
@@ -379,43 +409,44 @@
 
         // --- Chat Flow Logic ---
         function startChat() {
-            setTimeout(() => addMessage(`Hi ${userDetails.firstName}! My name is Chloe, your AI support agent. Thanks for providing your details. I see you have about ${formatCurrency(userDetails.debtAmount)} in debt.`), 500);
-            setTimeout(() => addMessage("I just need to confirm a couple of things to make sure we can help."), 1500);
-            setTimeout(askIncome, 2500);
+            setTimeout(() => addMessage(`Hi ${userDetails.firstName}! My name is Chloe. I've got your form and can see you're dealing with about ${formatCurrency(userDetails.debtAmount)} in debt.`), 500);
+            setTimeout(() => addMessage("I just need to ask a couple more questions to see how we can best help."), 1500);
+            setTimeout(askCurrentPayments, 2500);
         }
 
-        function askIncome() {
-            addMessage("To make sure we find the right program for you, are you currently employed or have a steady source of income?");
+        function askCurrentPayments() {
+            addMessage("Are you currently making payments on your unsecured debts? If not, that's okay too.");
             showOptions([
                 { text: "Yes", action: () => { 
-                    addMessage("That's great! It gives us more options to work with.", 'bot'); 
-                    setTimeout(askState, 1000);
+                    userDetails.makingPayments = true;
+                    setTimeout(askBudget, 1000);
                 }},
                 { text: "No", action: () => { 
-                    addMessage("A steady income is required for this program. We can't proceed at this time, but we wish you the best.", 'bot'); 
-                    chatInputArea.innerHTML = '<p class="text-center text-gray-400">Thank you for your time.</p>';
+                    userDetails.makingPayments = false;
+                    setTimeout(askBudget, 1000);
                 }}
             ]);
         }
 
-        function askState() {
-            addMessage("Just one last thing. To ensure we can service your area, what state do you live in?");
-            showTextInput("Enter your state (e.g., CA)", (state) => {
-                addMessage(state, 'user');
-                const formattedState = state.trim().toUpperCase();
-                if (excludedStates.includes(formattedState)) {
-                    addMessage("I'm sorry, but it looks like we don't currently offer our program in your state. We appreciate your time.", 'bot');
-                    chatInputArea.innerHTML = '<p class="text-center text-gray-400">Thank you for your interest.</p>';
-                } else {
-                    userDetails.state = formattedState;
-                    addMessage("Perfect, we can help in your state!", 'bot');
-                    setTimeout(askToSchedule, 1000);
-                }
-            });
+        function askBudget() {
+            // "Smart" calculation for the monthly payment suggestion
+            const suggestedPayment = Math.max(200, Math.round((userDetails.debtAmount * 0.015) / 50) * 50); // Calculate 1.5%, round to nearest $50, min $200.
+
+            addMessage(`Okay, thank you. Assuming you had no other payments towards your debt or cards, would you be able to allocate about ${formatCurrency(suggestedPayment)} per month in your budget to resolve your debt?`);
+             showOptions([
+                { text: "Yes", action: () => { 
+                    addMessage("I understand and we should be able to help. It looks like you may qualify for a few options.", 'bot'); 
+                    setTimeout(askToSchedule, 1500);
+                }},
+                { text: "No", action: () => { 
+                    addMessage("I understand. Based on that, it doesn't look like our program is the right fit at this time. We wish you the best.", 'bot'); 
+                    chatInputArea.innerHTML = '<p class="text-center text-gray-400">Thank you for your time.</p>';
+                }}
+            ]);
         }
         
         function askToSchedule() {
-            addMessage("I can also answer any questions you might have about debt relief. Or, are you ready to schedule your free callback with a specialist?");
+            addMessage("We can schedule a callback from one of our specialists, or I can answer any questions you might have first. What would you like to do?");
             showOptions([
                 { text: "Schedule Callback", action: askPhoneConfirmation },
                 { text: "I have a question", action: askQuestion }
@@ -474,3 +505,4 @@
 
 </body>
 </html>
+

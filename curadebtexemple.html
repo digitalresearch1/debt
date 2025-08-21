@@ -78,17 +78,36 @@
             <section id="estimator" class="bg-white py-16 md:py-24">
                 <div class="container mx-auto px-6 text-center">
                     <div class="max-w-3xl mx-auto">
-                        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">See Your Potential Savings In Under 60 Seconds</h2>
-                        <p class="mt-4 text-lg text-gray-600">Our free, no-obligation estimator can show you how much you could save with a personalized debt relief program. Take the first step towards financial freedom today.</p>
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">Free Debt Relief Consultation. See If You Qualify In 1 Minute.</h2>
+                        <p class="mt-4 text-lg text-gray-600">Take the first step towards financial freedom today.</p>
                     </div>
 
                     <div class="mt-12 max-w-2xl mx-auto bg-gray-100 rounded-2xl shadow-lg p-8">
-                        <label for="debt-slider" class="text-xl font-semibold text-gray-700">Select Your Total Debt Amount</label>
+                        <label for="debt-slider" class="text-xl font-semibold text-gray-700">Select Amount Of Credit Card & Personal Loan Debts</label>
                         <p id="debt-amount-display" class="text-6xl font-bold text-blue-600 my-4">$25,000</p>
                         <input type="range" id="debt-slider" min="5000" max="100000" value="25000" step="1000" class="w-full slider-thumb">
                         <div class="flex justify-between text-sm text-gray-500 mt-2 px-2">
                             <span>$5,000</span>
                             <span>$100,000+</span>
+                        </div>
+                        
+                        <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
+                            <label class="flex items-center space-x-2 text-gray-700">
+                                <input type="checkbox" class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span>Credit Cards</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-gray-700">
+                                <input type="checkbox" class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span>Personal Loans</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-gray-700">
+                                <input type="checkbox" class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span>Medical Debt</span>
+                            </label>
+                             <label class="flex items-center space-x-2 text-gray-700">
+                                <input type="checkbox" class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span>Non-Federal Student Loans</span>
+                            </label>
                         </div>
                         
                         <form id="lead-form" class="mt-8">
@@ -505,4 +524,3 @@
 
 </body>
 </html>
-

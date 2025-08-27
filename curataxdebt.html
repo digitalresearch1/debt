@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Relief Solutions - Your Path to IRS Debt Freedom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles from the original code for consistency */
+        body { font-family: 'Inter', sans-serif; }
+        .slider-thumb {
+            -webkit-appearance: none;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #2563eb; /* blue-600 */
+            cursor: pointer;
+            margin-top: -10px;
+            border: 4px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 8px;
+            background: #e5e7eb; /* gray-200 */
+            border-radius: 9999px;
+        }
+        .chat-bubble {
+            animation: pop-in 0.3s ease-out;
+            word-wrap: break-word;
+        }
+        @keyframes pop-in {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Added for smooth transitions */
+        .fade-out {
+            animation: fade-out 0.5s forwards;
+        }
+        .fade-in {
+            animation: fade-in 0.5s forwards;
+        }
+        @keyframes fade-out {
+            from { opacity: 1; }
+            to { opacity: 0; visibility: hidden; }
+        }
+        @keyframes fade-in {
+            from { opacity: 0; visibility: visible; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Landing Page Section -->
+    <div id="landing-page">
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-blue-700">TaxRelief Solutions</h1>
+                <a href="#estimator" class="hidden md:inline-block bg-blue-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-blue-700 transition duration-300">Get a Free Consultation</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Hero Section with Estimator -->
+            <section id="estimator" class="bg-white py-16 md:py-24">
+                <div class="container mx-auto px-6 text-center">
+                    <div class="max-w-3xl mx-auto">
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">Free Tax Debt Consultation. See If You Qualify In 1 Minute.</h2>
+                        <p class="mt-4 text-lg text-gray-600">Owe the IRS? Take the first step towards resolving your tax debt today.</p>
+                    </div>
+
+                    <div class="mt-12 max-w-2xl mx-auto bg-gray-100 rounded-2xl shadow-lg p-8">
+                        <label for="debt-slider" class="text-xl font-semibold text-gray-700">Select Your Total Tax Debt Amount</label>
+                        <p id="debt-amount-display" class="text-6xl font-bold text-blue-600 my-4">$25,000</p>
+                        <input type="range" id="debt-slider" min="5000" max="100000" value="25000" step="1000" class="w-full slider-thumb">
+                        <div class="flex justify-between text-sm text-gray-500 mt-2 px-2">
+                            <span>$5,000</span>
+                            <span>$100,000+</span>
+                        </div>
+                        
+                        <form id="lead-form" class="mt-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <input type="text" id="first-name" placeholder="First Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
+                                <input type="text" id="last-name" placeholder="Last Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
+                            </div>
+                            <input type="email" id="email" placeholder="Email Address" required class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-blue-500 transition">
+                             <select id="state" name="state" required class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-blue-500 transition bg-white">
+                                <option value="" disabled selected>Select Your State</option>
+                                <!-- States will be populated by JavaScript -->
+                            </select>
+                            <input type="tel" id="phone" placeholder="Phone Number" required class="w-full p-3 border border-gray-300 rounded-md mb-6 focus:ring-2 focus:ring-blue-500 transition">
+                            <button type="submit" class="w-full bg-red-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105">
+                                Get My Free Consultation →
+                            </button>
+                            <div id="form-error" class="text-red-600 font-semibold mt-4 text-center hidden"></div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works Section -->
+            <section class="py-16 md:py-24 bg-gray-50">
+                <div class="container mx-auto px-6">
+                    <div class="text-center max-w-2xl mx-auto">
+                        <h2 class="text-3xl font-bold">Your Simple Path to Tax Relief</h2>
+                        <p class="text-gray-600 mt-4">We've simplified the process into three easy steps. Our team of tax professionals is here to guide you.</p>
+                    </div>
+                    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                        <!-- Step 1 -->
+                        <div class="p-8 bg-white rounded-lg shadow-md">
+                            <div class="bg-blue-100 text-blue-600 rounded-full h-20 w-20 flex items-center justify-center mx-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                            </div>
+                            <h3 class="text-xl font-semibold mt-6">Free Consultation</h3>
+                            <p class="text-gray-600 mt-2">Tell us about your tax situation. We'll help you understand your options with the IRS.</p>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="p-8 bg-white rounded-lg shadow-md">
+                             <div class="bg-blue-100 text-blue-600 rounded-full h-20 w-20 flex items-center justify-center mx-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            </div>
+                            <h3 class="text-xl font-semibold mt-6">Personalized Plan</h3>
+                            <p class="text-gray-600 mt-2">We'll craft a customized tax resolution strategy to help you get the best possible outcome.</p>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="p-8 bg-white rounded-lg shadow-md">
+                             <div class="bg-blue-100 text-blue-600 rounded-full h-20 w-20 flex items-center justify-center mx-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>
+                            </div>
+                            <h3 class="text-xl font-semibold mt-6">Resolve Your Debt</h3>
+                            <p class="text-gray-600 mt-2">Execute your plan with our support and start your journey towards a life free from tax debt stress.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials Section -->
+            <section class="py-16 md:py-24 bg-white">
+                <div class="container mx-auto px-6">
+                    <div class="text-center max-w-2xl mx-auto">
+                        <h2 class="text-3xl font-bold">What Our Clients Say</h2>
+                        <p class="text-gray-600 mt-4">Thousands of people have trusted us to help them with their IRS problems.</p>
+                    </div>
+                    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                         <!-- Testimonial 1 -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <div class="text-yellow-400 mb-4">★★★★★</div>
+                            <p class="text-gray-700 italic">"I had years of unfiled taxes and was terrified. TaxRelief Solutions helped me get compliant and settled my debt for way less than I expected. A huge weight off my shoulders!"</p>
+                            <div class="flex items-center mt-4">
+                                <img src="https://placehold.co/40x40/d1d5db/374151?text=DJ" class="w-10 h-10 rounded-full mr-3" alt="Profile picture of David J.">
+                                <p class="font-semibold">- David J., Arizona</p>
+                            </div>
+                        </div>
+                         <!-- Testimonial 2 -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <div class="text-yellow-400 mb-4">★★★★★</div>
+                            <p class="text-gray-700 italic">"The IRS was garnishing my wages. This team acted fast and got the garnishment lifted while they negotiated a payment plan I could afford. So grateful!"</p>
+                            <div class="flex items-center mt-4">
+                                <img src="https://placehold.co/40x40/d1d5db/374151?text=LW" class="w-10 h-10 rounded-full mr-3" alt="Profile picture of Lisa W.">
+                                <p class="font-semibold">- Lisa W., Georgia</p>
+                            </div>
+                        </div>
+                         <!-- Testimonial 3 -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <div class="text-yellow-400 mb-4">★★★★★</div>
+                            <p class="text-gray-700 italic">"Dealing with the IRS is a nightmare. These guys handled everything for me. Professional, knowledgeable, and worth every penny."</p>
+                            <div class="flex items-center mt-4">
+                                <img src="https://placehold.co/40x40/d1d5db/374151?text=MT" class="w-10 h-10 rounded-full mr-3" alt="Profile picture of Mark T.">
+                                <p class="font-semibold">- Mark T., Ohio</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ Section -->
+            <section class="py-16 md:py-24 bg-gray-50">
+                <div class="container mx-auto px-6 max-w-3xl">
+                    <h2 class="text-3xl font-bold text-center mb-10">Frequently Asked Questions</h2>
+                    <div class="space-y-4">
+                        <div class="bg-white p-5 rounded-lg shadow-sm">
+                            <h3 class="font-semibold">What kind of tax problems can you help with?</h3>
+                            <p class="text-gray-600 mt-2">We can help with a wide range of IRS and state tax issues, including unfiled tax returns, back taxes, wage garnishments, bank levies, and more.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg shadow-sm">
+                            <h3 class="font-semibold">How much does this service cost?</h3>
+                            <p class="text-gray-600 mt-2">The cost varies depending on the complexity of your case. We offer a free initial consultation to assess your situation and provide a clear, flat-fee quote with no hidden charges.</p>
+                        </div>
+                         <div class="bg-white p-5 rounded-lg shadow-sm">
+                            <h3 class="font-semibold">How long does it take to resolve a tax debt issue?</h3>
+                            <p class="text-gray-600 mt-2">The timeline depends on your specific situation and the IRS's current processing times. Some issues can be resolved in a few months, while more complex cases can take longer. We work to resolve your case as quickly as possible.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-gray-800 text-white">
+            <div class="container mx-auto px-6 py-8 text-center">
+                <p>&copy; 2024 TaxRelief Solutions. All Rights Reserved.</p>
+                <div class="mt-4">
+                    <a href="#" class="text-gray-400 hover:text-white mx-2">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white mx-2">Terms of Service</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Chatbot Section -->
+    <div id="chatbot-section" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-900 flex flex-col w-full max-w-lg h-full md:h-auto md:max-h-[90vh] rounded-lg shadow-2xl">
+            <header class="bg-gray-800 p-4 text-white text-center shadow-md flex items-center justify-center rounded-t-lg">
+                <div class="w-3 h-3 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                <h2 class="text-xl font-bold">Chloe | Tax Support Agent</h2>
+            </header>
+
+            <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4">
+                <!-- Chat messages will be appended here -->
+            </div>
+
+            <footer id="chat-input-area" class="p-4 bg-gray-800 border-t border-gray-700 rounded-b-lg">
+                <!-- Chat inputs will be appended here -->
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // --- Element Selectors ---
+        const landingPage = document.getElementById('landing-page');
+        const chatbotSection = document.getElementById('chatbot-section');
+        const leadForm = document.getElementById('lead-form');
+        const debtSlider = document.getElementById('debt-slider');
+        const debtAmountDisplay = document.getElementById('debt-amount-display');
+        const chatWindow = document.getElementById('chat-window');
+        const chatInputArea = document.getElementById('chat-input-area');
+        const stateSelect = document.getElementById('state');
+        const formError = document.getElementById('form-error');
+
+        let userDetails = {};
+        const excludedStates = ['NH', 'MI', 'MN', 'CO', 'VA', 'IA', 'WA', 'PA', 'IL', 'KS', 'OR', 'TN', 'UT', 'VI', 'WV', 'RI'];
+        const allStates = [ "AK", "AL", "AR", "AS", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "GU", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "PR", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VI", "VT", "WA", "WI", "WV", "WY"];
+
+        // --- Initializer Functions ---
+
+        // Populate state dropdown
+        allStates.forEach(state => {
+            const option = document.createElement('option');
+            option.value = state;
+            option.textContent = state;
+            stateSelect.appendChild(option);
+        });
+
+        // Function to format currency
+        const formatCurrency = (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amount);
+
+        // Update slider display value on input
+        debtSlider.addEventListener('input', () => {
+            const amount = parseInt(debtSlider.value);
+            debtAmountDisplay.textContent = amount >= 100000 ? `${formatCurrency(amount)}+` : formatCurrency(amount);
+        });
+        
+        // Set initial display value for the slider
+        debtAmountDisplay.textContent = formatCurrency(debtSlider.value);
+
+        // Handle form submission to transition to chatbot
+        leadForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            formError.classList.add('hidden'); // Hide error on new submission
+
+            const debtAmount = parseInt(debtSlider.value);
+            const selectedState = stateSelect.value;
+
+            // Validation Check
+            if (debtAmount < 10000) {
+                formError.textContent = 'Minimum tax debt of $10,000 is required to qualify.';
+                formError.classList.remove('hidden');
+                return;
+            }
+
+            if (excludedStates.includes(selectedState)) {
+                formError.textContent = 'Unfortunately, we do not service your state at this time.';
+                formError.classList.remove('hidden');
+                return;
+            }
+
+            // If validation passes, proceed
+            userDetails = {
+                firstName: document.getElementById('first-name').value,
+                lastName: document.getElementById('last-name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                state: selectedState,
+                debtAmount: debtAmount
+            };
+            
+            // Fade out landing page and fade in chatbot
+            landingPage.classList.add('fade-out');
+            chatbotSection.classList.remove('hidden');
+            chatbotSection.classList.add('fade-in');
+
+            startChat();
+        });
+
+        // --- UI Helper Functions for Chatbot ---
+        function addMessage(message, sender = 'bot', isLoading = false) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `chat-bubble flex items-start gap-3 max-w-xs md:max-w-md ${sender === 'bot' ? 'self-start' : 'self-end flex-row-reverse'}`;
+            
+            let content = '';
+            if (isLoading) {
+                content = `<div class="p-3 rounded-lg bg-blue-600"><div class="loader"></div></div>`;
+            } else {
+                content = `<p class="p-3 rounded-lg ${sender === 'bot' ? 'bg-blue-600 text-white' : 'bg-gray-600 text-white'}">${message}</p>`;
+            }
+            
+            messageEl.innerHTML = content;
+            chatWindow.appendChild(messageEl);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            return messageEl;
+        }
+
+        function showOptions(options) {
+            chatInputArea.innerHTML = ''; // Clear previous options
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'flex flex-wrap justify-center gap-2';
+
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition';
+                button.textContent = option.text;
+                button.onclick = () => {
+                    addMessage(option.text, 'user');
+                    option.action();
+                };
+                optionsContainer.appendChild(button);
+            });
+            chatInputArea.appendChild(optionsContainer);
+        }
+        
+        function showTextInput(placeholder, onSend) {
+            chatInputArea.innerHTML = `
+                <div class="flex gap-2">
+                    <input type="text" id="user-input-field" class="flex-1 bg-gray-700 text-white p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="${placeholder}">
+                    <button id="send-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Send</button>
+                </div>
+            `;
+            const inputField = document.getElementById('user-input-field');
+            const sendBtn = document.getElementById('send-btn');
+
+            const submitHandler = () => {
+                const value = inputField.value.trim();
+                if (value) {
+                    onSend(value);
+                }
+            };
+            
+            sendBtn.onclick = submitHandler;
+            inputField.onkeydown = (e) => {
+                if (e.key === 'Enter') submitHandler();
+            };
+            inputField.focus();
+        }
+
+        // --- Gemini API Integration ---
+        async function getGeminiAnswer(question) {
+            addMessage(question, 'user');
+            const loadingBubble = addMessage('', 'bot', true);
+            const prompt = `You are a helpful tax relief assistant named Chloe. Answer the following user question about tax debt concisely and clearly, in 1-2 friendly sentences. User question: "${question}"`;
+            
+            try {
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // API key is handled by the environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates[0].content.parts[0].text) {
+                    const answer = result.candidates[0].content.parts[0].text;
+                    loadingBubble.innerHTML = `<p class="p-3 rounded-lg bg-blue-600 text-white">${answer}</p>`;
+                } else {
+                    throw new Error("Invalid response structure from API.");
+                }
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                loadingBubble.innerHTML = `<p class="p-3 rounded-lg bg-red-500 text-white">I'm having trouble connecting right now. Let's continue with scheduling.</p>`;
+            } finally {
+                setTimeout(askToSchedule, 1500);
+            }
+        }
+
+        // --- Chat Flow Logic ---
+        function startChat() {
+            setTimeout(() => addMessage(`Hi ${userDetails.firstName}! My name is Chloe. I've received your information and see you're dealing with about ${formatCurrency(userDetails.debtAmount)} in tax debt.`), 500);
+            setTimeout(() => addMessage("I just need to ask a couple more questions to confirm we can help you."), 1500);
+            setTimeout(askTaxType, 2500);
+        }
+
+        function askTaxType() {
+            addMessage("Is your tax debt with the IRS, a state, or both?");
+            showOptions([
+                { text: "IRS", action: () => { setTimeout(askToSchedule, 1000); }},
+                { text: "State", action: () => { setTimeout(askToSchedule, 1000); }},
+                { text: "Both", action: () => { setTimeout(askToSchedule, 1000); }}
+            ]);
+        }
+        
+        function askToSchedule() {
+            addMessage("Thank you. It looks like we can help. We can schedule a callback from one of our tax specialists, or I can answer any questions you might have first. What would you like to do?");
+            showOptions([
+                { text: "Schedule Callback", action: askPhoneConfirmation },
+                { text: "I have a question", action: askQuestion }
+            ]);
+        }
+
+        function askQuestion() {
+            addMessage("What's your question about tax debt?");
+            showTextInput("Type your question here...", getGeminiAnswer);
+        }
+
+        function askPhoneConfirmation() {
+            addMessage(`Perfect. Just to confirm, is ${userDetails.phone} the best number to reach you at for your free consultation?`);
+            showOptions([
+                { text: "Yes, that's right", action: scheduleDay },
+                { text: "No, use a different number", action: askForNewNumber }
+            ]);
+        }
+        
+        function askForNewNumber() {
+            addMessage("No problem. What's the best number to use?");
+            showTextInput("Enter new phone number...", (newNumber) => {
+                addMessage(newNumber, 'user');
+                userDetails.phone = newNumber;
+                addMessage(`Got it. We'll use ${newNumber}.`, 'bot');
+                setTimeout(scheduleDay, 500);
+            });
+        }
+
+        function scheduleDay() {
+            addMessage("Great! Our specialists are available Monday through Friday. What day works best for your callback?");
+            showOptions([
+                { text: "Next available weekday", action: () => askTime("the next available weekday") },
+                { text: "Later this week", action: () => askTime("later this week") },
+                { text: "Next week", action: () => askTime("next week") }
+            ]);
+        }
+
+        function askTime(day) {
+            userDetails.callbackDay = day;
+            addMessage(`Excellent. For your callback ${day}, what time of day is best? Our hours are 9am-6pm EST.`);
+            showOptions([
+                { text: "Morning (9am-12pm EST)", action: () => confirmCallback("Morning (9am-12pm EST)") },
+                { text: "Afternoon (12pm-3pm EST)", action: () => confirmCallback("Afternoon (12pm-3pm EST)") },
+                { text: "Late Afternoon (3pm-6pm EST)", action: () => confirmCallback("Late Afternoon (3pm-6pm EST)") }
+            ]);
+        }
+
+        function confirmCallback(time) {
+            userDetails.callbackTime = time;
+            addMessage(`All set! We've scheduled your free, no-obligation callback for ${userDetails.callbackDay} in the ${userDetails.callbackTime}.`);
+            setTimeout(() => addMessage("A tax relief specialist will call you from the number you provided. Thanks for using our service!"), 1500);
+            chatInputArea.innerHTML = '<p class="text-center text-gray-400">You may now close this window.</p>';
+        }
+    </script>
+
+</body>
+</html>

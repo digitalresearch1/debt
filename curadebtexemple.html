@@ -243,10 +243,25 @@
       const formatCurrency = (amount) =>
         new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amount);
 
-      function getClickId() {
+      function getTrackingIds() {
         const p = new URLSearchParams(location.search);
-        // **FIXED**: Now checks for data1 and data2 as well.
-        return p.get('data1') || p.get('data2') || p.get('click_id') || p.get('fbclid') || p.get('gclid') || p.get('msclkid') || 'no_click_id';
+
+        // Prefer explicit data1/data2 if present
+        const d1 =
+          p.get('data1') ||
+          p.get('click_id') || p.get('gclid') || p.get('fbclid') || p.get('msclkid') ||
+          '';
+
+        const d2 =
+          p.get('data2') ||
+          // if data2 is absent, fall back to d1 (some networks only pass one id)
+          (p.get('data1') ? '' : (p.get('click_id') || p.get('gclid') || p.get('fbclid') || p.get('msclkid') || '')) ||
+          '';
+
+        return {
+          data1: d1 || 'no_click_id',
+          data2: d2 || 'no_click_id'
+        };
       }
 
       function digitsOnly(s) {
@@ -310,9 +325,9 @@
         await ipPromise;
         
         // Populate hidden fields (IP / click IDs)
-        const cid = getClickId();
-        data1Hidden.value = cid;
-        data2Hidden.value = cid;
+        const { data1, data2 } = getTrackingIds();
+        data1Hidden.value = data1;
+        data2Hidden.value = data2;
         ipHidden.value = clientIp || '';
 
         // Sanitize phone to digits only

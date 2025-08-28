@@ -279,6 +279,9 @@
 
       // ----- SUBMIT HANDLER -----
       leadForm.addEventListener('submit', async (e) => {
+        // ALWAYS prevent default to take control
+        e.preventDefault();
+
         formError.classList.add('hidden');
         submitButton.disabled = true;
         submitButton.textContent = 'Submitting...';
@@ -288,7 +291,6 @@
 
         // Validate debt + state
         if (debtAmount < 10000) {
-          e.preventDefault();
           formError.textContent = 'Minimum debt of $10,000 is required to qualify.';
           formError.classList.remove('hidden');
           submitButton.disabled = false;
@@ -296,7 +298,6 @@
           return;
         }
         if (excludedStates.includes(selectedState)) {
-          e.preventDefault();
           formError.textContent = 'Unfortunately, we do not service your state at this time.';
           formError.classList.remove('hidden');
           submitButton.disabled = false;
@@ -304,25 +305,9 @@
           return;
         }
 
-        // Ensure IP is ready (required by CuraDebt); wait up to ~1s
-        if (clientIp === null) {
-          e.preventDefault();
-          try { await Promise.race([ipPromise, new Promise(res => setTimeout(res, 1000))]); }
-          catch {}
-          // After wait, set and resubmit programmatically
-          const cid = getClickId();
-          data1Hidden.value = cid;
-          data2Hidden.value = cid;
-          ipHidden.value = clientIp || '';
-
-          // sanitize phone to digits only (safer for CRMs)
-          phoneInput.value = digitsOnly(phoneInput.value);
-
-          // submit programmatically
-          leadForm.submit();
-          return;
-        }
-
+        // Wait for the IP address to be fetched before proceeding
+        await ipPromise;
+        
         // Populate hidden fields (IP / click IDs)
         const cid = getClickId();
         data1Hidden.value = cid;
@@ -332,8 +317,8 @@
         // Sanitize phone to digits only
         phoneInput.value = digitsOnly(phoneInput.value);
 
-        // IMPORTANT: do NOT preventDefault now → let the browser POST the form
-        // The request will be application/x-www-form-urlencoded with CuraDebt field names.
+        // Programmatically submit the form now that all data is ready
+        leadForm.submit();
       });
     </script>
 </body>

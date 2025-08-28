@@ -245,7 +245,8 @@
 
       function getClickId() {
         const p = new URLSearchParams(location.search);
-        return p.get('click_id') || p.get('fbclid') || p.get('gclid') || p.get('msclkid') || 'no_click_id';
+        // **FIXED**: Now checks for data1 and data2 as well.
+        return p.get('data1') || p.get('data2') || p.get('click_id') || p.get('fbclid') || p.get('gclid') || p.get('msclkid') || 'no_click_id';
       }
 
       function digitsOnly(s) {
@@ -323,3 +324,4 @@
     </script>
 </body>
 </html>
+

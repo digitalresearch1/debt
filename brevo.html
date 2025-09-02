@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debt Relief Study - Final Feedback</title>
+    <style>
+        /* This is a basic reset and font import. The main styles are now inline. */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem;">
+
+    <div style="width: 100%; max-width: 42rem; margin-left: auto; margin-right: auto; background-color: #ffffff; border-radius: 1rem; padding: 1.5rem; md:padding: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h1 style="font-size: 1.875rem; font-weight: 700; color: #1f2937;">Final Feedback</h1>
+            <p style="margin-top: 0.5rem; color: #4b5563;">Thank you for helping us with our research. Please answer the following questions about your call with the debt specialist.</p>
+        </div>
+
+        <form id="sib-form" method="POST" action="https://52bcaf92.sibforms.com/serve/MUIFABfVum1wLO3h-Ub9sgYBnGinwlitWUfg0FlFymSvz4ld-hoOdLEjqPF0cbvtYZa-sAQyagyMBYIlfi-5R3BMWppSPFJO_9lWsYzhW9nuv8DP1ErikkKllMNzzEoQba5f27T22I_0--oDq1FPdtbpgcFc_JtV6c1vi0b24g8btdknz26TihKyEOU6wmyaMEwpB2M5wCTlVfFf" style="space-y: 2rem;">
+            
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem;">1. Did you receive a call from a CuraDebt specialist as expected?</label>
+                <div style="display: flex; gap: 1rem;">
+                    <label style="display: flex; align-items: center; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; flex: 1; cursor: pointer;">
+                        <input type="radio" name="YES_NO" value="YES" style="height: 1.25rem; width: 1.25rem;" required>
+                        <span style="margin-left: 0.75rem; color: #374151;">Yes</span>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; flex: 1; cursor: pointer;">
+                        <input type="radio" name="YES_NO" value="NO" style="height: 1.25rem; width: 1.25rem;">
+                        <span style="margin-left: 0.75rem; color: #374151;">No</span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem; text-align: center;">2. How would you rate the helpfulness of the specialist?</label>
+                <div style="text-align: center;">
+                    <!-- Star rating logic would require JavaScript which might not be supported. This is a visual representation. -->
+                    <p style="font-size: 2.5rem; color: #d1d5db;">★★★★★</p>
+                    <input type="hidden" name="RATING" value=""> <!-- You can use JS to populate this or use a simple number input -->
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 2rem;">
+                <label for="DESCRIPTION" style="display: block; font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem;">3. Please share any other details about your experience. (What was helpful? What could be improved?)</label>
+                <textarea id="DESCRIPTION" name="DESCRIPTION" rows="5" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;" placeholder="Your feedback is the most important part..." required></textarea>
+            </div>
+            
+            <input type="text" name="email_address_check" value="" style="display:none;">
+            <input type="hidden" name="locale" value="en">
+            <input type="hidden" id="EMAIL" name="EMAIL" value="participant@feedback.com">
+
+            <div style="text-align: center; padding-top: 1rem;">
+                <button type="submit" style="width: 100%; max-width: 20rem; background-color: #4f46e5; color: #ffffff; font-weight: 700; padding: 0.75rem 2.5rem; border-radius: 0.5rem; transition: background-color 0.2s;">
+                    Submit Feedback & Complete Study
+                </button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
+

@@ -80,46 +80,30 @@
 
       const [, area, prefix, line] = m;
 
-      // Disallow N11 (211,311,…,911) in area or prefix
       const isN11 = (s) => /^[2-9]11$/.test(s);
       if (isN11(area) || isN11(prefix)) {
         return { ok: false, error: 'N11 service codes are not valid phone numbers.' };
       }
 
-      // Allow TOLL-FREE — just tag it
       const TOLL_FREE = new Set(['800','833','844','855','866','877','888','822']);
       const tollFree = TOLL_FREE.has(area);
 
-      // Disallow premium-rate 900
-      if (area === '900') {
-        return { ok: false, error: 'Premium-rate (900) numbers are not accepted.' };
-      }
+      if (area === '900') return { ok: false, error: 'Premium-rate (900) numbers are not accepted.' };
+      if (prefix === '555' && /^01\d{2}$/.test(line)) return { ok: false, error: '555-01xx test numbers are not accepted.' };
 
-      // Disallow test numbers 555-01xx
-      if (prefix === '555' && /^01\d{2}$/.test(line)) {
-        return { ok: false, error: '555-01xx test numbers are not accepted.' };
-      }
-
-      // Disallow obviously fake patterns (all same or straight sequences)
       const ten = area + prefix + line;
-      if (/^(\d)\1{9}$/.test(ten)) {
-        return { ok: false, error: 'Invalid pattern (all digits identical).' };
-      }
+      if (/^(\d)\1{9}$/.test(ten)) return { ok: false, error: 'Invalid pattern (all digits identical).' };
       const seq = '01234567890123456789';
       const rseq = '98765432109876543210';
-      if (seq.includes(ten) || rseq.includes(ten)) {
-        return { ok: false, error: 'Invalid pattern (sequential digits).' };
-      }
+      if (seq.includes(ten) || rseq.includes(ten)) return { ok: false, error: 'Invalid pattern (sequential digits).' };
 
       return { ok: true, e164: `+1${area}${prefix}${line}`, meta: { area, prefix, line, tollFree } };
     }
 
     async function validatePhoneWithSignalWire(raw) {
-      // First: strict client-side NANP checks
       const strict = parseStrictNANP(raw);
       if (!strict.ok) return strict;
 
-      // Then: live lookup via your Worker (SignalWire)
       const r = await fetch(VALIDATE_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -128,25 +112,133 @@
       const j = await r.json().catch(() => ({}));
       if (!j.ok) return { ok: false, error: j.error || 'Validation failed.' };
 
-      // Return Worker result + our strict metadata (including toll-free tag)
       return { ...j, e164: strict.e164, meta: { ...(strict.meta || {}) } };
     }
 
     // === Email Validation (Cloudflare Worker) ===
     const VALIDATE_EMAIL_ENDPOINT = "https://solitary-base-4a8b.kasindeesther.workers.dev/";
 
-    async function validateEmailWithWorker(raw) {
-      const email = String(raw || '').trim().toLowerCase();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
-        return { ok: false, error: 'Enter a valid email address.' };
+    // Tight policy toggles
+    const BLOCK_PLUS_EVERYWHERE = true;       // block '+' aliases for ALL domains
+    const BLOCK_GMAIL_DOT_ALIASES = true;     // block dots in gmail local part
+    const REQUIRE_ALPHA_IN_LOCAL = true;      // local must include letters
+    const MIN_LOCAL_LEN = 3;                  // at least 3 chars in local
+    const MAX_LOCAL_DOTS = 2;                 // max 2 dots in local part
+
+    const ROLE_LOCALS = new Set([
+      'admin','administrator','root','support','help','helpdesk','info','contact','sales',
+      'marketing','billing','accounts','accounting','abuse','postmaster','webmaster',
+      'no-reply','noreply','donotreply','security','compliance','legal','test'
+    ]);
+
+    const FREEMAIL = new Set([
+      'gmail.com','googlemail.com','yahoo.com','ymail.com','rocketmail.com','outlook.com',
+      'hotmail.com','live.com','msn.com','icloud.com','me.com','proton.me','aol.com','mail.com'
+    ]);
+
+    const DOMAIN_TYPO_MAP = {
+      'gamil.com': 'gmail.com', 'gmial.com': 'gmail.com', 'gmai.com': 'gmail.com', 'gmail.con': 'gmail.com',
+      'yahoo.con': 'yahoo.com', 'yhoo.com': 'yahoo.com', 'hotnail.com': 'hotmail.com', 'hotmial.com': 'hotmail.com',
+      'outlok.com': 'outlook.com', 'outllok.com': 'outlook.com', 'icloud,com': 'icloud.com',
+      'protonn.me': 'proton.me'
+    };
+
+    function strictEmailClient(raw) {
+      const email = String(raw || '').trim();
+
+      // Basic shape
+      const at = email.indexOf('@');
+      if (at < 1 || at === email.length - 1) return { ok: false, error: 'Enter a valid email address.' };
+
+      const local = email.slice(0, at);
+      const domain = email.slice(at + 1).toLowerCase();
+
+      // Length limits
+      if (local.length < MIN_LOCAL_LEN || local.length > 64) return { ok: false, error: 'Email local part length is invalid.' };
+      if (domain.length < 4 || domain.length > 255) return { ok: false, error: 'Email domain length is invalid.' };
+
+      // Local rules: allowed chars, no leading/trailing dot, no consecutive dots
+      if (!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\-]{0,62}[A-Za-z0-9])?$/.test(local)) {
+        return { ok: false, error: 'Invalid characters in email.' };
       }
+      if (local.includes('..')) return { ok: false, error: 'Email local part has consecutive dots.' };
+
+      // Tighten: require at least one letter; not numeric-only; limit dots
+      if (REQUIRE_ALPHA_IN_LOCAL && !/[A-Za-z]/.test(local)) return { ok: false, error: 'Email must contain letters (not only numbers).' };
+      if (/^\d+$/.test(local)) return { ok: false, error: 'Email local part cannot be only digits.' };
+      if ((local.match(/\./g) || []).length > MAX_LOCAL_DOTS) return { ok: false, error: 'Too many dots in email local part.' };
+
+      // Domain must contain a dot
+      if (domain.indexOf('.') < 1) return { ok: false, error: 'Email domain must contain a dot.' };
+
+      // Domain labels: allowed chars & lengths; no leading/trailing hyphen; no underscores
+      const labels = domain.split('.');
+      for (const label of labels) {
+        if (label.length < 1 || label.length > 63) return { ok: false, error: 'Email domain label length is invalid.' };
+        if (!/^[A-Za-z0-9-]+$/.test(label)) return { ok: false, error: 'Email domain contains invalid characters.' };
+        if (label.startsWith('-') || label.endsWith('-')) return { ok: false, error: 'Email domain label cannot start/end with a hyphen.' };
+      }
+
+      // TLD checks
+      const tld = labels[labels.length - 1];
+      if (tld.length < 2 || tld.length > 63) return { ok: false, error: 'Email TLD is invalid.' };
+      if (/^\d+$/.test(tld)) return { ok: false, error: 'Email TLD cannot be all digits.' };
+      if (tld === 'con') return { ok: false, error: 'TLD looks mistyped (.con). Did you mean .com?' };
+
+      // Policy: role accounts are blocked
+      const localLower = local.toLowerCase();
+      const role = ROLE_LOCALS.has(localLower);
+
+      // Policy: block plus aliases everywhere
+      const plusAnywhere = local.includes('+');
+
+      // Policy: block Gmail dot aliases
+      const gmailDot = (domain === 'gmail.com' || domain === 'googlemail.com') && local.includes('.');
+
+      // Typo suggestion
+      const suggestion = DOMAIN_TYPO_MAP[domain] || null;
+
+      // Reserved/testing domains
+      if (/(^|\.)example\.com$/.test(domain) || /(^|\.)test(\.local)?$/.test(domain)) {
+        return { ok: false, error: 'Testing domains are not accepted.' };
+      }
+
+      // Info bundle for UI & submit policy
+      return {
+        ok: true,
+        normalized: `${local}@${domain}`,
+        info: {
+          role,
+          plusAnywhere,
+          gmailDot,
+          freemail: FREEMAIL.has(domain),
+          numericOnly: /^\d+$/.test(local)
+        },
+        suggestion
+      };
+    }
+
+    async function validateEmailWithWorker(raw) {
+      const c = strictEmailClient(raw);
+      if (!c.ok) return c;
+
+      // Ask Worker for disposable and (optionally) MX checks if you added them
       const r = await fetch(VALIDATE_EMAIL_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email: c.normalized, want_mx: true })
       });
       const j = await r.json().catch(() => ({}));
-      return j.ok ? j : { ok: false, error: j.error || 'Email validation failed.' };
+      if (!j.ok) return { ok: false, error: j.error || 'Email validation failed.' };
+
+      return {
+        ok: true,
+        normalized: c.normalized,
+        disposable: !!j.disposable,
+        has_mx: typeof j.has_mx === 'boolean' ? j.has_mx : undefined,
+        suggestion: j.suggestion || c.suggestion || null,
+        info: c.info
+      };
     }
 
     // ---- Helpers ----
@@ -254,6 +346,7 @@
           <input type="text" name="f_fname" placeholder="First Name" required>
           <input type="text" name="f_lname" placeholder="Last Name" required>
         </div>
+
         <input type="email" name="f_email" id="f_email" placeholder="Email Address" required>
         <div id="email-hint" class="text-xs mt-1 text-gray-400"></div>
 
@@ -275,7 +368,6 @@
       chatWindow.appendChild(formWrapper);
       chatWindow.scrollTop = chatWindow.scrollHeight;
 
-      // populate states
       const stateSelect = formContainer.querySelector('select[name="f_whereyoulive"]');
       allStates.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; stateSelect.appendChild(o); });
 
@@ -286,7 +378,7 @@
       updateDebt();
       newDebtSlider.addEventListener('input', updateDebt);
 
-      // Email validation UI wiring
+      // Email validation UI
       const emailInput = formContainer.querySelector('#f_email');
       const emailHint  = formContainer.querySelector('#email-hint');
       const runEmailValidationUI = async () => {
@@ -294,19 +386,26 @@
         emailHint.textContent = 'Checking email…';
         const res = await validateEmailWithWorker(emailInput.value);
         if (res.ok) {
-          const dom = String(emailInput.value).trim().toLowerCase().split('@')[1] || '';
-          const suggest = res.suggestion && res.suggestion !== dom ? ` (did you mean @${res.suggestion}?)` : '';
-          emailHint.textContent = `✅ Valid${suggest}`;
-          emailHint.classList.add('text-green-400'); emailHint.classList.remove('text-red-400');
+          let msg = '✅ Valid';
+          if (res.suggestion) msg += ` (did you mean ${emailInput.value.split('@')[0]}@${res.suggestion}?)`;
+          if (res.disposable) msg = '⚠️ Disposable address detected. Please use a personal or work email.';
+          if (res.info?.role) msg = '⚠️ Role account (e.g., info@) is not accepted.';
+          if (res.info?.plusAnywhere) msg = '⚠️ Plus-addressing is not accepted.';
+          if (res.info?.gmailDot) msg = '⚠️ Gmail dot aliases are not accepted.';
+          emailHint.textContent = msg;
+          const warn = res.disposable || res.info?.role || res.info?.plusAnywhere || res.info?.gmailDot;
+          emailHint.classList.toggle('text-green-400', !warn);
+          emailHint.classList.toggle('text-yellow-400', warn);
+          emailHint.classList.remove('text-red-400');
         } else {
           emailHint.textContent = `❌ ${res.error}`;
-          emailHint.classList.add('text-red-400'); emailHint.classList.remove('text-green-400');
+          emailHint.classList.add('text-red-400'); emailHint.classList.remove('text-green-400','text-yellow-400');
         }
       };
       emailInput.addEventListener('blur', runEmailValidationUI);
       emailInput.addEventListener('change', runEmailValidationUI);
 
-      // Phone validation UI wiring
+      // Phone validation UI
       const phoneInput = formContainer.querySelector('#f_phone');
       const phoneHint  = formContainer.querySelector('#phone-hint');
       const runPhoneValidationUI = async () => {
@@ -316,10 +415,10 @@
         if (res.ok) {
           const extra = res?.meta?.tollFree ? ' (toll-free)' : '';
           phoneHint.textContent = `✅ Valid ${res.country} ${res.type}: ${res.e164}${extra}`;
-          phoneHint.classList.add('text-green-400'); phoneHint.classList.remove('text-red-400');
+          phoneHint.classList.add('text-green-400'); phoneHint.classList.remove('text-red-400','text-yellow-400');
         } else {
           phoneHint.textContent = `❌ ${res.error}`;
-          phoneHint.classList.add('text-red-400'); phoneHint.classList.remove('text-green-400');
+          phoneHint.classList.add('text-red-400'); phoneHint.classList.remove('text-green-400','text-yellow-400');
         }
       };
       phoneInput.addEventListener('blur', runPhoneValidationUI);
@@ -378,7 +477,7 @@
         return;
       }
 
-      // >>> Email validation (block submit if invalid)
+      // >>> Email validation (tight policy on submit)
       const emailRaw = form.querySelector('input[name="f_email"]').value || '';
       const emailCheck = await validateEmailWithWorker(emailRaw);
       if (!emailCheck.ok) {
@@ -388,10 +487,30 @@
         submitButton.textContent = 'See If I Qualify';
         return;
       }
-      const normalizedEmail = String(emailRaw).trim().toLowerCase();
-      const emailTypeTag = emailCheck.disposable ? 'disposable' : 'normal';
+      if (emailCheck.disposable) {
+        formError.textContent = 'Disposable email addresses are not accepted. Please use a personal or work email.';
+        formError.classList.remove('hidden'); submitButton.disabled = false; submitButton.textContent = 'See If I Qualify'; return;
+      }
+      if (emailCheck.info?.role) {
+        formError.textContent = 'Role-based emails (e.g., info@, support@) are not accepted. Please use your personal email.';
+        formError.classList.remove('hidden'); submitButton.disabled = false; submitButton.textContent = 'See If I Qualify'; return;
+      }
+      if (emailCheck.info?.plusAnywhere) {
+        formError.textContent = 'Plus-alias emails are not accepted. Please use your base address.';
+        formError.classList.remove('hidden'); submitButton.disabled = false; submitButton.textContent = 'See If I Qualify'; return;
+      }
+      if (emailCheck.info?.gmailDot) {
+        formError.textContent = 'Gmail dot aliases are not accepted. Remove dots from your Gmail username.';
+        formError.classList.remove('hidden'); submitButton.disabled = false; submitButton.textContent = 'See If I Qualify'; return;
+      }
+      const normalizedEmail = emailCheck.normalized;
+      let emailStatusTag = 'normal';
+      if (emailCheck.disposable) emailStatusTag = 'disposable';
+      else if (emailCheck.info?.role) emailStatusTag = 'role';
+      else if (emailCheck.info?.plusAnywhere) emailStatusTag = 'plus';
+      else if (emailCheck.info?.gmailDot) emailStatusTag = 'gmaildot';
 
-      // >>> Phone validation (block submit if invalid)
+      // >>> Phone validation
       const phoneRaw = form.querySelector('input[name="f_phone"]').value || '';
       const phoneCheck = await validatePhoneWithSignalWire(phoneRaw);
       if (!phoneCheck.ok) {
@@ -401,7 +520,7 @@
         submitButton.textContent = 'See If I Qualify';
         return;
       }
-      const normalizedE164 = phoneCheck.e164 || phoneRaw; // e.g. +1XXXXXXXXXX
+      const normalizedE164 = phoneCheck.e164 || phoneRaw;
       const phoneType = phoneCheck.type || 'unknown';
       const isTollFree = !!(phoneCheck.meta && phoneCheck.meta.tollFree);
 
@@ -420,19 +539,16 @@
       hidden.elements['f_fname'].value        = fd.get('f_fname') || '';
       hidden.elements['f_lname'].value        = fd.get('f_lname') || '';
       hidden.elements['f_email'].value        = normalizedEmail;
-      // Use normalized number; strip +1 to keep 10 digits if CuraDebt needs that format
       hidden.elements['f_phone'].value        = normalizedE164.startsWith('+1') ? normalizedE164.replace('+1','') : normalizedE164;
       hidden.elements['f_whereyoulive'].value = fd.get('f_whereyoulive') || '';
       hidden.elements['f_totaldebt'].value    = String(debtAmount);
       hidden.elements['data1'].value          = data1;
-      // Tag comments with phone/email quality for routing
-      hidden.elements['f_comments'].value     = `Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailTypeTag} | toll_free=${isTollFree}`;
+      hidden.elements['f_comments'].value     = `Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree}`;
       hidden.elements['data2'].value          = 'CLICKID2';
       hidden.elements['f_ip'].value           = clientIp;
 
       hidden.submit();
 
-      // advance flow immediately
       form.parentElement.remove();
       addMessage("I've submitted my information.", 'user');
       goToStep('formSuccess');

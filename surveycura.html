@@ -49,7 +49,8 @@
     <input name="f_totaldebt">
     <input name="f_comments" value="Lead from AI Chatbot Survey">
     <input name="data1">
-    <input name="data2">
+    <!-- data2 is FIXED as requested -->
+    <input name="data2" value="CLICKID2">
     <input name="f_ip">
     <!-- Optional fields if required later by CuraDebt -->
     <input name="f_mobilephone">
@@ -68,7 +69,7 @@
     let clientIp = '';
 
     const allStates = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"];
-    // Exclusions confirmed with Eric
+    // Exclusions confirmed
     const excludedStates = ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','RI'];
 
     // ---- Helpers ----
@@ -109,11 +110,10 @@
       chatInputArea.appendChild(container);
     }
 
-    function getTrackingIdsFromUrl() {
+    function getData1FromUrl() {
       const p = new URLSearchParams(location.search);
       const d1 = p.get('data1') || p.get('click_id') || p.get('gclid') || p.get('fbclid') || p.get('msclkid') || '';
-      const d2 = p.get('data2') || p.get('sub_id') || '';
-      return { data1: d1 || 'no_click_id', data2: d2 || '' };
+      return d1 || 'no_click_id';
     }
 
     function digitsOnly(s) { return String(s || '').replace(/\D+/g, ''); }
@@ -184,7 +184,7 @@
           <option value="" disabled selected>Select Your State</option>
         </select>
         <label class="flex items-start gap-2 text-xs text-gray-300">
-          <input type="checkbox" id="tcpa" required class="mt-1"> 
+          <input type="checkbox" id="tcpa" required class="mt-1">
           <span>By clicking, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts). Your consent is not required to purchase. Message/data rates may apply.</span>
         </label>
         <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-lg py-3 rounded-lg transition">See If I Qualify</button>
@@ -259,15 +259,6 @@
         return;
       }
 
-      // OPTIONAL: enforce business hours (commented out)
-      // if (!withinOfficeHoursEST()) {
-      //   formError.textContent = 'Please submit during 9am–6pm EST (Mon–Fri) for fastest contact.';
-      //   formError.classList.remove('hidden');
-      //   submitButton.disabled = false;
-      //   submitButton.textContent = 'See If I Qualify';
-      //   return;
-      // }
-
       // get IP best-effort
       try {
         const r = await fetch('https://api.ipify.org?format=json');
@@ -278,7 +269,7 @@
       // Build and submit hidden POST (CORS-safe)
       const hidden = document.getElementById('hidden-curadebt-post');
       const fd = new FormData(form);
-      const { data1, data2 } = getTrackingIdsFromUrl();
+      const data1 = getData1FromUrl() || transactionId;
 
       hidden.elements['f_fname'].value        = fd.get('f_fname') || '';
       hidden.elements['f_lname'].value        = fd.get('f_lname') || '';
@@ -286,8 +277,9 @@
       hidden.elements['f_phone'].value        = (fd.get('f_phone') || '').replace(/\D+/g,'');
       hidden.elements['f_whereyoulive'].value = fd.get('f_whereyoulive') || '';
       hidden.elements['f_totaldebt'].value    = String(debtAmount);
-      hidden.elements['data1'].value          = data1 || transactionId;
-      hidden.elements['data2'].value          = data2 || transactionId;
+      hidden.elements['data1'].value          = data1;
+      // FIXED data2 per request
+      hidden.elements['data2'].value          = 'CLICKID2';
       hidden.elements['f_ip'].value           = clientIp;
 
       hidden.submit();

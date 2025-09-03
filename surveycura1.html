@@ -94,6 +94,23 @@
       return j.ok ? j : { ok: false, error: j.error || 'Validation failed.' };
     }
 
+    // === Email Validation (Cloudflare Worker) ===
+    const VALIDATE_EMAIL_ENDPOINT = "https://solitary-base-4a8b.kasindeesther.workers.dev/";
+
+    async function validateEmailWithWorker(raw) {
+      const email = String(raw || '').trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+        return { ok: false, error: 'Enter a valid email address.' };
+      }
+      const r = await fetch(VALIDATE_EMAIL_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const j = await r.json().catch(() => ({}));
+      return j.ok ? j : { ok: false, error: j.error || 'Email validation failed.' };
+    }
+
     // ---- Helpers ----
     function addMessage(message, sender = 'bot') {
       const messageEl = document.createElement('div');
@@ -200,10 +217,14 @@
           <input type="text" name="f_fname" placeholder="First Name" required>
           <input type="text" name="f_lname" placeholder="Last Name" required>
         </div>
-        <input type="email" name="f_email" placeholder="Email Address" required>
+        <!-- Updated: add id and hint for email -->
+        <input type="email" name="f_email" id="f_email" placeholder="Email Address" required>
+        <div id="email-hint" class="text-xs mt-1 text-gray-400"></div>
+
         <!-- Updated: add id and hint for phone -->
         <input type="tel" name="f_phone" id="f_phone" placeholder="Phone Number" required>
         <div id="phone-hint" class="text-xs mt-1 text-gray-400"></div>
+
         <select name="f_whereyoulive" required>
           <option value="" disabled selected>Select Your State</option>
         </select>
@@ -226,11 +247,31 @@
       const newDebtSlider = formContainer.querySelector('#debt-slider');
       const newDebtDisplay = formContainer.querySelector('#debt-amount-display');
       const formatCurrency = (amt) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amt);
-      const updateDebt = () => { const v = parseInt(newDebtSlider.value,10); newDebtDisplay.textContent = v >= 100000 ? `${formatCurrency(v)}+` : formatCurrency(v); };
+      const updateDebt = () => { const v = parseInt(newDebtSlider.value,10); newDebtDisplay.textContent = v >= 100000 ? `${formatCurrency(v)}+` : `${formatCurrency(v)}`; };
       updateDebt();
       newDebtSlider.addEventListener('input', updateDebt);
 
-      // Phone validation UI wiring (field added dynamically)
+      // Email validation UI wiring
+      const emailInput = formContainer.querySelector('#f_email');
+      const emailHint  = formContainer.querySelector('#email-hint');
+      const runEmailValidationUI = async () => {
+        if (!emailInput || !emailHint) return;
+        emailHint.textContent = 'Checking email…';
+        const res = await validateEmailWithWorker(emailInput.value);
+        if (res.ok) {
+          const dom = String(emailInput.value).trim().toLowerCase().split('@')[1] || '';
+          const suggest = res.suggestion && res.suggestion !== dom ? ` (did you mean @${res.suggestion}?)` : '';
+          emailHint.textContent = `✅ Valid${suggest}`;
+          emailHint.classList.add('text-green-400'); emailHint.classList.remove('text-red-400');
+        } else {
+          emailHint.textContent = `❌ ${res.error}`;
+          emailHint.classList.add('text-red-400'); emailHint.classList.remove('text-green-400');
+        }
+      };
+      emailInput.addEventListener('blur', runEmailValidationUI);
+      emailInput.addEventListener('change', runEmailValidationUI);
+
+      // Phone validation UI wiring
       const phoneInput = formContainer.querySelector('#f_phone');
       const phoneHint  = formContainer.querySelector('#phone-hint');
       const runPhoneValidationUI = async () => {
@@ -301,6 +342,19 @@
         return;
       }
 
+      // >>> Email validation (block submit if invalid)
+      const emailRaw = form.querySelector('input[name="f_email"]').value || '';
+      const emailCheck = await validateEmailWithWorker(emailRaw);
+      if (!emailCheck.ok) {
+        formError.textContent = emailCheck.error || 'Please enter a valid email address.';
+        formError.classList.remove('hidden');
+        submitButton.disabled = false;
+        submitButton.textContent = 'See If I Qualify';
+        return;
+      }
+      const normalizedEmail = String(emailRaw).trim().toLowerCase();
+      const emailTypeTag = emailCheck.disposable ? 'disposable' : 'normal';
+
       // >>> Phone validation (block submit if invalid)
       const phoneRaw = form.querySelector('input[name="f_phone"]').value || '';
       const phoneCheck = await validatePhoneWithSignalWire(phoneRaw);
@@ -312,6 +366,7 @@
         return;
       }
       const normalizedE164 = phoneCheck.e164 || phoneRaw; // e.g. +1XXXXXXXXXX
+      const phoneType = phoneCheck.type || 'unknown';
 
       // get IP best-effort
       try {
@@ -327,12 +382,14 @@
 
       hidden.elements['f_fname'].value        = fd.get('f_fname') || '';
       hidden.elements['f_lname'].value        = fd.get('f_lname') || '';
-      hidden.elements['f_email'].value        = fd.get('f_email') || '';
+      hidden.elements['f_email'].value        = normalizedEmail;
       // Use normalized number; strip +1 to keep 10 digits if CuraDebt needs that format
       hidden.elements['f_phone'].value        = normalizedE164.startsWith('+1') ? normalizedE164.replace('+1','') : normalizedE164;
       hidden.elements['f_whereyoulive'].value = fd.get('f_whereyoulive') || '';
       hidden.elements['f_totaldebt'].value    = String(debtAmount);
       hidden.elements['data1'].value          = data1;
+      // Tag comments with phone/email quality for routing
+      hidden.elements['f_comments'].value     = `Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailTypeTag}`;
       // FIXED data2 per request
       hidden.elements['data2'].value          = 'CLICKID2';
       hidden.elements['f_ip'].value           = clientIp;
@@ -399,3 +456,4 @@
   </script>
 </body>
 </html>
+

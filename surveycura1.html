@@ -35,7 +35,7 @@
     </div>
 
     <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4 flex flex-col"></div>
-    <footer id="chat-input-area" class="p-4 bg-gray-900 border-t border-gray-700"></footer>
+    <footer id="chat-input-area" class="p-0 bg-gray-900 border-t border-gray-700"></footer>
   </div>
 
   <!-- Hidden background POST (CORS-safe) -->
@@ -49,8 +49,10 @@
     <input name="f_totaldebt">
     <input name="f_comments" value="Lead from AI Chatbot Survey">
     <input name="data1">
+    <!-- data2 is FIXED as requested -->
     <input name="data2" value="CLICKID2">
     <input name="f_ip">
+    <!-- Optional fields if required later by CuraDebt -->
     <input name="f_mobilephone">
     <input name="f_city">
     <input name="f_zip">
@@ -61,12 +63,12 @@
     const chatInputArea = document.getElementById('chat-input-area');
     const progressBar = document.getElementById('progress-bar');
 
-    let surveyAnswers = {};
     let currentStepKey = 'start';
     let transactionId = '';
     let clientIp = '';
 
     const allStates = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"];
+    // Exclusions confirmed
     const excludedStates = ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','RI'];
 
     // === Phone Validation using your Cloudflare Worker + SignalWire ===
@@ -123,7 +125,7 @@
     const BLOCK_GMAIL_DOT_ALIASES = true;     // block dots in gmail local part
     const REQUIRE_ALPHA_IN_LOCAL = true;      // local must include letters
     const MIN_LOCAL_LEN = 3;                  // at least 3 chars in local
-    const MAX_LOCAL_DOTS = 2;                 // max 2 dots in local part
+    const MAX_LOCAL_DOTS = 2;                 // max 2 dots in the local part
 
     const ROLE_LOCALS = new Set([
       'admin','administrator','root','support','help','helpdesk','info','contact','sales',
@@ -163,7 +165,7 @@
       }
       if (local.includes('..')) return { ok: false, error: 'Email local part has consecutive dots.' };
 
-      // Tighten: require at least one letter; not numeric-only; limit dots
+      // Tighten: require letters; not numeric-only; limit dots
       if (REQUIRE_ALPHA_IN_LOCAL && !/[A-Za-z]/.test(local)) return { ok: false, error: 'Email must contain letters (not only numbers).' };
       if (/^\d+$/.test(local)) return { ok: false, error: 'Email local part cannot be only digits.' };
       if ((local.match(/\./g) || []).length > MAX_LOCAL_DOTS) return { ok: false, error: 'Too many dots in email local part.' };
@@ -203,7 +205,6 @@
         return { ok: false, error: 'Testing domains are not accepted.' };
       }
 
-      // Info bundle for UI & submit policy
       return {
         ok: true,
         normalized: `${local}@${domain}`,
@@ -222,7 +223,6 @@
       const c = strictEmailClient(raw);
       if (!c.ok) return c;
 
-      // Ask Worker for disposable and (optionally) MX checks if you added them
       const r = await fetch(VALIDATE_EMAIL_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -250,33 +250,88 @@
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
+    // Sticky quick-reply container
     function createBaseContainer() {
       chatInputArea.innerHTML = '';
       const container = document.createElement('div');
-      container.className = 'flex flex-col items-center gap-2 w-full';
+      container.className = 'sticky bottom-0 w-full bg-gray-900 pt-3 pb-4 border-t border-gray-700 ' +
+                            'before:content-[""] before:block before:h-3 before:-mt-3 before:bg-gradient-to-t before:from-gray-900 before:to-transparent';
       return container;
     }
 
-    function showOptions(options, onSelect) {
+    // Sticky quick-reply buttons with keyboard shortcuts
+    function showOptions(options, onSelect, config = {}) {
+      const { primaryIndex = 0, showNumbers = true } = config;
+
       const container = createBaseContainer();
+
+      const hint = document.createElement('div');
+      hint.className = 'text-center text-xs text-gray-400 mb-2';
+      hint.textContent = showNumbers
+        ? 'Tap an option or press 1–9 (Enter selects the first)'
+        : 'Tap an option to continue';
+      container.appendChild(hint);
+
       const optionsContainer = document.createElement('div');
-      optionsContainer.className = 'flex flex-wrap justify-center gap-2';
-      options.forEach(optionText => {
-        const button = document.createElement('button');
-        button.className = 'bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition';
-        button.textContent = optionText;
-        button.onclick = () => { addMessage(optionText, 'user'); onSelect(optionText); };
-        optionsContainer.appendChild(button);
-      });
+      optionsContainer.className = 'flex flex-wrap justify-center gap-2 px-2';
       container.appendChild(optionsContainer);
 
-      const abandonButton = document.createElement('button');
-      abandonButton.className = 'text-red-400 hover:text-red-300 text-xs mt-3';
-      abandonButton.textContent = 'Abandon Survey';
-      abandonButton.onclick = () => { addMessage('Abandon Survey', 'user'); goToStep('leaveSurvey'); };
-      container.appendChild(abandonButton);
+      const buttons = [];
+
+      const finalize = (value) => {
+        buttons.forEach(b => { b.disabled = true; b.classList.add('opacity-60', 'cursor-not-allowed'); });
+        addMessage(value, 'user');
+        window.removeEventListener('keydown', keyHandler);
+        onSelect(value);
+      };
+
+      options.forEach((text, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = [
+          'px-4 py-2 rounded-full font-semibold transition shadow-sm',
+          'bg-indigo-500 hover:bg-indigo-600 text-white',
+          i === primaryIndex ? 'ring-2 ring-indigo-300' : ''
+        ].join(' ').trim();
+
+        btn.innerHTML = (showNumbers && i < 9)
+          ? `<span class="mr-1 text-xs opacity-80">${i + 1}.</span>${text}`
+          : text;
+
+        btn.setAttribute('aria-label', text);
+        btn.dataset.index = String(i + 1);
+
+        btn.addEventListener('click', () => finalize(text));
+        optionsContainer.appendChild(btn);
+        buttons.push(btn);
+      });
+
+      const abandon = document.createElement('button');
+      abandon.type = 'button';
+      abandon.className = 'block mx-auto mt-3 text-red-400 hover:text-red-300 text-xs';
+      abandon.textContent = 'Abandon Survey';
+      abandon.addEventListener('click', () => {
+        addMessage('Abandon Survey', 'user');
+        window.removeEventListener('keydown', keyHandler);
+        goToStep('leaveSurvey');
+      });
+      container.appendChild(abandon);
 
       chatInputArea.appendChild(container);
+
+      if (buttons[primaryIndex]) buttons[primaryIndex].focus();
+
+      const keyHandler = (e) => {
+        if (/^[1-9]$/.test(e.key)) {
+          const idx = parseInt(e.key, 10) - 1;
+          if (buttons[idx]) buttons[idx].click();
+        } else if (e.key === 'Enter') {
+          if (buttons[primaryIndex]) buttons[primaryIndex].click();
+        } else if (e.key === 'Escape') {
+          abandon.click();
+        }
+      };
+      window.addEventListener('keydown', keyHandler);
     }
 
     function getData1FromUrl() {
@@ -368,6 +423,7 @@
       chatWindow.appendChild(formWrapper);
       chatWindow.scrollTop = chatWindow.scrollHeight;
 
+      // populate states
       const stateSelect = formContainer.querySelector('select[name="f_whereyoulive"]');
       allStates.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; stateSelect.appendChild(o); });
 
@@ -520,7 +576,7 @@
         submitButton.textContent = 'See If I Qualify';
         return;
       }
-      const normalizedE164 = phoneCheck.e164 || phoneRaw;
+      const normalizedE164 = phoneCheck.e164 || phoneRaw; // e.g. +1XXXXXXXXXX
       const phoneType = phoneCheck.type || 'unknown';
       const isTollFree = !!(phoneCheck.meta && phoneCheck.meta.tollFree);
 
@@ -539,16 +595,20 @@
       hidden.elements['f_fname'].value        = fd.get('f_fname') || '';
       hidden.elements['f_lname'].value        = fd.get('f_lname') || '';
       hidden.elements['f_email'].value        = normalizedEmail;
+      // Use normalized number; strip +1 to keep 10 digits if CuraDebt needs that format
       hidden.elements['f_phone'].value        = normalizedE164.startsWith('+1') ? normalizedE164.replace('+1','') : normalizedE164;
       hidden.elements['f_whereyoulive'].value = fd.get('f_whereyoulive') || '';
       hidden.elements['f_totaldebt'].value    = String(debtAmount);
       hidden.elements['data1'].value          = data1;
+      // Tag comments with phone/email quality for routing
       hidden.elements['f_comments'].value     = `Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree}`;
+      // FIXED data2 per request
       hidden.elements['data2'].value          = 'CLICKID2';
       hidden.elements['f_ip'].value           = clientIp;
 
       hidden.submit();
 
+      // advance flow immediately
       form.parentElement.remove();
       addMessage("I've submitted my information.", 'user');
       goToStep('formSuccess');
@@ -575,7 +635,7 @@
       const timeout = (step.message && showMessage) ? delay : 100;
       setTimeout(() => {
         if (step.type === 'multiple-choice') {
-          showOptions(step.options, step.action);
+          showOptions(step.options, step.action, { primaryIndex: 0, showNumbers: true });
         } else if (step.type === 'api-form') {
           showApiForm();
         } else if (step.type === 'iframe-form') {
@@ -608,4 +668,3 @@
   </script>
 </body>
 </html>
-

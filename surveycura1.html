@@ -30,7 +30,7 @@
     </header>
 
     <!-- Progress Bar -->
-    <div class="w-full bg-gray-700 h-2">
+    <div class="w-full bg-gray-700 h-2" aria-hidden="true">
       <div id="progress-bar" class="bg-indigo-500 h-2 transition-all duration-500" style="width: 0%;"></div>
     </div>
 
@@ -94,7 +94,7 @@
       if (prefix === '555' && /^01\d{2}$/.test(line)) return { ok: false, error: '555-01xx test numbers are not accepted.' };
 
       const ten = area + prefix + line;
-      if (/^(\d)\1{9}$/.test(ten)) return { ok: false, error: 'Invalid pattern (all digits identical).' };
+      if(/^(\d)\1{9}$/.test(ten)) return { ok: false, error: 'Invalid pattern (all digits identical).' };
       const seq = '01234567890123456789';
       const rseq = '98765432109876543210';
       if (seq.includes(ten) || rseq.includes(ten)) return { ok: false, error: 'Invalid pattern (sequential digits).' };
@@ -121,8 +121,6 @@
     const VALIDATE_EMAIL_ENDPOINT = "https://solitary-base-4a8b.kasindeesther.workers.dev/";
 
     // Tight policy toggles
-    const BLOCK_PLUS_EVERYWHERE = true;       // block '+' aliases for ALL domains
-    const BLOCK_GMAIL_DOT_ALIASES = true;     // block dots in gmail local part
     const REQUIRE_ALPHA_IN_LOCAL = true;      // local must include letters
     const MIN_LOCAL_LEN = 3;                  // at least 3 chars in local
     const MAX_LOCAL_DOTS = 2;                 // max 2 dots in the local part
@@ -141,39 +139,32 @@
     const DOMAIN_TYPO_MAP = {
       'gamil.com': 'gmail.com', 'gmial.com': 'gmail.com', 'gmai.com': 'gmail.com', 'gmail.con': 'gmail.com',
       'yahoo.con': 'yahoo.com', 'yhoo.com': 'yahoo.com', 'hotnail.com': 'hotmail.com', 'hotmial.com': 'hotmail.com',
-      'outlok.com': 'outlook.com', 'outllok.com': 'outlook.com', 'icloud,com': 'icloud.com',
-      'protonn.me': 'proton.me'
+      'outlok.com': 'outlook.com', 'outllok.com': 'outlook.com', 'icloud,com': 'icloud.com', 'protonn.me': 'proton.me'
     };
 
     function strictEmailClient(raw) {
       const email = String(raw || '').trim();
 
-      // Basic shape
       const at = email.indexOf('@');
       if (at < 1 || at === email.length - 1) return { ok: false, error: 'Enter a valid email address.' };
 
       const local = email.slice(0, at);
       const domain = email.slice(at + 1).toLowerCase();
 
-      // Length limits
       if (local.length < MIN_LOCAL_LEN || local.length > 64) return { ok: false, error: 'Email local part length is invalid.' };
       if (domain.length < 4 || domain.length > 255) return { ok: false, error: 'Email domain length is invalid.' };
 
-      // Local rules: allowed chars, no leading/trailing dot, no consecutive dots
       if (!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\-]{0,62}[A-Za-z0-9])?$/.test(local)) {
         return { ok: false, error: 'Invalid characters in email.' };
       }
       if (local.includes('..')) return { ok: false, error: 'Email local part has consecutive dots.' };
 
-      // Tighten: require letters; not numeric-only; limit dots
       if (REQUIRE_ALPHA_IN_LOCAL && !/[A-Za-z]/.test(local)) return { ok: false, error: 'Email must contain letters (not only numbers).' };
       if (/^\d+$/.test(local)) return { ok: false, error: 'Email local part cannot be only digits.' };
       if ((local.match(/\./g) || []).length > MAX_LOCAL_DOTS) return { ok: false, error: 'Too many dots in email local part.' };
 
-      // Domain must contain a dot
       if (domain.indexOf('.') < 1) return { ok: false, error: 'Email domain must contain a dot.' };
 
-      // Domain labels: allowed chars & lengths; no leading/trailing hyphen; no underscores
       const labels = domain.split('.');
       for (const label of labels) {
         if (label.length < 1 || label.length > 63) return { ok: false, error: 'Email domain label length is invalid.' };
@@ -181,42 +172,31 @@
         if (label.startsWith('-') || label.endsWith('-')) return { ok: false, error: 'Email domain label cannot start/end with a hyphen.' };
       }
 
-      // TLD checks
       const tld = labels[labels.length - 1];
       if (tld.length < 2 || tld.length > 63) return { ok: false, error: 'Email TLD is invalid.' };
       if (/^\d+$/.test(tld)) return { ok: false, error: 'Email TLD cannot be all digits.' };
       if (tld === 'con') return { ok: false, error: 'TLD looks mistyped (.con). Did you mean .com?' };
 
-      // Policy: role accounts are blocked
       const localLower = local.toLowerCase();
       const role = ROLE_LOCALS.has(localLower);
-
-      // Policy: block plus aliases everywhere
-      const plusAnywhere = local.includes('+');
-
-      // Policy: block Gmail dot aliases
-      const gmailDot = (domain === 'gmail.com' || domain === 'googlemail.com') && local.includes('.');
 
       // Typo suggestion
       const suggestion = DOMAIN_TYPO_MAP[domain] || null;
 
-      // Reserved/testing domains
       if (/(^|\.)example\.com$/.test(domain) || /(^|\.)test(\.local)?$/.test(domain)) {
         return { ok: false, error: 'Testing domains are not accepted.' };
       }
 
-      return {
-        ok: true,
-        normalized: `${local}@${domain}`,
-        info: {
-          role,
-          plusAnywhere,
-          gmailDot,
-          freemail: FREEMAIL.has(domain),
-          numericOnly: /^\d+$/.test(local)
-        },
-        suggestion
+      // Policy checks handled in UI + submit path
+      const info = {
+        role,
+        plusAnywhere: local.includes('+'),
+        gmailDot: (domain === 'gmail.com' || domain === 'googlemail.com') && local.includes('.'),
+        freemail: FREEMAIL.has(domain),
+        numericOnly: /^\d+$/.test(local)
       };
+
+      return { ok: true, normalized: `${local}@${domain}`, info, suggestion };
     }
 
     async function validateEmailWithWorker(raw) {
@@ -255,7 +235,7 @@
       chatInputArea.innerHTML = '';
       const container = document.createElement('div');
       container.className = 'sticky bottom-0 w-full bg-gray-900 pt-3 pb-4 border-t border-gray-700 ' +
-                            'before:content-[""] before:block before:h-3 before:-mt-3 before:bg-gradient-to-t before:from-gray-900 before:to-transparent';
+                            'before:content-["""] before:block before:h-3 before:-mt-3 before:bg-gradient-to-t before:from-gray-900 before:to-transparent';
       return container;
     }
 
@@ -340,15 +320,6 @@
       return d1 || 'no_click_id';
     }
 
-    function digitsOnly(s) { return String(s || '').replace(/\D+/g, ''); }
-
-    function withinOfficeHoursEST(date = new Date()) {
-      const est = new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-      const day = est.getDay();
-      const hour = est.getHours();
-      return day >= 1 && day <= 5 && hour >= 9 && hour < 18;
-    }
-
     // ---- Survey Flow ----
     const surveyFlow = {
       'start': {
@@ -395,18 +366,44 @@
         <div class="text-center">
           <label for="debt-slider" class="text-lg font-semibold text-gray-300">Select Amount Of Unsecured Debt</label>
           <p id="debt-amount-display" class="text-4xl font-bold text-indigo-400 my-2">$25,000</p>
-          <input type="range" id="debt-slider" min="5000" max="100000" value="25000" step="1000" class="w-full slider-thumb">
+
+          <!-- Slider: exact control (step $100) -->
+          <input type="range" id="debt-slider" min="0" max="100000" value="25000" step="100" class="w-full slider-thumb" list="debt-ticks">
+          <datalist id="debt-ticks">
+            <option value="0"></option>
+            <option value="5000"></option>
+            <option value="10000"></option>
+            <option value="20000"></option>
+            <option value="30000"></option>
+            <option value="40000"></option>
+            <option value="50000"></option>
+            <option value="75000"></option>
+            <option value="100000"></option>
+          </datalist>
+
+          <!-- Exact numeric entry -->
+          <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
+            <label class="text-sm text-gray-300 sm:col-span-1" for="debt-number">Or type exact amount</label>
+            <input type="text" id="debt-number" inputmode="numeric" placeholder="e.g. 12,450"
+                   class="sm:col-span-2 bg-gray-800 border border-gray-700 rounded-md px-3 py-2 w-full" value="25,000">
+          </div>
+          <!-- Move slider hint -->
+          <p id="move-hint" class="text-sm text-yellow-300 mt-2">Move the slider to confirm your amount.</p>
+
+          <div id="debt-warning" class="text-xs text-yellow-400 mt-2 hidden">Minimum debt is $10,000 to qualify.</div>
+          <input type="hidden" id="debt-confirmed" value="0">
         </div>
+
         <div class="grid grid-cols-2 gap-3 pt-2">
           <input type="text" name="f_fname" placeholder="First Name" required>
           <input type="text" name="f_lname" placeholder="Last Name" required>
         </div>
 
         <input type="email" name="f_email" id="f_email" placeholder="Email Address" required>
-        <div id="email-hint" class="text-xs mt-1 text-gray-400"></div>
+        <div id="email-hint" class="text-xs mt-1 text-gray-400" aria-live="polite"></div>
 
         <input type="tel" name="f_phone" id="f_phone" placeholder="Phone Number" required>
-        <div id="phone-hint" class="text-xs mt-1 text-gray-400"></div>
+        <div id="phone-hint" class="text-xs mt-1 text-gray-400" aria-live="polite"></div>
 
         <select name="f_whereyoulive" required>
           <option value="" disabled selected>Select Your State</option>
@@ -415,7 +412,11 @@
           <input type="checkbox" id="tcpa" required class="mt-1">
           <span>By clicking, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts). Your consent is not required to purchase. Message/data rates may apply.</span>
         </label>
-        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-lg py-3 rounded-lg transition">See If I Qualify</button>
+        <button type="submit" id="submit-btn"
+                class="w-full bg-green-600 text-white font-bold text-lg py-3 rounded-lg transition opacity-60 cursor-not-allowed"
+                disabled> Select amount to continue
+        </button>
+
         <div id="form-error" class="text-red-400 font-semibold text-center text-sm hidden"></div>
       `;
 
@@ -427,18 +428,66 @@
       const stateSelect = formContainer.querySelector('select[name="f_whereyoulive"]');
       allStates.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; stateSelect.appendChild(o); });
 
-      const newDebtSlider = formContainer.querySelector('#debt-slider');
-      const newDebtDisplay = formContainer.querySelector('#debt-amount-display');
-      const formatCurrency = (amt) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amt);
-      const updateDebt = () => { const v = parseInt(newDebtSlider.value,10); newDebtDisplay.textContent = v >= 100000 ? `${formatCurrency(v)}+` : `${formatCurrency(v)}`; };
-      updateDebt();
-      newDebtSlider.addEventListener('input', updateDebt);
+      const MIN_QUAL = 10000;
+      const MAX_DEBT = 100000;
 
-      // Email validation UI
+      const debtSlider      = formContainer.querySelector('#debt-slider');
+      const debtDisplay     = formContainer.querySelector('#debt-amount-display');
+      const debtNumber      = formContainer.querySelector('#debt-number');
+      const submitBtn       = formContainer.querySelector('#submit-btn');
+      const debtConfirmedEl = formContainer.querySelector('#debt-confirmed');
+      const debtWarning     = formContainer.querySelector('#debt-warning');
+      const moveHint       = formContainer.querySelector('#move-hint');
+
+      const formatCurrency = (amt) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amt);
+      const toInt = (s) => { const n = parseInt(String(s||'').replace(/[^\d]/g,''),10); return isNaN(n) ? 0 : n; };
+
+      const setSubmitState = () => {
+        const v = parseInt(debtSlider.value,10) || 0;
+        const confirmed = debtConfirmedEl.value === '1';
+        if (moveHint) moveHint.classList.toggle('hidden', confirmed);
+        if (!confirmed) {
+          submitBtn.disabled = true;
+          submitBtn.classList.add('opacity-60','cursor-not-allowed');
+          submitBtn.textContent = 'Select amount to continue';
+          return;
+        }
+        if (v < MIN_QUAL) {
+          submitBtn.disabled = true;
+          submitBtn.classList.add('opacity-60','cursor-not-allowed');
+          submitBtn.textContent = 'Minimum $10,000 required';
+          debtWarning.classList.remove('hidden');
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-60','cursor-not-allowed');
+          submitBtn.textContent = 'See If I Qualify';
+          debtWarning.classList.add('hidden');
+        }
+      };
+
+      const applyAmount = (raw) => {
+        const clamped = Math.max(0, Math.min(MAX_DEBT, Math.round(raw)));
+        debtSlider.value = clamped;
+        debtNumber.value = clamped.toLocaleString('en-US');
+        debtDisplay.textContent = clamped >= MAX_DEBT ? `${formatCurrency(clamped)}+` : `${formatCurrency(clamped)}`;        debtConfirmedEl.value = '1';
+        setSubmitState();
+      };
+
+      // init
+      debtDisplay.textContent = formatCurrency(parseInt(debtSlider.value,10));
+      setSubmitState();
+
+      // events
+      debtSlider.addEventListener('input', () => applyAmount(parseInt(debtSlider.value,10)));
+      debtNumber.addEventListener('input', () => applyAmount(toInt(debtNumber.value)));
+      debtNumber.addEventListener('blur', () => { debtNumber.value = toInt(debtNumber.value).toLocaleString('en-US'); });
+
+      // Email validation UI (uses validateEmailWithWorker)
       const emailInput = formContainer.querySelector('#f_email');
       const emailHint  = formContainer.querySelector('#email-hint');
       const runEmailValidationUI = async () => {
         if (!emailInput || !emailHint) return;
+        if (!emailInput.value) { emailHint.textContent = ''; return; }
         emailHint.textContent = 'Checking email…';
         const res = await validateEmailWithWorker(emailInput.value);
         if (res.ok) {
@@ -466,11 +515,12 @@
       const phoneHint  = formContainer.querySelector('#phone-hint');
       const runPhoneValidationUI = async () => {
         if (!phoneInput || !phoneHint) return;
+        if (!phoneInput.value) { phoneHint.textContent = ''; return; }
         phoneHint.textContent = 'Checking number…';
         const res = await validatePhoneWithSignalWire(phoneInput.value);
         if (res.ok) {
           const extra = res?.meta?.tollFree ? ' (toll-free)' : '';
-          phoneHint.textContent = `✅ Valid ${res.country} ${res.type}: ${res.e164}${extra}`;
+          phoneHint.textContent = `✅ Valid ${res.country || ''} ${res.type || ''}: ${res.e164}${extra}`.trim();
           phoneHint.classList.add('text-green-400'); phoneHint.classList.remove('text-red-400','text-yellow-400');
         } else {
           phoneHint.textContent = `❌ ${res.error}`;
@@ -518,6 +568,16 @@
       const debtAmount = parseInt(form.querySelector('#debt-slider').value, 10) || 0;
       const selectedState = form.querySelector('select[name="f_whereyoulive"]').value;
 
+      // Require explicit confirmation/change of debt amount
+      const debtConfirmedEl = document.getElementById('debt-confirmed');
+      if (!debtConfirmedEl || debtConfirmedEl.value !== '1') {
+        formError.textContent = 'Please confirm your debt amount by moving the slider or typing the exact amount.';
+        formError.classList.remove('hidden');
+        submitButton.disabled = false;
+        submitButton.textContent = 'See If I Qualify';
+        return;
+      }
+
       if (debtAmount < 10000) {
         formError.textContent = 'Minimum debt of $10,000 is required to qualify.';
         formError.classList.remove('hidden');
@@ -539,8 +599,7 @@
       if (!emailCheck.ok) {
         formError.textContent = emailCheck.error || 'Please enter a valid email address.';
         formError.classList.remove('hidden');
-        submitButton.disabled = false;
-        submitButton.textContent = 'See If I Qualify';
+        submitButton.disabled = false; submitButton.textContent = 'See If I Qualify';
         return;
       }
       if (emailCheck.disposable) {
@@ -572,8 +631,7 @@
       if (!phoneCheck.ok) {
         formError.textContent = phoneCheck.error || 'Please enter a valid phone number.';
         formError.classList.remove('hidden');
-        submitButton.disabled = false;
-        submitButton.textContent = 'See If I Qualify';
+        submitButton.disabled = false; submitButton.textContent = 'See If I Qualify';
         return;
       }
       const normalizedE164 = phoneCheck.e164 || phoneRaw; // e.g. +1XXXXXXXXXX
@@ -600,9 +658,7 @@
       hidden.elements['f_whereyoulive'].value = fd.get('f_whereyoulive') || '';
       hidden.elements['f_totaldebt'].value    = String(debtAmount);
       hidden.elements['data1'].value          = data1;
-      // Tag comments with phone/email quality for routing
       hidden.elements['f_comments'].value     = `Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree}`;
-      // FIXED data2 per request
       hidden.elements['data2'].value          = 'CLICKID2';
       hidden.elements['f_ip'].value           = clientIp;
 
@@ -619,8 +675,9 @@
       if (!step) return;
 
       currentStepKey = stepKey;
-      const stepIndex = Object.keys(surveyFlow).indexOf(stepKey);
-      updateProgress(stepIndex);
+      const keys = Object.keys(surveyFlow);
+      const stepIndex = keys.indexOf(stepKey);
+      updateProgress(stepIndex, keys.length);
 
       const delay = 1200;
       if (step.message && showMessage) setTimeout(() => addMessage(step.message, 'bot'), delay / 2);
@@ -646,8 +703,8 @@
       }, timeout);
     }
 
-    function updateProgress(index) {
-      const progress = (index / (Object.keys(surveyFlow).length - 1)) * 100;
+    function updateProgress(index, total) {
+      const progress = Math.max(0, Math.min(100, (index / Math.max(1, total - 1)) * 100));
       progressBar.style.width = `${progress}%`;
     }
 
@@ -668,3 +725,4 @@
   </script>
 </body>
 </html>
+

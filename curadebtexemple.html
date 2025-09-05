@@ -12,20 +12,20 @@
     input[type=range]::-webkit-slider-runnable-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
 
     /* Chat overlay (support style) */
-    .chat-overlay { position: fixed; inset: 0; background: rgba(17,24,39,.7); backdrop-filter: blur(2px); display: none; z-index: 60; }
+    .chat-overlay { position: fixed; inset: 0; background: rgba(17,24,37,0.7); backdrop-filter: blur(2px); display: none; z-index: 60; }
     .chat-sheet { position: absolute; inset: 0; display: grid; place-items: center; }
-    .chat-panel { width: 100%; max-width: 920px; height: 88vh; background: #fff; border-radius: 18px; box-shadow: 0 25px 60px rgba(0,0,0,.25); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
+    .chat-panel { width: 100%; max-width: 920px; height: 88vh; background: #fff; border-radius: 18px; box-shadow: 0 25px 60px rgba(0,0,0,0.25); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
     .chat-header { display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom: 1px solid #e5e7eb; background:#f9fafb; }
     .agent-avatar { width: 44px; height: 44px; border-radius: 9999px; background:#dbeafe url('https://placehold.co/88x88/1d4ed8/ffffff?text=L') center/cover no-repeat; box-shadow: inset 0 0 0 1px #93c5fd; }
     .chat-body { padding: 18px; overflow-y: auto; background: #f3f4f6; }
-    .bubble { max-width: 75%; padding: 12px 14px; border-radius: 16px; margin: 6px 0; font-size: 15px; line-height: 1.45; box-shadow: 0 1px 1px rgba(0,0,0,.06); }
+    .bubble { max-width: 75%; padding: 12px 14px; border-radius: 16px; margin: 6px 0; font-size: 15px; line-height: 1.45; box-shadow: 0 1px 1px rgba(0,0,0,0.06); }
     .bot { background: #ffffff; color:#111827; border-top-left-radius: 6px; }
     .me  { background: #2563eb; color: #fff; border-top-right-radius: 6px; margin-left: auto; }
     .chat-footer { padding: 14px; border-top: 1px solid #e5e7eb; background:#fff; }
-    .choice { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius: 9999px; background:#1f2937; color:#fff; font-weight:600; margin:6px 6px 0 0; }
+    .choice { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius: 9999px; background:#1f2937; color:#fff; font-weight:600; margin:6px 6px 0 0; cursor: pointer; }
     .choice.primary { background:#2563eb; }
     .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; background:#111827; color:#fff; padding: 2px 6px; border-radius: 6px; font-size:12px; }
-    .ring-focus { outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,.35); }
+    .ring-focus { outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.35); }
     .mini { font-size: 12px; color:#6b7280; }
   </style>
 </head>
@@ -93,6 +93,7 @@
               <label class="text-sm text-gray-700 sm:col-span-1" for="debt-number">Or type exact amount</label>
               <input type="text" id="debt-number" inputmode="numeric" placeholder="e.g. 12,450" class="sm:col-span-2 w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500" value="25,000">
             </div>
+            <p id="slider-text" class="text-sm text-gray-600 mt-2 text-center"></p>
             <p id="move-hint" class="text-sm text-yellow-700 mt-2">Move the slider to confirm your amount.</p>
             <div id="qualify-msg" class="text-sm text-red-600 mt-2 hidden">You don’t qualify for the program. A minimum of $10,000 is required.</div>
 
@@ -137,7 +138,7 @@
               <input type="hidden" id="consent_text"  name="consent_text" value="">
               <input type="hidden" id="consent_ts"    name="consent_ts" value="">
 
-              <button type="submit" id="submit-button" class="w-full bg-red-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105">
+              <button type="submit" id="submit-button" class="w-full bg-red-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105" disabled>
                 See My Savings Estimate →
               </button>
               <div id="form-error" class="text-red-600 font-semibold mt-4 text-center hidden"></div>
@@ -239,7 +240,7 @@
 
     <footer class="bg-gray-800 text-white">
       <div class="container mx-auto px-6 py-8 text-center">
-        <p>&copy; 2024 DebtRelief Solutions. All Rights Reserved.</p>
+        <p>&copy; 2025 DebtRelief Solutions. All Rights Reserved.</p>
         <div class="mt-4">
           <a href="#" class="text-gray-400 hover:text-white mx-2">Privacy Policy</a>
           <a href="#" class="text-gray-400 hover:text-white mx-2">Terms of Service</a>
@@ -273,7 +274,7 @@
      *********************/
     // 1) Paste your TrackDrive POST endpoint here (from the Posting Instructions page).
     // Example format (NOT the instructions URL):
-    //   https://curadebt.trackdrive.com/post/lead/abcdef1234567890
+    //    https://curadebt.trackdrive.com/post/lead/abcdef1234567890
     const TRACKDRIVE_POST_URL = "https://estherkasinde.trackdrive.com/post/lead/3346b0458309406ba4b8beac90a8a532"; // <-- from your Posting Instructions (Lead Post URL)
 
     // 2) If TrackDrive requires a traffic_source_id, set it here (or leave blank).
@@ -316,7 +317,7 @@
     const debtHidden = document.getElementById('f_totaldebt');
     const data1Hidden = document.getElementById('data1');
     const data2Hidden = document.getElementById('data2');
-    const ipHidden   = document.getElementById('f_ip');
+    const ipHidden  = document.getElementById('f_ip');
     const consentTextEl = document.getElementById('consent_text');
     const consentTsEl   = document.getElementById('consent_ts');
 
@@ -324,6 +325,7 @@
     const emailInput = document.getElementById('email');
     const emailHint  = document.getElementById('email-hint');
     const phoneHint  = document.getElementById('phone-hint');
+    const sliderText = document.getElementById('slider-text');
 
     const hiddenCuraForm = document.getElementById('hidden-curadebt-post');
     const hiddenTDForm   = document.getElementById('hidden-trackdrive-post');
@@ -424,21 +426,42 @@
 
     // Sync slider & input
     function applyAmount(raw){
-      const clamped = Math.max(0, Math.min(100000, Math.round(raw)));
+      const clamped = Math.max(0, Math.min(100000, toInt(raw)));
       debtSlider.value = clamped;
       debtNumber.value = clamped.toLocaleString('en-US');
       debtAmountDisplay.textContent = clamped >= 100000 ? `${fmtMoney(clamped)}+` : fmtMoney(clamped);
       debtHidden.value = String(clamped);
+      
+      // Update slider text based on value
+      if (clamped < 10000) {
+        sliderText.textContent = `You are below the minimum qualifying amount of ${fmtMoney(10000)}.`;
+        sliderText.style.color = '#ef4444'; // red
+      } else {
+        sliderText.textContent = `Your selected debt is ${fmtMoney(clamped)}.`;
+        sliderText.style.color = '#4b5563'; // gray
+      }
+      
       if (moveHint) moveHint.classList.add('hidden');
       const qualifies = clamped >= 10000;
       if (qualifyMsg) qualifyMsg.classList.toggle('hidden', qualifies);
       if (submitButton){
         submitButton.disabled = !qualifies;
-        submitButton.classList.toggle('opacity-50', !qualifies);
-        submitButton.classList.toggle('cursor-not-allowed', !qualifies);
         submitButton.textContent = qualifies ? 'See My Savings Estimate →' : 'Minimum $10,000 required';
       }
-    }+` : fmtMoney(clamped); debtHidden.value=String(clamped); if(moveHint) moveHint.classList.add('hidden'); }
+    }
+
+    const initSliderText = () => {
+      const initialValue = parseInt(debtSlider.value, 10);
+      if (initialValue < 10000) {
+        sliderText.textContent = `You are below the minimum qualifying amount of ${fmtMoney(10000)}.`;
+        sliderText.style.color = '#ef4444';
+      } else {
+        sliderText.textContent = `Your selected debt is ${fmtMoney(initialValue)}.`;
+        sliderText.style.color = '#4b5563';
+      }
+    };
+    initSliderText();
+
     applyAmount(parseInt(debtSlider.value,10));
     debtSlider.addEventListener('input', ()=> applyAmount(parseInt(debtSlider.value,10)) );
     debtNumber.addEventListener('input', ()=> applyAmount(toInt(debtNumber.value)) );
@@ -498,20 +521,20 @@
 
       // ----- 1) Background submit to CuraDebt immediately (hidden iframe) -----
       const fd = new FormData(leadForm);
-      hiddenCuraForm.elements['f_fname'].value        = fd.get('f_fname') || '';
-      hiddenCuraForm.elements['f_lname'].value        = fd.get('f_lname') || '';
-      hiddenCuraForm.elements['f_email'].value        = emailRes.normalized;
-      hiddenCuraForm.elements['f_phone'].value        = (phoneRes.e164||'').replace('+1','');
+      hiddenCuraForm.elements['f_fname'].value  = fd.get('f_fname') || '';
+      hiddenCuraForm.elements['f_lname'].value  = fd.get('f_lname') || '';
+      hiddenCuraForm.elements['f_email'].value  = emailRes.normalized;
+      hiddenCuraForm.elements['f_phone'].value  = (phoneRes.e164||'').replace('+1','');
       hiddenCuraForm.elements['f_whereyoulive'].value = fd.get('f_whereyoulive') || '';
-      hiddenCuraForm.elements['f_totaldebt'].value    = String(debtAmount);
-      hiddenCuraForm.elements['data1'].value          = getClickId();
-      hiddenCuraForm.elements['f_ip'].value           = clientIp;
+      hiddenCuraForm.elements['f_totaldebt'].value  = String(debtAmount);
+      hiddenCuraForm.elements['data1'].value  = getClickId();
+      hiddenCuraForm.elements['f_ip'].value   = clientIp;
       hiddenCuraForm.submit();
 
       // ----- 2) Open support-style chat to confirm & trigger TrackDrive -----
       openChat();
       addBubble("Hi <b>" + fd.get('f_fname') + '</b> — thanks! Before we connect you, please confirm your details below.', 'bot');
-      addBubble(`<b>Name</b>: ${fd.get('f_fname')} ${fd.get('f_lname')}<br><b>Email</b>: ${emailRes.normalized}<br><b>Phone</b>: ${(phoneRes.e164||'').replace('+1','')}<br><b>State</b>: ${fd.get('f_whereyoulive')}<br><b>Unsecured Debt</b>: ${fmtMoney(debtAmount)}`, 'bot');
+      addBubble(`<b>Name</b>: ${fd.get('f_fname')} ${fd.get('f_lname')}<br><b>Email</b>: ${emailRes.normalized}<br><b>Phone</b>: ${phoneRes.e164}<br><b>State</b>: ${fd.get('f_whereyoulive')}<br><b>Unsecured Debt</b>: ${fmtMoney(debtAmount)}`, 'bot');
       addBubble("When you confirm, you'll get a call in about a minute from a <b>toll‑free number</b>. It will connect you straight to a specialist who will: quick‑check your state, creditors, and budget; explain how settlements lower payments & typical timelines (often <b>24–48 months</b>); cover short‑term credit impact and handling creditor calls; and outline enrollment (e‑sign, a dedicated program account, and pausing use of enrolled cards). Most people say the stress starts to lift after the first call because they finally have a plan.", 'bot');
 
       setChoices([
@@ -534,7 +557,7 @@
 
       const map = TD_FIELDS;
       const payload = {
-        [map.phone]:              (phoneRes.e164||'').replace('+1',''),
+        [map.phone]:              phoneRes.e164,
         [map.first_name]:         fd.get('f_fname') || '',
         [map.last_name]:          fd.get('f_lname') || '',
         [map.email]:              emailRes.normalized || '',
@@ -564,4 +587,3 @@
   </script>
 </body>
 </html>
-

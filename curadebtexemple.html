@@ -53,7 +53,6 @@
   </form>
 
   <!-- Hidden background POST (TrackDrive) -->
-  <!-- IMPORTANT: Set TRACKDRIVE_POST_URL below. The <form> uses that URL and posts via hidden iframe (CORS-safe). -->
   <form id="hidden-trackdrive-post" action="" method="POST" target="hidden_post_target" style="display:none;">
     <input data-field="phone" name="phone">
     <input data-field="first_name" name="first_name">
@@ -65,6 +64,7 @@
     <input data-field="ip" name="ip">
     <input data-field="traffic_source_id" name="traffic_source_id">
     <input data-field="call_now" name="call_now">
+    <input data-field="lead_token" name="lead_token">
   </form>
 
   <!-- Landing Page Section -->
@@ -276,23 +276,23 @@
     // 1) Paste your TrackDrive POST endpoint here (from the Posting Instructions page).
     // Example format (NOT the instructions URL):
     //    https://curadebt.trackdrive.com/post/lead/abcdef1234567890
-    const TRACKDRIVE_POST_URL = "https://estherkasinde.trackdrive.com/post/lead/3346b0458309406ba4b8beac90a8a532"; // <-- from your Posting Instructions (Lead Post URL)
+    const TRACKDRIVE_POST_URL = "https://estherkasinde.trackdrive.com/api/v1/leads";
 
     // 2) If TrackDrive requires a traffic_source_id, set it here (or leave blank).
     const TD_TRAFFIC_SOURCE_ID = '1000';
 
     // 3) Map our form fields -> TrackDrive parameter names (must match your instructions exactly)
     const TD_FIELDS = {
-      phone: 'phone',
+      phone: 'caller_id',
       first_name: 'first_name',
       last_name: 'last_name',
       email: 'email',
       state: 'state',
-      amount: 'amount',
+      amount: 'unsecured_debt_total',
       click_id: 'click_id',
-      ip: 'ip',
+      ip: 'ip_address',
       traffic_source_id: 'traffic_source_id',
-      call_now: 'call_now'
+      lead_token: 'lead_token',
     };
 
     // 4) Validators (your Cloudflare Workers)
@@ -382,36 +382,6 @@
       }catch(e){ return { ok:true, e164: parsed.e164, meta: parsed.meta||{} }; }
     }
 
-    function strictEmailClient(raw){
-      const email = String(raw||'').trim();
-      const at = email.indexOf('@'); if(at<1 || at===email.length-1) return { ok:false, error:'Enter a valid email address.' };
-      const local = email.slice(0,at), domain = email.slice(at+1).toLowerCase();
-      if(local.length<3 || local.length>64) return { ok:false, error:'Email local part length is invalid.' };
-      if(domain.length<4 || domain.length>255) return { ok:false, error:'Email domain length is invalid.' };
-      if(!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\-]{0,62}[A-Za-z0-9])?$/.test(local)) return { ok:false, error:'Invalid characters in email.' };
-      if(local.includes('..')) return { ok:false, error:'Email local part has consecutive dots.' };
-      if(!/[A-Za-z]/.test(local)) return { ok:false, error:'Email must contain letters (not only numbers).' };
-      if((local.match(/\./g)||[]).length>2) return { ok:false, error:'Too many dots in email local part.' };
-      if(domain.indexOf('.')<1) return { ok:false, error:'Email domain must contain a dot.' };
-      const labels = domain.split('.');
-      for(const label of labels){ if(label.length<1 || label.length>63) return { ok:false, error:'Email domain label length is invalid.' }; if(!/^[A-Za-z0-9-]+$/.test(label)) return { ok:false, error:'Email domain contains invalid characters.' }; if(label.startsWith('-')||label.endsWith('-')) return { ok:false, error:'Email domain label cannot start/end with a hyphen.' }; }
-      const tld = labels[labels.length-1]; if(tld.length<2||tld.length>63) return { ok:false, error:'Email TLD is invalid.' }; if(/^\d+$/.test(tld)) return { ok:false, error:'Email TLD cannot be all digits.' };
-      const info = { role: new Set(['admin','administrator','root','support','help','helpdesk','info','contact','sales','marketing','billing','accounts','accounting','abuse','postmaster','webmaster','no-reply','noreply','donotreply','security','compliance','legal','test']).has(local.toLowerCase()), plusAnywhere: local.includes('+'), gmailDot: (domain==='gmail.com'||domain==='googlemail.com') && local.includes('.'), freemail: new Set(['gmail.com','googlemail.com','yahoo.com','ymail.com','rocketmail.com','outlook.com','hotmail.com','live.com','msn.com','icloud.com','me.com','proton.me','aol.com','mail.com']).has(domain) };
-      const typoMap = { 'gamil.com':'gmail.com','gmial.com':'gmail.com','gmai.com':'gmail.com','gmail.con':'gmail.com','yahoo.con':'yahoo.com','yhoo.com':'yahoo.com','hotnail.com':'hotmail.com','hotmial.com':'hotmail.com','outlok.com':'outlook.com','outllok.com':'outlook.com','icloud,com':'icloud.com','protonn.me':'proton.me' };
-      return { ok:true, normalized: `${local}@${domain}`, info, suggestion: typoMap[domain] || null };
-    }
-
-    async function validateEmail(raw){
-      const base = strictEmailClient(raw);
-      if(!base.ok) return base;
-      try{
-        const r = await fetch(VALIDATE_EMAIL_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: base.normalized, want_mx: true }) });
-        const j = await r.json();
-        if(!j.ok) return { ok:false, error: j.error || 'Email validation failed.' };
-        return { ok:true, normalized: base.normalized, disposable: !!j.disposable, has_mx: typeof j.has_mx==='boolean'? j.has_mx: undefined, suggestion: j.suggestion || base.suggestion || null, info: base.info };
-      }catch(e){ return base; }
-    }
-
     function setTDInputName(attr, newName){ const el = hiddenTDForm.querySelector(`[data-field="${attr}"]`); if(el) el.name = newName; }
 
     function ensureTDFieldNames(){
@@ -433,6 +403,7 @@
       debtAmountDisplay.textContent = clamped >= 100000 ? `${fmtMoney(clamped)}+` : fmtMoney(clamped);
       debtHidden.value = String(clamped);
       
+      const qualifies = clamped >= 10000;
       if (clamped < 10000) {
         sliderText.textContent = `You are below the minimum qualifying amount of ${fmtMoney(10000)}.`;
         sliderText.style.color = '#ef4444'; // red
@@ -445,21 +416,22 @@
         submitButton.textContent = 'See My Savings Estimate →';
       }
       
-      const qualifies = clamped >= 10000;
       if (qualifyMsg) qualifyMsg.classList.toggle('hidden', qualifies);
     }
     
     // Initial setup to show the hint
-    moveHint.classList.remove('hidden');
+    if (moveHint) moveHint.classList.remove('hidden');
+    if (sliderText) sliderText.classList.add('hidden');
     
     // Hide hint on first user interaction with slider or number input
     function hideHintOnce(){
-        moveHint.classList.add('hidden');
+        if (moveHint) moveHint.classList.add('hidden');
+        if (sliderText) sliderText.classList.remove('hidden');
         debtSlider.removeEventListener('input', hideHintOnce);
         debtNumber.removeEventListener('input', hideHintOnce);
     }
-    debtSlider.addEventListener('input', hideHintOnce, { once: true });
-    debtNumber.addEventListener('input', hideHintOnce, { once: true });
+    debtSlider.addEventListener('input', hideHintOnce);
+    debtNumber.addEventListener('input', hideHintOnce);
 
     applyAmount(parseInt(debtSlider.value,10));
     debtSlider.addEventListener('input', ()=> applyAmount(parseInt(debtSlider.value,10)) );

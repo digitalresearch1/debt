@@ -40,6 +40,9 @@
 
   <!-- Hidden background POST (CORS-safe) -->
   <iframe name="hidden_post_target" style="display:none;"></iframe>
+  <iframe name="hidden_td_target" style="display:none;"></iframe>
+
+  <!-- Hidden CuraDebt POST -->
   <form id="hidden-curadebt-post" action="https://signup.curadebt.com/apkconnect/" method="POST" target="hidden_post_target" style="display:none;">
     <input name="f_fname">
     <input name="f_lname">
@@ -58,6 +61,34 @@
     <input name="f_zip">
   </form>
 
+  <!-- Hidden TrackDrive POST (Lead-to-Call) -->
+  <form id="hidden-trackdrive-post"
+        action="https://curadebt.trackdrive.com/api/v1/leads"
+        method="POST" target="hidden_td_target" style="display:none;">
+    <!-- REQUIRED -->
+    <input name="lead_token" value="3346b0458309406ba4b8beac90a8a532">
+    <input name="traffic_source_id" value="1000">
+    <input name="caller_id">
+
+    <!-- RECOMMENDED OPTIONALS -->
+    <input name="first_name">
+    <input name="last_name">
+    <input name="email">
+    <input name="state">
+    <input name="zip">
+    <input name="ip_address">
+    <input name="source_url">
+    <input name="useragent">
+    <input name="original_lead_submit_date">
+    <input name="tcpa_opt_in">
+    <input name="tcpa_optin_consent_language">
+    <input name="sub_id">
+    <input name="gclid">
+    <input name="fbeventid">
+    <input name="msclkid">
+    <input name="traffic_source_lead_id">
+  </form>
+
   <script>
     const chatWindow = document.getElementById('chat-window');
     const chatInputArea = document.getElementById('chat-input-area');
@@ -74,18 +105,14 @@
     // === Phone Validation using your Cloudflare Worker + SignalWire ===
     const VALIDATE_ENDPOINT = "https://silent-sea-a717.kasindeesther.workers.dev/";
 
-    // Strict NANP parser (US/Canada) — ALLOWS TOLL-FREE, blocks other bad patterns
     function parseStrictNANP(raw) {
       const digits = String(raw || '').replace(/\D+/g, '');
       const m = digits.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/);
       if (!m) return { ok: false, error: 'Enter a valid US number (NANP).' };
 
       const [, area, prefix, line] = m;
-
       const isN11 = (s) => /^[2-9]11$/.test(s);
-      if (isN11(area) || isN11(prefix)) {
-        return { ok: false, error: 'N11 service codes are not valid phone numbers.' };
-      }
+      if (isN11(area) || isN11(prefix)) return { ok: false, error: 'N11 service codes are not valid phone numbers.' };
 
       const TOLL_FREE = new Set(['800','833','844','855','866','877','888','822']);
       const tollFree = TOLL_FREE.has(area);
@@ -94,7 +121,7 @@
       if (prefix === '555' && /^01\d{2}$/.test(line)) return { ok: false, error: '555-01xx test numbers are not accepted.' };
 
       const ten = area + prefix + line;
-      if(/^(\d)\1{9}$/.test(ten)) return { ok: false, error: 'Invalid pattern (all digits identical).' };
+      if (/^(\d)\1{9}$/.test(ten)) return { ok: false, error: 'Invalid pattern (all digits identical).' };
       const seq = '01234567890123456789';
       const rseq = '98765432109876543210';
       if (seq.includes(ten) || rseq.includes(ten)) return { ok: false, error: 'Invalid pattern (sequential digits).' };
@@ -105,7 +132,6 @@
     async function validatePhoneWithSignalWire(raw) {
       const strict = parseStrictNANP(raw);
       if (!strict.ok) return strict;
-
       const r = await fetch(VALIDATE_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -113,17 +139,15 @@
       });
       const j = await r.json().catch(() => ({}));
       if (!j.ok) return { ok: false, error: j.error || 'Validation failed.' };
-
       return { ...j, e164: strict.e164, meta: { ...(strict.meta || {}) } };
     }
 
     // === Email Validation (Cloudflare Worker) ===
     const VALIDATE_EMAIL_ENDPOINT = "https://solitary-base-4a8b.kasindeesther.workers.dev/";
 
-    // Tight policy toggles
-    const REQUIRE_ALPHA_IN_LOCAL = true;      // local must include letters
-    const MIN_LOCAL_LEN = 3;                  // at least 3 chars in local
-    const MAX_LOCAL_DOTS = 2;                 // max 2 dots in the local part
+    const REQUIRE_ALPHA_IN_LOCAL = true;
+    const MIN_LOCAL_LEN = 3;
+    const MAX_LOCAL_DOTS = 2;
 
     const ROLE_LOCALS = new Set([
       'admin','administrator','root','support','help','helpdesk','info','contact','sales',
@@ -144,7 +168,6 @@
 
     function strictEmailClient(raw) {
       const email = String(raw || '').trim();
-
       const at = email.indexOf('@');
       if (at < 1 || at === email.length - 1) return { ok: false, error: 'Enter a valid email address.' };
 
@@ -154,9 +177,7 @@
       if (local.length < MIN_LOCAL_LEN || local.length > 64) return { ok: false, error: 'Email local part length is invalid.' };
       if (domain.length < 4 || domain.length > 255) return { ok: false, error: 'Email domain length is invalid.' };
 
-      if (!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\-]{0,62}[A-Za-z0-9])?$/.test(local)) {
-        return { ok: false, error: 'Invalid characters in email.' };
-      }
+      if (!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\-]{0,62}[A-Za-z0-9])?$/.test(local)) return { ok: false, error: 'Invalid characters in email.' };
       if (local.includes('..')) return { ok: false, error: 'Email local part has consecutive dots.' };
 
       if (REQUIRE_ALPHA_IN_LOCAL && !/[A-Za-z]/.test(local)) return { ok: false, error: 'Email must contain letters (not only numbers).' };
@@ -178,31 +199,21 @@
       if (tld === 'con') return { ok: false, error: 'TLD looks mistyped (.con). Did you mean .com?' };
 
       const localLower = local.toLowerCase();
-      const role = ROLE_LOCALS.has(localLower);
-
-      // Typo suggestion
-      const suggestion = DOMAIN_TYPO_MAP[domain] || null;
-
-      if (/(^|\.)example\.com$/.test(domain) || /(^|\.)test(\.local)?$/.test(domain)) {
-        return { ok: false, error: 'Testing domains are not accepted.' };
-      }
-
-      // Policy checks handled in UI + submit path
       const info = {
-        role,
+        role: ROLE_LOCALS.has(localLower),
         plusAnywhere: local.includes('+'),
         gmailDot: (domain === 'gmail.com' || domain === 'googlemail.com') && local.includes('.'),
         freemail: FREEMAIL.has(domain),
         numericOnly: /^\d+$/.test(local)
       };
 
+      const suggestion = DOMAIN_TYPO_MAP[domain] || null;
       return { ok: true, normalized: `${local}@${domain}`, info, suggestion };
     }
 
     async function validateEmailWithWorker(raw) {
       const c = strictEmailClient(raw);
       if (!c.ok) return c;
-
       const r = await fetch(VALIDATE_EMAIL_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -230,19 +241,15 @@
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    // Sticky quick-reply container
     function createBaseContainer() {
       chatInputArea.innerHTML = '';
       const container = document.createElement('div');
-      container.className = 'sticky bottom-0 w-full bg-gray-900 pt-3 pb-4 border-t border-gray-700 ' +
-                            'before:content-["""] before:block before:h-3 before:-mt-3 before:bg-gradient-to-t before:from-gray-900 before:to-transparent';
+      container.className = 'sticky bottom-0 w-full bg-gray-900 pt-3 pb-4 border-t border-gray-700 before:content-[""] before:block before:h-3 before:-mt-3 before:bg-gradient-to-t before:from-gray-900 before:to-transparent';
       return container;
     }
 
-    // Sticky quick-reply buttons with keyboard shortcuts
     function showOptions(options, onSelect, config = {}) {
       const { primaryIndex = 0, showNumbers = true } = config;
-
       const container = createBaseContainer();
 
       const hint = document.createElement('div');
@@ -257,7 +264,6 @@
       container.appendChild(optionsContainer);
 
       const buttons = [];
-
       const finalize = (value) => {
         buttons.forEach(b => { b.disabled = true; b.classList.add('opacity-60', 'cursor-not-allowed'); });
         addMessage(value, 'user');
@@ -280,7 +286,6 @@
 
         btn.setAttribute('aria-label', text);
         btn.dataset.index = String(i + 1);
-
         btn.addEventListener('click', () => finalize(text));
         optionsContainer.appendChild(btn);
         buttons.push(btn);
@@ -319,6 +324,8 @@
       const d1 = p.get('data1') || p.get('click_id') || p.get('gclid') || p.get('fbclid') || p.get('msclkid') || '';
       return d1 || 'no_click_id';
     }
+
+    function digitsOnly(s) { return String(s || '').replace(/\D+/g, ''); }
 
     // ---- Survey Flow ----
     const surveyFlow = {
@@ -469,7 +476,8 @@
         const clamped = Math.max(0, Math.min(MAX_DEBT, Math.round(raw)));
         debtSlider.value = clamped;
         debtNumber.value = clamped.toLocaleString('en-US');
-        debtDisplay.textContent = clamped >= MAX_DEBT ? `${formatCurrency(clamped)}+` : `${formatCurrency(clamped)}`;        debtConfirmedEl.value = '1';
+        debtDisplay.textContent = clamped >= MAX_DEBT ? `${formatCurrency(clamped)}+` : `${formatCurrency(clamped)}`;
+        debtConfirmedEl.value = '1';
         setSubmitState();
       };
 
@@ -645,7 +653,7 @@
         clientIp = j.ip || '';
       } catch (err) { clientIp = ''; }
 
-      // Build and submit hidden POST (CORS-safe)
+      // Build & submit hidden POST to CuraDebt (CORS-safe)
       const hidden = document.getElementById('hidden-curadebt-post');
       const fd = new FormData(form);
       const data1 = getData1FromUrl() || transactionId;
@@ -653,7 +661,6 @@
       hidden.elements['f_fname'].value        = fd.get('f_fname') || '';
       hidden.elements['f_lname'].value        = fd.get('f_lname') || '';
       hidden.elements['f_email'].value        = normalizedEmail;
-      // Use normalized number; strip +1 to keep 10 digits if CuraDebt needs that format
       hidden.elements['f_phone'].value        = normalizedE164.startsWith('+1') ? normalizedE164.replace('+1','') : normalizedE164;
       hidden.elements['f_whereyoulive'].value = fd.get('f_whereyoulive') || '';
       hidden.elements['f_totaldebt'].value    = String(debtAmount);
@@ -661,8 +668,40 @@
       hidden.elements['f_comments'].value     = `Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree}`;
       hidden.elements['data2'].value          = 'CLICKID2';
       hidden.elements['f_ip'].value           = clientIp;
-
       hidden.submit();
+
+      // --- TrackDrive Lead-to-Call POST (separate iframe) ---
+      const tdForm = document.getElementById('hidden-trackdrive-post');
+      const qs = new URLSearchParams(location.search);
+      const gclid = qs.get('gclid') || '';
+      const fbeventid = qs.get('fbclid') || '';
+      const msclkid = qs.get('msclkid') || '';
+      const tcpaBox = document.getElementById('tcpa');
+
+      // REQUIRED
+      tdForm.elements['caller_id'].value = normalizedE164; // must be +1XXXXXXXXXX
+
+      // OPTIONALS
+      tdForm.elements['first_name'].value  = fd.get('f_fname') || '';
+      tdForm.elements['last_name'].value   = fd.get('f_lname') || '';
+      tdForm.elements['email'].value       = normalizedEmail;
+      tdForm.elements['state'].value       = fd.get('f_whereyoulive') || '';
+      tdForm.elements['zip'].value         = fd.get('f_zip') || '';
+      tdForm.elements['ip_address'].value  = clientIp || '';
+      tdForm.elements['source_url'].value  = location.href;
+      tdForm.elements['useragent'].value   = navigator.userAgent || '';
+      tdForm.elements['original_lead_submit_date'].value = new Date().toISOString().replace('T',' ').slice(0,19); // "YYYY-MM-DD HH:MM:SS"
+      tdForm.elements['tcpa_opt_in'].value = tcpaBox && tcpaBox.checked ? 'true' : 'false';
+      tdForm.elements['tcpa_optin_consent_language'].value =
+        (document.querySelector('label[for="tcpa"] span')?.innerText || '').trim();
+      tdForm.elements['sub_id'].value      = data1;
+      tdForm.elements['gclid'].value       = gclid;
+      tdForm.elements['fbeventid'].value   = fbeventid;
+      tdForm.elements['msclkid'].value     = msclkid;
+      tdForm.elements['traffic_source_lead_id'].value = transactionId;
+
+      // Submit to TrackDrive (this triggers the call on their side)
+      tdForm.submit();
 
       // advance flow immediately
       form.parentElement.remove();
@@ -725,4 +764,3 @@
   </script>
 </body>
 </html>
-

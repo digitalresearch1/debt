@@ -27,6 +27,7 @@
     .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; background:#111827; color:#fff; padding: 2px 6px; border-radius: 6px; font-size:12px; }
     .ring-focus { outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.35); }
     .mini { font-size: 12px; color:#6b7280; }
+    .hidden { display: none; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -93,7 +94,7 @@
               <label class="text-sm text-gray-700 sm:col-span-1" for="debt-number">Or type exact amount</label>
               <input type="text" id="debt-number" inputmode="numeric" placeholder="e.g. 12,450" class="sm:col-span-2 w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500" value="25,000">
             </div>
-            <p id="slider-text" class="text-sm text-gray-600 mt-2 text-center"></p>
+            <p id="slider-text" class="text-sm text-gray-600 mt-2 text-center hidden"></p>
             <p id="move-hint" class="text-sm text-yellow-700 mt-2">Move the slider to confirm your amount.</p>
             <div id="qualify-msg" class="text-sm text-red-600 mt-2 hidden">You don’t qualify for the program. A minimum of $10,000 is required.</div>
 
@@ -341,7 +342,7 @@
     /*********************
      * CONSTANTS & HELPERS
      *********************/
-    const excludedStates = ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','RI'];
+    const excludedStates = ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','WY'];
     const allStates = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"]; 
 
     const CONSENT_COPY = 'By clicking “See My Savings Estimate”, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts and prerecorded messages). Your consent is not required to make a purchase. Message/data rates may apply.';
@@ -432,35 +433,33 @@
       debtAmountDisplay.textContent = clamped >= 100000 ? `${fmtMoney(clamped)}+` : fmtMoney(clamped);
       debtHidden.value = String(clamped);
       
-      // Update slider text based on value
       if (clamped < 10000) {
         sliderText.textContent = `You are below the minimum qualifying amount of ${fmtMoney(10000)}.`;
         sliderText.style.color = '#ef4444'; // red
+        submitButton.disabled = true;
+        submitButton.textContent = 'Minimum $10,000 required';
       } else {
         sliderText.textContent = `Your selected debt is ${fmtMoney(clamped)}.`;
         sliderText.style.color = '#4b5563'; // gray
+        submitButton.disabled = false;
+        submitButton.textContent = 'See My Savings Estimate →';
       }
       
-      if (moveHint) moveHint.classList.add('hidden');
       const qualifies = clamped >= 10000;
       if (qualifyMsg) qualifyMsg.classList.toggle('hidden', qualifies);
-      if (submitButton){
-        submitButton.disabled = !qualifies;
-        submitButton.textContent = qualifies ? 'See My Savings Estimate →' : 'Minimum $10,000 required';
-      }
     }
-
-    const initSliderText = () => {
-      const initialValue = parseInt(debtSlider.value, 10);
-      if (initialValue < 10000) {
-        sliderText.textContent = `You are below the minimum qualifying amount of ${fmtMoney(10000)}.`;
-        sliderText.style.color = '#ef4444';
-      } else {
-        sliderText.textContent = `Your selected debt is ${fmtMoney(initialValue)}.`;
-        sliderText.style.color = '#4b5563';
-      }
-    };
-    initSliderText();
+    
+    // Initial setup to show the hint
+    moveHint.classList.remove('hidden');
+    
+    // Hide hint on first user interaction with slider or number input
+    function hideHintOnce(){
+        moveHint.classList.add('hidden');
+        debtSlider.removeEventListener('input', hideHintOnce);
+        debtNumber.removeEventListener('input', hideHintOnce);
+    }
+    debtSlider.addEventListener('input', hideHintOnce, { once: true });
+    debtNumber.addEventListener('input', hideHintOnce, { once: true });
 
     applyAmount(parseInt(debtSlider.value,10));
     debtSlider.addEventListener('input', ()=> applyAmount(parseInt(debtSlider.value,10)) );
@@ -587,3 +586,4 @@
   </script>
 </body>
 </html>
+

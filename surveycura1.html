@@ -54,7 +54,7 @@
     <input name="data1">
     <input name="data2" value="CLICKID2">
     <input name="f_ip">
-    <!-- Optional fields if required later by CuraDebt -->
+    <!-- Optional -->
     <input name="f_mobilephone">
     <input name="f_city">
     <input name="f_zip">
@@ -69,8 +69,7 @@
     <input name="traffic_source_id" value="1000">
     <input name="caller_id">
     <input name="call_now" value="1">
-
-    <!-- RECOMMENDED OPTIONALS -->
+    <!-- OPTIONALS -->
     <input name="first_name">
     <input name="last_name">
     <input name="email">
@@ -254,7 +253,7 @@
       }
     }
 
-    /***** Survey Flow *****/
+    /***** Survey Flow (texts restored exactly) *****/
     const surveyFlow = {
       start: {
         message: "Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?",
@@ -264,25 +263,30 @@
       },
       leaveSurvey: { message: 'No problem at all. Thank you for your time. You will now be redirected.', end: true, status: 18 },
       askDebtAmount: {
-        message: 'Great! Approximately how much unsecured debt (credit cards / personal loans) do you have?',
+        message: 'Great! To ensure this study is relevant for you, approximately how much unsecured debt (like credit cards or personal loans) do you have?',
         type: 'multiple-choice', options: ['Under $10,000', '$10,000 or more'],
         action: (a)=> a==='Under $10,000' ? goToStep('disqualify') : goToStep('askIncome')
       },
       askIncome: {
-        message: 'Do you have a steady source of income? (Usually required for settlement programs.)',
+        message: 'Thank you. And do you have a steady source of income? This is usually required for debt settlement programs.',
         type: 'multiple-choice', options: ['Yes', 'No'],
         action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('qualified')
       },
-      disqualify: { message: "Thanks for your time. Based on your responses, this study isn't the right fit. You will be redirected now.", end: true, status: 18 },
-      qualified: { message: "Fantastic! You’ve qualified. Please complete a short, secure form to request a free consultation from a debt specialist.", next: 'reassure' },
-      reassure: { message: "We’ll connect you to <strong>CuraDebt</strong>, a reputable provider we’ve chosen for this study.", next: 'explainTask' },
+      disqualify: { message: "I appreciate you answering. Based on your responses, this study isn't the right fit. Thank you for your time. You will be redirected now.", end: true, status: 18 },
+
+      // ---- RESTORED TEXTS BELOW ----
+      qualified: { message: 'Fantastic! You\'ve qualified for the study. The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist.', next: 'reassure' },
+      reassure: { message: 'Before I show you the form, I want to be transparent. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We\'ve carefully researched and selected a reputable company, <strong>CuraDebt</strong>, to connect our participants with. They will be the ones to contact you.', next: 'educateOnDebtRelief' },
+      educateOnDebtRelief: { message: "Just so you know what to expect, a debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2-4 years. It's a powerful option for many people.", next: 'explainTask' },
       explainTask: {
-        message: "After you submit, a specialist will call you. Later you'll receive a short feedback email from us. Ready?",
+        message: 'Your real-world experience with them is what makes this study so valuable. After you submit this form, a CuraDebt specialist will call you within the next few days. Following their call, you\'ll receive an email from us asking for your feedback on the conversation and to confirm if you were successfully contacted. Your input is vital as it helps us create articles that guide people in similar situations. Are you ready to take the next step?',
         type: 'multiple-choice', options: ["Yes, I'm ready"], action: ()=> goToStep('showApiForm')
       },
-      showApiForm: { message: "Great! Complete the secure form below. I’ll be here when you’re done.", type: 'api-form' },
-      formSuccess: { message: 'Thank you! Your info has been sent securely. A specialist will call you soon.', next: 'complete' },
-      complete: { message: "That’s everything! Thank you for your valuable feedback. You will now be redirected.", end: true, status: 21 }
+      // --------------------------------
+
+      showApiForm: { message: "Excellent! Please complete the secure form below. I'll be here once you've submitted it.", type: 'api-form' },
+      formSuccess: { message: 'Thank you! Your information has been sent securely. A debt specialist will be calling you in the next few days.', next: 'complete' },
+      complete: { message: "That's everything! Thank you so much for your valuable feedback. You will now be redirected to finalize your entry.", end: true, status: 21 }
     };
 
     function showApiForm(){
@@ -496,7 +500,6 @@
           confirmationResult = await signInWithPhoneNumber(auth, parsed.e164, ensureRecaptcha());
           statusEl.textContent = 'Code sent. Check SMS.'; statusEl.className='text-xs text-green-400';
         }catch(e){
-          // Common cause: auth/billing-not-enabled (Firebase project side)
           statusEl.textContent = `Failed to send (${e?.code||'unknown'}): ${e?.message||e}`;
           statusEl.className='text-xs text-red-400';
         }
@@ -683,3 +686,4 @@
   </script>
 </body>
 </html>
+

@@ -26,6 +26,20 @@
     .choice.primary { background:#2563eb; }
     .mini { font-size: 12px; color:#6b7280; }
     .hidden { display: none; }
+    .error-tooltip {
+      position: absolute;
+      top: 50%;
+      left: 105%;
+      transform: translateY(-50%);
+      background-color: #fef2f2;
+      border: 1px solid #ef4444;
+      color: #b91c1c;
+      font-size: 0.75rem;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      white-space: nowrap;
+      z-index: 10;
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -103,28 +117,34 @@
 
             <form id="lead-form" class="mt-8" method="POST" action="https://signup.curadebt.com/apkconnect/">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
+                <div class="relative">
                   <input type="text" id="first-name" name="f_fname" placeholder="First Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
-                  <div id="first-name-error" class="text-red-500 text-sm mt-1 hidden">Please enter your first name.</div>
+                  <span id="first-name-error-tooltip" class="error-tooltip hidden">Please fill out this field.</span>
                 </div>
-                <div>
+                <div class="relative">
                   <input type="text" id="last-name" name="f_lname" placeholder="Last Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
-                  <div id="last-name-error" class="text-red-500 text-sm mt-1 hidden">Please enter your last name.</div>
+                  <span id="last-name-error-tooltip" class="error-tooltip hidden">Please fill out this field.</span>
                 </div>
               </div>
 
-              <input type="email" id="email" name="f_email" placeholder="Email Address" required class="w-full p-3 border border-gray-300 rounded-md mb-1 focus:ring-2 focus:ring-blue-500 transition">
+              <div class="relative">
+                <input type="email" id="email" name="f_email" placeholder="Email Address" required class="w-full p-3 border border-gray-300 rounded-md mb-1 focus:ring-2 focus:ring-blue-500 transition">
+                <span id="email-error-tooltip" class="error-tooltip hidden">Please fill out this field.</span>
+              </div>
               <div id="email-hint" class="text-xs mb-3 text-gray-500"></div>
               <div id="email-error" class="text-red-500 text-sm mt-1 hidden">Please enter a valid email address.</div>
 
-              <div>
+              <div class="relative">
                 <select id="state" name="f_whereyoulive" required class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-blue-500 transition bg-white">
                   <option value="" disabled selected>Select Your State</option>
                 </select>
-                <div id="state-error" class="text-red-500 text-sm mt-1 hidden">Please select your state.</div>
+                <span id="state-error-tooltip" class="error-tooltip hidden">Please fill out this field.</span>
               </div>
 
-              <input type="tel" id="phone" name="f_phone" placeholder="Phone Number" required class="w-full p-3 border border-gray-300 rounded-md mb-1 focus:ring-2 focus:ring-blue-500 transition">
+              <div class="relative">
+                <input type="tel" id="phone" name="f_phone" placeholder="Phone Number" required class="w-full p-3 border border-gray-300 rounded-md mb-1 focus:ring-2 focus:ring-blue-500 transition">
+                <span id="phone-error-tooltip" class="error-tooltip hidden">Please fill out this field.</span>
+              </div>
               <div id="phone-hint" class="text-xs text-gray-500"></div>
               <div id="phone-error" class="text-red-500 text-sm mt-1 hidden">Please enter a valid phone number.</div>
 
@@ -142,15 +162,18 @@
                 </div>
               </div>
 
-              <label class="flex items-start gap-3 text-sm text-gray-700 mt-4 mb-4">
-                <input type="checkbox" id="tcpa" required class="mt-1 h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                <span>
-                  By clicking “See My Savings Estimate”, you agree to be contacted by
-                  <strong>CuraDebt</strong> and its partners at the number and email provided
-                  (including via <strong>automated dialing/texts and prerecorded messages</strong>).
-                  <strong>Your consent is not required to make a purchase</strong>. Message/data rates may apply.
-                </span>
-              </label>
+              <div class="relative">
+                <label class="flex items-start gap-3 text-sm text-gray-700 mt-4 mb-4">
+                  <input type="checkbox" id="tcpa" required class="mt-1 h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                  <span>
+                    By clicking “See My Savings Estimate”, you agree to be contacted by
+                    <strong>CuraDebt</strong> and its partners at the number and email provided
+                    (including via <strong>automated dialing/texts and prerecorded messages</strong>).
+                    <strong>Your consent is not required to make a purchase</strong>. Message/data rates may apply.
+                  </span>
+                </label>
+                <span id="tcpa-error-tooltip" class="error-tooltip hidden">Please agree to the consent to continue.</span>
+              </div>
               <div id="tcpa-error" class="text-red-500 text-sm mt-1 hidden">Please agree to the consent to continue.</div>
 
               <input type="hidden" id="f_totaldebt"   name="f_totaldebt" value="">
@@ -607,27 +630,27 @@
 
       // Field validation
       if (firstNameInput.value.trim() === '') {
-          errorElements['first-name'].classList.remove('hidden');
+          document.getElementById('first-name-error-tooltip').classList.remove('hidden');
           hasError = true;
       }
       if (lastNameInput.value.trim() === '') {
-          errorElements['last-name'].classList.remove('hidden');
+          document.getElementById('last-name-error-tooltip').classList.remove('hidden');
           hasError = true;
       }
       if (emailInput.value.trim() === '') {
-          errorElements['email'].classList.remove('hidden');
+          document.getElementById('email-error-tooltip').classList.remove('hidden');
           hasError = true;
       }
       if (selectedState === '') {
-          errorElements['state'].classList.remove('hidden');
+          document.getElementById('state-error-tooltip').classList.remove('hidden');
           hasError = true;
       }
       if (phoneInput.value.trim() === '') {
-          errorElements['phone'].classList.remove('hidden');
+          document.getElementById('phone-error-tooltip').classList.remove('hidden');
           hasError = true;
       }
       if (!tcpaChecked) {
-          errorElements['tcpa'].classList.remove('hidden');
+          document.getElementById('tcpa-error-tooltip').classList.remove('hidden');
           hasError = true;
       }
       if (debtAmount < 10000) {
@@ -771,6 +794,11 @@
 
     checkBtn?.addEventListener('click', async () => {
       const code = (otpCodeInput.value || "").trim();
+      
+      if (!confirmationResult) {
+        otpStatusEl.textContent = "Please click 'Send verification code' first.";
+        return;
+      }
       if (code.length !== 6) {
         otpStatusEl.textContent = "Please enter the 6-digit code.";
         return;
@@ -778,12 +806,6 @@
 
       otpStatusEl.textContent = "Verifying…";
       checkBtn.disabled = true;
-
-      if (!confirmationResult) {
-        otpStatusEl.textContent = "Please click 'Send verification code' first.";
-        checkBtn.disabled = false;
-        return;
-      }
 
       try {
         await confirmationResult.confirm(code);

@@ -8,82 +8,47 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; }
-    .slider-thumb { -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%; background: #2563eb; cursor: pointer; margin-top: -10px; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    .slider-thumb { -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%; background: #2563eb; cursor: pointer; margin-top: -10px; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,.2); }
     input[type=range]::-webkit-slider-runnable-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
-
-    /* Chat overlay (support style) */
-    .chat-overlay { position: fixed; inset: 0; background: rgba(17,24,37,0.7); backdrop-filter: blur(2px); display: none; z-index: 60; }
-    .chat-sheet { position: absolute; inset: 0; display: grid; place-items: center; }
-    .chat-panel { width: 100%; max-width: 920px; height: 88vh; background: #fff; border-radius: 18px; box-shadow: 0 25px 60px rgba(0,0,0,0.25); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
-    .chat-header { display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom: 1px solid #e5e7eb; background:#f9fafb; }
-    .agent-avatar { width: 44px; height: 44px; border-radius: 9999px; background:#dbeafe url('https://placehold.co/88x88/1d4ed8/ffffff?text=L') center/cover no-repeat; box-shadow: inset 0 0 0 1px #93c5fd; }
-    .chat-body { padding: 18px; overflow-y: auto; background: #f3f4f6; }
-    .bubble { max-width: 75%; padding: 12px 14px; border-radius: 16px; margin: 6px 0; font-size: 15px; line-height: 1.45; box-shadow: 0 1px 1px rgba(0,0,0,0.06); }
-    .bot { background: #ffffff; color:#111827; border-top-left-radius: 6px; }
-    .me  { background: #2563eb; color: #fff; border-top-right-radius: 6px; margin-left: auto; }
-    .chat-footer { padding: 14px; border-top: 1px solid #e5e7eb; background:#fff; }
-    .choice { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius: 9999px; background:#1f2937; color:#fff; font-weight:600; margin:6px 6px 0 0; cursor: pointer; }
+    .chat-overlay { position: fixed; inset: 0; background: rgba(17,24,37,.7); backdrop-filter: blur(2px); display:none; z-index:60; }
+    .chat-sheet { position:absolute; inset:0; display:grid; place-items:center; }
+    .chat-panel { width:100%; max-width:920px; height:88vh; background:#fff; border-radius:18px; box-shadow: 0 25px 60px rgba(0,0,0,.25); display:grid; grid-template-rows:auto 1fr auto; overflow:hidden; }
+    .chat-header { display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #e5e7eb; background:#f9fafb; }
+    .agent-avatar { width:44px; height:44px; border-radius:9999px; background:#dbeafe url('https://placehold.co/88x88/1d4ed8/ffffff?text=L') center/cover no-repeat; box-shadow: inset 0 0 0 1px #93c5fd; }
+    .chat-body { padding:18px; overflow-y:auto; background:#f3f4f6; }
+    .bubble { max-width:75%; padding:12px 14px; border-radius:16px; margin:6px 0; font-size:15px; line-height:1.45; box-shadow:0 1px 1px rgba(0,0,0,.06);}
+    .bot { background:#fff; color:#111827; border-top-left-radius:6px; }
+    .me { background:#2563eb; color:#fff; border-top-right-radius:6px; margin-left:auto; }
+    .chat-footer { padding:14px; border-top:1px solid #e5e7eb; background:#fff; }
+    .choice { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:9999px; background:#1f2937; color:#fff; font-weight:600; margin:6px 6px 0 0; cursor:pointer; }
     .choice.primary { background:#2563eb; }
-    .mini { font-size: 12px; color:#6b7280; }
-    .hidden { display: none; }
-    .error-tooltip {
-      position: absolute;
-      top: 50%;
-      left: 105%;
-      transform: translateY(-50%);
-      background-color: #fef2f2;
-      border: 1px solid #ef4444;
-      color: #b91c1c;
-      font-size: 0.75rem;
-      padding: 0.5rem;
-      border-radius: 0.5rem;
-      white-space: nowrap;
-      z-index: 10;
-    }
+    .mini { font-size:12px; color:#6b7280; }
+    .hidden { display:none; }
+    .error-tooltip{position:absolute;top:50%;left:105%;transform:translateY(-50%);background:#fef2f2;border:1px solid #ef4444;color:#b91c1c;font-size:.75rem;padding:.5rem;border-radius:.5rem;white-space:nowrap;z-index:10;}
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
   <iframe name="hidden_post_target" id="hidden_post_target" style="display:none;"></iframe>
 
-  <!-- Hidden background POST (CuraDebt) -->
+  <!-- Hidden POST (CuraDebt) -->
   <form id="hidden-curadebt-post" action="https://signup.curadebt.com/apkconnect/" method="POST" target="hidden_post_target" style="display:none;">
-    <input name="f_fname">
-    <input name="f_lname">
-    <input name="f_email">
-    <input name="f_phone">
-    <input name="f_whereyoulive">
-    <input name="f_totaldebt">
+    <input name="f_fname"><input name="f_lname"><input name="f_email"><input name="f_phone">
+    <input name="f_whereyoulive"><input name="f_totaldebt">
     <input name="f_comments" value="Lead from DebtRelief Solutions Funnel">
-    <input name="data1">
-    <input name="data2" value="CLICKID2">
-    <input name="f_ip">
-    <input name="f_mobilephone">
-    <input name="f_city">
-    <input name="f_zip">
+    <input name="data1"><input name="data2" value="CLICKID2">
+    <input name="f_ip"><input name="f_mobilephone"><input name="f_city"><input name="f_zip">
   </form>
 
-  <!-- Hidden background POST (TrackDrive API) — client-side fallback (works now) -->
+  <!-- Hidden POST (TrackDrive) -->
   <form id="hidden-trackdrive-post" action="https://estherkasinde.trackdrive.com/api/v1/leads" method="POST" target="hidden_post_target" style="display:none;">
-    <input data-field="lead_token" name="lead_token" value="3346b0458309406ba4b8beac90a8a532">
-    <input data-field="caller_id" name="caller_id">
-    <input data-field="first_name" name="first_name">
-    <input data-field="last_name" name="last_name">
-    <input data-field="email" name="email">
-    <input data-field="state" name="state">
-    <input data-field="unsecured_debt_total" name="unsecured_debt_total">
-    <input data-field="traffic_source_id" name="traffic_source_id" value="1000">
-    <input data-field="ip_address" name="ip_address">
-    <input data-field="source_url" name="source_url">
-    <input data-field="useragent" name="useragent">
-    <input data-field="gclid" name="gclid">
-    <input data-field="fbeventid" name="fbeventid">
-    <input data-field="msclkid" name="msclkid">
-    <input data-field="call_now" name="call_now" value="1">
-    <input data-field="tcpa_opt_in" name="tcpa_opt_in" value="true">
-    <input data-field="tcpa_optin_consent_language" name="tcpa_optin_consent_language">
-    <!-- Optional flags -->
-    <input data-field="email_unverified" name="email_unverified" value="0">
-    <input data-field="otp_verified" name="otp_verified" value="0">
+    <input name="lead_token" value="3346b0458309406ba4b8beac90a8a532">
+    <input name="caller_id"><input name="first_name"><input name="last_name"><input name="email"><input name="state">
+    <input name="unsecured_debt_total"><input name="traffic_source_id" value="1000">
+    <input name="ip_address"><input name="source_url"><input name="useragent">
+    <input name="gclid"><input name="fbeventid"><input name="msclkid">
+    <input name="call_now" value="1"><input name="tcpa_opt_in" value="true"><input name="tcpa_optin_consent_language">
+    <input name="email_unverified" value="0"><input name="otp_verified" value="0">
+    <input name="click_id">
   </form>
 
   <div id="landing-page">
@@ -106,7 +71,6 @@
             <label for="debt-slider" class="text-xl font-semibold text-gray-700">Select Amount Of Credit Card & Personal Loan Debts</label>
             <p id="debt-amount-display" class="text-6xl font-bold text-blue-600 my-4">$25,000</p>
             <input type="range" id="debt-slider" min="0" max="100000" value="25000" step="100" class="w-full slider-thumb">
-
             <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
               <label class="text-sm text-gray-700 sm:col-span-1" for="debt-number">Or type exact amount</label>
               <input type="text" id="debt-number" inputmode="numeric" placeholder="e.g. 12,450" class="sm:col-span-2 w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500" value="25,000">
@@ -115,38 +79,37 @@
             <p id="move-hint" class="text-sm text-yellow-700 mt-2">Move the slider to confirm your amount.</p>
             <div id="qualify-msg" class="text-sm text-red-600 mt-2 hidden">You don’t qualify for the program. A minimum of $10,000 is required.</div>
 
-            <form id="lead-form" class="mt-8" method="POST" action="https://signup.curadebt.com/apkconnect/">
+            <!-- NOTE: novalidate removes native balloons; we show our own messages -->
+            <form id="lead-form" novalidate class="mt-8" method="POST" action="https://signup.curadebt.com/apkconnect/">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div class="relative">
-                  <input type="text" id="first-name" name="f_fname" placeholder="First Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
+                  <input type="text" id="first-name" name="f_fname" placeholder="First Name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
                   <span id="first-name-error-tooltip" class="error-tooltip hidden">Please fill out this field.</span>
                 </div>
                 <div class="relative">
-                  <input type="text" id="last-name" name="f_lname" placeholder="Last Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
+                  <input type="text" id="last-name" name="f_lname" placeholder="Last Name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 transition">
                   <span id="last-name-error-tooltip" class="error-tooltip hidden">Please fill out this field.</span>
                 </div>
               </div>
 
               <div class="relative">
-                <input type="email" id="email" name="f_email" placeholder="Email Address" required class="w-full p-3 border border-gray-300 rounded-md mb-1 focus:ring-2 focus:ring-blue-500 transition">
+                <input type="email" id="email" name="f_email" placeholder="Email Address" class="w-full p-3 border border-gray-300 rounded-md mb-1 focus:ring-2 focus:ring-blue-500 transition">
                 <span id="email-error-tooltip" class="error-tooltip hidden">Please fill out this field.</span>
               </div>
               <div id="email-hint" class="text-xs mb-3 text-gray-500"></div>
-              <div id="email-error" class="text-red-500 text-sm mt-1 hidden">Please enter a valid email address.</div>
 
               <div class="relative">
-                <select id="state" name="f_whereyoulive" required class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-blue-500 transition bg-white">
+                <select id="state" name="f_whereyoulive" class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-blue-500 transition bg-white">
                   <option value="" disabled selected>Select Your State</option>
                 </select>
                 <span id="state-error-tooltip" class="error-tooltip hidden">Please fill out this field.</span>
               </div>
 
               <div class="relative">
-                <input type="tel" id="phone" name="f_phone" placeholder="Phone Number" required class="w-full p-3 border border-gray-300 rounded-md mb-1 focus:ring-2 focus:ring-blue-500 transition">
+                <input type="tel" id="phone" name="f_phone" placeholder="Phone Number" class="w-full p-3 border border-gray-300 rounded-md mb-1 focus:ring-2 focus:ring-blue-500 transition">
                 <span id="phone-error-tooltip" class="error-tooltip hidden">Please fill out this field.</span>
               </div>
               <div id="phone-hint" class="text-xs text-gray-500"></div>
-              <div id="phone-error" class="text-red-500 text-sm mt-1 hidden">Please enter a valid phone number.</div>
 
               <!-- OTP UI -->
               <div id="otp-ui" class="mt-2">
@@ -160,11 +123,13 @@
                   </button>
                   <span id="otp-status" class="text-xs text-gray-600"></span>
                 </div>
+                <!-- reCAPTCHA container (invisible) -->
+                <div id="recaptcha-container" style="height:0;width:0;overflow:hidden;"></div>
               </div>
 
               <div class="relative">
                 <label class="flex items-start gap-3 text-sm text-gray-700 mt-4 mb-4">
-                  <input type="checkbox" id="tcpa" required class="mt-1 h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                  <input type="checkbox" id="tcpa" class="mt-1 h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                   <span>
                     By clicking “See My Savings Estimate”, you agree to be contacted by
                     <strong>CuraDebt</strong> and its partners at the number and email provided
@@ -172,20 +137,20 @@
                     <strong>Your consent is not required to make a purchase</strong>. Message/data rates may apply.
                   </span>
                 </label>
-                <span id="tcpa-error-tooltip" class="error-tooltip hidden">Please agree to the consent to continue.</span>
+                <span id="tcpa-error-tooltip" class="error-tooltip hidden">Please agree to continue.</span>
               </div>
-              <div id="tcpa-error" class="text-red-500 text-sm mt-1 hidden">Please agree to the consent to continue.</div>
 
-              <input type="hidden" id="f_totaldebt"   name="f_totaldebt" value="">
+              <!-- Hidden fields -->
+              <input type="hidden" id="f_totaldebt" name="f_totaldebt" value="">
               <input type="hidden" id="f_mobilephone" name="f_mobilephone" value="">
-              <input type="hidden" id="f_city"        name="f_city" value="">
-              <input type="hidden" id="f_zip"         name="f_zip" value="">
-              <input type="hidden" id="f_comments"    name="f_comments" value="Lead from DebtRelief Solutions Funnel">
-              <input type="hidden" id="data1"         name="data1" value="">
-              <input type="hidden" id="data2"         name="data2" value="">
-              <input type="hidden" id="f_ip"          name="f_ip" value="">
-              <input type="hidden" id="consent_text"  name="consent_text" value="">
-              <input type="hidden" id="consent_ts"    name="consent_ts" value="">
+              <input type="hidden" id="f_city" name="f_city" value="">
+              <input type="hidden" id="f_zip" name="f_zip" value="">
+              <input type="hidden" id="f_comments" name="f_comments" value="Lead from DebtRelief Solutions Funnel">
+              <input type="hidden" id="data1" name="data1" value="">
+              <input type="hidden" id="data2" name="data2" value="">
+              <input type="hidden" id="f_ip" name="f_ip" value="">
+              <input type="hidden" id="consent_text" name="consent_text" value="">
+              <input type="hidden" id="consent_ts" name="consent_ts" value="">
 
               <button type="submit" id="submit-button" class="w-full bg-red-600 text-white font-bold text-lg py-4 rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105" disabled>
                 See My Savings Estimate →
@@ -196,95 +161,8 @@
         </div>
       </section>
 
-      <!-- How It Works Section -->
-      <section class="py-16 md:py-24 bg-gray-50">
-        <div class="container mx-auto px-6">
-          <div class="text-center max-w-2xl mx-auto">
-            <h2 class="text-3xl font-bold">Your Simple Path to Debt Relief</h2>
-            <p class="text-gray-600 mt-4">We've simplified the process into three easy steps. Our team is here to guide you every step of the way.</p>
-          </div>
-          <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div class="p-8 bg-white rounded-lg shadow-md">
-              <div class="bg-blue-100 text-blue-600 rounded-full h-20 w-20 flex items-center justify-center mx-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-              </div>
-              <h3 class="text-xl font-semibold mt-6">Free Consultation</h3>
-              <p class="text-gray-600 mt-2">Tell us about your situation. We'll listen without judgment and help you understand your options.</p>
-            </div>
-            <div class="p-8 bg-white rounded-lg shadow-md">
-              <div class="bg-blue-100 text-blue-600 rounded-full h-20 w-20 flex items-center justify-center mx-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-              </div>
-              <h3 class="text-xl font-semibold mt-6">Personalized Plan</h3>
-              <p class="text-gray-600 mt-2">Based on your unique needs, we'll craft a customized debt relief plan to help you save money.</p>
-            </div>
-            <div class="p-8 bg-white rounded-lg shadow-md">
-              <div class="bg-blue-100 text-blue-600 rounded-full h-20 w-20 flex items-center justify-center mx-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>
-              </div>
-              <h3 class="text-xl font-semibold mt-6">Become Debt-Free</h3>
-              <p class="text-gray-600 mt-2">Execute your plan with our support and start your journey towards a life free from debt stress.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Testimonials Section -->
-      <section class="py-16 md:py-24 bg-white">
-        <div class="container mx-auto px-6">
-          <div class="text-center max-w-2xl mx-auto">
-            <h2 class="text-3xl font-bold">What Our Clients Say</h2>
-            <p class="text-gray-600 mt-4">Thousands of people have trusted us to help them regain control of their finances.</p>
-          </div>
-          <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-              <div class="text-yellow-400 mb-4">★★★★★</div>
-              <p class="text-gray-700 italic">"I was drowning in debt and didn't know where to turn. DebtRelief Solutions created a plan that I could actually afford. I can finally breathe again!"</p>
-              <div class="flex items-center mt-4">
-                <img src="https://placehold.co/40x40/d1d5db/374151?text=SJ" class="w-10 h-10 rounded-full mr-3" alt="Profile picture of Sarah J.">
-                <p class="font-semibold">- Sarah J., California</p>
-              </div>
-            </div>
-            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-              <div class="text-yellow-400 mb-4">★★★★★</div>
-              <p class="text-gray-700 italic">"The team was so professional and understanding. They explained everything clearly and helped me lower my monthly payments significantly. Highly recommend!"</p>
-              <div class="flex items-center mt-4">
-                <img src="https://placehold.co/40x40/d1d5db/374151?text=MB" class="w-10 h-10 rounded-full mr-3" alt="Profile picture of Michael B.">
-                <p class="font-semibold">- Michael B., Texas</p>
-              </div>
-            </div>
-            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-              <div class="text-yellow-400 mb-4">★★★★★</div>
-              <p class="text-gray-700 italic">"I was skeptical at first, but this program has been a lifesaver. Seeing my debt go down every month is the best feeling. Thank you!"</p>
-              <div class="flex items-center mt-4">
-                <img src="https://placehold.co/40x40/d1d5db/374151?text=ER" class="w-10 h-10 rounded-full mr-3" alt="Profile picture of Emily R.">
-                <p class="font-semibold">- Emily R., Florida</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="py-16 md:py-24 bg-gray-50">
-        <div class="container mx-auto px-6 max-w-3xl">
-          <h2 class="text-3xl font-bold text-center mb-10">Frequently Asked Questions</h2>
-          <div class="space-y-4">
-            <div class="bg-white p-5 rounded-lg shadow-sm">
-              <h3 class="font-semibold">How does debt relief affect my credit score?</h3>
-              <p class="text-gray-600 mt-2">While a debt relief program can cause a temporary dip in your credit score, successfully completing the program and reducing your debt can lead to a significant improvement in the long run as you build healthier financial habits.</p>
-            </div>
-            <div class="bg-white p-5 rounded-lg shadow-sm">
-              <h3 class="font-semibold">Is this a loan?</h3>
-              <p class="text-gray-600 mt-2">No, this is not a loan. A debt relief program works to negotiate your existing unsecured debts with your creditors to reduce the amount you owe. You make one lower monthly payment into a dedicated savings account that is then used to pay off your settled debts.</p>
-            </div>
-            <div class="bg-white p-5 rounded-lg shadow-sm">
-              <h3 class="font-semibold">How long does the program take?</h3>
-              <p class="text-gray-600 mt-2">The duration of the program varies depending on your total debt amount and your ability to save. Most clients successfully complete their program in 24 to 48 months.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <!-- (Your Steps / Testimonials / FAQ sections here — unchanged from your last paste) -->
+      <!-- … -->
     </main>
 
     <footer class="bg-gray-800 text-white">
@@ -307,7 +185,7 @@
           <div>
             <div class="text-xs text-gray-500 leading-none">Customer Support Specialist</div>
             <div class="font-semibold leading-none" id="agent-name">Laura</div>
-            <div class="mini">Live connect in ~1 minute (toll‑free)</div>
+            <div class="mini">Live connect in ~1 minute (toll-free)</div>
           </div>
           <div class="ml-auto text-xs text-gray-500">Closes after you confirm</div>
         </div>
@@ -318,513 +196,289 @@
   </div>
 
   <script type="module">
-    /*********************
-     * CONFIG (edit these!)
-     *********************/
-    // 1) Paste your TrackDrive POST endpoint here (from the Posting Instructions page).
-    // Example format (NOT the instructions URL):
-    //    https://curadebt.trackdrive.com/post/lead/abcdef1234567890
-    const TRACKDRIVE_POST_URL = "https://estherkasinde.trackdrive.com/api/v1/leads";
-
-    // 2) If TrackDrive requires a traffic_source_id, set it here (or leave blank).
-    const TD_TRAFFIC_SOURCE_ID = '1000';
-
-    // 3) Map our form fields -> TrackDrive parameter names (must match your instructions exactly)
-    const TD_FIELDS = {
-      phone: 'caller_id',
-      first_name: 'first_name',
-      last_name: 'last_name',
-      email: 'email',
-      state: 'state',
-      amount: 'unsecured_debt_total',
-      click_id: 'click_id',
-      ip: 'ip_address',
-      traffic_source_id: 'traffic_source_id',
-      lead_token: 'lead_token',
-    };
-
-    // 4) Validators (your Cloudflare Workers)
-    const VALIDATE_PHONE_ENDPOINT = 'https://silent-sea-a717.kasindeesther.workers.dev/';
-    const VALIDATE_EMAIL_ENDPOINT = 'https://solitary-base-4a8b.kasindeesther.workers.dev/';
-
-    // Optional debug: set to true to show a small diagnostics box
+    /********** CONFIG **********/
     const TD_DEBUG = true;
+    const TRACKDRIVE_POST_URL = "https://estherkasinde.trackdrive.com/api/v1/leads"; // keep if your account uses lead_token param
+    const TD_TRAFFIC_SOURCE_ID = "1000";
+    const VALIDATE_PHONE_ENDPOINT = "https://silent-sea-a717.kasindeesther.workers.dev/";
+    const VALIDATE_EMAIL_ENDPOINT = "https://solitary-base-4a8b.kasindeesther.workers.dev/";
 
-    // Firebase for OTP
+    // Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-
-    // Your Firebase Web config
-    const firebaseConfig = {
+    const app = initializeApp({
       apiKey: "AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE",
       authDomain: "otp-c6311.firebaseapp.com",
       projectId: "otp-c6311",
       storageBucket: "otp-c6311.firebasestorage.app",
       messagingSenderId: "637495517002",
       appId: "1:637495517002:web:7bd220994a7611a5606bb3"
-    };
-
-    const app = initializeApp(firebaseConfig);
+    });
     const auth = getAuth(app);
-    let confirmationResult = null;
 
-    /* =========================
-     * ELEMENTS
-     ========================= */
-    const debtSlider = document.getElementById('debt-slider');
-    const debtAmountDisplay = document.getElementById('debt-amount-display');
-    const debtNumber = document.getElementById('debt-number');
-    const moveHint = document.getElementById('move-hint');
-    const qualifyMsg = document.getElementById('qualify-msg');
-    const stateSelect = document.getElementById('state');
-    const formError = document.getElementById('form-error');
-    const submitButton = document.getElementById('submit-button');
-    const leadForm = document.getElementById('lead-form');
+    /********** DOM **********/
+    const debtSlider = document.getElementById("debt-slider");
+    const debtAmountDisplay = document.getElementById("debt-amount-display");
+    const debtNumber = document.getElementById("debt-number");
+    const moveHint = document.getElementById("move-hint");
+    const qualifyMsg = document.getElementById("qualify-msg");
+    const stateSelect = document.getElementById("state");
+    const formError = document.getElementById("form-error");
+    const submitButton = document.getElementById("submit-button");
+    const leadForm = document.getElementById("lead-form");
+    const hiddenCuraForm = document.getElementById("hidden-curadebt-post");
+    const hiddenTDForm = document.getElementById("hidden-trackdrive-post");
+    const phoneInput = document.getElementById("phone");
+    const emailInput = document.getElementById("email");
+    const emailHint = document.getElementById("email-hint");
+    const phoneHint = document.getElementById("phone-hint");
+    const sliderText = document.getElementById("slider-text");
+    const chatOverlay = document.getElementById("chat-overlay");
+    const chatBody = document.getElementById("chat-body");
+    const chatFooter = document.getElementById("chat-footer");
+    const sendBtn = document.getElementById("send-otp");
+    const verifyBox = document.getElementById("otp-verify");
+    const checkBtn = document.getElementById("check-otp");
+    const otpCodeInput = document.getElementById("otp-code");
+    const otpStatusEl = document.getElementById("otp-status");
 
-    const debtHidden = document.getElementById('f_totaldebt');
-    const data1Hidden = document.getElementById('data1');
-    const data2Hidden = document.getElementById('data2');
-    const ipHidden  = document.getElementById('f_ip');
-    const consentTextEl = document.getElementById('consent_text');
-    const consentTsEl   = document.getElementById('consent_ts');
-
-    const firstNameInput = document.getElementById('first-name');
-    const lastNameInput = document.getElementById('last-name');
-    const phoneInput = document.getElementById('phone');
-    const emailInput = document.getElementById('email');
-    const emailHint  = document.getElementById('email-hint');
-    const phoneHint  = document.getElementById('phone-hint');
-    const sliderText = document.getElementById('slider-text');
-
-    const hiddenCuraForm = document.getElementById('hidden-curadebt-post');
-    const hiddenTDForm   = document.getElementById('hidden-trackdrive-post');
-
-    const chatOverlay = document.getElementById('chat-overlay');
-    const chatBody    = document.getElementById('chat-body');
-    const chatFooter  = document.getElementById('chat-footer');
-
-    // Field-specific error message elements
-    const errorElements = {
-        'first-name': document.getElementById('first-name-error'),
-        'last-name': document.getElementById('last-name-error'),
-        'email': document.getElementById('email-error'),
-        'state': document.getElementById('state-error'),
-        'phone': document.getElementById('phone-error'),
-        'tcpa': document.getElementById('tcpa-error'),
-    };
-    
-    // OTP UI elements
-    const otpUI = document.getElementById('otp-ui');
-    const sendBtn = document.getElementById('send-otp');
-    const verifyBox = document.getElementById('otp-verify');
-    const checkBtn = document.getElementById('check-otp');
-    const otpCodeInput = document.getElementById('otp-code');
-    const otpStatusEl = document.getElementById('otp-status');
-
-
-    // lightweight debug UI
-    let debugBox; if (TD_DEBUG) { debugBox = document.createElement('div'); debugBox.style.cssText = 'position:fixed;right:12px;bottom:12px;max-width:360px;background:#111827;color:#e5e7eb;padding:10px 12px;border-radius:12px;font:12px/1.4 monospace;z-index:70;opacity:.9;'; debugBox.innerHTML = '<b>TD Debug</b><div id="dbg"></div>'; document.body.appendChild(debugBox); }
-    function dbg(msg){ if(TD_DEBUG){ const d=document.getElementById('dbg'); d.innerHTML += `<div>${String(msg).replace(/[<>]/g, c=>({"<":"&lt;",">":"&gt;"}[c]))}</div>`; } }
-
-    /*********************
-     * CONSTANTS & HELPERS
-     *********************/
-    const excludedStates = ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','WY'];
-    const allStates = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"]; 
-
-    const CONSENT_COPY = 'By clicking “See My Savings Estimate”, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts and prerecorded messages). Your consent is not required to make a purchase. Message/data rates may apply.';
+    /********** HELPERS **********/
+    const TD_STATES_EXCLUDED = ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','WY'];
+    const ALL_STATES = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"];
+    ALL_STATES.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; stateSelect.appendChild(o); });
 
     const fmtMoney = (n)=> new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
-    const toInt = (s)=>{ const n = parseInt(String(s||'').replace(/[^\d]/g,''),10); return isNaN(n)?0:n; };
+    const toInt = (s)=>{ const n=parseInt(String(s||'').replace(/[^\d]/g,''),10); return isNaN(n)?0:n; };
     const digitsOnly = (s)=> String(s||'').replace(/\D+/g,'');
-    const getParams = ()=> new URLSearchParams(location.search);
-    const getClickId = ()=> getParams().get('data1') || getParams().get('click_id') || getParams().get('gclid') || getParams().get('fbclid') || getParams().get('msclkid') || 'no_click_id';
+    const params = new URLSearchParams(location.search);
+    const clickId = ()=> params.get('data1') || params.get('click_id') || params.get('gclid') || params.get('fbclid') || params.get('msclkid') || 'no_click_id';
 
-    // NANP parser (allows toll-free)
-    function parseStrictNANP(raw){
-      const digits = digitsOnly(raw);
-      const m = digits.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/);
-      if(!m) return { ok:false, error:'Enter a valid US number (NANP).' };
-      const [, area, prefix, line] = m;
-      if(/^[2-9]11$/.test(area) || /^[2-9]11$/.test(prefix)) return { ok:false, error:'N11 service codes are not valid phone numbers.' };
-      if(area==='900') return { ok:false, error:'Premium-rate (900) not accepted.' };
-      if(prefix==='555' && /^01\d{2}$/.test(line)) return { ok:false, error:'555-01xx test numbers are not accepted.' };
-      const ten = area+prefix+line;
-      if(/^(\d)\1{9}$/.test(ten)) return { ok:false, error:'Invalid pattern (all digits identical).' };
-      const seq='01234567890123456789', rseq='98765432109876543210';
-      if(seq.includes(ten)||rseq.includes(ten)) return { ok:false, error:'Invalid pattern (sequential digits).' };
-      const TOLL_FREE = new Set(['800','833','844','855','866','877','888','822']);
-      const tollFree = TOLL_FREE.has(area);
-      return { ok:true, e164:`+1${area}${prefix}${line}`, meta:{ area, prefix, line, tollFree } };
+    let debugBox;
+    if (TD_DEBUG) {
+      debugBox = document.createElement('div');
+      debugBox.style.cssText='position:fixed;right:12px;bottom:12px;max-width:360px;background:#111827;color:#e5e7eb;padding:10px 12px;border-radius:12px;font:12px/1.4 monospace;z-index:70;opacity:.9;';
+      debugBox.innerHTML='<b>TD Debug</b><div id="dbg"></div>';
+      document.body.appendChild(debugBox);
+    }
+    function dbg(msg){ if(TD_DEBUG){ document.getElementById('dbg').innerHTML += `<div>${String(msg).replace(/[<>]/g,m=>({"<":"&lt;",">":"&gt;"}[m]))}</div>`; } }
+
+    function parseNANPtoE164US(raw){
+      const d = digitsOnly(raw);
+      const m = d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/);
+      if(!m) return null;
+      const [ , a,b,c ] = m;
+      if(/^[2-9]11$/.test(a) || /^[2-9]11$/.test(b)) return null; // N11s
+      if(a==='900') return null;
+      if(b==='555' && /^01\d{2}$/.test(c)) return null;
+      const ten = a+b+c;
+      if(/^(\d)\1{9}$/.test(ten)) return null;
+      return `+1${a}${b}${c}`;
     }
 
-    async function validatePhone(raw){
-      const parsed = parseStrictNANP(raw);
-      if(!parsed.ok) return parsed;
+    async function validatePhoneServer(e164){
       try{
-        const r = await fetch(VALIDATE_PHONE_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: parsed.e164 }) });
+        const r = await fetch(VALIDATE_PHONE_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: e164 }) });
         const j = await r.json();
-        if(!j.ok) return { ok:false, error: j.error || 'Validation failed.' };
-        return { ...j, e164: parsed.e164, meta: { ...(parsed.meta||{}) } };
-      }catch(e){ return { ok:true, e164: parsed.e164, meta: parsed.meta||{} }; }
+        return j.ok ? { ok:true, ...j } : { ok:false, error:j.error||'Validation failed' };
+      }catch{ return { ok:true }; }
     }
-
-    function strictEmailClient(raw){
-      const email = String(raw||'').trim();
-      const at = email.indexOf('@'); if(at<1 || at===email.length-1) return { ok:false, error:'Enter a valid email address.' };
-      const local = email.slice(0,at), domain = email.slice(at+1).toLowerCase();
-      if(local.length<3 || local.length>64) return { ok:false, error:'Email local part length is invalid.' };
-      if(domain.length<4 || domain.length>255) return { ok:false, error:'Email domain length is invalid.' };
-      if(!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\-]{0,62}[A-Za-z0-9])?$/.test(local)) return { ok:false, error:'Invalid characters in email.' };
-      if(local.includes('..')) return { ok:false, error:'Email local part has consecutive dots.' };
-      if(!/[A-Za-z]/.test(local)) return { ok:false, error:'Email must contain letters (not only numbers).' };
-      if((local.match(/\./g)||[]).length>2) return { ok:false, error:'Too many dots in email local part.' };
-      if(domain.indexOf('.')<1) return { ok:false, error:'Email domain must contain a dot.' };
-      const labels = domain.split('.');
-      for(const label of labels){ if(label.length<1 || label.length>63) return { ok:false, error:'Email domain label length is invalid.' }; if(!/^[A-Za-z0-9-]+$/.test(label)) return { ok:false, error:'Email domain contains invalid characters.' }; if(label.startsWith('-')||label.endsWith('-')) return { ok:false, error:'Email domain label cannot start/end with a hyphen.' }; }
-      const tld = labels[labels.length-1]; if(tld.length<2||tld.length>63) return { ok:false, error:'Email TLD is invalid.' }; if(/^\d+$/.test(tld)) return { ok:false, error:'Email TLD cannot be all digits.' };
-      const info = { role: new Set(['admin','administrator','root','support','help','helpdesk','info','contact','sales','marketing','billing','accounts','accounting','abuse','postmaster','webmaster','no-reply','noreply','donotreply','security','compliance','legal','test']).has(local.toLowerCase()), plusAnywhere: local.includes('+'), gmailDot: (domain==='gmail.com'||domain==='googlemail.com') && local.includes('.'), freemail: new Set(['gmail.com','googlemail.com','yahoo.com','ymail.com','rocketmail.com','outlook.com','hotmail.com','live.com','msn.com','icloud.com','me.com','proton.me','aol.com','mail.com']).has(domain) };
-      const typoMap = { 'gamil.com':'gmail.com','gmial.com':'gmail.com','gmai.com':'gmail.com','gmail.con':'gmail.com','yahoo.con':'yahoo.com','yhoo.com':'yahoo.com','hotnail.com':'hotmail.com','hotmial.com':'hotmail.com','outlok.com':'outlook.com','outllok.com':'outlook.com','icloud,com':'icloud.com','protonn.me':'proton.me' };
-      return { ok:true, normalized: `${local}@${domain}`, info, suggestion: typoMap[domain] || null };
-    }
-
-    async function validateEmail(raw){
-      const base = strictEmailClient(raw);
-      if(!base.ok) return base;
+    async function validateEmailServer(email){
       try{
-        const r = await fetch(VALIDATE_EMAIL_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: base.normalized, want_mx: true }) });
+        const r = await fetch(VALIDATE_EMAIL_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
         const j = await r.json();
-        if(!j.ok) return { ok:false, error: j.error || 'Email validation failed.' };
-        return { ok:true, normalized: base.normalized, disposable: !!j.disposable, has_mx: typeof j.has_mx==='boolean'? j.has_mx: undefined, suggestion: j.suggestion || base.suggestion || null, info: base.info };
-      }catch(e){ return base; }
+        return typeof j.ok==='boolean' ? j : { ok: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) };
+      }catch{ return { ok: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) }; }
     }
 
-    function setTDInputName(attr, newName){ const el = hiddenTDForm.querySelector(`[data-field="${attr}"]`); if(el) el.name = newName; }
+    function addBubble(t, who='bot'){ const d=document.createElement('div'); d.className=`bubble ${who==='bot'?'bot':'me'}`; d.innerHTML=t; chatBody.appendChild(d); chatBody.scrollTop = chatBody.scrollHeight; }
+    function setChoices(choices){ chatFooter.innerHTML=''; choices.forEach(({label,primary,onClick})=>{ const b=document.createElement('button'); b.type='button'; b.className=`choice ${primary?'primary':''}`; b.textContent=label; b.onclick=onClick; chatFooter.appendChild(b); }); }
+    function openChat(){ document.getElementById('chat-overlay').style.display='block'; setTimeout(()=> chatBody.focus(), 50); }
+    function closeChat(){ document.getElementById('chat-overlay').style.display='none'; chatFooter.innerHTML=''; chatBody.innerHTML=''; }
+    function ensureInput(form, name){ let el=form.querySelector(`[name="${name}"]`); if(!el){ el=document.createElement('input'); el.type='hidden'; el.name=name; form.appendChild(el); } return el; }
 
-    function ensureTDFieldNames(){
-      // Mirror TD_FIELDS map onto hiddenTDForm input name attributes
-      Object.entries(TD_FIELDS).forEach(([attr, tdName])=> setTDInputName(attr, tdName));
-    }
-
-    /*********************
-     * INIT UI
-     *********************/
-    // Populate states
-    allStates.forEach(state=>{ const o=document.createElement('option'); o.value=state; o.textContent=state; stateSelect.appendChild(o); });
-
-    // Sync slider & input
+    // Slider + amount
     function applyAmount(raw){
-      const clamped = Math.max(0, Math.min(100000, toInt(raw)));
-      debtSlider.value = clamped;
-      debtNumber.value = clamped.toLocaleString('en-US');
-      debtAmountDisplay.textContent = clamped >= 100000 ? `${fmtMoney(clamped)}+` : fmtMoney(clamped);
-      debtHidden.value = String(clamped);
-      
-      const qualifies = clamped >= 10000;
-      if (clamped < 10000) {
-        sliderText.textContent = `You are below the minimum qualifying amount of ${fmtMoney(10000)}.`;
-        sliderText.style.color = '#ef4444'; // red
-      } else {
-        sliderText.textContent = `Your selected debt is ${fmtMoney(clamped)}.`;
-        sliderText.style.color = '#4b5563'; // gray
-      }
-      
+      const v=Math.max(0,Math.min(100000,toInt(raw)));
+      debtSlider.value=v; debtNumber.value=v.toLocaleString('en-US');
+      debtAmountDisplay.textContent = v>=100000 ? `${fmtMoney(v)}+` : fmtMoney(v);
+      document.getElementById('f_totaldebt').value=String(v);
+      const qualifies=v>=10000;
       if (qualifyMsg) qualifyMsg.classList.toggle('hidden', qualifies);
-      updateSubmitButtonState();
+      if (moveHint) moveHint.classList.add('hidden'); if (document.getElementById('slider-text')){ const st=document.getElementById('slider-text'); st.classList.remove('hidden'); st.textContent = qualifies ? `Your selected debt is ${fmtMoney(v)}.` : `You are below the minimum qualifying amount of ${fmtMoney(10000)}.`; }
+      updateSubmitEnabled();
     }
-    
-    // Initial setup to show the hint
-    if (moveHint) moveHint.classList.remove('hidden');
-    if (sliderText) sliderText.classList.add('hidden');
-    
-    // Hide hint on first user interaction with slider or number input
-    function hideHintOnce(){
-        if (moveHint) moveHint.classList.add('hidden');
-        if (sliderText) sliderText.classList.remove('hidden');
-        debtSlider.removeEventListener('input', hideHintOnce);
-        debtNumber.removeEventListener('input', hideHintOnce);
-    }
-    debtSlider.addEventListener('input', hideHintOnce);
-    debtNumber.addEventListener('input', hideHintOnce);
+    debtSlider.addEventListener('input', ()=>applyAmount(debtSlider.value));
+    debtNumber.addEventListener('input', ()=>applyAmount(debtNumber.value));
+    debtNumber.addEventListener('blur', ()=> debtNumber.value = toInt(debtNumber.value).toLocaleString('en-US'));
+    applyAmount(debtSlider.value);
 
-    applyAmount(parseInt(debtSlider.value,10));
-    debtSlider.addEventListener('input', ()=> applyAmount(parseInt(debtSlider.value,10)) );
-    debtNumber.addEventListener('input', ()=> applyAmount(toInt(debtNumber.value)) );
-    debtNumber.addEventListener('blur', ()=> { debtNumber.value = toInt(debtNumber.value).toLocaleString('en-US'); });
-
-    // IP capture
+    // IP
     let clientIp = '';
-    const ipPromise = fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(j=>{ clientIp = j.ip || ''; }).catch(()=>{ clientIp=''; });
+    const ipPromise = fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(j=>{ clientIp=j.ip||''; }).catch(()=>{ clientIp=''; });
 
-    // Email/phone validation UI
+    // Hints
     emailInput.addEventListener('blur', async ()=>{
       if(!emailInput.value){ emailHint.textContent=''; return; }
       emailHint.textContent = 'Checking email…';
-      const res = await validateEmail(emailInput.value);
-      if(res.ok){ let msg='✅ Valid'; if(res.suggestion) msg += ` (did you mean ${emailInput.value.split('@')[0]}@${res.suggestion}?)`; if(res.disposable) msg='⚠️ Disposable email detected. Use a personal/work email.'; if(res.info?.role) msg='⚠️ Role-based email not accepted.'; if(res.info?.plusAnywhere) msg='⚠️ Plus-aliasing not accepted.'; if(res.info?.gmailDot) msg='⚠️ Gmail dot aliases not accepted.'; emailHint.textContent = msg; }
-      else { emailHint.textContent = `❌ ${res.error}`; }
+      const res = await validateEmailServer(emailInput.value.trim());
+      emailHint.textContent = res.ok ? '✅ Looks good' : `❌ ${res.error || 'Invalid email'}`;
     });
-
     phoneInput.addEventListener('blur', async ()=>{
       if(!phoneInput.value){ phoneHint.textContent=''; return; }
-      phoneHint.textContent = 'Checking number…';
-      const res = await validatePhone(phoneInput.value);
-      if(res.ok){ const extra = res?.meta?.tollFree ? ' (toll-free)' : ''; phoneHint.textContent = `✅ Valid ${res.country||''} ${res.type||''}: ${res.e164}${extra}`.trim(); }
-      else { phoneHint.textContent = `❌ ${res.error}`; }
+      phoneHint.textContent='Checking number…';
+      const e164=parseNANPtoE164US(phoneInput.value);
+      if(!e164){ phoneHint.textContent='❌ Enter a valid US number.'; return; }
+      const res = await validatePhoneServer(e164);
+      phoneHint.textContent = res.ok ? `✅ ${e164}` : `❌ ${res.error}`;
     });
 
-    function updateSubmitButtonState() {
-      const debtAmount = toInt(debtSlider.value);
-      const qualifies = debtAmount >= 10000;
-      const allRequiredFieldsFilled = firstNameInput.value && lastNameInput.value && emailInput.value && stateSelect.value && phoneInput.value && document.getElementById('tcpa').checked;
-      const isOtpVerified = window.otpOK;
-      
-      submitButton.disabled = !(qualifies && allRequiredFieldsFilled && isOtpVerified);
-      
-      if (!qualifies) {
-          submitButton.textContent = 'Minimum $10,000 required';
-      } else {
-          submitButton.textContent = 'See My Savings Estimate →';
-      }
+    // Enable/disable submit
+    window.otpOK = false;
+    function updateSubmitEnabled(){
+      const amountOK = Number(document.getElementById('f_totaldebt').value||'0') >= 10000;
+      const stateOK = stateSelect.value && !TD_STATES_EXCLUDED.includes(stateSelect.value);
+      const consentOK = document.getElementById('tcpa').checked;
+      const basicOK = firstName.value && lastName.value && emailInput.value && phoneInput.value;
+      submitButton.disabled = !(amountOK && stateOK && consentOK && basicOK && window.otpOK);
+      submitButton.textContent = submitButton.disabled ? 'Verify your phone to continue' : 'See My Savings Estimate →';
+    }
+    ['change','input'].forEach(ev=>{
+      stateSelect.addEventListener(ev, updateSubmitEnabled);
+      document.getElementById('tcpa').addEventListener(ev, updateSubmitEnabled);
+      ['first-name','last-name','email','phone'].forEach(id=> document.getElementById(id).addEventListener(ev, ()=>{
+        if(id==='phone'){ window.otpOK=false; otpStatusEl.textContent=''; }
+        updateSubmitEnabled();
+      }));
+    });
+    const firstName=document.getElementById('first-name');
+    const lastName=document.getElementById('last-name');
+
+    // OTP — Recaptcha + send + verify
+    let recaptchaVerifier, confirmationResult;
+    function initRecaptcha(){
+      if (recaptchaVerifier) return recaptchaVerifier;
+      recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size:'invisible' });
+      // Render ensures the widget exists before we use it
+      return recaptchaVerifier.render().then(()=>recaptchaVerifier);
     }
 
-    // Keep state/consent in sync with button
-    stateSelect.addEventListener('change', updateSubmitButtonState);
-    document.getElementById('tcpa').addEventListener('change', updateSubmitButtonState);
-    phoneInput.addEventListener('input', () => {
-      window.otpOK = false;
-      document.getElementById("otp-status").textContent = "";
-      updateSubmitButtonState();
+    sendBtn.addEventListener('click', async ()=>{
+      const e164=parseNANPtoE164US(phoneInput.value);
+      otpStatusEl.className='text-xs text-gray-600';
+      if(!e164){ otpStatusEl.textContent='Enter a valid US number.'; return; }
+      otpStatusEl.textContent='Sending code…'; sendBtn.disabled=true;
+      try{
+        await initRecaptcha();
+        confirmationResult = await signInWithPhoneNumber(auth, e164, recaptchaVerifier);
+        verifyBox.classList.remove('hidden');
+        otpStatusEl.textContent='Code sent. Check SMS.';
+      }catch(e){
+        console.error('OTP send error:', e);
+        otpStatusEl.textContent = `Failed to send (${e?.code||'unknown'}).`;
+      }finally{ sendBtn.disabled=false; }
     });
-    firstNameInput.addEventListener('input', updateSubmitButtonState);
-    lastNameInput.addEventListener('input', updateSubmitButtonState);
-    emailInput.addEventListener('input', updateSubmitButtonState);
 
-    /*********************
-     * CHAT HELPERS
-     *********************/
-    function addBubble(text, who='bot'){ const div=document.createElement('div'); div.className=`bubble ${who==='bot'?'bot':'me'}`; div.innerHTML=text; chatBody.appendChild(div); chatBody.scrollTop = chatBody.scrollHeight; }
-    function setChoices(choices){ chatFooter.innerHTML=''; choices.forEach(({label,primary,onClick})=>{ const b=document.createElement('button'); b.type='button'; b.className=`choice ${primary?'primary':''}`; b.textContent=label; b.onclick=onClick; chatFooter.appendChild(b); }); }
-    function openChat(){ chatOverlay.style.display='block'; setTimeout(()=> chatBody.focus(), 50); }
-    function closeChat(){ chatOverlay.style.display='none'; chatFooter.innerHTML=''; chatBody.innerHTML=''; }
+    otpCodeInput.addEventListener('input', ()=> checkBtn.disabled = (otpCodeInput.value.trim().length!==6) );
+    checkBtn.addEventListener('click', async ()=>{
+      const code = otpCodeInput.value.trim();
+      if(!confirmationResult){ otpStatusEl.textContent='Click “Send verification code” first.'; return; }
+      otpStatusEl.textContent='Verifying…'; checkBtn.disabled=true;
+      try{
+        await confirmationResult.confirm(code);
+        window.otpOK=true;
+        otpStatusEl.textContent='Verified ✓';
+        otpStatusEl.className='text-xs text-green-700';
+      }catch(e){
+        window.otpOK=false;
+        console.error('OTP verify error:', e);
+        otpStatusEl.textContent='Verification failed. Try again.';
+        otpStatusEl.className='text-xs text-red-700';
+      }finally{
+        updateSubmitEnabled();
+        checkBtn.disabled=false;
+      }
+    });
 
-    /*********************
-     * SUBMIT HANDLER
-     *********************/
+    // Remove native balloons by preventing default submit and handling ourselves
     leadForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
-      
-      // Clear all previous errors
-      Object.values(errorElements).forEach(el => el.classList.add('hidden'));
       formError.classList.add('hidden');
 
-      // Re-enable button temporarily for visual feedback
-      submitButton.disabled = true;
-      submitButton.textContent = 'Submitting…';
+      // simple front-end check
+      const amount = Number(document.getElementById('f_totaldebt').value||'0');
+      if(amount<10000){ formError.textContent='Minimum debt of $10,000 is required to qualify.'; formError.classList.remove('hidden'); return; }
+      if(!stateSelect.value || TD_STATES_EXCLUDED.includes(stateSelect.value)){ formError.textContent='Unfortunately, we do not service your state.'; formError.classList.remove('hidden'); return; }
+      if(!document.getElementById('tcpa').checked){ formError.textContent='Please agree to the consent to continue.'; formError.classList.remove('hidden'); return; }
+      if(!window.otpOK){ formError.textContent='Please verify your phone to continue.'; formError.classList.remove('hidden'); return; }
 
-      const debtAmount = toInt(debtSlider.value);
-      const selectedState = stateSelect.value;
-      const tcpaChecked = document.getElementById('tcpa').checked;
-      
-      let hasError = false;
+      // deep checks
+      const e164=parseNANPtoE164US(phoneInput.value);
+      if(!e164){ formError.textContent='Enter a valid US number.'; formError.classList.remove('hidden'); return; }
+      const [emailRes, phoneRes] = await Promise.all([
+        validateEmailServer(emailInput.value.trim()),
+        validatePhoneServer(e164)
+      ]);
+      if(!emailRes.ok){ formError.textContent=emailRes.error||'Invalid email.'; formError.classList.remove('hidden'); return; }
+      if(!phoneRes.ok){ formError.textContent=phoneRes.error||'Invalid phone.'; formError.classList.remove('hidden'); return; }
 
-      // Field validation
-      if (firstNameInput.value.trim() === '') {
-          document.getElementById('first-name-error-tooltip').classList.remove('hidden');
-          hasError = true;
-      }
-      if (lastNameInput.value.trim() === '') {
-          document.getElementById('last-name-error-tooltip').classList.remove('hidden');
-          hasError = true;
-      }
-      if (emailInput.value.trim() === '') {
-          document.getElementById('email-error-tooltip').classList.remove('hidden');
-          hasError = true;
-      }
-      if (selectedState === '') {
-          document.getElementById('state-error-tooltip').classList.remove('hidden');
-          hasError = true;
-      }
-      if (phoneInput.value.trim() === '') {
-          document.getElementById('phone-error-tooltip').classList.remove('hidden');
-          hasError = true;
-      }
-      if (!tcpaChecked) {
-          document.getElementById('tcpa-error-tooltip').classList.remove('hidden');
-          hasError = true;
-      }
-      if (debtAmount < 10000) {
-          formError.textContent = 'Minimum debt of $10,000 is required to qualify.';
-          formError.classList.remove('hidden');
-          hasError = true;
-      }
-      if (excludedStates.includes(selectedState)) {
-          formError.textContent = 'Unfortunately, we do not service your state at this time.';
-          formError.classList.remove('hidden');
-          hasError = true;
-      }
+      submitButton.disabled=true; submitButton.textContent='Submitting…';
+      await ipPromise;
 
-      if (hasError) {
-          submitButton.disabled = false;
-          updateSubmitButtonState();
-          return;
-      }
-      
-      // Phone verification check
-      if (!window.otpOK) {
-        formError.textContent = "Please verify your phone number to continue.";
-        formError.classList.remove('hidden');
-        submitButton.disabled = false;
-        updateSubmitButtonState();
-        return;
-      }
-
-      // Deeper validation after basic checks pass
-      const [emailRes, phoneRes] = await Promise.all([ validateEmail(emailInput.value), validatePhone(phoneInput.value) ]);
-      
-      if (!emailRes.ok || emailRes.disposable || emailRes.info?.role || emailRes.info?.plusAnywhere || emailRes.info?.gmailDot) {
-        formError.textContent = emailRes.ok ? 'Please use a personal, non-role, non-alias email.' : (emailRes.error || 'Invalid email.');
-        formError.classList.remove('hidden');
-        submitButton.disabled = false;
-        updateSubmitButtonState();
-        return;
-      }
-      if (!phoneRes.ok) {
-        formError.textContent = phoneRes.error || 'Please enter a valid phone number.';
-        formError.classList.remove('hidden');
-        submitButton.disabled = false;
-        updateSubmitButtonState();
-        return;
-      }
-      
-      await ipPromise; // ensure IP captured
-
-      // ----- 1) Background submit to CuraDebt immediately (hidden iframe) -----
+      // ---- Post to CuraDebt (hidden iframe) ----
       const fd = new FormData(leadForm);
       hiddenCuraForm.elements['f_fname'].value  = fd.get('f_fname') || '';
       hiddenCuraForm.elements['f_lname'].value  = fd.get('f_lname') || '';
-      hiddenCuraForm.elements['f_email'].value  = emailRes.normalized;
-      hiddenCuraForm.elements['f_phone'].value  = (phoneRes.e164||'').replace('+1','');
-      hiddenCuraForm.elements['f_whereyoulive'].value = fd.get('f_whereyoulive') || '';
-      hiddenCuraForm.elements['f_totaldebt'].value  = String(debtAmount);
-      hiddenCuraForm.elements['data1'].value  = getClickId();
+      hiddenCuraForm.elements['f_email'].value  = emailInput.value.trim();
+      hiddenCuraForm.elements['f_phone'].value  = e164.replace('+1','');
+      hiddenCuraForm.elements['f_whereyoulive'].value = stateSelect.value || '';
+      hiddenCuraForm.elements['f_totaldebt'].value  = String(amount);
+      hiddenCuraForm.elements['data1'].value  = clickId();
       hiddenCuraForm.elements['f_ip'].value   = clientIp;
       hiddenCuraForm.submit();
 
-      // ----- 2) Open support-style chat to confirm & trigger TrackDrive -----
+      // ---- Confirm + TrackDrive ----
       openChat();
-      addBubble("Hi <b>" + fd.get('f_fname') + '</b> — thanks! Before we connect you, please confirm your details below.', 'bot');
-      addBubble(`<b>Name</b>: ${fd.get('f_fname')} ${fd.get('f_lname')}<br><b>Email</b>: ${emailRes.normalized}<br><b>Phone</b>: ${phoneRes.e164}<br><b>State</b>: ${fd.get('f_whereyoulive')}<br><b>Unsecured Debt</b>: ${fmtMoney(debtAmount)}`, 'bot');
-      addBubble("When you confirm, you'll get a call in about a minute from a <b>toll‑free number</b>. It will connect you straight to a specialist who will: quick‑check your state, creditors, and budget; explain how settlements lower payments & typical timelines (often <b>24–48 months</b>); cover short‑term credit impact and handling creditor calls; and outline enrollment (e‑sign, a dedicated program account, and pausing use of enrolled cards). Most people say the stress starts to lift after the first call because they finally have a plan.", 'bot');
-
+      addBubble(`Hi <b>${fd.get('f_fname')}</b> — thanks! Confirm your details below.`, 'bot');
+      addBubble(`<b>Name</b>: ${fd.get('f_fname')} ${fd.get('f_lname')}<br><b>Email</b>: ${emailInput.value.trim()}<br><b>Phone</b>: ${e164}<br><b>State</b>: ${stateSelect.value}<br><b>Unsecured Debt</b>: ${fmtMoney(amount)}`, 'bot');
       setChoices([
-        { label:'Confirm & Connect Me Now', primary:true, onClick: ()=> triggerTrackDrive(fd, debtAmount, emailRes, phoneRes) },
-        { label:'Edit Info', primary:false, onClick: ()=> { closeChat(); submitButton.disabled=false; updateSubmitButtonState(); } }
+        { label:'Confirm & Connect Me Now', primary:true, onClick: ()=>{
+            // Fill TD form and submit via iframe
+            hiddenTDForm.setAttribute('action', TRACKDRIVE_POST_URL);
+            ensureInput(hiddenTDForm, 'caller_id').value = e164;
+            ensureInput(hiddenTDForm, 'first_name').value = fd.get('f_fname') || '';
+            ensureInput(hiddenTDForm, 'last_name').value  = fd.get('f_lname') || '';
+            ensureInput(hiddenTDForm, 'email').value      = emailInput.value.trim();
+            ensureInput(hiddenTDForm, 'state').value      = stateSelect.value || '';
+            ensureInput(hiddenTDForm, 'unsecured_debt_total').value = String(amount);
+            ensureInput(hiddenTDForm, 'traffic_source_id').value = "1000";
+            ensureInput(hiddenTDForm, 'ip_address').value = clientIp || '';
+            ensureInput(hiddenTDForm, 'source_url').value = location.href;
+            ensureInput(hiddenTDForm, 'useragent').value  = navigator.userAgent || '';
+            ensureInput(hiddenTDForm, 'gclid').value      = params.get('gclid')||'';
+            ensureInput(hiddenTDForm, 'fbeventid').value  = params.get('fbclid')||'';
+            ensureInput(hiddenTDForm, 'msclkid').value    = params.get('msclkid')||'';
+            ensureInput(hiddenTDForm, 'tcpa_opt_in').value = 'true';
+            ensureInput(hiddenTDForm, 'tcpa_optin_consent_language').value = document.querySelector('label[for="tcpa"] + span')?.innerText || 'TCPA consent captured';
+            ensureInput(hiddenTDForm, 'call_now').value   = '1';
+            ensureInput(hiddenTDForm, 'otp_verified').value = '1';
+            ensureInput(hiddenTDForm, 'click_id').value   = clickId();
+
+            if (TD_DEBUG){
+              dbg('Posting to TrackDrive…');
+              Array.from(hiddenTDForm.elements).forEach(el=>{ if(el.name){ dbg(`${el.name}: ${el.value}`); } });
+            }
+            hiddenTDForm.submit();
+            addBubble('Great — connecting you now. If you see a toll-free caller ID, that’s us.', 'bot');
+            setChoices([{ label:'Okay', primary:true, onClick: ()=> { closeChat(); submitButton.disabled=false; submitButton.textContent='Submitted ✔'; } }]);
+          }},
+        { label:'Edit Info', onClick: ()=>{ closeChat(); submitButton.disabled=false; updateSubmitEnabled(); } }
       ]);
     });
 
-    function triggerTrackDrive(fd, debtAmount, emailRes, phoneRes){
-      ensureTDFieldNames();
-
-      if(!TRACKDRIVE_POST_URL){
-        dbg('❌ TRACKDRIVE_POST_URL is empty. Paste your post endpoint URL.');
-        addBubble('<b>Heads up:</b> We still need to plug in the TrackDrive POST URL in the code. I\'ll stay open — tell your tech to set it at the top where it says <code>TRACKDRIVE_POST_URL</code>.', 'bot');
-        return;
-      }
-
-      // Prepare action and payload on the hidden form
-      hiddenTDForm.setAttribute('action', TRACKDRIVE_POST_URL);
-
-      const map = TD_FIELDS;
-      const payload = {
-        [map.phone]:              phoneRes.e164,
-        [map.first_name]:         fd.get('f_fname') || '',
-        [map.last_name]:          fd.get('f_lname') || '',
-        [map.email]:              emailRes.normalized || '',
-        [map.state]:              fd.get('f_whereyoulive') || '',
-        [map.amount]:             String(debtAmount),
-        [map.click_id]:           getClickId(),
-        [map.ip]:                 clientIp || '',
-        [map.traffic_source_id]:  TD_TRAFFIC_SOURCE_ID || '',
-        [map.call_now]:           '1'
-      };
-
-      // Fill hidden inputs per mapping
-      Object.entries(payload).forEach(([name, val])=>{
-        const el = hiddenTDForm.querySelector(`[name="${CSS.escape(name)}"]`);
-        if(el) el.value = val;
-      });
-
-      dbg('Posting to TrackDrive…');
-      Object.entries(payload).forEach(([k,v])=> dbg(k+': '+v));
-
-      // Submit via hidden iframe (CORS-safe)
-      hiddenTDForm.submit();
-
-      addBubble('Great — connecting you now. If you see a toll‑free caller ID, that\'s us.', 'bot');
-      setChoices([{ label:'Okay', primary:true, onClick: ()=> { closeChat(); submitButton.disabled=false; submitButton.textContent='Submitted ✔'; } }]);
-    }
-
-    // OTP related logic
-    window.otpOK = false;
-    const verifier = new RecaptchaVerifier(auth, "send-otp", { size: "invisible" });
-
-    sendBtn?.addEventListener('click', async () => {
-      const e164 = toE164US(phoneInput.value);
-      if (!e164) { 
-        otpStatusEl.textContent = "Please enter a valid phone number.";
-        return; 
-      }
-      
-      otpStatusEl.textContent = "Sending code…";
-      sendBtn.disabled = true;
-
-      try {
-        confirmationResult = await signInWithPhoneNumber(auth, e164, verifier);
-        otpStatusEl.textContent = "Code sent. Check your text messages.";
-        verifyBox.classList.remove('hidden');
-        checkBtn.disabled = false;
-      } catch (e) {
-        console.error('OTP send error:', e);
-        otpStatusEl.textContent = `Failed to send (${e?.code || "unknown"}): ${e?.message || e}`;
-      } finally {
-        sendBtn.disabled = false;
-      }
-    });
-
-    checkBtn?.addEventListener('click', async () => {
-      const code = (otpCodeInput.value || "").trim();
-      
-      if (!confirmationResult) {
-        otpStatusEl.textContent = "Please click 'Send verification code' first.";
-        return;
-      }
-      if (code.length !== 6) {
-        otpStatusEl.textContent = "Please enter the 6-digit code.";
-        return;
-      }
-
-      otpStatusEl.textContent = "Verifying…";
-      checkBtn.disabled = true;
-
-      try {
-        await confirmationResult.confirm(code);
-        window.otpOK = true;
-        otpStatusEl.textContent = "Verified ✓";
-        otpStatusEl.className = "text-xs text-green-700";
-        updateSubmitButtonState();
-      } catch (e) {
-        window.otpOK = false;
-        console.error('OTP verify error:', e);
-        otpStatusEl.textContent = `Verification failed. Please try again.`;
-        otpStatusEl.className = "text-xs text-red-700";
-        updateSubmitButtonState();
-      } finally {
-        checkBtn.disabled = false;
-      }
-    });
-    
+    // Initial state
+    updateSubmitEnabled();
+    // Show OTP verify UI when a code is sent
+    verifyBox.classList.add('hidden');
   </script>
 </body>
 </html>
-

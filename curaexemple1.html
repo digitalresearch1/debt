@@ -135,7 +135,7 @@
                 </button>
                 <div id="otp-verify" class="hidden mt-2 flex gap-2 items-center">
                   <input id="otp-code" class="border p-2 rounded w-40" placeholder="6-digit code" maxlength="6" />
-                  <button type="button" id="check-otp" class="px-3 py-2 rounded bg-green-600 text-white text-sm">
+                  <button type="button" id="check-otp" class="px-3 py-2 rounded bg-green-600 text-white text-sm" disabled>
                     Verify
                   </button>
                   <span id="otp-status" class="text-xs text-gray-600"></span>
@@ -553,8 +553,16 @@
     function updateSubmitButtonState() {
       const debtAmount = toInt(debtSlider.value);
       const qualifies = debtAmount >= 10000;
-      submitButton.disabled = !qualifies;
-      submitButton.textContent = qualifies ? 'See My Savings Estimate →' : 'Minimum $10,000 required';
+      const allRequiredFieldsFilled = firstNameInput.value && lastNameInput.value && emailInput.value && stateSelect.value && phoneInput.value && document.getElementById('tcpa').checked;
+      const isOtpVerified = window.otpOK;
+      
+      submitButton.disabled = !(qualifies && allRequiredFieldsFilled && isOtpVerified);
+      
+      if (!qualifies) {
+          submitButton.textContent = 'Minimum $10,000 required';
+      } else {
+          submitButton.textContent = 'See My Savings Estimate →';
+      }
     }
 
     // Keep state/consent in sync with button
@@ -565,6 +573,9 @@
       document.getElementById("otp-status").textContent = "";
       updateSubmitButtonState();
     });
+    firstNameInput.addEventListener('input', updateSubmitButtonState);
+    lastNameInput.addEventListener('input', updateSubmitButtonState);
+    emailInput.addEventListener('input', updateSubmitButtonState);
 
     /*********************
      * CHAT HELPERS
@@ -619,10 +630,20 @@
           errorElements['tcpa'].classList.remove('hidden');
           hasError = true;
       }
+      if (debtAmount < 10000) {
+          formError.textContent = 'Minimum debt of $10,000 is required to qualify.';
+          formError.classList.remove('hidden');
+          hasError = true;
+      }
+      if (excludedStates.includes(selectedState)) {
+          formError.textContent = 'Unfortunately, we do not service your state at this time.';
+          formError.classList.remove('hidden');
+          hasError = true;
+      }
 
       if (hasError) {
           submitButton.disabled = false;
-          submitButton.textContent = 'See My Savings Estimate →';
+          updateSubmitButtonState();
           return;
       }
       
@@ -631,7 +652,7 @@
         formError.textContent = "Please verify your phone number to continue.";
         formError.classList.remove('hidden');
         submitButton.disabled = false;
-        submitButton.textContent = 'See My Savings Estimate →';
+        updateSubmitButtonState();
         return;
       }
 
@@ -642,14 +663,14 @@
         formError.textContent = emailRes.ok ? 'Please use a personal, non-role, non-alias email.' : (emailRes.error || 'Invalid email.');
         formError.classList.remove('hidden');
         submitButton.disabled = false;
-        submitButton.textContent = 'See My Savings Estimate →';
+        updateSubmitButtonState();
         return;
       }
       if (!phoneRes.ok) {
         formError.textContent = phoneRes.error || 'Please enter a valid phone number.';
         formError.classList.remove('hidden');
         submitButton.disabled = false;
-        submitButton.textContent = 'See My Savings Estimate →';
+        updateSubmitButtonState();
         return;
       }
       
@@ -675,7 +696,7 @@
 
       setChoices([
         { label:'Confirm & Connect Me Now', primary:true, onClick: ()=> triggerTrackDrive(fd, debtAmount, emailRes, phoneRes) },
-        { label:'Edit Info', primary:false, onClick: ()=> { closeChat(); submitButton.disabled=false; submitButton.textContent='See My Savings Estimate →'; } }
+        { label:'Edit Info', primary:false, onClick: ()=> { closeChat(); submitButton.disabled=false; updateSubmitButtonState(); } }
       ]);
     });
 
@@ -720,6 +741,68 @@
       addBubble('Great — connecting you now. If you see a toll‑free caller ID, that\'s us.', 'bot');
       setChoices([{ label:'Okay', primary:true, onClick: ()=> { closeChat(); submitButton.disabled=false; submitButton.textContent='Submitted ✔'; } }]);
     }
+
+    // OTP related logic
+    window.otpOK = false;
+    const verifier = new RecaptchaVerifier(auth, "send-otp", { size: "invisible" });
+
+    sendBtn?.addEventListener('click', async () => {
+      const e164 = toE164US(phoneInput.value);
+      if (!e164) { 
+        otpStatusEl.textContent = "Please enter a valid phone number.";
+        return; 
+      }
+      
+      otpStatusEl.textContent = "Sending code…";
+      sendBtn.disabled = true;
+
+      try {
+        confirmationResult = await signInWithPhoneNumber(auth, e164, verifier);
+        otpStatusEl.textContent = "Code sent. Check your text messages.";
+        verifyBox.classList.remove('hidden');
+        checkBtn.disabled = false;
+      } catch (e) {
+        console.error('OTP send error:', e);
+        otpStatusEl.textContent = `Failed to send (${e?.code || "unknown"}): ${e?.message || e}`;
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+
+    checkBtn?.addEventListener('click', async () => {
+      const code = (otpCodeInput.value || "").trim();
+      if (code.length !== 6) {
+        otpStatusEl.textContent = "Please enter the 6-digit code.";
+        return;
+      }
+
+      otpStatusEl.textContent = "Verifying…";
+      checkBtn.disabled = true;
+
+      if (!confirmationResult) {
+        otpStatusEl.textContent = "Please click 'Send verification code' first.";
+        checkBtn.disabled = false;
+        return;
+      }
+
+      try {
+        await confirmationResult.confirm(code);
+        window.otpOK = true;
+        otpStatusEl.textContent = "Verified ✓";
+        otpStatusEl.className = "text-xs text-green-700";
+        updateSubmitButtonState();
+      } catch (e) {
+        window.otpOK = false;
+        console.error('OTP verify error:', e);
+        otpStatusEl.textContent = `Verification failed. Please try again.`;
+        otpStatusEl.className = "text-xs text-red-700";
+        updateSubmitButtonState();
+      } finally {
+        checkBtn.disabled = false;
+      }
+    });
+    
   </script>
 </body>
 </html>
+

@@ -52,10 +52,9 @@
     <input name="f_totaldebt">
     <input name="f_comments" value="Lead from AI Chatbot Survey">
     <input name="data1">
-    <!-- data2 is FIXED as requested -->
     <input name="data2" value="CLICKID2">
     <input name="f_ip">
-    <!-- Optional fields if required later by CuraDebt -->
+    <!-- Optional if CuraDebt ever needs them -->
     <input name="f_mobilephone">
     <input name="f_city">
     <input name="f_zip">
@@ -90,6 +89,9 @@
   </form>
 
   <script>
+    /* =========================
+       BASIC STATE
+    ========================= */
     const chatWindow = document.getElementById('chat-window');
     const chatInputArea = document.getElementById('chat-input-area');
     const progressBar = document.getElementById('progress-bar');
@@ -97,35 +99,33 @@
     let currentStepKey = 'start';
     let transactionId = '';
     let clientIp = '';
+    window.otpOK = false; // <-- gate for submit
 
+    /* =========================
+       VALIDATION HELPERS
+    ========================= */
     const allStates = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"];
-    // Exclusions confirmed
     const excludedStates = ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','RI'];
 
-    // === Phone Validation using your Cloudflare Worker + SignalWire ===
     const VALIDATE_ENDPOINT = "https://silent-sea-a717.kasindeesther.workers.dev/";
+    const VALIDATE_EMAIL_ENDPOINT = "https://solitary-base-4a8b.kasindeesther.workers.dev/";
 
     function parseStrictNANP(raw) {
       const digits = String(raw || '').replace(/\D+/g, '');
       const m = digits.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/);
       if (!m) return { ok: false, error: 'Enter a valid US number (NANP).' };
-
       const [, area, prefix, line] = m;
       const isN11 = (s) => /^[2-9]11$/.test(s);
       if (isN11(area) || isN11(prefix)) return { ok: false, error: 'N11 service codes are not valid phone numbers.' };
-
       const TOLL_FREE = new Set(['800','833','844','855','866','877','888','822']);
       const tollFree = TOLL_FREE.has(area);
-
       if (area === '900') return { ok: false, error: 'Premium-rate (900) numbers are not accepted.' };
       if (prefix === '555' && /^01\d{2}$/.test(line)) return { ok: false, error: '555-01xx test numbers are not accepted.' };
-
       const ten = area + prefix + line;
       if (/^(\d)\1{9}$/.test(ten)) return { ok: false, error: 'Invalid pattern (all digits identical).' };
       const seq = '01234567890123456789';
       const rseq = '98765432109876543210';
       if (seq.includes(ten) || rseq.includes(ten)) return { ok: false, error: 'Invalid pattern (sequential digits).' };
-
       return { ok: true, e164: `+1${area}${prefix}${line}`, meta: { area, prefix, line, tollFree } };
     }
 
@@ -133,8 +133,7 @@
       const strict = parseStrictNANP(raw);
       if (!strict.ok) return strict;
       const r = await fetch(VALIDATE_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: strict.e164 })
       });
       const j = await r.json().catch(() => ({}));
@@ -142,71 +141,38 @@
       return { ...j, e164: strict.e164, meta: { ...(strict.meta || {}) } };
     }
 
-    // === Email Validation (Cloudflare Worker) ===
-    const VALIDATE_EMAIL_ENDPOINT = "https://solitary-base-4a8b.kasindeesther.workers.dev/";
-
-    const REQUIRE_ALPHA_IN_LOCAL = true;
-    const MIN_LOCAL_LEN = 3;
-    const MAX_LOCAL_DOTS = 2;
-
-    const ROLE_LOCALS = new Set([
-      'admin','administrator','root','support','help','helpdesk','info','contact','sales',
-      'marketing','billing','accounts','accounting','abuse','postmaster','webmaster',
-      'no-reply','noreply','donotreply','security','compliance','legal','test'
-    ]);
-
-    const FREEMAIL = new Set([
-      'gmail.com','googlemail.com','yahoo.com','ymail.com','rocketmail.com','outlook.com',
-      'hotmail.com','live.com','msn.com','icloud.com','me.com','proton.me','aol.com','mail.com'
-    ]);
-
-    const DOMAIN_TYPO_MAP = {
-      'gamil.com': 'gmail.com', 'gmial.com': 'gmail.com', 'gmai.com': 'gmail.com', 'gmail.con': 'gmail.com',
-      'yahoo.con': 'yahoo.com', 'yhoo.com': 'yahoo.com', 'hotnail.com': 'hotmail.com', 'hotmial.com': 'hotmail.com',
-      'outlok.com': 'outlook.com', 'outllok.com': 'outlook.com', 'icloud,com': 'icloud.com', 'protonn.me': 'proton.me'
-    };
-
+    const ROLE_LOCALS = new Set(['admin','administrator','root','support','help','helpdesk','info','contact','sales','marketing','billing','accounts','accounting','abuse','postmaster','webmaster','no-reply','noreply','donotreply','security','compliance','legal','test']);
+    const FREEMAIL = new Set(['gmail.com','googlemail.com','yahoo.com','ymail.com','rocketmail.com','outlook.com','hotmail.com','live.com','msn.com','icloud.com','me.com','proton.me','aol.com','mail.com']);
+    const DOMAIN_TYPO_MAP = {'gamil.com':'gmail.com','gmial.com':'gmail.com','gmai.com':'gmail.com','gmail.con':'gmail.com','yahoo.con':'yahoo.com','yhoo.com':'yahoo.com','hotnail.com':'hotmail.com','hotmial.com':'hotmail.com','outlok.com':'outlook.com','outllok.com':'outlook.com','icloud,com':'icloud.com','protonn.me':'proton.me'};
     function strictEmailClient(raw) {
       const email = String(raw || '').trim();
       const at = email.indexOf('@');
       if (at < 1 || at === email.length - 1) return { ok: false, error: 'Enter a valid email address.' };
-
       const local = email.slice(0, at);
       const domain = email.slice(at + 1).toLowerCase();
-
-      if (local.length < MIN_LOCAL_LEN || local.length > 64) return { ok: false, error: 'Email local part length is invalid.' };
+      if (local.length < 3 || local.length > 64) return { ok: false, error: 'Email local part length is invalid.' };
       if (domain.length < 4 || domain.length > 255) return { ok: false, error: 'Email domain length is invalid.' };
-
       if (!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\-]{0,62}[A-Za-z0-9])?$/.test(local)) return { ok: false, error: 'Invalid characters in email.' };
       if (local.includes('..')) return { ok: false, error: 'Email local part has consecutive dots.' };
-
-      if (REQUIRE_ALPHA_IN_LOCAL && !/[A-Za-z]/.test(local)) return { ok: false, error: 'Email must contain letters (not only numbers).' };
-      if (/^\d+$/.test(local)) return { ok: false, error: 'Email local part cannot be only digits.' };
-      if ((local.match(/\./g) || []).length > MAX_LOCAL_DOTS) return { ok: false, error: 'Too many dots in email local part.' };
-
+      if (!/[A-Za-z]/.test(local)) return { ok: false, error: 'Email must contain letters (not only numbers).' };
+      if ((local.match(/\./g) || []).length > 2) return { ok: false, error: 'Too many dots in email local part.' };
       if (domain.indexOf('.') < 1) return { ok: false, error: 'Email domain must contain a dot.' };
-
       const labels = domain.split('.');
       for (const label of labels) {
         if (label.length < 1 || label.length > 63) return { ok: false, error: 'Email domain label length is invalid.' };
         if (!/^[A-Za-z0-9-]+$/.test(label)) return { ok: false, error: 'Email domain contains invalid characters.' };
         if (label.startsWith('-') || label.endsWith('-')) return { ok: false, error: 'Email domain label cannot start/end with a hyphen.' };
       }
-
       const tld = labels[labels.length - 1];
       if (tld.length < 2 || tld.length > 63) return { ok: false, error: 'Email TLD is invalid.' };
       if (/^\d+$/.test(tld)) return { ok: false, error: 'Email TLD cannot be all digits.' };
       if (tld === 'con') return { ok: false, error: 'TLD looks mistyped (.con). Did you mean .com?' };
-
-      const localLower = local.toLowerCase();
       const info = {
-        role: ROLE_LOCALS.has(localLower),
+        role: ROLE_LOCALS.has(local.toLowerCase()),
         plusAnywhere: local.includes('+'),
         gmailDot: (domain === 'gmail.com' || domain === 'googlemail.com') && local.includes('.'),
-        freemail: FREEMAIL.has(domain),
-        numericOnly: /^\d+$/.test(local)
+        freemail: FREEMAIL.has(domain)
       };
-
       const suggestion = DOMAIN_TYPO_MAP[domain] || null;
       return { ok: true, normalized: `${local}@${domain}`, info, suggestion };
     }
@@ -215,29 +181,22 @@
       const c = strictEmailClient(raw);
       if (!c.ok) return c;
       const r = await fetch(VALIDATE_EMAIL_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: c.normalized, want_mx: true })
       });
       const j = await r.json().catch(() => ({}));
       if (!j.ok) return { ok: false, error: j.error || 'Email validation failed.' };
-
-      return {
-        ok: true,
-        normalized: c.normalized,
-        disposable: !!j.disposable,
-        has_mx: typeof j.has_mx === 'boolean' ? j.has_mx : undefined,
-        suggestion: j.suggestion || c.suggestion || null,
-        info: c.info
-      };
+      return { ok: true, normalized: c.normalized, disposable: !!j.disposable, has_mx: j.has_mx, suggestion: j.suggestion || c.suggestion || null, info: c.info };
     }
 
-    // ---- Helpers ----
+    /* =========================
+       UI HELPERS
+    ========================= */
     function addMessage(message, sender = 'bot') {
-      const messageEl = document.createElement('div');
-      messageEl.className = `chat-bubble flex items-start gap-3 max-w-full ${sender === 'bot' ? 'self-start' : 'self-end flex-row-reverse'}`;
-      messageEl.innerHTML = `<p class="p-3 rounded-lg ${sender === 'bot' ? 'bg-indigo-600 text-white' : 'bg-gray-600 text-white'}">${message}</p>`;
-      chatWindow.appendChild(messageEl);
+      const el = document.createElement('div');
+      el.className = `chat-bubble flex items-start gap-3 max-w-full ${sender === 'bot' ? 'self-start' : 'self-end flex-row-reverse'}`;
+      el.innerHTML = `<p class="p-3 rounded-lg ${sender === 'bot' ? 'bg-indigo-600 text-white' : 'bg-gray-600 text-white'}">${message}</p>`;
+      chatWindow.appendChild(el);
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
@@ -254,9 +213,7 @@
 
       const hint = document.createElement('div');
       hint.className = 'text-center text-xs text-gray-400 mb-2';
-      hint.textContent = showNumbers
-        ? 'Tap an option or press 1–9 (Enter selects the first)'
-        : 'Tap an option to continue';
+      hint.textContent = showNumbers ? 'Tap an option or press 1–9 (Enter selects the first)' : 'Tap an option to continue';
       container.appendChild(hint);
 
       const optionsContainer = document.createElement('div');
@@ -274,16 +231,8 @@
       options.forEach((text, i) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = [
-          'px-4 py-2 rounded-full font-semibold transition shadow-sm',
-          'bg-indigo-500 hover:bg-indigo-600 text-white',
-          i === primaryIndex ? 'ring-2 ring-indigo-300' : ''
-        ].join(' ').trim();
-
-        btn.innerHTML = (showNumbers && i < 9)
-          ? `<span class="mr-1 text-xs opacity-80">${i + 1}.</span>${text}`
-          : text;
-
+        btn.className = ['px-4 py-2 rounded-full font-semibold transition shadow-sm','bg-indigo-500 hover:bg-indigo-600 text-white',i===primaryIndex?'ring-2 ring-indigo-300':''].join(' ').trim();
+        btn.innerHTML = (showNumbers && i < 9) ? `<span class="mr-1 text-xs opacity-80">${i+1}.</span>${text}` : text;
         btn.setAttribute('aria-label', text);
         btn.dataset.index = String(i + 1);
         btn.addEventListener('click', () => finalize(text));
@@ -303,7 +252,6 @@
       container.appendChild(abandon);
 
       chatInputArea.appendChild(container);
-
       if (buttons[primaryIndex]) buttons[primaryIndex].focus();
 
       const keyHandler = (e) => {
@@ -321,13 +269,12 @@
 
     function getData1FromUrl() {
       const p = new URLSearchParams(location.search);
-      const d1 = p.get('data1') || p.get('click_id') || p.get('gclid') || p.get('fbclid') || p.get('msclkid') || '';
-      return d1 || 'no_click_id';
+      return p.get('data1') || p.get('click_id') || p.get('gclid') || p.get('fbclid') || p.get('msclkid') || 'no_click_id';
     }
 
-    function digitsOnly(s) { return String(s || '').replace(/\D+/g, ''); }
-
-    // ---- Survey Flow ----
+    /* =========================
+       SURVEY FLOW
+    ========================= */
     const surveyFlow = {
       'start': {
         message: "Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?",
@@ -374,29 +321,18 @@
           <label for="debt-slider" class="text-lg font-semibold text-gray-300">Select Amount Of Unsecured Debt</label>
           <p id="debt-amount-display" class="text-4xl font-bold text-indigo-400 my-2">$25,000</p>
 
-          <!-- Slider: exact control (step $100) -->
           <input type="range" id="debt-slider" min="0" max="100000" value="25000" step="100" class="w-full slider-thumb" list="debt-ticks">
           <datalist id="debt-ticks">
-            <option value="0"></option>
-            <option value="5000"></option>
-            <option value="10000"></option>
-            <option value="20000"></option>
-            <option value="30000"></option>
-            <option value="40000"></option>
-            <option value="50000"></option>
-            <option value="75000"></option>
-            <option value="100000"></option>
+            <option value="0"></option><option value="5000"></option><option value="10000"></option><option value="20000"></option>
+            <option value="30000"></option><option value="40000"></option><option value="50000"></option><option value="75000"></option><option value="100000"></option>
           </datalist>
 
-          <!-- Exact numeric entry -->
           <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
             <label class="text-sm text-gray-300 sm:col-span-1" for="debt-number">Or type exact amount</label>
             <input type="text" id="debt-number" inputmode="numeric" placeholder="e.g. 12,450"
                    class="sm:col-span-2 bg-gray-800 border border-gray-700 rounded-md px-3 py-2 w-full" value="25,000">
           </div>
-          <!-- Move slider hint -->
           <p id="move-hint" class="text-sm text-yellow-300 mt-2">Move the slider to confirm your amount.</p>
-
           <div id="debt-warning" class="text-xs text-yellow-400 mt-2 hidden">Minimum debt is $10,000 to qualify.</div>
           <input type="hidden" id="debt-confirmed" value="0">
         </div>
@@ -409,37 +345,41 @@
         <input type="email" name="f_email" id="f_email" placeholder="Email Address" required>
         <div id="email-hint" class="text-xs mt-1 text-gray-400" aria-live="polite"></div>
 
-        <div>
-          <input type="tel" name="f_phone" id="f_phone" placeholder="Phone Number" required>
-          <div id="phone-hint" class="text-xs mt-1 text-gray-400" aria-live="polite"></div>
+        <input type="tel" name="f_phone" id="f_phone" placeholder="Phone Number" required>
+        <div id="phone-hint" class="text-xs mt-1 text-gray-400" aria-live="polite"></div>
 
-          <!-- OTP UI (inserted here) -->
-          <div id="otp-ui" class="mt-2 space-y-2">
-            <button type="button" id="send-otp" class="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-xs">
+        <!-- OTP UI (always visible) -->
+        <div id="otp-ui" class="mt-2 space-y-2">
+          <div class="flex flex-wrap gap-2 items-center">
+            <button type="button" id="send-otp"
+                    class="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-xs">
               Send verification code
             </button>
-            <div id="otp-verify" class="hidden flex gap-2 items-center">
+            <div id="otp-verify" class="flex gap-2 items-center">
               <input id="otp-code" class="bg-gray-800 border border-gray-700 p-2 rounded w-36" placeholder="6-digit code" maxlength="6" />
-              <button type="button" id="check-otp" class="px-3 py-2 rounded bg-green-600 hover:bg-green-700 text-white text-xs">
-                Verify
+              <button type="button" id="check-otp"
+                      class="px-3 py-2 rounded bg-green-600 hover:bg-green-700 text-white text-xs">
+                Verify number
               </button>
-              <span id="otp-status" class="text-xs text-gray-300"></span>
             </div>
-            <!-- reCAPTCHA widget gets rendered invisibly/bound to the Send button -->
-            <div id="recaptcha-container" class="hidden"></div>
+            <span id="otp-status" class="text-xs text-gray-300"></span>
           </div>
+          <!-- reCAPTCHA mounts here (invisible) -->
+          <div id="recaptcha-container"></div>
         </div>
 
         <select name="f_whereyoulive" required>
           <option value="" disabled selected>Select Your State</option>
         </select>
+
         <label class="flex items-start gap-2 text-xs text-gray-300">
           <input type="checkbox" id="tcpa" required class="mt-1">
           <span>By clicking, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts). Your consent is not required to purchase. Message/data rates may apply.</span>
         </label>
+
         <button type="submit" id="submit-btn"
                 class="w-full bg-green-600 text-white font-bold text-lg py-3 rounded-lg transition opacity-60 cursor-not-allowed"
-                disabled> Select amount to continue
+                disabled> Verify your number to continue
         </button>
 
         <div id="form-error" class="text-red-400 font-semibold text-center text-sm hidden"></div>
@@ -453,55 +393,55 @@
       const stateSelect = formContainer.querySelector('select[name="f_whereyoulive"]');
       allStates.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; stateSelect.appendChild(o); });
 
-      const MIN_QUAL = 10000;
-      const MAX_DEBT = 100000;
-
-      const debtSlider      = formContainer.querySelector('#debt-slider');
-      const debtDisplay     = formContainer.querySelector('#debt-amount-display');
-      const debtNumber      = formContainer.querySelector('#debt-number');
-      const submitBtn       = formContainer.querySelector('#submit-btn');
+      const MIN_QUAL = 10000, MAX_DEBT = 100000;
+      const debtSlider = formContainer.querySelector('#debt-slider');
+      const debtDisplay = formContainer.querySelector('#debt-amount-display');
+      const debtNumber = formContainer.querySelector('#debt-number');
+      const submitBtn = formContainer.querySelector('#submit-btn');
       const debtConfirmedEl = formContainer.querySelector('#debt-confirmed');
-      const debtWarning     = formContainer.querySelector('#debt-warning');
-      const moveHint        = formContainer.querySelector('#move-hint');
+      const debtWarning = formContainer.querySelector('#debt-warning');
+      const moveHint = formContainer.querySelector('#move-hint');
+      const tcpa = formContainer.querySelector('#tcpa');
 
-      const formatCurrency = (amt) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amt);
-      const toInt = (s) => { const n = parseInt(String(s||'').replace(/[^\d]/g,''),10); return isNaN(n) ? 0 : n; };
+      const formatCurrency = (amt) => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(amt);
+      const toInt = (s) => { const n = parseInt(String(s||'').replace(/[^\d]/g,''),10); return isNaN(n)?0:n; };
 
-      // global OTP flag
-      window.otpOK = false;
-
-      const setSubmitState = () => {
+      // submit enable/disable logic, including OTP gate
+      formContainer._updateSubmitState = function(){
         const v = parseInt(debtSlider.value,10) || 0;
         const confirmed = debtConfirmedEl.value === '1';
+        const stateOK = stateSelect.value && !excludedStates.includes(stateSelect.value);
+        const consentOK = tcpa && tcpa.checked;
+        const eligibleDebt = v >= MIN_QUAL;
 
-        if (moveHint) moveHint.classList.toggle('hidden', confirmed);
+        let allow = confirmed && eligibleDebt && stateOK && consentOK && window.otpOK;
 
-        // Require both amount OK and OTP verified
         if (!confirmed) {
-          submitBtn.disabled = true;
-          submitBtn.classList.add('opacity-60','cursor-not-allowed');
-          submitBtn.textContent = 'Select amount to continue';
-          return;
+          submitBtn.disabled = true; submitBtn.classList.add('opacity-60','cursor-not-allowed');
+          submitBtn.textContent = 'Select amount to continue'; return;
         }
-        if (v < MIN_QUAL) {
-          submitBtn.disabled = true;
-          submitBtn.classList.add('opacity-60','cursor-not-allowed');
-          submitBtn.textContent = 'Minimum $10,000 required';
-          debtWarning.classList.remove('hidden');
-          return;
+        if (!eligibleDebt) {
+          submitBtn.disabled = true; submitBtn.classList.add('opacity-60','cursor-not-allowed');
+          submitBtn.textContent = 'Minimum $10,000 required'; debtWarning.classList.remove('hidden'); return;
         } else {
           debtWarning.classList.add('hidden');
         }
-
+        if (!stateOK) {
+          submitBtn.disabled = true; submitBtn.classList.add('opacity-60','cursor-not-allowed');
+          submitBtn.textContent = 'We do not service your state'; return;
+        }
+        if (!consentOK) {
+          submitBtn.disabled = true; submitBtn.classList.add('opacity-60','cursor-not-allowed');
+          submitBtn.textContent = 'Agree to the consent to continue'; return;
+        }
         if (!window.otpOK) {
-          submitBtn.disabled = true;
-          submitBtn.classList.add('opacity-60','cursor-not-allowed');
-          submitBtn.textContent = 'Verify your phone to continue';
-          return;
+          submitBtn.disabled = true; submitBtn.classList.add('opacity-60','cursor-not-allowed');
+          submitBtn.textContent = 'Verify your number to continue'; return;
         }
 
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('opacity-60','cursor-not-allowed');
+        submitBtn.disabled = !allow;
+        submitBtn.classList.toggle('opacity-60', !allow);
+        submitBtn.classList.toggle('cursor-not-allowed', !allow);
         submitBtn.textContent = 'See If I Qualify';
       };
 
@@ -511,31 +451,31 @@
         debtNumber.value = clamped.toLocaleString('en-US');
         debtDisplay.textContent = clamped >= MAX_DEBT ? `${formatCurrency(clamped)}+` : `${formatCurrency(clamped)}`;
         debtConfirmedEl.value = '1';
-        setSubmitState();
+        formContainer._updateSubmitState();
       };
 
-      // init
+      // init + events
       debtDisplay.textContent = formatCurrency(parseInt(debtSlider.value,10));
-      setSubmitState();
+      formContainer._updateSubmitState();
 
-      // events
       debtSlider.addEventListener('input', () => applyAmount(parseInt(debtSlider.value,10)));
       debtNumber.addEventListener('input', () => applyAmount(toInt(debtNumber.value)));
       debtNumber.addEventListener('blur', () => { debtNumber.value = toInt(debtNumber.value).toLocaleString('en-US'); });
+      stateSelect.addEventListener('change', () => formContainer._updateSubmitState());
+      tcpa.addEventListener('change', () => formContainer._updateSubmitState());
 
       // Email validation UI
       const emailInput = formContainer.querySelector('#f_email');
       const emailHint  = formContainer.querySelector('#email-hint');
       const runEmailValidationUI = async () => {
-        if (!emailInput || !emailHint) return;
         if (!emailInput.value) { emailHint.textContent = ''; return; }
         emailHint.textContent = 'Checking email…';
         const res = await validateEmailWithWorker(emailInput.value);
         if (res.ok) {
           let msg = '✅ Valid';
           if (res.suggestion) msg += ` (did you mean ${emailInput.value.split('@')[0]}@${res.suggestion}?)`;
-          if (res.disposable) msg = '⚠️ Disposable address detected. Please use a personal or work email.';
-          if (res.info?.role) msg = '⚠️ Role account (e.g., info@) is not accepted.';
+          if (res.disposable) msg = '⚠️ Disposable address detected. Please use a personal/work email.';
+          if (res.info?.role) msg = '⚠️ Role account is not accepted.';
           if (res.info?.plusAnywhere) msg = '⚠️ Plus-addressing is not accepted.';
           if (res.info?.gmailDot) msg = '⚠️ Gmail dot aliases are not accepted.';
           emailHint.textContent = msg;
@@ -555,369 +495,8 @@
       const phoneInput = formContainer.querySelector('#f_phone');
       const phoneHint  = formContainer.querySelector('#phone-hint');
       const runPhoneValidationUI = async () => {
-        if (!phoneInput || !phoneHint) return;
         if (!phoneInput.value) { phoneHint.textContent = ''; return; }
         phoneHint.textContent = 'Checking number…';
         const res = await validatePhoneWithSignalWire(phoneInput.value);
         if (res.ok) {
-          const extra = res?.meta?.tollFree ? ' (toll-free)' : '';
-          phoneHint.textContent = `✅ Valid ${res.country || ''} ${res.type || ''}: ${res.e164}${extra}`.trim();
-          phoneHint.classList.add('text-green-400'); phoneHint.classList.remove('text-red-400','text-yellow-400');
-        } else {
-          phoneHint.textContent = `❌ ${res.error}`;
-          phoneHint.classList.add('text-red-400'); phoneHint.classList.remove('text-green-400','text-yellow-400');
-        }
-      };
-      phoneInput.addEventListener('blur', runPhoneValidationUI);
-      phoneInput.addEventListener('change', runPhoneValidationUI);
-
-      // expose the submit-state updater so OTP module can call it
-      formContainer._updateSubmitState = setSubmitState;
-
-      // phone edits always reset OTP
-      phoneInput.addEventListener('input', () => {
-        window.otpOK = false;
-        const s = formContainer.querySelector('#otp-status');
-        if (s) s.textContent = '';
-        setSubmitState();
-      });
-
-      // mount OTP (Firebase) onto this form
-      if (window.setupOtp) window.setupOtp(formContainer);
-      formContainer.addEventListener('otp-state-changed', () => setSubmitState());
-
-      formContainer.addEventListener('submit', handleApiFormSubmit);
-    }
-
-    function showIframeForm(iframeSrc, onContinue) {
-      const container = createBaseContainer();
-      const formWrapper = document.createElement('div');
-      formWrapper.className = 'w-full h-full flex-grow bg-gray-900 rounded-lg p-1 my-2';
-
-      const iframe = document.createElement('iframe');
-      iframe.src = `${iframeSrc}?rid=${transactionId}`;
-      iframe.className = 'w-full h-full border-0 rounded-md';
-      formWrapper.appendChild(iframe);
-
-      chatWindow.innerHTML = '';
-      chatWindow.appendChild(formWrapper);
-      chatWindow.scrollTop = 0;
-
-      const continueButton = document.createElement('button');
-      continueButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold text-lg py-3 px-6 rounded-lg transition mt-4';
-      continueButton.textContent = "I've Submitted My Feedback";
-      continueButton.onclick = () => { addMessage("I've Submitted My Feedback", 'user'); formWrapper.remove(); onContinue(); };
-      container.appendChild(continueButton);
-      chatInputArea.appendChild(container);
-    }
-
-    async function handleApiFormSubmit(e) {
-      e.preventDefault();
-      const form = e.target;
-      const submitButton = form.querySelector('button[type="submit"]');
-      const formError = form.querySelector('#form-error');
-
-      formError.classList.add('hidden');
-      submitButton.disabled = true;
-      submitButton.innerHTML = '<div class="loader mx-auto"></div>';
-
-      // OTP GATE: block unless verified
-      if (!window.otpOK) {
-        formError.textContent = 'Please verify your phone number to continue.';
-        formError.classList.remove('hidden');
-        submitButton.disabled = false;
-        submitButton.textContent = 'See If I Qualify';
-        return;
-      }
-
-      const debtAmount = parseInt(form.querySelector('#debt-slider').value, 10) || 0;
-      const selectedState = form.querySelector('select[name="f_whereyoulive"]').value;
-
-      const debtConfirmedEl = document.getElementById('debt-confirmed');
-      if (!debtConfirmedEl || debtConfirmedEl.value !== '1') {
-        formError.textContent = 'Please confirm your debt amount by moving the slider or typing the exact amount.';
-        formError.classList.remove('hidden');
-        submitButton.disabled = false;
-        submitButton.textContent = 'See If I Qualify';
-        return;
-      }
-
-      if (debtAmount < 10000) {
-        formError.textContent = 'Minimum debt of $10,000 is required to qualify.';
-        formError.classList.remove('hidden');
-        submitButton.disabled = false;
-        submitButton.textContent = 'See If I Qualify';
-        return;
-      }
-      if (excludedStates.includes(selectedState)) {
-        formError.textContent = 'Unfortunately, we do not service your state at this time.';
-        formError.classList.remove('hidden');
-        submitButton.disabled = false;
-        submitButton.textContent = 'See If I Qualify';
-        return;
-      }
-
-      // Email validation (strict)
-      const emailRaw = form.querySelector('input[name="f_email"]').value || '';
-      const emailCheck = await validateEmailWithWorker(emailRaw);
-      if (!emailCheck.ok || emailCheck.disposable || emailCheck.info?.role || emailCheck.info?.plusAnywhere || emailCheck.info?.gmailDot) {
-        formError.textContent = emailCheck.ok
-          ? 'Please use a personal, non-role, non-alias email.'
-          : (emailCheck.error || 'Please enter a valid email address.');
-        formError.classList.remove('hidden');
-        submitButton.disabled = false; submitButton.textContent = 'See If I Qualify';
-        return;
-      }
-      const normalizedEmail = emailCheck.normalized;
-      let emailStatusTag = 'normal';
-      if (emailCheck.disposable) emailStatusTag = 'disposable';
-      else if (emailCheck.info?.role) emailStatusTag = 'role';
-      else if (emailCheck.info?.plusAnywhere) emailStatusTag = 'plus';
-      else if (emailCheck.info?.gmailDot) emailStatusTag = 'gmaildot';
-
-      // Phone validation (format/type) – OTP already passed
-      const phoneRaw = form.querySelector('input[name="f_phone"]').value || '';
-      const phoneCheck = await validatePhoneWithSignalWire(phoneRaw);
-      if (!phoneCheck.ok) {
-        formError.textContent = phoneCheck.error || 'Please enter a valid phone number.';
-        formError.classList.remove('hidden');
-        submitButton.disabled = false; submitButton.textContent = 'See If I Qualify';
-        return;
-      }
-      const normalizedE164 = phoneCheck.e164 || phoneRaw;
-      const phoneType = phoneCheck.type || 'unknown';
-      const isTollFree = !!(phoneCheck.meta && phoneCheck.meta.tollFree);
-
-      // get IP best-effort
-      try {
-        const r = await fetch('https://api.ipify.org?format=json');
-        const j = await r.json();
-        clientIp = j.ip || '';
-      } catch (err) { clientIp = ''; }
-
-      // --- CuraDebt (hidden iframe) ---
-      const hidden = document.getElementById('hidden-curadebt-post');
-      const fd = new FormData(form);
-      const data1 = getData1FromUrl() || transactionId;
-
-      hidden.elements['f_fname'].value        = fd.get('f_fname') || '';
-      hidden.elements['f_lname'].value        = fd.get('f_lname') || '';
-      hidden.elements['f_email'].value        = normalizedEmail;
-      hidden.elements['f_phone'].value        = normalizedE164.startsWith('+1') ? normalizedE164.replace('+1','') : normalizedE164;
-      hidden.elements['f_whereyoulive'].value = fd.get('f_whereyoulive') || '';
-      hidden.elements['f_totaldebt'].value    = String(debtAmount);
-      hidden.elements['data1'].value          = data1;
-      hidden.elements['f_comments'].value     = `Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree} | otp=1`;
-      hidden.elements['data2'].value          = 'CLICKID2';
-      hidden.elements['f_ip'].value           = clientIp;
-      hidden.submit();
-
-      // --- TrackDrive (hidden iframe) ---
-      const tdForm = document.getElementById('hidden-trackdrive-post');
-      const qs = new URLSearchParams(location.search);
-      const gclid = qs.get('gclid') || '';
-      const fbeventid = qs.get('fbclid') || '';
-      const msclkid = qs.get('msclkid') || '';
-      const tcpaBox = document.getElementById('tcpa');
-
-      tdForm.elements['caller_id'].value = normalizedE164; // +1XXXXXXXXXX
-      tdForm.elements['first_name'].value  = fd.get('f_fname') || '';
-      tdForm.elements['last_name'].value   = fd.get('f_lname') || '';
-      tdForm.elements['email'].value       = normalizedEmail;
-      tdForm.elements['state'].value       = fd.get('f_whereyoulive') || '';
-      tdForm.elements['zip'].value         = fd.get('f_zip') || '';
-      tdForm.elements['ip_address'].value  = clientIp || '';
-      tdForm.elements['source_url'].value  = location.href;
-      tdForm.elements['useragent'].value   = navigator.userAgent || '';
-      tdForm.elements['original_lead_submit_date'].value = new Date().toISOString().replace('T',' ').slice(0,19);
-      tdForm.elements['tcpa_opt_in'].value = tcpaBox && tcpaBox.checked ? 'true' : 'false';
-      tdForm.elements['tcpa_optin_consent_language'].value =
-        (document.querySelector('label[for="tcpa"] span')?.innerText || '').trim();
-      tdForm.elements['sub_id'].value      = data1;
-      tdForm.elements['gclid'].value       = gclid;
-      tdForm.elements['fbeventid'].value   = fbeventid;
-      tdForm.elements['msclkid'].value     = msclkid;
-      tdForm.elements['traffic_source_lead_id'].value = transactionId;
-
-      tdForm.submit();
-
-      // advance flow
-      form.parentElement.remove();
-      addMessage("I've submitted my information.", 'user');
-      goToStep('formSuccess');
-    }
-
-    function goToStep(stepKey, showMessage = true) {
-      const step = surveyFlow[stepKey];
-      if (!step) return;
-
-      currentStepKey = stepKey;
-      const keys = Object.keys(surveyFlow);
-      const stepIndex = keys.indexOf(stepKey);
-      updateProgress(stepIndex, keys.length);
-
-      const delay = 1200;
-      if (step.message && showMessage) setTimeout(() => addMessage(step.message, 'bot'), delay / 2);
-
-      if (step.end) {
-        chatInputArea.innerHTML = `<p class="text-center text-gray-400 text-sm">You will be redirected shortly...</p>`;
-        const finalUrl = `https://spectrumsurveys.com/surveydone?st=${step.status}&transaction_id=${transactionId}`;
-        setTimeout(() => { window.location.href = finalUrl; }, 2500);
-        return;
-      }
-
-      const timeout = (step.message && showMessage) ? delay : 100;
-      setTimeout(() => {
-        if (step.type === 'multiple-choice') {
-          showOptions(step.options, step.action, { primaryIndex: 0, showNumbers: true });
-        } else if (step.type === 'api-form') {
-          showApiForm();
-        } else if (step.type === 'iframe-form') {
-          showIframeForm(step.iframeSrc, () => goToStep(step.next));
-        } else if (step.next) {
-          goToStep(step.next);
-        }
-      }, timeout);
-    }
-
-    function updateProgress(index, total) {
-      const progress = Math.max(0, Math.min(100, (index / Math.max(1, total - 1)) * 100));
-      progressBar.style.width = `${progress}%`;
-    }
-
-    async function init() {
-      const urlParams = new URLSearchParams(window.location.search);
-      transactionId = urlParams.get('transaction_id') || urlParams.get('RID') || `tx_${Date.now()}`;
-
-      try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        clientIp = data.ip;
-      } catch (_) { clientIp = ''; }
-
-      goToStep('start');
-    }
-
-    init();
-  </script>
-
-  <!-- Firebase OTP module: mounts OTP on the chat form and gates submit -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-
-    // 🔁 Replace with your Firebase project if needed
-    const app = initializeApp({
-      apiKey: "AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE",
-      authDomain: "otp-c6311.firebaseapp.com",
-      projectId: "otp-c6311",
-      storageBucket: "otp-c6311.firebasestorage.app",
-      messagingSenderId: "637495517002",
-      appId: "1:637495517002:web:7bd220994a7611a5606bb3"
-    });
-    const auth = getAuth(app);
-
-    // Attach a helper to window; the main script calls this after building the form
-    window.setupOtp = (formContainer) => {
-      const sendBtn   = formContainer.querySelector('#send-otp');
-      const checkBtn  = formContainer.querySelector('#check-otp');
-      const verifyBox = formContainer.querySelector('#otp-verify');
-      const statusEl  = formContainer.querySelector('#otp-status');
-      const phoneEl   = formContainer.querySelector('#f_phone');
-      const recaptchaDiv = formContainer.querySelector('#recaptcha-container');
-
-      // util: E.164 for US
-      const digitsOnly = s => String(s||'').replace(/\D+/g,'');
-      const toE164US = (raw) => {
-        const d = digitsOnly(raw);
-        const m = d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/);
-        return m ? `+1${m[1]}${m[2]}${m[3]}` : null;
-      };
-
-      let confirmationResult = null;
-
-      // Bind reCAPTCHA invisibly to the Send button
-      // Using the button container id as required by modular SDK
-      const verifier = new RecaptchaVerifier(auth, sendBtn, {
-        size: "invisible"
-      });
-
-      // Keep submit-state callable from here
-      const updateSubmit = () => {
-        if (typeof formContainer._updateSubmitState === 'function') {
-          formContainer._updateSubmitState();
-        }
-      };
-
-      // Send code
-      sendBtn?.addEventListener('click', async ()=>{
-        const e164 = toE164US(phoneEl.value);
-        verifyBox?.classList.remove('hidden');
-        if (!e164){
-          statusEl.textContent = "Enter a valid US number.";
-          statusEl.className = "text-xs text-red-400";
-          return;
-        }
-        statusEl.textContent = "Sending code…";
-        statusEl.className = "text-xs text-gray-300";
-        sendBtn.disabled = true;
-
-        try {
-          confirmationResult = await signInWithPhoneNumber(auth, e164, verifier);
-          statusEl.textContent = "Code sent. Check SMS.";
-          statusEl.className = "text-xs text-green-400";
-        } catch (e) {
-          console.error('OTP send error:', e);
-          statusEl.textContent = `Failed to send (${e?.code||"unknown"}): ${e?.message||e}`;
-          statusEl.className = "text-xs text-red-400";
-        } finally {
-          sendBtn.disabled = false;
-        }
-      });
-
-      // Verify code
-      checkBtn?.addEventListener('click', async ()=>{
-        const code = (formContainer.querySelector('#otp-code').value || "").trim();
-        if (!confirmationResult) {
-          statusEl.textContent = "Please press “Send verification code” first.";
-          statusEl.className = "text-xs text-yellow-400";
-          return;
-        }
-        if (code.length !== 6) {
-          statusEl.textContent = "Enter the 6-digit code.";
-          statusEl.className = "text-xs text-yellow-400";
-          return;
-        }
-        statusEl.textContent = "Verifying…";
-        statusEl.className = "text-xs text-gray-300";
-        checkBtn.disabled = true;
-
-        try {
-          await confirmationResult.confirm(code);
-          window.otpOK = true;
-          statusEl.textContent = "Verified ✓";
-          statusEl.className = "text-xs text-green-400";
-          updateSubmit();
-        } catch (e) {
-          window.otpOK = false;
-          console.error('OTP verify error:', e);
-          statusEl.textContent = `Verify failed (${e?.code||"unknown"}). Try again.`;
-          statusEl.className = "text-xs text-red-400";
-          updateSubmit();
-        } finally {
-          checkBtn.disabled = false;
-        }
-      });
-
-      // If user edits phone, reset OTP state (the main script also resets)
-      phoneEl?.addEventListener('input', ()=>{
-        window.otpOK = false;
-        statusEl.textContent = "";
-        statusEl.className = "text-xs text-gray-300";
-        updateSubmit();
-      });
-    };
-  </script>
-</body>
-</html>
-
+          const extra = res?.meta?.toll

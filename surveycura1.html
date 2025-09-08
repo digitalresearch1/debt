@@ -409,8 +409,26 @@
         <input type="email" name="f_email" id="f_email" placeholder="Email Address" required>
         <div id="email-hint" class="text-xs mt-1 text-gray-400" aria-live="polite"></div>
 
-        <input type="tel" name="f_phone" id="f_phone" placeholder="Phone Number" required>
-        <div id="phone-hint" class="text-xs mt-1 text-gray-400" aria-live="polite"></div>
+        <div>
+          <input type="tel" name="f_phone" id="f_phone" placeholder="Phone Number" required>
+          <div id="phone-hint" class="text-xs mt-1 text-gray-400" aria-live="polite"></div>
+
+          <!-- OTP UI (inserted here) -->
+          <div id="otp-ui" class="mt-2 space-y-2">
+            <button type="button" id="send-otp" class="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-xs">
+              Send verification code
+            </button>
+            <div id="otp-verify" class="hidden flex gap-2 items-center">
+              <input id="otp-code" class="bg-gray-800 border border-gray-700 p-2 rounded w-36" placeholder="6-digit code" maxlength="6" />
+              <button type="button" id="check-otp" class="px-3 py-2 rounded bg-green-600 hover:bg-green-700 text-white text-xs">
+                Verify
+              </button>
+              <span id="otp-status" class="text-xs text-gray-300"></span>
+            </div>
+            <!-- reCAPTCHA widget gets rendered invisibly/bound to the Send button -->
+            <div id="recaptcha-container" class="hidden"></div>
+          </div>
+        </div>
 
         <select name="f_whereyoulive" required>
           <option value="" disabled selected>Select Your State</option>
@@ -444,15 +462,21 @@
       const submitBtn       = formContainer.querySelector('#submit-btn');
       const debtConfirmedEl = formContainer.querySelector('#debt-confirmed');
       const debtWarning     = formContainer.querySelector('#debt-warning');
-      const moveHint       = formContainer.querySelector('#move-hint');
+      const moveHint        = formContainer.querySelector('#move-hint');
 
       const formatCurrency = (amt) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amt);
       const toInt = (s) => { const n = parseInt(String(s||'').replace(/[^\d]/g,''),10); return isNaN(n) ? 0 : n; };
 
+      // global OTP flag
+      window.otpOK = false;
+
       const setSubmitState = () => {
         const v = parseInt(debtSlider.value,10) || 0;
         const confirmed = debtConfirmedEl.value === '1';
+
         if (moveHint) moveHint.classList.toggle('hidden', confirmed);
+
+        // Require both amount OK and OTP verified
         if (!confirmed) {
           submitBtn.disabled = true;
           submitBtn.classList.add('opacity-60','cursor-not-allowed');
@@ -464,12 +488,21 @@
           submitBtn.classList.add('opacity-60','cursor-not-allowed');
           submitBtn.textContent = 'Minimum $10,000 required';
           debtWarning.classList.remove('hidden');
+          return;
         } else {
-          submitBtn.disabled = false;
-          submitBtn.classList.remove('opacity-60','cursor-not-allowed');
-          submitBtn.textContent = 'See If I Qualify';
           debtWarning.classList.add('hidden');
         }
+
+        if (!window.otpOK) {
+          submitBtn.disabled = true;
+          submitBtn.classList.add('opacity-60','cursor-not-allowed');
+          submitBtn.textContent = 'Verify your phone to continue';
+          return;
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-60','cursor-not-allowed');
+        submitBtn.textContent = 'See If I Qualify';
       };
 
       const applyAmount = (raw) => {
@@ -490,7 +523,7 @@
       debtNumber.addEventListener('input', () => applyAmount(toInt(debtNumber.value)));
       debtNumber.addEventListener('blur', () => { debtNumber.value = toInt(debtNumber.value).toLocaleString('en-US'); });
 
-      // Email validation UI (uses validateEmailWithWorker)
+      // Email validation UI
       const emailInput = formContainer.querySelector('#f_email');
       const emailHint  = formContainer.querySelector('#email-hint');
       const runEmailValidationUI = async () => {
@@ -538,6 +571,21 @@
       phoneInput.addEventListener('blur', runPhoneValidationUI);
       phoneInput.addEventListener('change', runPhoneValidationUI);
 
+      // expose the submit-state updater so OTP module can call it
+      formContainer._updateSubmitState = setSubmitState;
+
+      // phone edits always reset OTP
+      phoneInput.addEventListener('input', () => {
+        window.otpOK = false;
+        const s = formContainer.querySelector('#otp-status');
+        if (s) s.textContent = '';
+        setSubmitState();
+      });
+
+      // mount OTP (Firebase) onto this form
+      if (window.setupOtp) window.setupOtp(formContainer);
+      formContainer.addEventListener('otp-state-changed', () => setSubmitState());
+
       formContainer.addEventListener('submit', handleApiFormSubmit);
     }
 
@@ -573,10 +621,18 @@
       submitButton.disabled = true;
       submitButton.innerHTML = '<div class="loader mx-auto"></div>';
 
+      // OTP GATE: block unless verified
+      if (!window.otpOK) {
+        formError.textContent = 'Please verify your phone number to continue.';
+        formError.classList.remove('hidden');
+        submitButton.disabled = false;
+        submitButton.textContent = 'See If I Qualify';
+        return;
+      }
+
       const debtAmount = parseInt(form.querySelector('#debt-slider').value, 10) || 0;
       const selectedState = form.querySelector('select[name="f_whereyoulive"]').value;
 
-      // Require explicit confirmation/change of debt amount
       const debtConfirmedEl = document.getElementById('debt-confirmed');
       if (!debtConfirmedEl || debtConfirmedEl.value !== '1') {
         formError.textContent = 'Please confirm your debt amount by moving the slider or typing the exact amount.';
@@ -601,30 +657,16 @@
         return;
       }
 
-      // >>> Email validation (tight policy on submit)
+      // Email validation (strict)
       const emailRaw = form.querySelector('input[name="f_email"]').value || '';
       const emailCheck = await validateEmailWithWorker(emailRaw);
-      if (!emailCheck.ok) {
-        formError.textContent = emailCheck.error || 'Please enter a valid email address.';
+      if (!emailCheck.ok || emailCheck.disposable || emailCheck.info?.role || emailCheck.info?.plusAnywhere || emailCheck.info?.gmailDot) {
+        formError.textContent = emailCheck.ok
+          ? 'Please use a personal, non-role, non-alias email.'
+          : (emailCheck.error || 'Please enter a valid email address.');
         formError.classList.remove('hidden');
         submitButton.disabled = false; submitButton.textContent = 'See If I Qualify';
         return;
-      }
-      if (emailCheck.disposable) {
-        formError.textContent = 'Disposable email addresses are not accepted. Please use a personal or work email.';
-        formError.classList.remove('hidden'); submitButton.disabled = false; submitButton.textContent = 'See If I Qualify'; return;
-      }
-      if (emailCheck.info?.role) {
-        formError.textContent = 'Role-based emails (e.g., info@, support@) are not accepted. Please use your personal email.';
-        formError.classList.remove('hidden'); submitButton.disabled = false; submitButton.textContent = 'See If I Qualify'; return;
-      }
-      if (emailCheck.info?.plusAnywhere) {
-        formError.textContent = 'Plus-alias emails are not accepted. Please use your base address.';
-        formError.classList.remove('hidden'); submitButton.disabled = false; submitButton.textContent = 'See If I Qualify'; return;
-      }
-      if (emailCheck.info?.gmailDot) {
-        formError.textContent = 'Gmail dot aliases are not accepted. Remove dots from your Gmail username.';
-        formError.classList.remove('hidden'); submitButton.disabled = false; submitButton.textContent = 'See If I Qualify'; return;
       }
       const normalizedEmail = emailCheck.normalized;
       let emailStatusTag = 'normal';
@@ -633,7 +675,7 @@
       else if (emailCheck.info?.plusAnywhere) emailStatusTag = 'plus';
       else if (emailCheck.info?.gmailDot) emailStatusTag = 'gmaildot';
 
-      // >>> Phone validation
+      // Phone validation (format/type) – OTP already passed
       const phoneRaw = form.querySelector('input[name="f_phone"]').value || '';
       const phoneCheck = await validatePhoneWithSignalWire(phoneRaw);
       if (!phoneCheck.ok) {
@@ -642,7 +684,7 @@
         submitButton.disabled = false; submitButton.textContent = 'See If I Qualify';
         return;
       }
-      const normalizedE164 = phoneCheck.e164 || phoneRaw; // e.g. +1XXXXXXXXXX
+      const normalizedE164 = phoneCheck.e164 || phoneRaw;
       const phoneType = phoneCheck.type || 'unknown';
       const isTollFree = !!(phoneCheck.meta && phoneCheck.meta.tollFree);
 
@@ -653,7 +695,7 @@
         clientIp = j.ip || '';
       } catch (err) { clientIp = ''; }
 
-      // Build & submit hidden POST to CuraDebt (CORS-safe)
+      // --- CuraDebt (hidden iframe) ---
       const hidden = document.getElementById('hidden-curadebt-post');
       const fd = new FormData(form);
       const data1 = getData1FromUrl() || transactionId;
@@ -665,12 +707,12 @@
       hidden.elements['f_whereyoulive'].value = fd.get('f_whereyoulive') || '';
       hidden.elements['f_totaldebt'].value    = String(debtAmount);
       hidden.elements['data1'].value          = data1;
-      hidden.elements['f_comments'].value     = `Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree}`;
+      hidden.elements['f_comments'].value     = `Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree} | otp=1`;
       hidden.elements['data2'].value          = 'CLICKID2';
       hidden.elements['f_ip'].value           = clientIp;
       hidden.submit();
 
-      // --- TrackDrive Lead-to-Call POST (separate iframe) ---
+      // --- TrackDrive (hidden iframe) ---
       const tdForm = document.getElementById('hidden-trackdrive-post');
       const qs = new URLSearchParams(location.search);
       const gclid = qs.get('gclid') || '';
@@ -678,10 +720,7 @@
       const msclkid = qs.get('msclkid') || '';
       const tcpaBox = document.getElementById('tcpa');
 
-      // REQUIRED
-      tdForm.elements['caller_id'].value = normalizedE164; // must be +1XXXXXXXXXX
-
-      // OPTIONALS
+      tdForm.elements['caller_id'].value = normalizedE164; // +1XXXXXXXXXX
       tdForm.elements['first_name'].value  = fd.get('f_fname') || '';
       tdForm.elements['last_name'].value   = fd.get('f_lname') || '';
       tdForm.elements['email'].value       = normalizedEmail;
@@ -690,7 +729,7 @@
       tdForm.elements['ip_address'].value  = clientIp || '';
       tdForm.elements['source_url'].value  = location.href;
       tdForm.elements['useragent'].value   = navigator.userAgent || '';
-      tdForm.elements['original_lead_submit_date'].value = new Date().toISOString().replace('T',' ').slice(0,19); // "YYYY-MM-DD HH:MM:SS"
+      tdForm.elements['original_lead_submit_date'].value = new Date().toISOString().replace('T',' ').slice(0,19);
       tdForm.elements['tcpa_opt_in'].value = tcpaBox && tcpaBox.checked ? 'true' : 'false';
       tdForm.elements['tcpa_optin_consent_language'].value =
         (document.querySelector('label[for="tcpa"] span')?.innerText || '').trim();
@@ -700,10 +739,9 @@
       tdForm.elements['msclkid'].value     = msclkid;
       tdForm.elements['traffic_source_lead_id'].value = transactionId;
 
-      // Submit to TrackDrive (this triggers the call on their side)
       tdForm.submit();
 
-      // advance flow immediately
+      // advance flow
       form.parentElement.remove();
       addMessage("I've submitted my information.", 'user');
       goToStep('formSuccess');
@@ -762,5 +800,124 @@
 
     init();
   </script>
+
+  <!-- Firebase OTP module: mounts OTP on the chat form and gates submit -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+    // 🔁 Replace with your Firebase project if needed
+    const app = initializeApp({
+      apiKey: "AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE",
+      authDomain: "otp-c6311.firebaseapp.com",
+      projectId: "otp-c6311",
+      storageBucket: "otp-c6311.firebasestorage.app",
+      messagingSenderId: "637495517002",
+      appId: "1:637495517002:web:7bd220994a7611a5606bb3"
+    });
+    const auth = getAuth(app);
+
+    // Attach a helper to window; the main script calls this after building the form
+    window.setupOtp = (formContainer) => {
+      const sendBtn   = formContainer.querySelector('#send-otp');
+      const checkBtn  = formContainer.querySelector('#check-otp');
+      const verifyBox = formContainer.querySelector('#otp-verify');
+      const statusEl  = formContainer.querySelector('#otp-status');
+      const phoneEl   = formContainer.querySelector('#f_phone');
+      const recaptchaDiv = formContainer.querySelector('#recaptcha-container');
+
+      // util: E.164 for US
+      const digitsOnly = s => String(s||'').replace(/\D+/g,'');
+      const toE164US = (raw) => {
+        const d = digitsOnly(raw);
+        const m = d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/);
+        return m ? `+1${m[1]}${m[2]}${m[3]}` : null;
+      };
+
+      let confirmationResult = null;
+
+      // Bind reCAPTCHA invisibly to the Send button
+      // Using the button container id as required by modular SDK
+      const verifier = new RecaptchaVerifier(auth, sendBtn, {
+        size: "invisible"
+      });
+
+      // Keep submit-state callable from here
+      const updateSubmit = () => {
+        if (typeof formContainer._updateSubmitState === 'function') {
+          formContainer._updateSubmitState();
+        }
+      };
+
+      // Send code
+      sendBtn?.addEventListener('click', async ()=>{
+        const e164 = toE164US(phoneEl.value);
+        verifyBox?.classList.remove('hidden');
+        if (!e164){
+          statusEl.textContent = "Enter a valid US number.";
+          statusEl.className = "text-xs text-red-400";
+          return;
+        }
+        statusEl.textContent = "Sending code…";
+        statusEl.className = "text-xs text-gray-300";
+        sendBtn.disabled = true;
+
+        try {
+          confirmationResult = await signInWithPhoneNumber(auth, e164, verifier);
+          statusEl.textContent = "Code sent. Check SMS.";
+          statusEl.className = "text-xs text-green-400";
+        } catch (e) {
+          console.error('OTP send error:', e);
+          statusEl.textContent = `Failed to send (${e?.code||"unknown"}): ${e?.message||e}`;
+          statusEl.className = "text-xs text-red-400";
+        } finally {
+          sendBtn.disabled = false;
+        }
+      });
+
+      // Verify code
+      checkBtn?.addEventListener('click', async ()=>{
+        const code = (formContainer.querySelector('#otp-code').value || "").trim();
+        if (!confirmationResult) {
+          statusEl.textContent = "Please press “Send verification code” first.";
+          statusEl.className = "text-xs text-yellow-400";
+          return;
+        }
+        if (code.length !== 6) {
+          statusEl.textContent = "Enter the 6-digit code.";
+          statusEl.className = "text-xs text-yellow-400";
+          return;
+        }
+        statusEl.textContent = "Verifying…";
+        statusEl.className = "text-xs text-gray-300";
+        checkBtn.disabled = true;
+
+        try {
+          await confirmationResult.confirm(code);
+          window.otpOK = true;
+          statusEl.textContent = "Verified ✓";
+          statusEl.className = "text-xs text-green-400";
+          updateSubmit();
+        } catch (e) {
+          window.otpOK = false;
+          console.error('OTP verify error:', e);
+          statusEl.textContent = `Verify failed (${e?.code||"unknown"}). Try again.`;
+          statusEl.className = "text-xs text-red-400";
+          updateSubmit();
+        } finally {
+          checkBtn.disabled = false;
+        }
+      });
+
+      // If user edits phone, reset OTP state (the main script also resets)
+      phoneEl?.addEventListener('input', ()=>{
+        window.otpOK = false;
+        statusEl.textContent = "";
+        statusEl.className = "text-xs text-gray-300";
+        updateSubmit();
+      });
+    };
+  </script>
 </body>
 </html>
+

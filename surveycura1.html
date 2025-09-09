@@ -254,42 +254,149 @@
       }
     }
 
-   const surveyFlow = {
+const surveyFlow = {
   start: {
     message: "Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?",
     type: 'multiple-choice',
     options: ["Yes, I'll participate", "No, thank you"],
     action: (a)=> a==="Yes, I'll participate" ? goToStep('askDebtAmount') : goToStep('leaveSurvey')
   },
+
   leaveSurvey: { message: 'No problem at all. Thank you for your time. You will now be redirected.', end: true, status: 18 },
+
   askDebtAmount: {
     message: 'Great! To ensure this study is relevant for you, approximately how much unsecured debt (like credit cards or personal loans) do you have?',
-    type: 'multiple-choice', options: ['Under $10,000', '$10,000 or more'],
+    type: 'multiple-choice',
+    options: ['Under $10,000', '$10,000 or more'],
     action: (a)=> a==='Under $10,000' ? goToStep('disqualify') : goToStep('askIncome')
   },
+
   askIncome: {
     message: 'Thank you. And do you have a steady source of income? This is usually required for debt settlement programs.',
-    type: 'multiple-choice', options: ['Yes', 'No'],
-    action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('qualified')
+    type: 'multiple-choice',
+    options: ['Yes', 'No'],
+    action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('screenIntro') // updated to intro
   },
+
+  /* ---------- Intro before “who is it for” ---------- */
+  screenIntro: {
+    message: 'Great—quick heads up: this research includes a **free, no-obligation consultation** with a debt specialist so we can gather real-world feedback. To match you correctly, just a couple of quick questions.',
+    next: 'whoConsultFor'
+  },
+
+  /* ---------- Added screeners (KO / score / route) ---------- */
+
+  whoConsultFor: {
+    message: 'To confirm we match the consultation correctly, who is it for?',
+    type: 'multiple-choice',
+    options: ['Myself', 'Me & my partner', 'A family member (I\'m the decision maker)', 'I\'m just researching'],
+    action: (a)=> a==="I'm just researching" ? goToStep('disqualify') : goToStep('debtTypeMajority')
+  },
+
+  debtTypeMajority: {
+    message: 'Which kinds of debt make up most of the amount?',
+    type: 'multiple-choice',
+    options: ['Credit cards', 'Personal loans', 'Store cards', 'Medical bills', 'Collections', 'Student loans', 'Tax debt', 'Auto loan', 'Mortgage'],
+    action: (a)=> (a==='Auto loan' || a==='Mortgage') ? goToStep('securedNotEligible') : goToStep('monthsBehind')
+  },
+
+  securedNotEligible: {
+    message: 'This study focuses on unsecured debts (credit cards, personal loans, etc.). Secured debts like auto loans or mortgages usually aren’t eligible.',
+    next: 'disqualify'
+  },
+
+  monthsBehind: {
+    message: 'How many months are you behind or struggling with minimums?',
+    type: 'multiple-choice',
+    options: ['Current but only paying minimums', '30–59 days', '60–89 days', '90+ days'],
+    action: ()=> goToStep('numCreditors')
+  },
+
+  numCreditors: {
+    message: 'How many creditors do you have?',
+    type: 'multiple-choice',
+    options: ['1–2', '3–5', '6–10', '10+'],
+    action: ()=> goToStep('hardshipCause')
+  },
+
+  hardshipCause: {
+    message: 'What caused the hardship?',
+    type: 'multiple-choice',
+    options: ['Job/income loss', 'Medical expenses', 'Divorce/household change', 'Cost of living increase', 'Business slowdown', 'Other'],
+    action: ()=> goToStep('budgetSetAside')
+  },
+
+  budgetSetAside: {
+    message: 'What could you realistically set aside monthly if a plan starts?',
+    type: 'multiple-choice',
+    options: ['<$150', '$150–$249', '$250–$349', '$350–$499', '$500+'],
+    action: ()=> goToStep('currentPrograms')
+  },
+
+  currentPrograms: {
+    message: 'Are you currently in bankruptcy or a debt management program?',
+    type: 'multiple-choice',
+    options: ['No', 'In/Filed Bankruptcy', 'In a Debt Management Plan', 'Considering'],
+    action: (a)=> (a==='In/Filed Bankruptcy' || a==='In a Debt Management Plan') ? goToStep('disqualify') : goToStep('willingStopCards')
+  },
+
+  willingStopCards: {
+    message: 'If you enroll, are you willing to stop using the cards included in the program?',
+    type: 'multiple-choice',
+    options: ['Yes', 'No', 'Not sure'],
+    action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('okToCall')
+  },
+
+  okToCall: {
+    message: 'Are you okay to receive a call from a debt specialist in the next 1–3 days?',
+    type: 'multiple-choice',
+    options: ['Yes', 'Prefer text first', 'No'],
+    action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('languagePref')
+  },
+
+  languagePref: {
+    message: 'Language preference?',
+    type: 'multiple-choice',
+    options: ['English', 'Español'],
+    action: ()=> goToStep('largestCreditor')
+  },
+
+  largestCreditor: {
+    message: 'Who is your largest creditor?',
+    type: 'multiple-choice',
+    options: ['Capital One', 'Chase', 'Citi', 'Bank of America', 'Discover', 'American Express', 'Synchrony', 'Wells Fargo', 'Other/Not listed'],
+    action: ()=> goToStep('callbackWindow')
+  },
+
+  callbackWindow: {
+    message: 'What time is best for a quick call?',
+    type: 'multiple-choice',
+    options: ['Morning (9–12)', 'Afternoon (12–3)', 'Late Afternoon (3–6)', 'Early Evening (6–8)'],
+    action: ()=> goToStep('qualified')
+  },
+
+  /* ---------------- Existing DQ ---------------- */
   disqualify: {
     message: "I appreciate you answering. Based on your responses, this study isn't the right fit. Thank you for your time. You will be redirected now.",
     end: true, status: 18
   },
 
-  // ✅ Text restored exactly as you provided:
+  /* ---------------- Existing education + form ---------------- */
   qualified: {
     message: 'Fantastic! You\'ve qualified for the study. The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist.',
     next: 'reassure'
   },
+
   reassure: {
     message: 'Before I show you the form, I want to be transparent. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We\'ve carefully researched and selected a reputable company, <strong>CuraDebt</strong>, to connect our participants with. They will be the ones to contact you.',
     next: 'educateOnDebtRelief'
   },
+
   educateOnDebtRelief: {
-    message: "Just so you know what to expect, a debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2-4 years. It's a powerful option for many people.",
+    message: "Just so you know what to expect, a debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years. It's a powerful option for many people.",
     next: 'explainTask'
   },
+
   explainTask: {
     message: 'Your real-world experience with them is what makes this study so valuable. After you submit this form, a CuraDebt specialist will call you within the next few days. Following their call, you\'ll receive an email from us asking for your feedback on the conversation and to confirm if you were successfully contacted. Your input is vital as it helps us create articles that guide people in similar situations. Are you ready to take the next step?',
     type: 'multiple-choice',
@@ -302,10 +409,10 @@
     type: 'api-form'
   },
 
-  /* === INSERTED: feedback iframe flow === */
+  /* === Feedback iframe flow (unchanged) === */
   formSuccess: {
     message: 'Thank you! Your information has been sent securely. A debt specialist will be calling you in the next few days.',
-    next: 'askToContinueToFeedback' // changed from 'complete'
+    next: 'askToContinueToFeedback'
   },
   askToContinueToFeedback: {
     message: 'Now for the final step. Ready to provide your feedback?',
@@ -319,7 +426,6 @@
     iframeSrc: 'https://digitalresearch1.github.io/debt/brevo.html',
     next: 'complete'
   },
-  /* === END INSERT === */
 
   complete: {
     message: "That's everything! Thank you so much for your valuable feedback. You will now be redirected to finalize your entry.",

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -361,7 +360,7 @@
         action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('screenIntro')
       },
 
-      /* CHANGED: statement -> question asking willingness */
+      /* Statement -> explicit willingness question */
       screenIntro: {
         message: 'Great—quick heads up: this research includes a <strong>free, no-obligation consultation</strong> with a debt specialist so we can gather real-world feedback. <br/><br/>Are you willing to participate?',
         type: 'multiple-choice',
@@ -369,7 +368,7 @@
         action: (a)=> a==="Yes, I'm willing" ? goToStep('whoConsultFor') : goToStep('disqualify')
       },
 
-      /* CHANGED: removed "I'm just researching" option */
+      /* Removed "I'm just researching" */
       whoConsultFor: {
         message: 'To confirm we match the consultation correctly, who is it for?',
         type: 'multiple-choice',
@@ -428,15 +427,10 @@
         message: 'If you enroll, are you willing to stop using the cards included in the program?',
         type: 'multiple-choice',
         options: ['Yes', 'No', 'Not sure'],
-        action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('okToCall')
-      },
-
-      okToCall: {
-        message: 'Are you okay to receive a call from a debt specialist in the next 1–3 days?',
-        type: 'multiple-choice',
-        options: ['Yes', 'Prefer text first', 'No'],
         action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('languagePref')
       },
+
+      /* REMOVED okToCall */
 
       languagePref: {
         message: 'Language preference?',
@@ -449,15 +443,10 @@
         message: 'Who is your largest creditor?',
         type: 'multiple-choice',
         options: ['Capital One', 'Chase', 'Citi', 'Bank of America', 'Discover', 'American Express', 'Synchrony', 'Wells Fargo', 'Other/Not listed'],
-        action: ()=> goToStep('callbackWindow')
-      },
-
-      callbackWindow: {
-        message: 'What time is best for a quick call?',
-        type: 'multiple-choice',
-        options: ['Morning (9–12)', 'Afternoon (12–3)', 'Late Afternoon (3–6)', 'Early Evening (6–8)'],
         action: ()=> goToStep('qualified')
       },
+
+      /* REMOVED callbackWindow */
 
       disqualify: {
         message: "I appreciate you answering. Based on your responses, this study isn't the right fit. Thank you for your time. You will be redirected now.",
@@ -480,7 +469,7 @@
       },
 
       explainTask: {
-        message: 'Your real-world experience with them is what makes this study so valuable. After you submit this form, a CuraDebt specialist will call you within the next few days. Following their call, you\'ll receive an email from us asking for your feedback on the conversation and to confirm if you were successfully contacted. Your input is vital as it helps us create articles that guide people in similar situations. Are you ready to take the next step?',
+        message: 'Your real-world experience with them is what makes this study so valuable. After you submit this form, a CuraDebt specialist will contact you in the next few days. Following their call, you\'ll receive an email from us asking for your feedback and to confirm if you were successfully contacted. Your input is vital as it helps us create articles that guide people in similar situations. Are you ready to take the next step?',
         type: 'multiple-choice',
         options: ["Yes, I'm ready"],
         action: ()=> goToStep('showApiForm')
@@ -492,7 +481,7 @@
       },
 
       formSuccess: {
-        message: 'Thank you! Your information has been sent securely. A debt specialist will be calling you in the next few days.',
+        message: 'Thank you! Your information has been sent securely. A debt specialist will be reaching out in the next few days.',
         next: 'askToContinueToFeedback'
       },
       askToContinueToFeedback: {

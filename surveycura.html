@@ -335,7 +335,7 @@
       }
     }
 
-    /* === Survey Flow === */
+    /* === Survey Flow (copy updated to mention toll‑free call) === */
     const surveyFlow = {
       start: {
         message: "Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?",
@@ -360,7 +360,6 @@
         action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('screenIntro')
       },
 
-      /* Statement -> explicit willingness question */
       screenIntro: {
         message: 'Great—quick heads up: this research includes a <strong>free, no-obligation consultation</strong> with a debt specialist so we can gather real-world feedback. <br/><br/>Are you willing to participate?',
         type: 'multiple-choice',
@@ -368,7 +367,6 @@
         action: (a)=> a==="Yes, I'm willing" ? goToStep('whoConsultFor') : goToStep('disqualify')
       },
 
-      /* Removed "I'm just researching" */
       whoConsultFor: {
         message: 'To confirm we match the consultation correctly, who is it for?',
         type: 'multiple-choice',
@@ -430,8 +428,6 @@
         action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('languagePref')
       },
 
-      /* REMOVED okToCall */
-
       languagePref: {
         message: 'Language preference?',
         type: 'multiple-choice',
@@ -445,8 +441,6 @@
         options: ['Capital One', 'Chase', 'Citi', 'Bank of America', 'Discover', 'American Express', 'Synchrony', 'Wells Fargo', 'Other/Not listed'],
         action: ()=> goToStep('qualified')
       },
-
-      /* REMOVED callbackWindow */
 
       disqualify: {
         message: "I appreciate you answering. Based on your responses, this study isn't the right fit. Thank you for your time. You will be redirected now.",
@@ -469,7 +463,7 @@
       },
 
       explainTask: {
-        message: 'Your real-world experience with them is what makes this study so valuable. After you submit this form, a CuraDebt specialist will contact you in the next few days. Following their call, you\'ll receive an email from us asking for your feedback and to confirm if you were successfully contacted. Your input is vital as it helps us create articles that guide people in similar situations. Are you ready to take the next step?',
+        message: 'Your real-world experience with them is what makes this study so valuable. After you verify your phone number and submit this form, you may receive a call from a <strong>toll‑free number</strong> (e.g., 800/833/844/855/866/877/888) to connect you directly to a specialist. If you miss it, you can call back from that number. Are you ready to take the next step?',
         type: 'multiple-choice',
         options: ["Yes, I'm ready"],
         action: ()=> goToStep('showApiForm')
@@ -481,7 +475,7 @@
       },
 
       formSuccess: {
-        message: 'Thank you! Your information has been sent securely. A debt specialist will be reaching out in the next few days.',
+        message: 'Thank you! Your information has been sent securely. Watch for a toll‑free call to connect you to a debt specialist.',
         next: 'askToContinueToFeedback'
       },
       askToContinueToFeedback: {
@@ -503,6 +497,7 @@
       }
     };
 
+    /* === API Form Renderer === */
     function showApiForm(){
       chatInputArea.innerHTML = '';
       const wrapper = document.createElement('div');
@@ -564,6 +559,12 @@
 
             <span id="otp-status" class="text-xs text-white/80"></span>
           </div>
+
+          <!-- Toll-free call notice (shown after OTP verifies) -->
+          <div id="tf-call-note" class="hidden text-[12px] text-emerald-300 bg-emerald-400/10 border border-emerald-400/30 rounded-md px-3 py-2">
+            ✅ Number verified. You may receive a call from a <strong>toll‑free</strong> number (800, 833, 844, 855, 866, 877, 888) to connect you with a specialist. If you miss it, call back from that number.
+          </div>
+
           <div id="recaptcha-container"></div>
         </div>
 
@@ -636,12 +637,6 @@
       debtDisplay.textContent = fmt(parseInt(debtSlider.value,10));
       setSubmitState();
 
-      debtSlider.addEventListener('input', ()=> applyAmount(parseInt(debtSlider.value,10)));
-      debtNumber.addEventListener('input', ()=> applyAmount(toInt(debtNumber.value)));
-      debtNumber.addEventListener('blur', ()=> debtNumber.value = toInt(debtNumber.value).toLocaleString('en-US'));
-      stateSelect.addEventListener('change', setSubmitState);
-      form.querySelector('#tcpa').addEventListener('change', setSubmitState);
-
       // Email validation UI
       const emailInput = form.querySelector('#f_email');
       const emailHint = form.querySelector('#email-hint');
@@ -668,9 +663,11 @@
       emailInput.addEventListener('blur', runEmailUI);
       emailInput.addEventListener('change', runEmailUI);
 
-      // Phone validation UI
+      // Phone validation + OTP UI
       const phoneInput = form.querySelector('#f_phone');
       const phoneHint = form.querySelector('#phone-hint');
+      const tfCallNote = form.querySelector('#tf-call-note');
+
       const runPhoneUI = async ()=>{
         if(!phoneInput.value){ phoneHint.textContent=''; return; }
         phoneHint.textContent='Checking number…';
@@ -687,7 +684,6 @@
       phoneInput.addEventListener('blur', runPhoneUI);
       phoneInput.addEventListener('change', runPhoneUI);
 
-      // OTP wiring (Send + Verify)
       const sendBtn  = form.querySelector('#send-otp');
       const checkBtn = form.querySelector('#check-otp');
       const codeInput= form.querySelector('#otp-code');
@@ -724,15 +720,18 @@
           await confirmationResult.confirm(code);
           window.otpOK = true;
           statusEl.textContent='Verified ✓'; statusEl.className='text-xs text-emerald-300';
+          tfCallNote?.classList.remove('hidden');
           setSubmitState();
         }catch(e){
           window.otpOK = false;
           statusEl.textContent = `Verify failed. ${e?.code||''}`; statusEl.className='text-xs text-rose-300';
+          tfCallNote?.classList.add('hidden');
           setSubmitState();
         }
       });
 
-      phoneInput.addEventListener('input', ()=>{ window.otpOK=false; statusEl.textContent=''; setSubmitState(); });
+      // If phone is edited after verify, require re-verify and hide notice
+      phoneInput.addEventListener('input', ()=>{ window.otpOK=false; statusEl.textContent=''; tfCallNote?.classList.add('hidden'); setSubmitState(); });
 
       form.addEventListener('submit', handleApiFormSubmit);
     }
@@ -802,6 +801,7 @@
         const r = await fetch('https://api.ipify.org?format=json'); const j = await r.json(); clientIp = j.ip || '';
       }catch{ clientIp=''; }
 
+      // ---- Submit to CuraDebt (hidden iframe) ----
       const hidden = document.getElementById('hidden-curadebt-post');
       const fd = new FormData(form);
       const data1 = getData1FromUrl() || transactionId;
@@ -818,6 +818,7 @@
       hidden.elements['f_ip'].value           = clientIp;
       hidden.submit();
 
+      // ---- Submit to TrackDrive (hidden iframe) ----
       const tdForm = document.getElementById('hidden-trackdrive-post');
       const qs = new URLSearchParams(location.search);
       const gclid = qs.get('gclid') || '';
@@ -922,3 +923,4 @@
   </script>
 </body>
 </html>
+

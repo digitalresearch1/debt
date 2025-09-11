@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,16 +8,13 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg1: 28 28 33; /* base */
-      --bg2: 17 17 21; /* darker */
-    }
     html,body{ height:100%; }
     body{ font-family: 'Inter', sans-serif; }
 
-    /* === Modern background (radial grid + subtle noise) === */
+    /* === Modern background (radial glow + grid) === */
+    body{ background:#1c1c21; color:#fff; }
     body::before{
-      content:""; position:fixed; inset:-10vmax;
+      content:""; position:fixed; inset:-10vmax; pointer-events:none;
       background:
         radial-gradient(60vmax 60vmax at 10% -10%, rgba(99,102,241,.35), transparent 60%),
         radial-gradient(70vmax 70vmax at 110% 10%, rgba(236,72,153,.25), transparent 60%),
@@ -65,12 +63,11 @@
     /* Responsive safe area padding for bottom bar */
     .safe-bottom{ padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
 
-    /* Visual progress dot */
+    /* Visual status dot */
     .progress-dot{ height:10px; width:10px; border-radius:9999px; box-shadow: 0 0 0 4px rgba(99,102,241,.15); }
   </style>
 </head>
-<body class="min-h-screen bg-[#1c1c21] text-white selection:bg-indigo-500/30">
-
+<body>
   <!-- Centered phone frame -->
   <div class="mx-auto max-w-md px-4 py-8 md:py-12">
     <div class="glass-border rounded-3xl">
@@ -101,9 +98,7 @@
         </div>
 
         <!-- Chat Window -->
-        <div id="chat-window" class="flex-1 px-4 pb-4 overflow-y-auto space-y-3">
-          <!-- messages injected here -->
-        </div>
+        <div id="chat-window" class="flex-1 px-4 pb-4 overflow-y-auto space-y-3"></div>
 
         <!-- Input / Controls area -->
         <footer id="chat-input-area" class="safe-bottom px-4 pt-2 pb-4 bg-gradient-to-t from-white/5 via-white/[.03] to-transparent border-t border-white/10"></footer>
@@ -341,6 +336,7 @@
       }
     }
 
+    /* === Survey Flow === */
     const surveyFlow = {
       start: {
         message: "Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?",
@@ -365,16 +361,20 @@
         action: (a)=> a==='No' ? goToStep('disqualify') : goToStep('screenIntro')
       },
 
+      /* CHANGED: statement -> question asking willingness */
       screenIntro: {
-        message: 'Great—quick heads up: this research includes a **free, no-obligation consultation** with a debt specialist so we can gather real-world feedback. To match you correctly, just a couple of quick questions.',
-        next: 'whoConsultFor'
+        message: 'Great—quick heads up: this research includes a <strong>free, no-obligation consultation</strong> with a debt specialist so we can gather real-world feedback. <br/><br/>Are you willing to participate?',
+        type: 'multiple-choice',
+        options: ["Yes, I'm willing", 'No'],
+        action: (a)=> a==="Yes, I'm willing" ? goToStep('whoConsultFor') : goToStep('disqualify')
       },
 
+      /* CHANGED: removed "I'm just researching" option */
       whoConsultFor: {
         message: 'To confirm we match the consultation correctly, who is it for?',
         type: 'multiple-choice',
-        options: ['Myself', 'Me & my partner', 'A family member (I\'m the decision maker)', 'I\'m just researching'],
-        action: (a)=> a==="I'm just researching" ? goToStep('disqualify') : goToStep('debtTypeMajority')
+        options: ['Myself', 'Me & my partner', 'A family member (I\'m the decision maker)'],
+        action: ()=> goToStep('debtTypeMajority')
       },
 
       debtTypeMajority: {
@@ -786,7 +786,6 @@
         formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return;
       }
 
-      // Email validation
       const emailRaw = form.querySelector('input[name="f_email"]').value || '';
       const emailCheck = await validateEmailWithWorker(emailRaw);
       if(!emailCheck.ok || emailCheck.disposable || emailCheck.info?.role || emailCheck.info?.plusAnywhere || emailCheck.info?.gmailDot){
@@ -800,7 +799,6 @@
       else if(emailCheck.info?.plusAnywhere) emailStatusTag='plus';
       else if(emailCheck.info?.gmailDot) emailStatusTag='gmaildot';
 
-      // Phone validation (format for posting)
       const phoneRaw = form.querySelector('input[name="f_phone"]').value || '';
       const phoneCheck = await validatePhoneWithSignalWire(phoneRaw);
       if(!phoneCheck.ok){
@@ -811,12 +809,10 @@
       const phoneType = phoneCheck.type || 'unknown';
       const isTollFree = !!(phoneCheck.meta && phoneCheck.meta.tollFree);
 
-      // IP best-effort
       try{
         const r = await fetch('https://api.ipify.org?format=json'); const j = await r.json(); clientIp = j.ip || '';
       }catch{ clientIp=''; }
 
-      // ---- Submit to CuraDebt (hidden iframe) ----
       const hidden = document.getElementById('hidden-curadebt-post');
       const fd = new FormData(form);
       const data1 = getData1FromUrl() || transactionId;
@@ -833,7 +829,6 @@
       hidden.elements['f_ip'].value           = clientIp;
       hidden.submit();
 
-      // ---- Submit to TrackDrive (hidden iframe) ----
       const tdForm = document.getElementById('hidden-trackdrive-post');
       const qs = new URLSearchParams(location.search);
       const gclid = qs.get('gclid') || '';
@@ -938,4 +933,3 @@
   </script>
 </body>
 </html>
-

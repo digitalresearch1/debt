@@ -212,37 +212,64 @@
 
     async function validateEmailWithWorker(raw){ const base=strictEmailClient(raw); if(!base.ok) return base; try{ const r=await fetch(VALIDATE_EMAIL_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ email: base.normalized, want_mx:true })}); const j=await r.json(); if(!j.ok) return { ok:false, error:j.error||'Email validation failed.' }; return { ok:true, normalized: base.normalized, disposable: !!j.disposable, has_mx: typeof j.has_mx==='boolean'? j.has_mx: undefined, suggestion: j.suggestion||base.suggestion||null, info: base.info }; }catch{ return base; } }
 
-    // === SURVEY FLOW (UNCHANGED QUESTIONS/STATEMENTS) ===
-    const surveyFlow={
-      start:{ message:"Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?", type:'multiple-choice', options:["Yes, I'll participate","No, thank you"], action:a=> a==="Yes, I'll participate"? goToStep('askDebtAmount') : goToStep('leaveSurvey') },
-      leaveSurvey:{ message:'No problem at all. Thank you for your time. You will now be redirected.', end:true, status:18 },
-      askDebtAmount:{ message:'Great! To ensure this study is relevant for you, approximately how much unsecured debt (like credit cards or personal loans) do you have?', type:'multiple-choice', options:['Under $10,000','$10,000 or more'], action:a=> a==='Under $10,000'? goToStep('disqualify') : goToStep('askIncome') },
-      askIncome:{ message:'Thank you. And do you have a steady source of income? This is usually required for debt settlement programs.', type:'multiple-choice', options:['Yes','No'], action:a=> a==='No'? goToStep('disqualify') : goToStep('screenIntro') },
-      screenIntro:{ message:'Great—quick heads up: this research includes a <strong>free, no-obligation consultation</strong> with a debt specialist so we can gather real-world feedback. <br/><br/>Are you willing to participate?', type:'multiple-choice', options:["Yes, I'm willing",'No'], action:a=> a==="Yes, I'm willing"? goToStep('whoConsultFor') : goToStep('disqualify') },
-      whoConsultFor:{ message:'To confirm we match the consultation correctly, who is it for?', type:'multiple-choice', options:['Myself','Me & my partner','A family member (I\'m the decision maker)'], action:()=> goToStep('debtTypeMajority') },
-      debtTypeMajority:{ message:'Which kinds of debt make up most of the amount?', type:'multiple-choice', options:['Credit cards','Personal loans','Store cards','Medical bills','Collections','Student loans','Tax debt','Auto loan','Mortgage'], action:a=> (a==='Auto loan'||a==='Mortgage')? goToStep('securedNotEligible') : goToStep('monthsBehind') },
-      securedNotEligible:{ message:'This study focuses on unsecured debts (credit cards, personal loans, etc.). Secured debts like auto loans or mortgages usually aren’t eligible.', next:'disqualify' },
-      monthsBehind:{ message:'How many months are you behind or struggling with minimums?', type:'multiple-choice', options:['Current but only paying minimums','30–59 days','60–89 days','90+ days'], action:()=> goToStep('numCreditors') },
-      numCreditors:{ message:'How many creditors do you have?', type:'multiple-choice', options:['1–2','3–5','6–10','10+'], action:()=> goToStep('hardshipCause') },
-      hardshipCause:{ message:'What caused the hardship?', type:'multiple-choice', options:['Job/income loss','Medical expenses','Divorce/household change','Cost of living increase','Business slowdown','Other'], action:()=> goToStep('budgetSetAside') },
-      budgetSetAside:{ message:'What could you realistically set aside monthly if a plan starts?', type:'multiple-choice', options:['<$150','$150–$249','$250–$349','$350–$499','$500+'], action:()=> goToStep('currentPrograms') },
-      currentPrograms:{ message:'Are you currently in bankruptcy or a debt management program?', type:'multiple-choice', options:['No','In/Filed Bankruptcy','In a Debt Management Plan','Considering'], action:a=> (a==='In/Filed Bankruptcy'||a==='In a Debt Management Plan')? goToStep('disqualify') : goToStep('willingStopCards') },
-      willingStopCards:{ message:'If you enroll, are you willing to stop using the cards included in the program?', type:'multiple-choice', options:['Yes','No','Not sure'], action:a=> a==='No'? goToStep('disqualify') : goToStep('languagePref') },
-      languagePref:{ message:'Language preference?', type:'multiple-choice', options:['English','Español'], action:()=> goToStep('largestCreditor') },
-      largestCreditor:{ message:'Who is your largest creditor?', type:'multiple-choice', options:['Capital One','Chase','Citi','Bank of America','Discover','American Express','Synchrony','Wells Fargo','Other/Not listed'], action:()=> goToStep('qualified') },
-      disqualify:{ message:"I appreciate you answering. Based on your responses, this study isn't the right fit. Thank you for your time. You will be redirected now.", end:true, status:18 },
-      qualified:{ message:'Fantastic! You\'ve qualified for the study. The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist.', next:'reassure' },
-      reassure:{ message:'Before I show you the form, I want to be transparent. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We\'ve carefully researched and selected a reputable company, <strong>CuraDebt</strong>, to connect our participants with. They will be the ones to contact you.', next:'educateOnDebtRelief' },
-      educateOnDebtRelief:{ message:"Just so you know what to expect, a debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years. It's a powerful option for many people.", next:'explainTask' },
-      explainTask:{ message:'Your real-world experience with them is what makes this study so valuable. After you verify your phone number and submit this form, you may receive a call from a <strong>toll‑free number</strong> (e.g., 800/833/844/855/866/877/888) to connect you directly to a specialist. If you miss it, you can call back from that number. Are you ready to take the next step?', type:'multiple-choice', options:["Yes, I'm ready"], action:()=> goToStep('showApiForm') },
-      showApiForm:{ message:"Excellent! Please complete the secure form below. I'll be here once you've submitted it.", type:'api-form' },
-      formSuccess:{ message:'Thank you! Your information has been sent securely. Watch for a toll‑free call to connect you to a debt specialist.', next:'askToContinueToFeedback' },
-      askToContinueToFeedback:{ message:'Now for the final step. Ready to provide your feedback?', type:'multiple-choice', options:['Yes, Continue to Feedback'], action:()=> goToStep('askForFeedback') },
-      askForFeedback:{ message:'Please complete the form below. You\'ll need to enter your email address so we can match your feedback to your initial submission.', type:'iframe-form', iframeSrc:'https://digitalresearch1.github.io/debt/brevo.html', next:'complete' },
-      complete:{ message:"That's everything! Thank you so much for your valuable feedback. You will now be redirected to finalize your entry.", end:true, status:21 }
+    // === SIMPLIFIED SURVEY FLOW ===
+    const surveyFlow = {
+      start: {
+        message: "Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?",
+        type: 'multiple-choice',
+        options: ["Yes, I'll participate", 'No, thank you'],
+        action: (a)=> a==="Yes, I'll participate" ? goToStep('qDebtMin') : goToStep('leaveSurvey')
+      },
+
+      leaveSurvey: { message: 'No problem at all. Thank you for your time. You will now be redirected.', end:true, status:18 },
+
+      // 1) Simple debt check (keeps the $10k rule crystal clear)
+      qDebtMin: {
+        message: 'Do you have at least $10,000 in unsecured debt (like credit cards or personal loans)?',
+        type: 'multiple-choice',
+        options: ['Yes', 'No / Not sure'],
+        action: (a)=> a==='Yes' ? goToStep('qIncome') : goToStep('disqualify')
+      },
+
+      // 2) Simple income check
+      qIncome: {
+        message: 'Do you have a steady source of income?',
+        type: 'multiple-choice',
+        options: ['Yes', 'No'],
+        action: (a)=> a==='Yes' ? goToStep('qWilling') : goToStep('disqualify')
+      },
+
+      // 3) Simple willingness check
+      qWilling: {
+        message: 'As part of the study, are you willing to speak with a debt specialist for a free, no-obligation consultation?',
+        type: 'multiple-choice',
+        options: ['Yes', 'No'],
+        action: (a)=> a==='Yes' ? goToStep('preFormInfo') : goToStep('disqualify')
+      },
+
+      // Your explainer KEPT VERBATIM, followed by the CTA
+      preFormInfo: {
+        message: `Fantastic! You've qualified for the study. The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist. Before I show you the form, I want to be transparent. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We've carefully researched and selected a reputable company, CuraDebt, to connect our participants with. They will be the ones to contact you. Just so you know what to expect, a debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years. It's a powerful option for many people. Your real-world experience with them is what makes this study so valuable. After you verify your phone number and submit this form, you may receive a call from a toll‑free number (e.g., 800/833/844/855/866/877/888) to connect you directly to a specialist. If you miss it, you can call back from that number. Are you ready to take the next step`,
+        type: 'multiple-choice',
+        options: ["Yes, I'm ready"],
+        action: ()=> goToStep('showApiForm')
+      },
+
+      // === Keep form + post-form steps ===
+      showApiForm: { message: "Excellent! Please complete the secure form below. I'll be here once you've submitted it.", type: 'api-form' },
+
+      formSuccess: { message: 'Thank you! Your information has been sent securely. Watch for a toll‑free call to connect you to a debt specialist.', next: 'askToContinueToFeedback' },
+
+      askToContinueToFeedback: { message: 'Now for the final step. Ready to provide your feedback?', type: 'multiple-choice', options: ['Yes, Continue to Feedback'], action: ()=> goToStep('askForFeedback') },
+
+      askForFeedback: { message: "Please complete the form below. You'll need to enter your email address so we can match your feedback to your initial submission.", type: 'iframe-form', iframeSrc: 'https://digitalresearch1.github.io/debt/brevo.html', next: 'complete' },
+
+      complete: { message: "That's everything! Thank you so much for your valuable feedback. You will now be redirected to finalize your entry.", end:true, status:21 },
+
+      disqualify: { message: "I appreciate you answering. Based on your responses, this study isn't the right fit. Thank you for your time. You will be redirected now.", end:true, status:18 }
     };
 
-    // === BEGIN: Existing secure form renderer (unchanged logic) ===
+    // === BEGIN: Existing secure form renderer ===
     function showApiForm(){
       chatInputArea.innerHTML=''; const wrapper=document.createElement('div'); wrapper.className='w-full bg-white border border-slate-200 rounded-2xl p-4 my-2 text-slate-900 backdrop-blur';
       const form=document.createElement('form'); form.id='cura-debt-form'; form.className='embedded-form w-full space-y-4';
@@ -372,7 +399,7 @@
 
     function updateProgress(index,total){ const p=Math.max(0, Math.min(100, (index/Math.max(1,total-1))*100)); progressBar.style.width=`${p}%`; }
 
-    // === NEW: INTRO PAGE (before the survey starts) ===
+    // === INTRO PAGE ===
     function showIntro(){
       chatWindow.innerHTML=''; chatInputArea.innerHTML='';
       const card=document.createElement('div'); card.className='mx-4 my-2 p-5 bg-white border border-slate-200 rounded-2xl shadow';
@@ -397,7 +424,7 @@
       });
     }
 
-    // === NEW: Lightweight FAQ modal ===
+    // === Lightweight FAQ modal ===
     const DEBT_FAQ = [
       { q:'How does debt settlement affect my credit?', a:'Debt settlement typically lowers your credit score in the short term because accounts may become delinquent during negotiations. Many people still choose it because it can reduce overall debt and shorten the payoff timeline compared to making minimum payments. Credit can be rebuilt over time with on‑time payments and responsible use.' , k:['credit','score','fico','impact','affect'] },
       { q:'Which debts qualify for settlement?', a:'Unsecured debts such as credit cards, personal loans, medical bills, and collections usually qualify. Secured debts tied to collateral (e.g., auto loans, mortgages) usually do not.' , k:['qualify','eligible','unsecured','secured','types'] },

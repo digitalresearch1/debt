@@ -209,7 +209,7 @@
       const w=document.createElement('div'); w.className='w-full h-[70vh] flex-grow bg-white rounded-xl p-1 ring-1 ring-slate-200';
       const iframe=document.createElement('iframe'); const rid=transactionId || (window.__rid ||= ('tx_'+Date.now()));
       iframe.src=`${iframeSrc}?rid=${encodeURIComponent(rid)}`; iframe.className='w-full h-full border-0 rounded-md'; iframe.setAttribute('loading','lazy'); iframe.setAttribute('referrerpolicy','no-referrer-when-downgrade');
-      w.appendChild(iframe); chatWindow.innerHTML=''; chatWindow.appendChild(w); chatWindow.scrollTop=0;
+      w.appendChild(iframe); chatWindow.innerHTML=''; chatInputArea.innerHTML=''; chatWindow.appendChild(w); chatWindow.scrollTop=0;
 
       const gate=document.createElement('div'); gate.className='mt-4 flex items-center gap-3';
       const chk=document.createElement('input'); chk.type='checkbox'; chk.id='fb-done'; chk.className='h-4 w-4';
@@ -233,7 +233,7 @@
     // Progress & navigation
     function goToStep(stepKey, showMessage=true){
       const step=surveyFlow[stepKey]; if(!step) return; currentStepKey=stepKey; const keys=Object.keys(surveyFlow); updateProgress(keys.indexOf(stepKey), keys.length);
-      const delay=700;
+      const delay = (stepKey==='start' ? 0 : 700);
       if(step.message && showMessage) setTimeout(()=> addMessage(step.message,'bot'), delay/2);
 
       // FORCE FEEDBACK: skip the optional choice and go straight to feedback
@@ -275,10 +275,13 @@
       chatWindow.appendChild(card);
       document.getElementById('begin-btn').addEventListener('click', ()=>{
         sessionStorage.setItem('chloe_started','1');
-        chatWindow.innerHTML='';
-        // push a history state to avoid going "back" to intro
+        // Remove the intro card only — do not add any user bubble
+        card.remove();
+        chatInputArea.innerHTML='';
+        // Prevent going back to intro in this session
         try{ history.replaceState({step:'intro'},''); history.pushState({step:'start'},''); }catch{}
-        goToStep('start');
+        // Immediately show the first bot message and options
+        goToStep('start', true);
       });
     }
 
@@ -294,11 +297,10 @@
       const urlParams=new URLSearchParams(window.location.search);
       transactionId=urlParams.get('transaction_id')||urlParams.get('RID')||`tx_${Date.now()}`;
       try{ const r=await fetch('https://api.ipify.org?format=json'); const j=await r.json(); clientIp=j.ip; }catch{ clientIp=''; }
-      if(sessionStorage.getItem('chloe_started')==='1'){ goToStep('start', false); }
+      if(sessionStorage.getItem('chloe_started')==='1'){ goToStep('start', true); }
       else { showIntro(); }
     }
     init();
   </script>
 </body>
 </html>
-

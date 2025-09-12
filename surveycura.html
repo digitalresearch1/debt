@@ -145,7 +145,7 @@
     const progressBar = document.getElementById('progress-bar');
 
     let currentStepKey = 'start'; let transactionId = ''; let clientIp = '';
-    $1
+    window.otpOK = false; let confirmationResult = null;
 
     let prefillDebtAmount = null;
 
@@ -164,7 +164,7 @@
     }
     function createBaseContainer(){ chatInputArea.innerHTML=''; const c=document.createElement('div'); c.className='sticky bottom-0 w-full safe-bottom pt-2'; return c; }
 
-    // === NEW: Optional typed answer + quick FAQ ===
+    // === Optional typed answer + quick FAQ ===
     function normalizeText(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim(); }
 
     function showOptions(options, onSelect, config={}){
@@ -212,9 +212,9 @@
 
     function strictEmailClient(raw){ const email=String(raw||'').trim(); const at=email.indexOf('@'); if(at<1||at===email.length-1) return {ok:false,error:'Enter a valid email address.'}; const local=email.slice(0,at), domain=email.slice(at+1).toLowerCase(); if(local.length<3||local.length>64) return {ok:false,error:'Email local part length is invalid.'}; if(domain.length<4||domain.length>255) return {ok:false,error:'Email domain length is invalid.'}; if(!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\-]{0,62}[A-Za-z0-9])?$/.test(local)) return {ok:false,error:'Invalid characters in email.'}; if(local.includes('..')) return {ok:false,error:'Email local has consecutive dots.'}; if(!/[A-Za-z]/.test(local)) return {ok:false,error:'Email must contain letters.'}; if((local.match(/\./g)||[]).length>2) return {ok:false,error:'Too many dots in email local.'}; if(domain.indexOf('.')<1) return {ok:false,error:'Email domain must contain a dot.'}; const labels=domain.split('.'); for(const lab of labels){ if(lab.length<1||lab.length>63) return {ok:false,error:'Email domain label length is invalid.'}; if(!/^[A-Za-z0-9-]+$/.test(lab)) return {ok:false,error:'Email domain contains invalid chars.'}; if(lab.startsWith('-')||lab.endsWith('-')) return {ok:false,error:'Domain label cannot start/end with -.'}; } const tld=labels[labels.length-1]; if(tld.length<2||tld.length>63) return {ok:false,error:'Email TLD invalid.'}; if(/^\d+$/.test(tld)) return {ok:false,error:'Email TLD cannot be all digits.'}; if(tld==='con') return {ok:false,error:'TLD looks mistyped (.con). Did you mean .com?'}; const info={ role:ROLE_LOCALS.has(local.toLowerCase()), plusAnywhere:local.includes('+'), gmailDot:(domain==='gmail.com'||domain==='googlemail.com')&&local.includes('.'), freemail:FREEMAIL.has(domain) }; return { ok:true, normalized:`${local}@${domain}`, info, suggestion: DOMAIN_TYPO_MAP[domain]||null } }
 
-    async function validateEmailWithWorker(raw){ const base=strictEmailClient(raw); if(!base.ok) return base; try{ const r=await fetch(VALIDATE_EMAIL_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ email: base.normalized, want_mx:true })}); const j=await r.json(); if(!j.ok) return { ok:false, error:j.error||'Email validation failed.' }; return { ok:true, normalized: base.normalized, disposable: !!j.disposable, has_mx: typeof j.has_mx==='boolean'? j.has_mx: undefined, suggestion: j.suggestion||base.suggestion||null, info: base.info }; }catch{ return base; } }
+    async function validateEmailWithWorker(raw){ const base=strictEmailClient(raw); if(!base.ok) return base; try{ const r=await fetch(VALIDATE_EMAIL_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ email: base.normalized, want_mx:true })}); const j=await r.json(); if(!j.ok) return { ok:false, error:j.error||'Email validation failed.' }; return { ok:true, normalized: base.normalized, disposable: !!j.disposable, has_mx: typeof j.has_mx==='boolean'? j.has_mx: undefined, suggestion: j.suggestion||base.suggestion||null, info: base.info }; }catch{ return base; }
 
-    // === SIMPLIFIED SURVEY FLOW ===
+    // === SIMPLIFIED SURVEY FLOW WITH RANGES ===
     const surveyFlow = {
       start: {
         message: "Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?",
@@ -255,7 +255,7 @@
 
       // Your explainer KEPT VERBATIM, followed by the CTA
       preFormInfo: {
-        message: `Fantastic! You've qualified for the study. The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist. Before I show you the form, I want to be transparent. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We've carefully researched and selected a reputable company, CuraDebt, to connect our participants with. They will be the ones to contact you. Just so you know what to expect, a debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years. It's a powerful option for many people. Your real-world experience with them is what makes this study so valuable. After you verify your phone number and submit this form, you may receive a call from a toll‑free number (e.g., 800/833/844/855/866/877/888) to connect you directly to a specialist. If you miss it, you can call back from that number. Are you ready to take the next step`,
+        message: `Fantastic! You've qualified for the study. The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist. Before I show you the form, I want to be transparent. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We've carefully researched and selected a reputable company, CuraDebt, to connect our participants with. They will be the ones to contact you. Just so you know what to expect, a debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years. It's a powerful option for many people. Your real-world experience with them is what makes this study so valuable. After you verify your phone number and submit this form, you may receive a call from a toll-free number (e.g., 800/833/844/855/866/877/888) to connect you directly to a specialist. If you miss it, you can call back from that number. Are you ready to take the next step`,
         type: 'multiple-choice',
         options: ["Yes, I'm ready"],
         action: ()=> goToStep('showApiForm')
@@ -264,7 +264,7 @@
       // === Keep form + post-form steps ===
       showApiForm: { message: "Excellent! Please complete the secure form below. I'll be here once you've submitted it.", type: 'api-form' },
 
-      formSuccess: { message: 'Thank you! Your information has been sent securely. Watch for a toll‑free call to connect you to a debt specialist.', next: 'askToContinueToFeedback' },
+      formSuccess: { message: 'Thank you! Your information has been sent securely. Watch for a toll-free call to connect you to a debt specialist.', next: 'askToContinueToFeedback' },
 
       askToContinueToFeedback: { message: 'Now for the final step. Ready to provide your feedback?', type: 'multiple-choice', options: ['Yes, Continue to Feedback'], action: ()=> goToStep('askForFeedback') },
 
@@ -310,7 +310,7 @@
             </div>
             <span id="otp-status" class="text-xs text-slate-700"></span>
           </div>
-          <div id="tf-call-note" class="hidden text-[12px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">✅ Number verified. You may receive a call from a <strong>toll‑free</strong> number (800, 833, 844, 855, 866, 877, 888) to connect you with a specialist. If you miss it, call back from that number.</div>
+          <div id="tf-call-note" class="hidden text-[12px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">✅ Number verified. You may receive a call from a <strong>toll-free</strong> number (800, 833, 844, 855, 866, 877, 888) to connect you with a specialist. If you miss it, call back from that number.</div>
           <div id="recaptcha-container"></div>
         </div>
         <select name="f_whereyoulive" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60"><option value="" disabled selected>Select Your State</option></select>
@@ -405,7 +405,27 @@
 
     function showIframeForm(iframeSrc, onContinue) { const c=createBaseContainer(); const w=document.createElement('div'); w.className='w-full h-[70vh] flex-grow bg-white rounded-xl p-1 ring-1 ring-slate-200'; const iframe=document.createElement('iframe'); const rid=transactionId || (window.__rid ||= ('tx_'+Date.now())); iframe.src=`${iframeSrc}?rid=${encodeURIComponent(rid)}`; iframe.className='w-full h-full border-0 rounded-md'; iframe.setAttribute('loading','lazy'); iframe.setAttribute('referrerpolicy','no-referrer-when-downgrade'); w.appendChild(iframe); chatWindow.innerHTML=''; chatWindow.appendChild(w); chatWindow.scrollTop=0; const btn=document.createElement('button'); btn.className='bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-base py-3 px-6 rounded-xl transition mt-4 shadow'; btn.textContent="I've Submitted My Feedback"; btn.onclick=()=>{ addMessage("I've Submitted My Feedback", 'user'); w.remove(); onContinue(); }; c.appendChild(btn); chatInputArea.innerHTML=''; chatInputArea.appendChild(c); }
 
-    function goToStep(stepKey, showMessage=true){ const step=surveyFlow[stepKey]; if(!step) return; currentStepKey=stepKey; const keys=Object.keys(surveyFlow); updateProgress(keys.indexOf(stepKey), keys.length); const delay=700; if(step.message && showMessage) setTimeout(()=> addMessage(step.message,'bot'), delay/2); if(step.end){ chatInputArea.innerHTML='<p class="text-center text-slate-600 text-sm">You will be redirected shortly...</p>'; const finalUrl=`https://spectrumsurveys.com/surveydone?st=${step.status}&transaction_id=${transactionId}`; setTimeout(()=>{ window.location.href=finalUrl; },2000); return; } const t=(step.message && showMessage) ? delay : 100; setTimeout(()=>{ if(step.type==='multiple-choice') showOptions(step.options, step.action, {primaryIndex:0, showNumbers:true, allowTyped:true}); else if(step.type==='api-form') showApiForm(); else if(step.type==='iframe-form') showIframeForm(step.iframeSrc, ()=> goToStep(step.next)); else if(step.next) goToStep(step.next); }, t); }
+    function goToStep(stepKey, showMessage=true){
+      const step=surveyFlow[stepKey]; if(!step) return;
+      currentStepKey=stepKey;
+      const keys=Object.keys(surveyFlow);
+      updateProgress(keys.indexOf(stepKey), keys.length);
+      const delay=700;
+      if(step.message && showMessage) setTimeout(()=> addMessage(step.message,'bot'), delay/2);
+      if(step.end){
+        chatInputArea.innerHTML='<p class="text-center text-slate-600 text-sm">You will be redirected shortly...</p>';
+        const finalUrl=`https://spectrumsurveys.com/surveydone?st=${step.status}&transaction_id=${transactionId}`;
+        setTimeout(()=>{ window.location.href=finalUrl; },2000);
+        return;
+      }
+      const t=(step.message && showMessage) ? delay : 100;
+      setTimeout(()=>{
+        if(step.type==='multiple-choice') showOptions(step.options, step.action, {primaryIndex:0, showNumbers:true, allowTyped:true});
+        else if(step.type==='api-form') showApiForm();
+        else if(step.type==='iframe-form') showIframeForm(step.iframeSrc, ()=> goToStep(step.next));
+        else if(step.next) goToStep(step.next);
+      }, t);
+    }
 
     function updateProgress(index,total){ const p=Math.max(0, Math.min(100, (index/Math.max(1,total-1))*100)); progressBar.style.width=`${p}%`; }
 
@@ -436,11 +456,11 @@
 
     // === Lightweight FAQ modal ===
     const DEBT_FAQ = [
-      { q:'How does debt settlement affect my credit?', a:'Debt settlement typically lowers your credit score in the short term because accounts may become delinquent during negotiations. Many people still choose it because it can reduce overall debt and shorten the payoff timeline compared to making minimum payments. Credit can be rebuilt over time with on‑time payments and responsible use.' , k:['credit','score','fico','impact','affect'] },
+      { q:'How does debt settlement affect my credit?', a:'Debt settlement typically lowers your credit score in the short term because accounts may become delinquent during negotiations. Many people still choose it because it can reduce overall debt and shorten the payoff timeline compared to making minimum payments. Credit can be rebuilt over time with on-time payments and responsible use.' , k:['credit','score','fico','impact','affect'] },
       { q:'Which debts qualify for settlement?', a:'Unsecured debts such as credit cards, personal loans, medical bills, and collections usually qualify. Secured debts tied to collateral (e.g., auto loans, mortgages) usually do not.' , k:['qualify','eligible','unsecured','secured','types'] },
       { q:'How long does the program take?', a:'Many programs last around 24–48 months depending on your total debt, monthly budget, and creditor responses.' , k:['how long','duration','time','months','years'] },
       { q:'Will creditors stop calling?', a:'Calls often decrease once negotiations start and when you direct creditors to your program. However, some contact may continue until accounts are resolved.' , k:['calls','harassment','collectors','stop'] },
-      { q:'Are there fees?', a:'Fees are usually success‑based and only charged after a settlement is reached. Exact fee structures are explained during your consultation.' , k:['fees','cost','charge','pricing'] },
+      { q:'Are there fees?', a:'Fees are usually success-based and only charged after a settlement is reached. Exact fee structures are explained during your consultation.' , k:['fees','cost','charge','pricing'] },
       { q:'Is there a minimum debt amount?', a:'Many programs prefer at least $10,000 in unsecured debt. Our screening reflects that threshold.' , k:['minimum','10k','qualify','threshold'] },
       { q:'What are the risks?', a:'Possible risks include temporary credit score impact, potential creditor legal action, and tax implications on forgiven amounts. Your specialist will explain how these may apply to you.' , k:['risk','lawsuit','tax','irs'] },
       { q:'What happens to interest and late fees?', a:'Negotiated settlements aim to reduce the principal balance you pay. Interest/fees can be part of the negotiation, varying by creditor.' , k:['interest','late fees','apr'] },
@@ -489,4 +509,5 @@
   </script>
 </body>
 </html>
+
 

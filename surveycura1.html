@@ -150,8 +150,8 @@
       window.addEventListener('keydown',kh);
     }
 
-    const digitsOnly = s => String(s||'').replace(/\\D+/g,'');
-    function parseStrictNANP(raw){ const d=digitsOnly(raw); const m=d.match(/^1?([2-9]\\d{2})([2-9]\\d{2})(\\d{4})$/); if(!m) return { ok:false, error:'Enter a valid US number (NANP).' }; const [,area,prefix,line]=m; if(/^[2-9]11$/.test(area)||/^[2-9]11$/.test(prefix)) return { ok:false, error:'N11 service codes are invalid.' }; if(area==='900') return { ok:false, error:'Premium-rate (900) not accepted.' }; if(prefix==='555'&&/^01\\d{2}$/.test(line)) return { ok:false, error:'555-01xx test numbers not accepted.' }; const ten=area+prefix+line; if(/^(\\d)\\1{9}$/.test(ten)) return { ok:false, error:'Invalid pattern (all digits identical).' }; const seq='0123456789'.repeat(3), rseq='9876543210'.repeat(3); if(seq.includes(ten)||rseq.includes(ten)) return { ok:false, error:'Invalid pattern (sequential digits).' }; const TOLL_FREE=new Set(['800','833','844','855','866','877','888','822']); return { ok:true, e164:`+1${area}${prefix}${line}`, meta:{ tollFree:TOLL_FREE.has(area) } } }
+    const digitsOnly = s => String(s||'').replace(/\D+/g,'');
+    function parseStrictNANP(raw){ const d=digitsOnly(raw); const m=d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/); if(!m) return { ok:false, error:'Enter a valid US number (NANP).' }; const [,area,prefix,line]=m; if(/^[2-9]11$/.test(area)||/^[2-9]11$/.test(prefix)) return { ok:false, error:'N11 service codes are invalid.' }; if(area==='900') return { ok:false, error:'Premium-rate (900) not accepted.' }; if(prefix==='555'&&/^01\d{2}$/.test(line)) return { ok:false, error:'555-01xx test numbers not accepted.' }; const ten=area+prefix+line; if(/^(\d)\1{9}$/.test(ten)) return { ok:false, error:'Invalid pattern (all digits identical).' }; const seq='0123456789'.repeat(3), rseq='9876543210'.repeat(3); if(seq.includes(ten)||rseq.includes(ten)) return { ok:false, error:'Invalid pattern (sequential digits).' }; const TOLL_FREE=new Set(['800','833','844','855','866','877','888','822']); return { ok:true, e164:`+1${area}${prefix}${line}`, meta:{ tollFree:TOLL_FREE.has(area) } } }
 
     async function validatePhoneWithSignalWire(raw){ const strict=parseStrictNANP(raw); if(!strict.ok) return strict; try{ const r=await fetch(VALIDATE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:strict.e164})}); const j=await r.json(); if(!j.ok) return {ok:false,error:j.error||'Validation failed.'}; return {...j,e164:strict.e164,meta:{...(strict.meta||{})}}; }catch{ return { ok:true, e164: strict.e164, meta: strict.meta||{} }; } }
 
@@ -159,7 +159,7 @@
     const FREEMAIL=new Set(['gmail.com','googlemail.com','yahoo.com','ymail.com','rocketmail.com','outlook.com','hotmail.com','live.com','msn.com','icloud.com','me.com','proton.me','aol.com','mail.com']);
     const DOMAIN_TYPO_MAP={'gamil.com':'gmail.com','gmial.com':'gmail.com','gmai.com':'gmail.com','gmail.con':'gmail.com','yahoo.con':'yahoo.com','yhoo.com':'yahoo.com','hotnail.com':'hotmail.com','hotmial.com':'hotmail.com','outlok.com':'outlook.com','outllok.com':'outlook.com','icloud,com':'icloud.com','protonn.me':'proton.me'};
 
-    function strictEmailClient(raw){ const email=String(raw||'').trim(); const at=email.indexOf('@'); if(at<1||at===email.length-1) return {ok:false,error:'Enter a valid email address.'}; const local=email.slice(0,at), domain=email.slice(at+1).toLowerCase(); if(local.length<3||local.length>64) return {ok:false,error:'Email local part length is invalid.'}; if(domain.length<4||domain.length>255) return {ok:false,error:'Email domain length is invalid.'}; if(!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\\-]{0,62}[A-Za-z0-9])?$/.test(local)) return {ok:false,error:'Invalid characters in email.'}; if(local.includes('..')) return {ok:false,error:'Email local has consecutive dots.'}; if(!/[A-Za-z]/.test(local)) return {ok:false,error:'Email must contain letters.'}; if((local.match(/\\./g)||[]).length>2) return {ok:false,error:'Too many dots in email local.'}; if(domain.indexOf('.')<1) return {ok:false,error:'Email domain must contain a dot.'}; const labels=domain.split('.'); for(const lab of labels){ if(lab.length<1||lab.length>63) return {ok:false,error:'Email domain label length is invalid.'}; if(!/^[A-Za-z0-9-]+$/.test(lab)) return {ok:false,error:'Email domain contains invalid chars.'}; if(lab.startsWith('-')||lab.endsWith('-')) return {ok:false,error:'Domain label cannot start/end with -.'}; } const tld=labels[labels.length-1]; if(tld.length<2||tld.length>63) return {ok:false,error:'Email TLD invalid.'}; if(/^\\d+$/.test(tld)) return {ok:false,error:'Email TLD cannot be all digits.'}; if(tld==='con') return {ok:false,error:'TLD looks mistyped (.con). Did you mean .com?'}; const info={ role:ROLE_LOCALS.has(local.toLowerCase()), plusAnywhere:local.includes('+'), gmailDot:(domain==='gmail.com'||'googlemail.com')&&local.includes('.'), freemail:FREEMAIL.has(domain) }; return { ok:true, normalized:`${local}@${domain}`, info, suggestion: DOMAIN_TYPO_MAP[domain]||null } }
+    function strictEmailClient(raw){ const email=String(raw||'').trim(); const at=email.indexOf('@'); if(at<1||at===email.length-1) return {ok:false,error:'Enter a valid email address.'}; const local=email.slice(0,at), domain=email.slice(at+1).toLowerCase(); if(local.length<3||local.length>64) return {ok:false,error:'Email local part length is invalid.'}; if(domain.length<4||domain.length>255) return {ok:false,error:'Email domain length is invalid.'}; if(!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\-]{0,62}[A-Za-z0-9])?$/.test(local)) return {ok:false,error:'Invalid characters in email.'}; if(local.includes('..')) return {ok:false,error:'Email local has consecutive dots.'}; if(!/[A-Za-z]/.test(local)) return {ok:false,error:'Email must contain letters.'}; if((local.match(/\./g)||[]).length>2) return {ok:false,error:'Too many dots in email local.'}; if(domain.indexOf('.')<1) return {ok:false,error:'Email domain must contain a dot.'}; const labels=domain.split('.'); for(const lab of labels){ if(lab.length<1||lab.length>63) return {ok:false,error:'Email domain label length is invalid.'}; if(!/^[A-Za-z0-9-]+$/.test(lab)) return {ok:false,error:'Email domain contains invalid chars.'}; if(lab.startsWith('-')||lab.endsWith('-')) return {ok:false,error:'Domain label cannot start/end with -.'}; } const tld=labels[labels.length-1]; if(tld.length<2||tld.length>63) return {ok:false,error:'Email TLD invalid.'}; if(/^\d+$/.test(tld)) return {ok:false,error:'Email TLD cannot be all digits.'}; if(tld==='con') return {ok:false,error:'TLD looks mistyped (.con). Did you mean .com?'}; const info={ role:ROLE_LOCALS.has(local.toLowerCase()), plusAnywhere:local.includes('+'), gmailDot:(domain==='gmail.com'||'googlemail.com')&&local.includes('.'), freemail:FREEMAIL.has(domain) }; return { ok:true, normalized:`${local}@${domain}`, info, suggestion: DOMAIN_TYPO_MAP[domain]||null } }
 
     async function validateEmailWithWorker(raw){ const base=strictEmailClient(raw); if(!base.ok) return base; try{ const r=await fetch(VALIDATE_EMAIL_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ email: base.normalized, want_mx:true })}); const j=await r.json(); if(!j.ok) return { ok:false, error:j.error||'Email validation failed.' }; return { ok:true, normalized: base.normalized, disposable: !!j.disposable, has_mx: typeof j.has_mx==='boolean'? j.has_mx: undefined, suggestion: j.suggestion||base.suggestion||null, info: base.info }; }catch{ return base; } }
 
@@ -173,9 +173,9 @@
 
       askIncome:{ message:'Thanks. Do you have a **steady source of income**? This helps determine eligibility for tax resolution programs.', type:'multiple-choice', options:['Yes','No'], action:a=> a==='No'? goToStep('disqualify') : goToStep('screenIntro') },
 
-      screenIntro:{ message:'Quick heads up: this research includes a **free, no‑obligation consultation** with a tax professional so we can gather real‑world feedback.\\n\\nAre you willing to participate?', type:'multiple-choice', options:["Yes, I'm willing",'No'], action:a=> a==="Yes, I'm willing"? goToStep('whoConsultFor') : goToStep('disqualify') },
+      screenIntro:{ message:'Quick heads up: this research includes a **free, no‑obligation consultation** with a tax professional so we can gather real‑world feedback.\n\nAre you willing to participate?', type:'multiple-choice', options:["Yes, I'm willing",'No'], action:a=> a==="Yes, I'm willing"? goToStep('whoConsultFor') : goToStep('disqualify') },
 
-      whoConsultFor:{ message:'To match the consultation correctly, **who is it for?**', type:'multiple-choice', options:['Myself','Me & my partner','A family member (I\\'m the decision maker)'], action:()=> goToStep('taxTypeMajority') },
+      whoConsultFor:{ message:'To match the consultation correctly, **who is it for?**', type:'multiple-choice', options:['Myself','Me & my partner','A family member (I\'m the decision maker)'], action:()=> goToStep('taxTypeMajority') },
 
       taxTypeMajority:{ message:'Which **tax types** apply to most of your balance?', type:'multiple-choice', options:['Personal income tax (1040)','Self‑employment / 1099','Payroll tax (941/940)','State income tax','Sales/Use tax','Business income tax','Not sure'], action:()=> goToStep('yearsOwed') },
 
@@ -195,13 +195,13 @@
 
       languagePref:{ message:'Language preference?', type:'multiple-choice', options:['English','Español'], action:()=> goToStep('latestAction') },
 
-      latestAction:{ message:'What is the **latest action** you\\'ve received?', type:'multiple-choice', options:['Lien filed','Levy / wage garnishment','CP/Notice letters only','No enforcement yet','Not sure'], action:()=> goToStep('qualified') },
+      latestAction:{ message:'What is the **latest action** you\'ve received?', type:'multiple-choice', options:['Lien filed','Levy / wage garnishment','CP/Notice letters only','No enforcement yet','Not sure'], action:()=> goToStep('qualified') },
 
       disqualify:{ message:"Thanks for answering. Based on your responses, this study isn't the right fit. You will be redirected now.", end:true, status:18 },
 
-      qualified:{ message:'Fantastic! You\\'ve qualified. The main part involves completing a short, secure form so a **tax professional** can review your situation and options.', next:'reassure' },
+      qualified:{ message:'Fantastic! You\'ve qualified. The main part involves completing a short, secure form so a **tax professional** can review your situation and options.', next:'reassure' },
 
-      reassure:{ message:'Transparency: we\\'ve selected a reputable firm, <strong>CuraDebt</strong>, to contact participants for the consultation. Your input helps us learn from real outcomes (installment plans, OIC, penalty relief, CNC, etc.).', next:'educateOnTaxRelief' },
+      reassure:{ message:'Transparency: we\'ve selected a reputable firm, <strong>CuraDebt</strong>, to contact participants for the consultation. Your input helps us learn from real outcomes (installment plans, OIC, penalty relief, CNC, etc.).', next:'educateOnTaxRelief' },
 
       educateOnTaxRelief:{ message:'Typical tax resolution options include **installment agreements**, **Offer in Compromise**, **penalty abatement**, and **Currently Not Collectible** status. The specialist will assess transcripts and recommend a path.', next:'explainTask' },
 
@@ -277,7 +277,7 @@
       const submitBtn=form.querySelector('#submit-btn'), debtConfirmedEl=form.querySelector('#debt-confirmed');
       const debtWarning=form.querySelector('#debt-warning'), moveHint=form.querySelector('#move-hint');
       const fmt=n=> new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
-      const toInt=s=>{ const n=parseInt(String(s||'').replace(/[^\\d]/g,''),10); return isNaN(n)?0:n; };
+      const toInt=s=>{ const n=parseInt(String(s||'').replace(/[^\d]/g,''),10); return isNaN(n)?0:n; };
 
       const setSubmitState = ()=>{
         const v=parseInt(debtSlider?.value||'0',10)||0; const confirmed=debtConfirmedEl.value==='1'; const state=stateSelect.value; const consentOK=form.querySelector('#tcpa')?.checked; const amountOK=confirmed && v>=MIN_QUAL; const stateOK=!!state && !excludedStates.includes(state); const otpOK=window.otpOK===true;
@@ -381,3 +381,4 @@
   </script>
 </body>
 </html>
+

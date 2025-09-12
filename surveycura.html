@@ -275,7 +275,7 @@
       chatWindow.appendChild(card);
       document.getElementById('begin-btn').addEventListener('click', ()=>{
         sessionStorage.setItem('chloe_started','1');
-        addMessage('Begin Survey','user');
+        chatWindow.innerHTML='';
         // push a history state to avoid going "back" to intro
         try{ history.replaceState({step:'intro'},''); history.pushState({step:'start'},''); }catch{}
         goToStep('start');
@@ -301,5 +301,4 @@
   </script>
 </body>
 </html>
-
 

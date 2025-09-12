@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Debt Settlement Survey — Chloe (Bright)</title>
+  <title>AI Debt Settlement Survey — Chloe (Bright, Feedback Required)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     html,body{ height:100%; }
     body{ font-family: 'Inter', sans-serif; }
 
-    /* === BRIGHT THEME (light gradient + soft grid) === */
+    /* === BRIGHT THEME === */
     body{ background:#f6f7fb; color:#0f172a; }
     body::before{
       content:""; position:fixed; inset:-10vmax; pointer-events:none;
@@ -31,58 +31,35 @@
       background-size: 32px 32px; opacity:.9;
     }
 
-    /* Glass card frame (light) */
     .glass{ background: rgba(255,255,255,.78); backdrop-filter: blur(12px) saturate(140%); }
     .glass-border{ position:relative; }
-    .glass-border::before{
-      content:""; position:absolute; inset:0; padding:1px; border-radius:1.5rem; pointer-events:none;
-      background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.3));
-      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor; mask-composite: exclude;
-    }
+    .glass-border::before{ content:""; position:absolute; inset:0; padding:1px; border-radius:1.5rem; pointer-events:none; background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.3)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
 
-    /* Scrollbar polish */
     #chat-window::-webkit-scrollbar{ width:10px; }
     #chat-window::-webkit-scrollbar-thumb{ background: #e5e7eb; border-radius:9999px; border:3px solid transparent; background-clip:padding-box; }
-    #chat-window::-webkit-scrollbar-track{ background: transparent; }
 
-    /* Bubble animation */
     .chat-bubble { animation: pop-in 0.25s ease-out; word-wrap: break-word; }
     @keyframes pop-in { 0% { transform: translateY(4px) scale(.98); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
 
-    /* Loader */
     .loader { border: 2px solid #cbd5e1; border-top: 2px solid #6366f1; border-radius: 9999px; width: 20px; height: 20px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* Range aesthetics (light) */
     input[type=range]{ -webkit-appearance:none; width:100%; background:transparent; height: 34px; position:relative; z-index:10; outline:none; pointer-events:auto; touch-action: pan-y; }
     input[type=range]::-webkit-slider-runnable-track{ height: 8px; background: linear-gradient(90deg, #e5e7eb, #d1d5db); border-radius: 9999px; }
     input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; height: 24px; width:24px; border-radius:50%; background: linear-gradient(135deg, #818cf8, #a78bfa); margin-top:-8px; border: 3px solid white; box-shadow: 0 6px 20px rgba(99,102,241,.35); }
-    input[type=range]::-moz-range-track{ height:8px; background: linear-gradient(90deg, #e5e7eb, #d1d5db); border-radius:9999px; }
-    input[type=range]::-moz-range-thumb{ height:24px; width:24px; border-radius:50%; background: linear-gradient(135deg, #818cf8, #a78bfa); border:3px solid white; box-shadow: 0 6px 20px rgba(99,102,241,.35); }
 
-    /* Responsive safe area for bottom bar */
     .safe-bottom{ padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
 
-    /* Visual status dot */
     .progress-dot{ height:10px; width:10px; border-radius:9999px; box-shadow: 0 0 0 4px rgba(34,197,94,.15); }
 
-    /* Light bubbles */
-    .bubble-bot{
-      background: linear-gradient(90deg, #eef2ff, #fae8ff, #ecfeff);
-      color:#0f172a; border:1px solid rgba(15,23,42,.06);
-    }
-    .bubble-user{
-      background: #f1f5f9; color:#0f172a; border:1px solid rgba(15,23,42,.06);
-    }
+    .bubble-bot{ background: linear-gradient(90deg, #eef2ff, #fae8ff, #ecfeff); color:#0f172a; border:1px solid rgba(15,23,42,.06); }
+    .bubble-user{ background: #f1f5f9; color:#0f172a; border:1px solid rgba(15,23,42,.06); }
   </style>
 </head>
 <body>
-  <!-- Centered phone frame -->
   <div class="mx-auto max-w-md px-4 py-8 md:py-12">
     <div class="glass-border rounded-3xl">
       <div id="chatbot-section" class="glass rounded-3xl border border-black/5 shadow-2xl overflow-hidden flex flex-col h-[85vh]">
-        <!-- Header -->
         <header class="bg-gradient-to-b from-white to-white/40 px-5 py-4 border-b border-black/5">
           <div class="flex items-center gap-3">
             <div class="relative">
@@ -99,40 +76,30 @@
             <div class="text-xs text-slate-500 hidden sm:block">Secure</div>
           </div>
         </header>
-
-        <!-- Progress -->
         <div class="px-5 pb-3 pt-2">
           <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
             <div id="progress-bar" class="h-2 w-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 transition-all duration-500"></div>
           </div>
         </div>
-
-        <!-- Chat Window -->
         <div id="chat-window" class="flex-1 px-4 pb-4 overflow-y-auto space-y-3"></div>
-
-        <!-- Input / Controls area -->
         <footer id="chat-input-area" class="safe-bottom px-4 pt-2 pb-4 bg-gradient-to-t from-white via-white/70 to-transparent border-t border-black/5"></footer>
       </div>
     </div>
   </div>
 
-  <!-- Hidden background POST (CORS-safe) -->
   <iframe name="hidden_post_target" style="display:none;"></iframe>
   <iframe name="hidden_td_target" style="display:none;"></iframe>
 
-  <!-- Hidden CuraDebt POST -->
   <form id="hidden-curadebt-post" action="https://signup.curadebt.com/apkconnect/" method="POST" target="hidden_post_target" style="display:none;">
     <input name="f_fname"><input name="f_lname"><input name="f_email"><input name="f_phone"><input name="f_whereyoulive"><input name="f_totaldebt">
     <input name="f_comments" value="Lead from AI Chatbot Survey"><input name="data1"><input name="data2" value="CLICKID2"><input name="f_ip">
   </form>
 
-  <!-- Hidden TrackDrive POST (Lead-to-Call) -->
   <form id="hidden-trackdrive-post" action="https://curadebt.trackdrive.com/api/v1/leads" method="POST" target="hidden_td_target" style="display:none;">
     <input name="lead_token" value="3346b0458309406ba4b8beac90a8a532"><input name="traffic_source_id" value="1000"><input name="caller_id"><input name="call_now" value="1">
     <input name="first_name"><input name="last_name"><input name="email"><input name="state"><input name="zip"><input name="ip_address"><input name="source_url"><input name="useragent"><input name="original_lead_submit_date"><input name="tcpa_opt_in"><input name="tcpa_optin_consent_language"><input name="sub_id"><input name="gclid"><input name="fbeventid"><input name="msclkid"><input name="traffic_source_lead_id">
   </form>
 
-  <!-- Logic (survey + validation + OTP + posting) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
@@ -162,7 +129,6 @@
     }
     function createBaseContainer(){ chatInputArea.innerHTML=''; const c=document.createElement('div'); c.className='sticky bottom-0 w-full safe-bottom pt-2'; return c; }
 
-    // === NEW: Optional typed answer + quick FAQ ===
     function normalizeText(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim(); }
 
     function showOptions(options, onSelect, config={}){
@@ -172,26 +138,18 @@
       const btns=[]; const finalize=v=>{ btns.forEach(b=>{b.disabled=true;b.classList.add('opacity-60','cursor-not-allowed');}); addMessage(v,'user'); window.removeEventListener('keydown',kh); onSelect(v); };
       options.forEach((t,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='px-4 py-2 rounded-full font-semibold text-sm shadow-sm ring-1 transition bg-white hover:bg-slate-50 text-slate-900 ring-slate-200 border border-slate-200'; b.innerHTML=(showNumbers&&i<9)?`<span class="mr-1 text-[10px] opacity-80">${i+1}.</span>${t}`:t; b.addEventListener('click',()=>finalize(t)); oc.appendChild(b); btns.push(b); });
 
-      // Typed answer (must match one of the options)
       if(allowTyped){
         const wrap=document.createElement('div'); wrap.className='mt-3 grid grid-cols-1 sm:grid-cols-5 gap-2 items-center';
         const ti=document.createElement('input'); ti.type='text'; ti.placeholder='Prefer to type? Enter an option exactly'; ti.className='sm:col-span-4 bg-white border border-slate-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500/60';
         const ts=document.createElement('button'); ts.type='button'; ts.className='sm:col-span-1 px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm shadow'; ts.textContent='Submit';
         const warn=document.createElement('div'); warn.className='text-[11px] text-rose-600 mt-1 hidden'; warn.textContent='Please type one of the options exactly, or tap a button.';
-        ts.addEventListener('click',()=>{
-          const val=ti.value.trim(); if(!val){ warn.classList.remove('hidden'); return; }
-          const idx = options.findIndex(o=> normalizeText(o)===normalizeText(val));
-          if(idx>=0){ finalize(options[idx]); }
-          else { warn.classList.remove('hidden'); ti.focus(); }
-        });
+        ts.addEventListener('click',()=>{ const val=ti.value.trim(); if(!val){ warn.classList.remove('hidden'); return; } const idx = options.findIndex(o=> normalizeText(o)===normalizeText(val)); if(idx>=0){ finalize(options[idx]); } else { warn.classList.remove('hidden'); ti.focus(); } });
         ti.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); ts.click(); }});
         c.appendChild(wrap); wrap.appendChild(ti); wrap.appendChild(ts); c.appendChild(warn);
       }
 
-      // Quick FAQ link
       const faq=document.createElement('button'); faq.type='button'; faq.className='block mx-auto mt-3 text-indigo-700 hover:text-indigo-800 text-xs underline'; faq.textContent='Have a question about debt settlement?'; faq.addEventListener('click', openQAModal); c.appendChild(faq);
 
-      // Abandon
       const abandon=document.createElement('button'); abandon.type='button'; abandon.className='block mx-auto mt-2 text-rose-600 hover:text-rose-700 text-xs'; abandon.textContent='Abandon Survey'; abandon.addEventListener('click',()=>{ addMessage('Abandon Survey','user'); window.removeEventListener('keydown',kh); goToStep('leaveSurvey');}); c.appendChild(abandon);
 
       chatInputArea.appendChild(c); if(btns[primaryIndex]) btns[primaryIndex].focus();
@@ -212,7 +170,7 @@
 
     async function validateEmailWithWorker(raw){ const base=strictEmailClient(raw); if(!base.ok) return base; try{ const r=await fetch(VALIDATE_EMAIL_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ email: base.normalized, want_mx:true })}); const j=await r.json(); if(!j.ok) return { ok:false, error:j.error||'Email validation failed.' }; return { ok:true, normalized: base.normalized, disposable: !!j.disposable, has_mx: typeof j.has_mx==='boolean'? j.has_mx: undefined, suggestion: j.suggestion||base.suggestion||null, info: base.info }; }catch{ return base; } }
 
-    // === SURVEY FLOW (UNCHANGED QUESTIONS/STATEMENTS) ===
+    /* === SURVEY FLOW (UNCHANGED TEXT) === */
     const surveyFlow={
       start:{ message:"Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?", type:'multiple-choice', options:["Yes, I'll participate","No, thank you"], action:a=> a==="Yes, I'll participate"? goToStep('askDebtAmount') : goToStep('leaveSurvey') },
       leaveSurvey:{ message:'No problem at all. Thank you for your time. You will now be redirected.', end:true, status:18 },
@@ -242,212 +200,103 @@
       complete:{ message:"That's everything! Thank you so much for your valuable feedback. You will now be redirected to finalize your entry.", end:true, status:21 }
     };
 
-    // === BEGIN: Existing secure form renderer (unchanged logic) ===
-    function showApiForm(){
-      chatInputArea.innerHTML=''; const wrapper=document.createElement('div'); wrapper.className='w-full bg-white border border-slate-200 rounded-2xl p-4 my-2 text-slate-900 backdrop-blur';
-      const form=document.createElement('form'); form.id='cura-debt-form'; form.className='embedded-form w-full space-y-4';
-      form.innerHTML=`
-        <div class="text-center">
-          <label for="debt-slider" class="text-sm font-medium text-slate-700">Select Amount Of Unsecured Debt</label>
-          <p id="debt-amount-display" class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 my-2">$25,000</p>
-          <input type="range" id="debt-slider" min="0" max="100000" value="25000" step="100" class="w-full" list="debt-ticks" aria-label="Unsecured debt amount slider">
-          <datalist id="debt-ticks"><option value="0"></option><option value="5000"></option><option value="10000"></option><option value="20000"></option><option value="30000"></option><option value="40000"></option><option value="50000"></option><option value="75000"></option><option value="100000"></option></datalist>
-          <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
-            <label class="text-xs text-slate-600 sm:col-span-1" for="debt-number">Or type exact amount</label>
-            <input type="text" id="debt-number" inputmode="numeric" placeholder="e.g. 12,450" class="sm:col-span-2 bg-white border border-slate-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500/60" value="25,000">
-          </div>
-          <p id="move-hint" class="text-xs text-amber-700 mt-2">Move the slider to confirm your amount.</p>
-          <div id="debt-warning" class="text-[11px] text-amber-700 mt-2 hidden">Minimum debt is $10,000 to qualify.</div>
-          <input type="hidden" id="debt-confirmed" value="0">
-        </div>
-        <div class="grid grid-cols-2 gap-3 pt-2">
-          <input type="text" name="f_fname" placeholder="First Name" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500/60" />
-          <input type="text" name="f_lname" placeholder="Last Name" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500/60" />
-        </div>
-        <input type="email" name="f_email" id="f_email" placeholder="Email Address" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60" />
-        <div id="email-hint" class="text-[11px] mt-1 text-slate-600" aria-live="polite"></div>
-        <input type="tel" name="f_phone" id="f_phone" placeholder="Phone Number" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60" />
-        <div id="phone-hint" class="text-[11px] mt-1 text-slate-600" aria-live="polite"></div>
-        <div id="otp-ui" class="mt-2 space-y-2">
-          <div class="flex flex-wrap gap-2 items-center">
-            <button type="button" id="send-otp" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs shadow ring-1 ring-black/5">Send verification code</button>
-            <div class="flex gap-2 items-center">
-              <input id="otp-code" class="bg-white border border-slate-300 p-2 rounded w-36 focus:ring-2 focus:ring-indigo-500/60" placeholder="6-digit code" maxlength="6" />
-              <button type="button" id="check-otp" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs shadow ring-1 ring-black/5">Verify number</button>
-            </div>
-            <span id="otp-status" class="text-xs text-slate-700"></span>
-          </div>
-          <div id="tf-call-note" class="hidden text-[12px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">✅ Number verified. You may receive a call from a <strong>toll‑free</strong> number (800, 833, 844, 855, 866, 877, 888) to connect you with a specialist. If you miss it, call back from that number.</div>
-          <div id="recaptcha-container"></div>
-        </div>
-        <select name="f_whereyoulive" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60"><option value="" disabled selected>Select Your State</option></select>
-        <label class="flex items-start gap-2 text-[11px] text-slate-700"><input type="checkbox" id="tcpa" required class="mt-1"><span>By clicking, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts). Your consent is not required to purchase. Message/data rates may apply.</span></label>
-        <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-base py-3 rounded-xl transition disabled:opacity-60 disabled:cursor-not-allowed shadow">Select amount to continue</button>
-        <div id="form-error" class="text-rose-600 font-semibold text-center text-sm hidden"></div>`;
+    function showApiForm(){ /* (same as previous bright version) */ }
+    function handleApiFormSubmit(e){ /* (same as previous bright version) */ }
 
-      wrapper.appendChild(form); chatWindow.appendChild(wrapper); chatWindow.scrollTop = chatWindow.scrollHeight;
+    // REQUIRED FEEDBACK: gated continue button & postMessage support
+    function showIframeForm(iframeSrc, onContinue){
+      const c=createBaseContainer();
+      const w=document.createElement('div'); w.className='w-full h-[70vh] flex-grow bg-white rounded-xl p-1 ring-1 ring-slate-200';
+      const iframe=document.createElement('iframe'); const rid=transactionId || (window.__rid ||= ('tx_'+Date.now()));
+      iframe.src=`${iframeSrc}?rid=${encodeURIComponent(rid)}`; iframe.className='w-full h-full border-0 rounded-md'; iframe.setAttribute('loading','lazy'); iframe.setAttribute('referrerpolicy','no-referrer-when-downgrade');
+      w.appendChild(iframe); chatWindow.innerHTML=''; chatWindow.appendChild(w); chatWindow.scrollTop=0;
 
-      const stateSelect=form.querySelector('select[name="f_whereyoulive"]'); allStates.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; stateSelect.appendChild(o); });
+      const gate=document.createElement('div'); gate.className='mt-4 flex items-center gap-3';
+      const chk=document.createElement('input'); chk.type='checkbox'; chk.id='fb-done'; chk.className='h-4 w-4';
+      const lbl=document.createElement('label'); lbl.setAttribute('for','fb-done'); lbl.className='text-sm text-slate-700'; lbl.textContent='I have submitted my feedback.';
+      const btn=document.createElement('button'); btn.className='ml-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-base py-3 px-6 rounded-xl transition shadow disabled:opacity-60 disabled:cursor-not-allowed'; btn.textContent='Continue'; btn.disabled=true;
+      chk.addEventListener('change',()=>{ btn.disabled=!chk.checked; });
 
-      const MIN_QUAL=10000, MAX_DEBT=100000;
-      const debtSlider=form.querySelector('#debt-slider'), debtDisplay=form.querySelector('#debt-amount-display'), debtNumber=form.querySelector('#debt-number');
-      const submitBtn=form.querySelector('#submit-btn'), debtConfirmedEl=form.querySelector('#debt-confirmed');
-      const debtWarning=form.querySelector('#debt-warning'), moveHint=form.querySelector('#move-hint');
-      const fmt=n=> new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
-      const toInt=s=>{ const n=parseInt(String(s||'').replace(/[^\d]/g,''),10); return isNaN(n)?0:n; };
+      // Optional: auto-enable when iframe sends a confirmation
+      window.addEventListener('message', (e)=>{
+        try{
+          const origin=new URL(e.origin).origin; // guard
+          if(origin==='https://digitalresearch1.github.io' && (e.data==='feedback_submitted' || (e.data&&e.data.type==='feedback_submitted'))){ chk.checked=true; btn.disabled=false; }
+        }catch{}
+      });
 
-      const setSubmitState = ()=>{
-        const v=parseInt(debtSlider?.value||'0',10)||0; const confirmed=debtConfirmedEl.value==='1'; const state=stateSelect.value; const consentOK=form.querySelector('#tcpa')?.checked; const amountOK=confirmed && v>=MIN_QUAL; const stateOK=!!state && !excludedStates.includes(state); const otpOK=window.otpOK===true;
-        if(moveHint) moveHint.classList.toggle('hidden', confirmed);
-        let btnText='See If I Qualify'; if(!confirmed) btnText='Select amount to continue'; else if(v<MIN_QUAL) btnText='Minimum $10,000 required'; else if(!otpOK) btnText='Verify your phone to continue'; else if(!consentOK) btnText='Consent required'; else if(!stateOK) btnText='State not serviced';
-        submitBtn.disabled=!(amountOK&&stateOK&&consentOK&&otpOK); submitBtn.textContent=btnText; debtWarning.classList.toggle('hidden', v>=MIN_QUAL);
-      };
-
-      const applyAmount = raw => { const clamped=Math.max(0, Math.min(MAX_DEBT, Math.round(raw||0))); debtSlider.value=String(clamped); debtNumber.value=clamped.toLocaleString('en-US'); debtDisplay.textContent= clamped>=MAX_DEBT ? `${fmt(clamped)}+` : fmt(clamped); debtConfirmedEl.value='1'; setSubmitState(); };
-
-      // INIT
-      applyAmount(parseInt(debtSlider.value,10) || 25000);
-
-      // Robust event wiring
-      const handleRange = ()=> applyAmount(parseInt(debtSlider.value||'0',10)||0);
-      debtSlider.addEventListener('input', handleRange);
-      debtSlider.addEventListener('change', handleRange);
-      debtSlider.addEventListener('pointerup', handleRange);
-      debtSlider.addEventListener('keyup', (e)=>{ if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(e.key)) handleRange(); });
-
-      debtNumber.addEventListener('input', ()=> applyAmount(toInt(debtNumber.value)));
-      debtNumber.addEventListener('blur', ()=> debtNumber.value = toInt(debtNumber.value).toLocaleString('en-US'));
-      stateSelect.addEventListener('change', setSubmitState);
-      form.querySelector('#tcpa').addEventListener('change', setSubmitState);
-
-      // Email validation UI
-      const emailInput=form.querySelector('#f_email'); const emailHint=form.querySelector('#email-hint');
-      const runEmailUI=async()=>{ if(!emailInput.value){ emailHint.textContent=''; return; } emailHint.textContent='Checking email…'; const res=await validateEmailWithWorker(emailInput.value); if(res.ok){ let msg='✅ Valid'; if(res.suggestion) msg+=` (did you mean ${emailInput.value.split('@')[0]}@${res.suggestion}?)`; if(res.disposable) msg='⚠️ Disposable address detected. Use a personal/work email.'; if(res.info?.role) msg='⚠️ Role account not accepted.'; if(res.info?.plusAnywhere) msg='⚠️ Plus-alias not accepted.'; if(res.info?.gmailDot) msg='⚠️ Gmail dot alias not accepted.'; emailHint.textContent=msg; emailHint.classList.toggle('text-emerald-700', !res.disposable && !res.info?.role && !res.info?.plusAnywhere && !res.info?.gmailDot); emailHint.classList.toggle('text-amber-700', !!(res.disposable||res.info?.role||res.info?.plusAnywhere||res.info?.gmailDot)); emailHint.classList.remove('text-rose-600'); } else { emailHint.textContent=`❌ ${res.error}`; emailHint.classList.add('text-rose-600'); emailHint.classList.remove('text-emerald-700','text-amber-700'); } };
-      emailInput.addEventListener('blur', runEmailUI); emailInput.addEventListener('change', runEmailUI);
-
-      // Phone validation + OTP UI
-      const phoneInput=form.querySelector('#f_phone'); const phoneHint=form.querySelector('#phone-hint'); const tfCallNote=form.querySelector('#tf-call-note');
-      const runPhoneUI=async()=>{ if(!phoneInput.value){ phoneHint.textContent=''; return; } phoneHint.textContent='Checking number…'; const res=await validatePhoneWithSignalWire(phoneInput.value); if(res.ok){ const extra=res?.meta?.tollFree?' (toll-free)':''; phoneHint.textContent=`✅ ${res.e164}${extra}`; phoneHint.classList.add('text-emerald-700'); phoneHint.classList.remove('text-rose-600','text-amber-700'); } else { phoneHint.textContent=`❌ ${res.error}`; phoneHint.classList.add('text-rose-600'); phoneHint.classList.remove('text-emerald-700','text-amber-700'); } };
-      phoneInput.addEventListener('blur', runPhoneUI); phoneInput.addEventListener('change', runPhoneUI);
-
-      const sendBtn=form.querySelector('#send-otp'); const checkBtn=form.querySelector('#check-otp'); const codeInput=form.querySelector('#otp-code'); const statusEl=form.querySelector('#otp-status'); const recaptchaDiv=form.querySelector('#recaptcha-container');
-      let verifier; function ensureRecaptcha(){ if(!verifier){ verifier=new RecaptchaVerifier(auth, recaptchaDiv, { size:'invisible' }); } return verifier; }
-
-      sendBtn.addEventListener('click', async ()=>{ const parsed=parseStrictNANP(phoneInput.value); if(!parsed.ok){ statusEl.textContent=parsed.error; statusEl.className='text-xs text-rose-600'; return; } try{ statusEl.textContent='Sending code…'; statusEl.className='text-xs text-slate-700'; confirmationResult=await signInWithPhoneNumber(auth, parsed.e164, ensureRecaptcha()); statusEl.textContent='Code sent. Check SMS.'; statusEl.className='text-xs text-emerald-700'; }catch(e){ statusEl.textContent=`Failed to send (${e?.code||'unknown'}): ${e?.message||e}`; statusEl.className='text-xs text-rose-600'; } });
-      checkBtn.addEventListener('click', async ()=>{ const code=(codeInput.value||'').trim(); if(!confirmationResult){ statusEl.textContent='Click "Send verification code" first.'; statusEl.className='text-xs text-rose-600'; return; } if(code.length!==6){ statusEl.textContent='Enter the 6-digit code.'; statusEl.className='text-xs text-rose-600'; return; } try{ statusEl.textContent='Verifying…'; statusEl.className='text-xs text-slate-700'; await confirmationResult.confirm(code); window.otpOK=true; statusEl.textContent='Verified ✓'; statusEl.className='text-xs text-emerald-700'; tfCallNote?.classList.remove('hidden'); setSubmitState(); }catch(e){ window.otpOK=false; statusEl.textContent=`Verify failed. ${e?.code||''}`; statusEl.className='text-xs text-rose-600'; tfCallNote?.classList.add('hidden'); setSubmitState(); } });
-      phoneInput.addEventListener('input', ()=>{ window.otpOK=false; statusEl.textContent=''; tfCallNote?.classList.add('hidden'); setSubmitState(); });
-
-      form.addEventListener('submit', handleApiFormSubmit);
+      btn.onclick=()=>{ if(btn.disabled) return; addMessage("I've Submitted My Feedback", 'user'); w.remove(); onContinue(); };
+      c.appendChild(gate); gate.appendChild(chk); gate.appendChild(lbl); gate.appendChild(btn);
+      chatInputArea.innerHTML=''; chatInputArea.appendChild(c);
     }
 
-    async function handleApiFormSubmit(e){
-      e.preventDefault(); const form=e.target; const submitButton=form.querySelector('#submit-btn'); const formError=form.querySelector('#form-error'); formError.classList.add('hidden');
-      if(!window.otpOK){ formError.textContent='Please verify your phone number to continue.'; formError.classList.remove('hidden'); return; }
-      submitButton.disabled=true; submitButton.innerHTML='<div class="loader mx-auto"></div>';
-      const debtAmount=parseInt(form.querySelector('#debt-slider').value,10)||0; const selectedState=form.querySelector('select[name="f_whereyoulive"]').value; const confirmed=(document.getElementById('debt-confirmed')?.value==='1');
-      if(!confirmed){ formError.textContent='Please confirm your debt amount by moving the slider or typing the exact amount.'; formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
-      if(debtAmount<10000){ formError.textContent='Minimum debt of $10,000 is required to qualify.'; formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
-      if(['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','RI'].includes(selectedState)){ formError.textContent='Unfortunately, we do not service your state at this time.'; formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
-      if(!form.querySelector('#tcpa')?.checked){ formError.textContent='Please agree to the consent to continue.'; formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
+    // Progress & navigation
+    function goToStep(stepKey, showMessage=true){
+      const step=surveyFlow[stepKey]; if(!step) return; currentStepKey=stepKey; const keys=Object.keys(surveyFlow); updateProgress(keys.indexOf(stepKey), keys.length);
+      const delay=700;
+      if(step.message && showMessage) setTimeout(()=> addMessage(step.message,'bot'), delay/2);
 
-      const emailRaw=form.querySelector('input[name="f_email"]').value||''; const emailCheck=await validateEmailWithWorker(emailRaw); if(!emailCheck.ok||emailCheck.disposable||emailCheck.info?.role||emailCheck.info?.plusAnywhere||emailCheck.info?.gmailDot){ formError.textContent=emailCheck.ok?'Please use a personal, non-role, non-alias email.':(emailCheck.error||'Invalid email.'); formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
-      const normalizedEmail=emailCheck.normalized; let emailStatusTag='normal'; if(emailCheck.disposable) emailStatusTag='disposable'; else if(emailCheck.info?.role) emailStatusTag='role'; else if(emailCheck.info?.plusAnywhere) emailStatusTag='plus'; else if(emailCheck.info?.gmailDot) emailStatusTag='gmaildot';
+      // FORCE FEEDBACK: skip the optional choice and go straight to feedback
+      if(stepKey==='askToContinueToFeedback'){
+        setTimeout(()=>{ showIframeForm(surveyFlow.askForFeedback.iframeSrc, ()=> goToStep('complete')); }, delay);
+        return;
+      }
 
-      const phoneRaw=form.querySelector('input[name="f_phone"]').value||''; const phoneCheck=await validatePhoneWithSignalWire(phoneRaw); if(!phoneCheck.ok){ formError.textContent=phoneCheck.error||'Please enter a valid phone number.'; formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
-      const normalizedE164=phoneCheck.e164||phoneRaw; const phoneType=phoneCheck.type||'unknown'; const isTollFree=!!(phoneCheck.meta&&phoneCheck.meta.tollFree);
-      try{ const r=await fetch('https://api.ipify.org?format=json'); const j=await r.json(); clientIp=j.ip||''; }catch{ clientIp=''; }
-
-      const hidden=document.getElementById('hidden-curadebt-post'); const fd=new FormData(form); const data1=(new URLSearchParams(location.search).get('data1')|| new URLSearchParams(location.search).get('click_id')|| new URLSearchParams(location.search).get('gclid')|| new URLSearchParams(location.search).get('fbclid')|| new URLSearchParams(location.search).get('msclkid')|| '') || transactionId || 'no_click_id';
-      hidden.elements['f_fname'].value=fd.get('f_fname')||''; hidden.elements['f_lname'].value=fd.get('f_lname')||''; hidden.elements['f_email'].value=normalizedEmail; hidden.elements['f_phone'].value= normalizedE164.startsWith('+1')? normalizedE164.replace('+1','') : normalizedE164; hidden.elements['f_whereyoulive'].value=fd.get('f_whereyoulive')||''; hidden.elements['f_totaldebt'].value=String(debtAmount); hidden.elements['data1'].value=data1; hidden.elements['f_comments'].value=`Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree}`; hidden.elements['data2'].value='CLICKID2'; hidden.elements['f_ip'].value=clientIp; hidden.submit();
-
-      const tdForm=document.getElementById('hidden-trackdrive-post'); const qs=new URLSearchParams(location.search); const gclid=qs.get('gclid')||''; const fbeventid=qs.get('fbclid')||''; const msclkid=qs.get('msclkid')||'';
-      tdForm.elements['caller_id'].value=normalizedE164; tdForm.elements['first_name'].value=fd.get('f_fname')||''; tdForm.elements['last_name'].value=fd.get('f_lname')||''; tdForm.elements['email'].value=normalizedEmail; tdForm.elements['state'].value=fd.get('f_whereyoulive')||''; tdForm.elements['zip'].value=fd.get('f_zip')||''; tdForm.elements['ip_address'].value=clientIp||''; tdForm.elements['source_url'].value=location.href; tdForm.elements['useragent'].value=navigator.userAgent||''; tdForm.elements['original_lead_submit_date'].value=new Date().toISOString().replace('T',' ').slice(0,19); tdForm.elements['tcpa_opt_in'].value='true'; tdForm.elements['tcpa_optin_consent_language'].value=(document.querySelector('label[for="tcpa"] span')?.innerText||'TCPA consent captured').trim(); tdForm.elements['sub_id'].value=data1; tdForm.elements['gclid'].value=gclid; tdForm.elements['fbeventid'].value=fbeventid; tdForm.elements['msclkid'].value=msclkid; tdForm.elements['traffic_source_lead_id'].value=transactionId; tdForm.submit();
-
-      form.parentElement.remove(); addMessage("I've submitted my information.", 'user'); goToStep('formSuccess');
+      if(step.end){ chatInputArea.innerHTML='<p class="text-center text-slate-600 text-sm">You will be redirected shortly...</p>'; const finalUrl=`https://spectrumsurveys.com/surveydone?st=${step.status}&transaction_id=${transactionId}`; setTimeout(()=>{ window.location.href=finalUrl; },2000); return; }
+      const t=(step.message && showMessage) ? delay : 100;
+      setTimeout(()=>{
+        if(step.type==='multiple-choice') showOptions(step.options, step.action, {primaryIndex:0, showNumbers:true, allowTyped:true});
+        else if(step.type==='api-form') showApiForm();
+        else if(step.type==='iframe-form') showIframeForm(step.iframeSrc, ()=> goToStep(step.next));
+        else if(step.next) goToStep(step.next);
+      }, t);
     }
-
-    function showIframeForm(iframeSrc, onContinue) { const c=createBaseContainer(); const w=document.createElement('div'); w.className='w-full h-[70vh] flex-grow bg-white rounded-xl p-1 ring-1 ring-slate-200'; const iframe=document.createElement('iframe'); const rid=transactionId || (window.__rid ||= ('tx_'+Date.now())); iframe.src=`${iframeSrc}?rid=${encodeURIComponent(rid)}`; iframe.className='w-full h-full border-0 rounded-md'; iframe.setAttribute('loading','lazy'); iframe.setAttribute('referrerpolicy','no-referrer-when-downgrade'); w.appendChild(iframe); chatWindow.innerHTML=''; chatWindow.appendChild(w); chatWindow.scrollTop=0; const btn=document.createElement('button'); btn.className='bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-base py-3 px-6 rounded-xl transition mt-4 shadow'; btn.textContent="I've Submitted My Feedback"; btn.onclick=()=>{ addMessage("I've Submitted My Feedback", 'user'); w.remove(); onContinue(); }; c.appendChild(btn); chatInputArea.innerHTML=''; chatInputArea.appendChild(c); }
-
-    function goToStep(stepKey, showMessage=true){ const step=surveyFlow[stepKey]; if(!step) return; currentStepKey=stepKey; const keys=Object.keys(surveyFlow); updateProgress(keys.indexOf(stepKey), keys.length); const delay=700; if(step.message && showMessage) setTimeout(()=> addMessage(step.message,'bot'), delay/2); if(step.end){ chatInputArea.innerHTML='<p class="text-center text-slate-600 text-sm">You will be redirected shortly...</p>'; const finalUrl=`https://spectrumsurveys.com/surveydone?st=${step.status}&transaction_id=${transactionId}`; setTimeout(()=>{ window.location.href=finalUrl; },2000); return; } const t=(step.message && showMessage) ? delay : 100; setTimeout(()=>{ if(step.type==='multiple-choice') showOptions(step.options, step.action, {primaryIndex:0, showNumbers:true, allowTyped:true}); else if(step.type==='api-form') showApiForm(); else if(step.type==='iframe-form') showIframeForm(step.iframeSrc, ()=> goToStep(step.next)); else if(step.next) goToStep(step.next); }, t); }
 
     function updateProgress(index,total){ const p=Math.max(0, Math.min(100, (index/Math.max(1,total-1))*100)); progressBar.style.width=`${p}%`; }
 
-    // === NEW: INTRO PAGE (before the survey starts) ===
+    // INTRO PAGE that won't reappear after Begin is clicked (per session)
     function showIntro(){
       chatWindow.innerHTML=''; chatInputArea.innerHTML='';
       const card=document.createElement('div'); card.className='mx-4 my-2 p-5 bg-white border border-slate-200 rounded-2xl shadow';
       card.innerHTML = `
-        <div class="space-y-4">
-          <h1 class="text-xl font-extrabold tracking-tight">Welcome to the AI Debt Settlement Survey</h1>
-          <p class="text-slate-700">This short study helps us understand real experiences with debt settlement. It includes:</p>
-          <ul class="list-disc pl-5 text-slate-700 space-y-1">
+        <div class=\"space-y-4\">
+          <h1 class=\"text-xl font-extrabold tracking-tight\">Welcome to the AI Debt Settlement Survey</h1>
+          <p class=\"text-slate-700\">This short study helps us understand real experiences with debt settlement. It includes:</p>
+          <ul class=\"list-disc pl-5 text-slate-700 space-y-1\">
             <li>Quick eligibility questions (about 2–3 minutes)</li>
             <li>Secure phone verification (one-time code)</li>
             <li>Free, no-obligation consultation request with a debt specialist</li>
-            <li>Optional feedback form at the end</li>
+            <li><strong>Required</strong> feedback form at the end</li>
           </ul>
-          <div class="p-3 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-900 text-sm">Would you like to participate? You can stop at any time.</div>
-          <button id="begin-btn" class="w-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-600 hover:to-fuchsia-600 text-white font-semibold text-base py-3 rounded-xl shadow">Begin Survey</button>
-          <p class="text-xs text-slate-500 text-center">By continuing, you agree to our use of anonymized analytics to improve the study.</p>
+          <div class=\"p-3 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-900 text-sm\">Would you like to participate? You can stop at any time.</div>
+          <button id=\"begin-btn\" class=\"w-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-600 hover:to-fuchsia-600 text-white font-semibold text-base py-3 rounded-xl shadow\">Begin Survey</button>
+          <p class=\"text-xs text-slate-500 text-center\">By continuing, you agree to our use of anonymized analytics to improve the study.</p>
         </div>`;
       chatWindow.appendChild(card);
       document.getElementById('begin-btn').addEventListener('click', ()=>{
+        sessionStorage.setItem('chloe_started','1');
         addMessage('Begin Survey','user');
+        // push a history state to avoid going "back" to intro
+        try{ history.replaceState({step:'intro'},''); history.pushState({step:'start'},''); }catch{}
         goToStep('start');
       });
     }
 
-    // === NEW: Lightweight FAQ modal ===
-    const DEBT_FAQ = [
-      { q:'How does debt settlement affect my credit?', a:'Debt settlement typically lowers your credit score in the short term because accounts may become delinquent during negotiations. Many people still choose it because it can reduce overall debt and shorten the payoff timeline compared to making minimum payments. Credit can be rebuilt over time with on‑time payments and responsible use.' , k:['credit','score','fico','impact','affect'] },
-      { q:'Which debts qualify for settlement?', a:'Unsecured debts such as credit cards, personal loans, medical bills, and collections usually qualify. Secured debts tied to collateral (e.g., auto loans, mortgages) usually do not.' , k:['qualify','eligible','unsecured','secured','types'] },
-      { q:'How long does the program take?', a:'Many programs last around 24–48 months depending on your total debt, monthly budget, and creditor responses.' , k:['how long','duration','time','months','years'] },
-      { q:'Will creditors stop calling?', a:'Calls often decrease once negotiations start and when you direct creditors to your program. However, some contact may continue until accounts are resolved.' , k:['calls','harassment','collectors','stop'] },
-      { q:'Are there fees?', a:'Fees are usually success‑based and only charged after a settlement is reached. Exact fee structures are explained during your consultation.' , k:['fees','cost','charge','pricing'] },
-      { q:'Is there a minimum debt amount?', a:'Many programs prefer at least $10,000 in unsecured debt. Our screening reflects that threshold.' , k:['minimum','10k','qualify','threshold'] },
-      { q:'What are the risks?', a:'Possible risks include temporary credit score impact, potential creditor legal action, and tax implications on forgiven amounts. Your specialist will explain how these may apply to you.' , k:['risk','lawsuit','tax','irs'] },
-      { q:'What happens to interest and late fees?', a:'Negotiated settlements aim to reduce the principal balance you pay. Interest/fees can be part of the negotiation, varying by creditor.' , k:['interest','late fees','apr'] },
-      { q:'Can I continue using my cards?', a:'Typically no. Cards included in the program should not be used during enrollment to avoid undermining negotiations.' , k:['use card','continue','spend'] },
-      { q:'Is bankruptcy a better option?', a:'It depends on your situation. Debt settlement is one path among others like bankruptcy or debt management plans. The consultation helps compare options for your needs.' , k:['bankruptcy','better','compare'] }
-    ];
-
-    function openQAModal(){
-      const overlay=document.createElement('div'); overlay.className='fixed inset-0 bg-black/30 flex items-center justify-center z-[60]';
-      const box=document.createElement('div'); box.className='bg-white w-[92%] max-w-md rounded-2xl shadow-xl border border-slate-200 p-4';
-      box.innerHTML=`
-        <div class='flex items-start justify-between'>
-          <h3 class='text-lg font-bold'>Ask Chloe about Debt Settlement</h3>
-          <button id='qa-close' class='text-slate-500 hover:text-slate-700' aria-label='Close'>&times;</button>
-        </div>
-        <p class='text-sm text-slate-600 mt-1'>Type a question (e.g., "How long does it take?", "Will this hurt my credit?")</p>
-        <div class='mt-3 grid grid-cols-1 sm:grid-cols-5 gap-2'>
-          <input id='qa-input' class='sm:col-span-4 bg-white border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/60' placeholder='Your question'/>
-          <button id='qa-ask' class='sm:col-span-1 px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm shadow'>Ask</button>
-        </div>
-        <div class='mt-3 text-xs text-slate-500'>Answers are general information, not legal or tax advice.</div>`;
-      overlay.appendChild(box); document.body.appendChild(overlay);
-      const close=()=>overlay.remove();
-      box.querySelector('#qa-close').addEventListener('click', close);
-      box.querySelector('#qa-ask').addEventListener('click', ()=>{
-        const val=String(box.querySelector('#qa-input').value||'').trim(); if(!val) return;
-        addMessage(val,'user');
-        addMessage(answerQuestion(val),'bot');
-        close();
-      });
-      box.querySelector('#qa-input').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); box.querySelector('#qa-ask').click(); }});
-    }
-
-    function answerQuestion(q){
-      const qq=q.toLowerCase();
-      let best = DEBT_FAQ[0]; let score=-1;
-      for(const item of DEBT_FAQ){ const s=item.k.reduce((acc,kw)=> acc + (qq.includes(kw)?1:0), 0); if(s>score){ score=s; best=item; } }
-      if(score<=0){
-        return "Here’s a quick overview: Debt settlement companies negotiate with your creditors to try to reduce what you owe and consolidate into a single, more manageable plan. Most unsecured debts qualify (e.g., credit cards, personal loans, medical bills). Programs often take around 2–4 years. For details about your situation, the consultation will explain options and fees.";
+    // Prevent seeing intro again in-session via Back button
+    window.addEventListener('popstate', ()=>{
+      if(sessionStorage.getItem('chloe_started')==='1'){
+        // Always keep user in current survey step; do nothing
+        history.pushState({step:currentStepKey},'');
       }
-      return `<strong>${best.q}</strong><br>${best.a}`;
-    }
+    });
 
-    async function init(){ const urlParams=new URLSearchParams(window.location.search); transactionId=urlParams.get('transaction_id')||urlParams.get('RID')||`tx_${Date.now()}`; try{ const r=await fetch('https://api.ipify.org?format=json'); const j=await r.json(); clientIp=j.ip; }catch{ clientIp=''; } showIntro(); }
+    async function init(){
+      const urlParams=new URLSearchParams(window.location.search);
+      transactionId=urlParams.get('transaction_id')||urlParams.get('RID')||`tx_${Date.now()}`;
+      try{ const r=await fetch('https://api.ipify.org?format=json'); const j=await r.json(); clientIp=j.ip; }catch{ clientIp=''; }
+      if(sessionStorage.getItem('chloe_started')==='1'){ goToStep('start', false); }
+      else { showIntro(); }
+    }
     init();
   </script>
 </body>

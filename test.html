@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Debt Settlement Survey — Chloe (Production)</title>
+  <title>AI Debt Settlement Survey — Chloe (Full Screen)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -22,10 +22,10 @@
 
     .glass{ background: rgba(255,255,255,.78); backdrop-filter: blur(12px) saturate(140%); }
     .glass-border{ position:relative; }
-    .glass-border::before{ content:""; position:absolute; inset:0; padding:1px; border-radius:1.5rem; pointer-events:none; background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.3)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+    .glass-border::before{ content:""; position:absolute; inset:0; padding:1px; border-radius:1.0rem; pointer-events:none; background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.3)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
 
     .bubble-bot{ background: linear-gradient(90deg, #eef2ff, #fae8ff, #ecfeff); color:#0f172a; border:1px solid rgba(15,23,42,.06); }
-    .bubble-user{ background: #f1f5f9; color:#0f172a; border:1px solid rgba(15,23,42,.06); }
+    .bubble-user{ background: #f1f5e9; color:#0f172a; border:1px solid rgba(15,23,42,.06); }
     .chat-bubble { animation: pop-in 0.22s ease-out; word-wrap: break-word; }
     @keyframes pop-in { 0% { transform: translateY(4px) scale(.98); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
 
@@ -44,12 +44,23 @@
     .progress-dot{ height:10px; width:10px; border-radius:9999px; box-shadow: 0 0 0 4px rgba(34,197,94,.15); }
     .loader { border: 2px solid #cbd5e1; border-top: 2px solid #6366f1; border-radius: 9999px; width: 20px; height: 20px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Custom styles for the AI chat bubble, including citations */
+    .bubble-ai { background: linear-gradient(90deg, #eef2ff, #fae8ff, #ecfeff); color: #0f172a; border: 1px solid rgba(15, 23, 42, .06); }
+    .ai-citation { font-size: 0.7rem; color: #64748b; margin-top: 0.5rem; }
+    .ai-citation a { color: #4338ca; text-decoration: underline; }
+
+    /* Modal styles */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); display: none; align-items: center; justify-content: center; z-index: 50; }
+    .modal-content { background: #fff; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); }
+    .form-submit-overlay { position: fixed; inset: 0; background: rgba(255, 255, 255, 0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 40; }
   </style>
 </head>
-<body>
-  <div class="mx-auto max-w-md px-4 py-8 md:py-12">
-    <div class="glass-border rounded-3xl">
-      <div class="glass rounded-3xl border border-black/5 shadow-2xl overflow-hidden flex flex-col h-[85vh]">
+<body class="min-h-screen">
+  <!-- Full-screen container -->
+  <div class="fixed inset-0 p-0 md:p-4">
+    <div class="glass-border h-full rounded-none md:rounded-2xl">
+      <div class="glass h-full rounded-none md:rounded-2xl border border-black/5 shadow-2xl overflow-hidden flex flex-col">
         <!-- Header -->
         <header class="bg-gradient-to-b from-white to-white/40 px-5 py-4 border-b border-black/5">
           <div class="flex items-center gap-3">
@@ -75,7 +86,7 @@
           </div>
         </div>
 
-        <!-- Scroll area with sticky/movable question bar -->
+        <!-- Scroll area with sticky/movable question bar (fills remaining height) -->
         <div class="relative flex-1 overflow-hidden">
           <div id="scroll-box" class="absolute inset-0 overflow-y-auto">
             <div id="question-bar" class="px-5 py-3 bg-white/80 border-y border-black/5">
@@ -95,327 +106,859 @@
     </div>
   </div>
 
-  <!-- Hidden background POST (CORS-safe) -->
-  <iframe name="hidden_post_target" style="display:none;"></iframe>
-  <iframe name="hidden_td_target" style="display:none;"></iframe>
+  <!-- Modal for conversational AI -->
+  <div id="ai-chat-modal" class="modal-overlay">
+      <div class="modal-content-lg flex flex-col h-[90vh] w-[95%] md:w-[700px] bg-white rounded-2xl shadow-xl">
+          <header class="p-4 border-b border-slate-200 flex justify-between items-center">
+              <h3 class="text-lg font-bold text-slate-800">Ask Chloe Anything about Debt</h3>
+              <button id="close-ai-chat" class="text-slate-500 hover:text-slate-700 font-bold text-xl">&times;</button>
+          </header>
+          <div id="ai-chat-history" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+          <div class="p-4 border-t border-slate-200 flex items-center gap-2">
+              <input type="text" id="ai-chat-input" placeholder="Ask a question..." class="flex-1 rounded-full px-4 py-2 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <button id="ai-send-btn" class="p-3 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                      <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.917H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.918a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405Z" />
+                  </svg>
+              </button>
+          </div>
+      </div>
+  </div>
 
-  <!-- Hidden CuraDebt POST -->
-  <form id="hidden-curadebt-post" action="https://signup.curadebt.com/apkconnect/" method="POST" target="hidden_post_target" style="display:none;">
-    <input name="f_fname"><input name="f_lname"><input name="f_email"><input name="f_phone"><input name="f_whereyoulive"><input name="f_totaldebt">
-    <input name="f_comments" value="Lead from AI Chatbot Survey"><input name="data1"><input name="data2" value="CLICKID2"><input name="f_ip">
-  </form>
-
-  <!-- Hidden TrackDrive POST (Lead-to-Call) -->
-  <form id="hidden-trackdrive-post" action="https://curadebt.trackdrive.com/api/v1/leads" method="POST" target="hidden_td_target" style="display:none;">
-    <input name="lead_token" value="3346b0458309406ba4b8beac90a8a532"><input name="traffic_source_id" value="1000"><input name="caller_id"><input name="call_now" value="1">
-    <input name="first_name"><input name="last_name"><input name="email"><input name="state"><input name="zip"><input name="ip_address"><input name="source_url"><input name="useragent"><input name="original_lead_submit_date"><input name="tcpa_opt_in"><input name="tcpa_optin_consent_language"><input name="sub_id"><input name="gclid"><input name="fbeventid"><input name="msclkid"><input name="traffic_source_lead_id">
-  </form>
+  <!-- Form Submission Overlay -->
+  <div id="form-submit-overlay" class="form-submit-overlay hidden">
+    <div class="loader-lg w-12 h-12 border-4 border-gray-300 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
+    <p class="text-xl font-semibold text-slate-700">Submitting your information...</p>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-
+    
+    // NOTE: The Firebase API key is provided here as it is public-facing for client-side auth.
+    // In a real-world scenario, the API key for external services like Gemini should be
+    // managed securely on a backend server to prevent abuse.
     const firebaseConfig = { apiKey: "AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE", authDomain: "otp-c6311.firebaseapp.com", projectId: "otp-c6311", storageBucket: "otp-c6311.firebasestorage.app", messagingSenderId: "637495517002", appId: "1:637495517002:web:7bd220994a7611a5606bb3" };
-    const app = initializeApp(firebaseConfig); const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    const scrollBox = document.getElementById('scroll-box');
-    const chatWindow = document.getElementById('chat-window');
-    const chatInputArea = document.getElementById('chat-input-area');
-    const progressBar = document.getElementById('progress-bar');
-    const qbar = document.getElementById('question-bar');
-    const qtext = document.getElementById('q-text');
-    const qhint = document.getElementById('q-hint');
+    const App = (() => {
+      const DOM = {
+        scrollBox: document.getElementById('scroll-box'),
+        chatWindow: document.getElementById('chat-window'),
+        chatInputArea: document.getElementById('chat-input-area'),
+        progressBar: document.getElementById('progress-bar'),
+        qbar: document.getElementById('question-bar'),
+        qtext: document.getElementById('q-text'),
+        qhint: document.getElementById('q-hint'),
+        aiChatModal: document.getElementById('ai-chat-modal'),
+        aiChatHistory: document.getElementById('ai-chat-history'),
+        aiChatInput: document.getElementById('ai-chat-input'),
+        aiSendBtn: document.getElementById('ai-send-btn'),
+        closeAiChatBtn: document.getElementById('close-ai-chat'),
+        formSubmitOverlay: document.getElementById('form-submit-overlay')
+      };
 
-    let currentStepKey = 'start'; let transactionId = ''; let clientIp = '';
-    window.otpOK = false; let confirmationResult = null;
-    let prefillDebtAmount = null; // set by debt range
+      let state = {
+        currentStepKey: 'start',
+        transactionId: '',
+        clientIp: '',
+        otpVerified: false,
+        confirmationResult: null,
+        prefillDebtAmount: null
+      };
 
-    const allStates = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"];
-    const excludedStates = ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','RI'];
+      const API_CONFIG = {
+        gemini: {
+          url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=",
+          apiKey: "" // API key will be provided by canvas environment
+        },
+        validator: {
+          phone: "https://silent-sea-a717.kasindeesther.workers.dev/",
+          email: "https://solitary-base-4a8b.kasindeesther.workers.dev/"
+        },
+        ip: "https://api.ipify.org?format=json",
+        curadebt: "https://signup.curadebt.com/apkconnect/",
+        trackdrive: "https://curadebt.trackdrive.com/api/v1/leads"
+      };
 
-    const VALIDATE_ENDPOINT = "https://silent-sea-a717.kasindeesther.workers.dev/";
-    const VALIDATE_EMAIL_ENDPOINT = "https://solitary-base-4a8b.kasindeesther.workers.dev/";
+      const SURVEY_FLOW = {
+        start: { message: "Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?", type: "multiple-choice", options: ["Yes, I'll participate", "No, thank you"], action: (a) => (a === "Yes, I'll participate" ? App.goToStep("qDebtRange") : App.goToStep("leaveSurvey")) },
+        leaveSurvey: { message: "No problem at all. Thank you for your time. You will now be redirected.", end: true, status: 18 },
+        qDebtRange: { message: "About how much unsecured debt do you have? (credit cards, personal loans, medical bills, etc.)", type: "multiple-choice", options: ["Below $10,000", "$10,000–$40,000", "$40,000+"], action: (a) => { if (a === "Below $10,000") return App.goToStep("disqualify"); if (a === "$10,000–$40,000") { state.prefillDebtAmount = 25000; return App.goToStep("qIncome"); } if (a === "$40000+") { state.prefillDebtAmount = 50000; return App.goToStep("qIncome"); } } },
+        qIncome: { message: "Do you have a steady source of income?", type: "multiple-choice", options: ["Yes", "No"], action: (a) => (a === "Yes" ? App.goToStep("qWilling") : App.goToStep("disqualify")) },
+        qWilling: { message: "As part of the study, are you willing to speak with a debt specialist for a free, no-obligation consultation?", type: "multiple-choice", options: ["Yes", "No"], action: (a) => (a === "Yes" ? App.goToStep("preFormInfo") : App.goToStep("disqualify")) },
+        preFormInfo: { message: `Fantastic! You've qualified for the study. The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We've carefully researched and selected a reputable company, CuraDebt, to connect our participants with. A debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years. After you submit this form, you may receive a call from +18553065699 to connect you to a specialist. We will also send an email to confirm your participation. Please reply to that email to let us know how your call went. Are you ready to take the next step?`, type: "multiple-choice", options: ["Yes, I'm ready"], action: () => App.goToStep("showApiForm") },
+        showApiForm: { message: "Excellent! Please complete the secure form below. I'll be here once you've submitted it.", type: "api-form" },
+        formSuccess: { message: "Thank you! Your information has been sent securely. Watch for a toll-free call to connect you to a debt specialist.", next: "askToContinueToFeedback" },
+        askToContinueToFeedback: { message: "Now for the final step. Ready to provide your feedback?", type: "multiple-choice", options: ["Yes, Continue to Feedback"], action: () => App.goToStep("askForFeedback") },
+        askForFeedback: { message: "Please complete the form below. You'll need to enter your email address so we can match your feedback to your initial submission.", type: "iframe-form", iframeSrc: "https://digitalresearch1.github.io/debt/brevo.html", next: "complete" },
+        complete: { message: "That's everything! Thank you so much for your valuable feedback. You will now be redirected to finalize your entry.", end: true, status: 21 },
+        disqualify: { message: "I appreciate you answering. Based on your responses, this study isn't the right fit. Thank you for your time. You will be redirected now.", end: true, status: 18 },
+      };
 
-    // === Ask Chloe (Debt Relief) ===
-    const Q_OPTION = "I have a question about debt relief";
-    const DEBT_KB = [
-      { q: 'What is debt settlement and how does it work?', a: 'Debt settlement is a negotiation process where a company (or you) asks creditors/collectors to accept less than the full balance as payment in full. You typically make one monthly deposit into a dedicated account. When enough funds accrue, settlements are negotiated one by one. Programs commonly run ~24–48 months. It is not a loan.', k: ['what is debt settlement','how works','negotiate','reduce balance','process','program'] },
-      { q: 'Which debts qualify?', a: 'Usually eligible: unsecured debts such as credit cards, personal loans, medical bills, collections, store cards, some payday loans. Not eligible: secured debts (auto, mortgage), child support, alimony, most taxes; federal student loans are generally excluded (different options apply).', k: ['qualify','eligible','unsecured','secured','medical','credit cards','personal loans','collections','payday','student'] },
-      { q: 'How long does a program take?', a: 'Many programs last ~24–48 months. Timeline varies by total debt, monthly deposit, creditor behavior, and the order/size of settlements.', k: ['how long','duration','time','months','years','timeline'] },
-      { q: 'How does it affect my credit?', a: 'Expect a short‑term drop in credit score. Enrolled accounts may become or remain delinquent during negotiations; settled accounts report as “settled for less.” Many people rebuild credit 6–24 months after completion with on‑time payments and low utilization.', k: ['credit','score','fico','impact','report'] },
-      { q: 'What fees are charged?', a: 'Reputable companies charge performance‑based fees earned only after you approve a settlement. Effective fees vary (often ~15–25% of enrolled debt, provider/state dependent). You should receive a clear fee schedule.', k: ['fees','cost','charge','pricing'] },
-      { q: 'Taxes on forgiven debt', a: 'Forgiven debt may be reported on IRS Form 1099‑C and could be taxable income. The insolvency exclusion may reduce/eliminate the tax in some cases. Consult a tax professional for advice.', k: ['tax','irs','1099','1099-c','insolvency'] },
-      { q: 'Legal risks', a: 'There is a risk a creditor/collector could sue on delinquent accounts. Programs monitor for this and discuss options. If served, respond promptly and consider local legal counsel.', k: ['sue','lawsuit','legal'] },
-      { q: 'Debt management vs settlement', a: 'Debt management plans (credit counseling) consolidate payments and usually reduce interest but repay 100% of principal. Settlement aims to reduce principal owed. Each has trade‑offs.', k: ['dmp','credit counseling','compare'] },
-      { q: 'Bankruptcy vs settlement', a: 'Bankruptcy (Chapter 7/13) may be faster/cheaper for some, but with different legal/credit effects. Legal advice is best for bankruptcy questions.', k: ['bankruptcy','chapter 7','chapter 13'] },
-      { q: 'After program / rebuild', a: 'After finishing, settled items remain on reports but age; many rebuild within 6–24 months with on‑time payments and responsible use.', k: ['after program','rebuild'] },
-    ];
-    function answerDebtQuestion(q){ const qq=(q||'').toLowerCase(); let best=DEBT_KB[0], score=-1; for(const item of DEBT_KB){ let s=0; (item.k||[]).forEach(kw=>{ if(qq.includes(kw)) s+=3; }); qq.split(/[^a-z0-9]+/g).forEach(t=>{ if(item.q.toLowerCase().includes(t)) s+=1; }); if(s>score){ score=s; best=item; } } return score<=0? "Debt settlement negotiates down unsecured debts using one monthly deposit; programs typically last 24–48 months. It can lower credit short‑term and may have tax/legal considerations. A specialist can compare this with credit counseling or bankruptcy. General info only." : `<strong>${best.q}</strong><br>${best.a}`; }
-    function openQAModal(onClose){ const overlay=document.createElement('div'); overlay.className='fixed inset-0 bg-black/30 flex items-center justify-center z-[60]'; const box=document.createElement('div'); box.className='bg-white w-[92%] max-w-md rounded-2xl shadow-xl border border-slate-200 p-4'; box.innerHTML=`<div class='flex items-start justify-between'><h3 class='text-lg font-bold'>Ask Chloe about Debt Relief</h3><button id='qa-close' class='text-slate-500 hover:text-slate-700' aria-label='Close'>&times;</button></div><p class='text-xs text-slate-500 mt-1'>General information — not legal/tax advice.</p><div class='mt-3 grid grid-cols-1 sm:grid-cols-5 gap-2'><input id='qa-input' class='sm:col-span-4 bg-white border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/60' placeholder='e.g., Will this hurt my credit?' /><button id='qa-ask' class='sm:col-span-1 px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm shadow'>Ask</button></div><div id='qa-ans' class='mt-3 text-sm text-slate-800'></div>`; overlay.appendChild(box); document.body.appendChild(overlay); const ans=box.querySelector('#qa-ans'); const close=()=>{ overlay.remove(); if(typeof onClose==='function') onClose(); }; box.querySelector('#qa-close').addEventListener('click', close); box.querySelector('#qa-ask').addEventListener('click', ()=>{ const v=String(box.querySelector('#qa-input').value||'').trim(); if(!v) return; ans.innerHTML=answerDebtQuestion(v); }); box.querySelector('#qa-input').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); box.querySelector('#qa-ask').click(); }}); }
+      const ASSETS = {
+        allStates: ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"],
+        excludedStates: ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','RI'],
+      };
 
-    // Sticky behavior: stick only when near bottom
-    function isAtBottom(){ return scrollBox.scrollHeight - (scrollBox.scrollTop + scrollBox.clientHeight) < 16; }
-    function updateSticky(){ const stick=isAtBottom(); qbar.classList.toggle('sticky', stick); qbar.classList.toggle('top-0', stick); qbar.classList.toggle('shadow-sm', stick); }
-    scrollBox.addEventListener('scroll', updateSticky, {passive:true});
-    function ensureBottom(){ requestAnimationFrame(()=>{ scrollBox.scrollTop = scrollBox.scrollHeight; updateSticky(); }); }
+      // --- UTILITY FUNCTIONS ---
+      const isAtBottom = () => DOM.scrollBox.scrollHeight - (DOM.scrollBox.scrollTop + DOM.scrollBox.clientHeight) < 16;
+      const updateSticky = () => { const stick = isAtBottom(); DOM.qbar.classList.toggle('sticky', stick); DOM.qbar.classList.toggle('top-0', stick); DOM.qbar.classList.toggle('shadow-sm', stick); };
+      const ensureBottom = () => requestAnimationFrame(() => { DOM.scrollBox.scrollTop = DOM.scrollBox.scrollHeight; updateSticky(); });
+      const digitsOnly = s => String(s || '').replace(/\D+/g, '');
+      const formatCurrency = n => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n);
+      const toInt = s => { const n = parseInt(String(s || '').replace(/[^\d]/g, ''), 10); return isNaN(n) ? 0 : n; };
 
-    function createBaseContainer(){ chatInputArea.innerHTML=''; const c=document.createElement('div'); c.className='sticky bottom-0 w-full safe-bottom pt-2'; return c; }
-    function setQuestion(text){ qtext.className='text-sm text-slate-900'; qtext.innerHTML = text || ''; const shouldGate = (text && text.replace(/<[^>]+>/g,'').length > 380); qtext.dataset.gated = shouldGate ? '1' : '0'; qtext.dataset.scrolled = shouldGate ? '0' : '1'; if(shouldGate){ qtext.classList.add('max-h-60','overflow-y-auto','pr-2','leading-relaxed'); qtext.classList.remove('font-semibold'); qhint.classList.remove('hidden'); } else { qtext.classList.add('font-semibold'); qhint.classList.add('hidden'); } updateSticky(); }
-    function addAnswer(text){ if(!text) return; const el=document.createElement('div'); el.className='chat-bubble flex items-end gap-2 justify-end'; const bubble=document.createElement('div'); bubble.className='px-4 py-3 rounded-2xl text-sm shadow ring-1 bubble-user'; bubble.textContent=text; el.appendChild(bubble); chatWindow.appendChild(el); }
-    function addAbandon(container){ const abandon=document.createElement('button'); abandon.type='button'; abandon.className='block mx-auto mt-2 text-rose-600 hover:text-rose-700 text-xs'; abandon.textContent='Abandon Survey'; abandon.addEventListener('click',()=>{ goToStep('leaveSurvey'); }); container.appendChild(abandon); }
+      const fetchWithExponentialBackoff = async (url, options, retries = 3, delay = 1000) => {
+        for (let i = 0; i < retries; i++) {
+          try {
+            const response = await fetch(url, options);
+            if (response.status === 429 && i < retries - 1) {
+              await new Promise(res => setTimeout(res, delay * (2 ** i)));
+              continue;
+            }
+            return response;
+          } catch (error) {
+            if (i === retries - 1) throw error;
+            await new Promise(res => setTimeout(res, delay * (2 ** i)));
+          }
+        }
+      };
+      
+      const showModal = (content, onClose = () => {}) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `<div class='modal-content-lg flex flex-col h-[90vh] w-[95%] md:w-[700px] bg-white rounded-2xl shadow-xl'>${content}</div>`;
+        document.body.appendChild(overlay);
+        overlay.style.display = 'flex';
+        overlay.querySelector('#modal-close-btn')?.addEventListener('click', () => {
+            overlay.remove();
+            onClose();
+        });
+        return overlay.querySelector('.modal-content-lg');
+      };
 
-    function showOptions(options, onSelect){
-      const c=createBaseContainer();
-      const oc=document.createElement('div'); oc.className='flex flex-col gap-2 px-1'; c.appendChild(oc);
-      const btns=[]; const finalize=v=>{ btns.forEach(b=>{b.disabled=true;b.classList.add('opacity-60','cursor-not-allowed');}); onSelect(v); };
-
-      options.forEach((t)=>{ const b=document.createElement('button'); b.type='button'; b.className='w-full px-4 py-3 rounded-full font-semibold text-sm shadow-sm ring-1 transition bg-white hover:bg-slate-50 text-slate-900 ring-slate-200 border border-slate-200 text-left'; b.textContent=t; b.addEventListener('click',()=>finalize(t)); oc.appendChild(b); btns.push(b); });
-
-      // Q&A always present and enabled
-      const qaBtn=document.createElement('button'); qaBtn.type='button'; qaBtn.dataset.role='qa'; qaBtn.className='w-full px-4 py-3 rounded-full font-semibold text-sm shadow-sm ring-1 transition bg-white hover:bg-slate-50 text-slate-900 ring-slate-200 border border-slate-200 text-left'; qaBtn.textContent=Q_OPTION; qaBtn.addEventListener('click',()=>{ openQAModal(()=>{ showOptions(options, onSelect); }); }); oc.appendChild(qaBtn); btns.push(qaBtn);
-
-      addAbandon(c);
-      chatInputArea.appendChild(c);
-      if(btns[0]) btns[0].focus();
-
-      // Gate primary buttons until long message scrolled to end; QA button stays enabled
-      const gateIfNeeded=()=>{ const gated = qtext.dataset.gated==='1'; const ok = qtext.dataset.scrolled==='1'; const disable = gated && !ok; btns.forEach(b=>{ const isQA=b.dataset.role==='qa'; b.disabled = disable && !isQA; b.classList.toggle('opacity-60', b.disabled); b.classList.toggle('cursor-not-allowed', b.disabled); }); };
-      gateIfNeeded();
-      qtext.addEventListener('scroll', ()=>{ if(qtext.scrollTop + qtext.clientHeight >= qtext.scrollHeight - 4){ qtext.dataset.scrolled='1'; qhint.classList.add('hidden'); gateIfNeeded(); } }, {passive:true});
-
-      ensureBottom();
-    }
-
-    // Validators (same strict rules as your original)
-    const digitsOnly = s => String(s||'').replace(/\D+/g,'');
-    function parseStrictNANP(raw){ const d=digitsOnly(raw); const m=d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/); if(!m) return { ok:false, error:'Enter a valid US number (NANP).' }; const [,area,prefix,line]=m; if(/^[2-9]11$/.test(area)||/^[2-9]11$/.test(prefix)) return { ok:false, error:'N11 service codes are invalid.' }; if(area==='900') return { ok:false, error:'Premium-rate (900) not accepted.' }; if(prefix==='555'&&/^01\d{2}$/.test(line)) return { ok:false, error:'555-01xx test numbers not accepted.' }; const ten=area+prefix+line; if(/^(\d)\1{9}$/.test(ten)) return { ok:false, error:'Invalid pattern (all digits identical).' }; const seq='0123456789'.repeat(3), rseq='9876543210'.repeat(3); if(seq.includes(ten)||rseq.includes(ten)) return { ok:false, error:'Invalid pattern (sequential digits).' }; const TOLL_FREE=new Set(['800','833','844','855','866','877','888','822']); return { ok:true, e164:`+1${area}${prefix}${line}`, meta:{ tollFree:TOLL_FREE.has(area) } } }
-    async function validatePhoneWithSignalWire(raw){ const strict=parseStrictNANP(raw); if(!strict.ok) return strict; try{ const r=await fetch(VALIDATE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:strict.e164})}); const j=await r.json(); if(!j.ok) return {ok:false,error:j.error||'Validation failed.'}; return {...j,e164:strict.e164,meta:{...(strict.meta||{})}}; }catch{ return { ok:true, e164: strict.e164, meta: strict.meta||{} }; } }
-    const ROLE_LOCALS=new Set(['admin','administrator','root','support','help','helpdesk','info','contact','sales','marketing','billing','accounts','accounting','abuse','postmaster','webmaster','no-reply','noreply','donotreply','security','compliance','legal','test']);
-    const FREEMAIL=new Set(['gmail.com','googlemail.com','yahoo.com','ymail.com','rocketmail.com','outlook.com','hotmail.com','live.com','msn.com','icloud.com','me.com','proton.me','aol.com','mail.com']);
-    const DOMAIN_TYPO_MAP={'gamil.com':'gmail.com','gmial.com':'gmail.com','gmai.com':'gmail.com','gmail.con':'gmail.com','yahoo.con':'yahoo.com','yhoo.com':'yahoo.com','hotnail.com':'hotmail.com','hotmial.com':'hotmail.com','outlok.com':'outlook.com','outllok.com':'outlook.com','icloud,com':'icloud.com','protonn.me':'proton.me'};
-    function strictEmailClient(raw){ const email=String(raw||'').trim(); const at=email.indexOf('@'); if(at<1||at===email.length-1) return {ok:false,error:'Enter a valid email address.'}; const local=email.slice(0,at), domain=email.slice(at+1).toLowerCase(); if(local.length<3||local.length>64) return {ok:false,error:'Email local part length is invalid.'}; if(domain.length<4||domain.length>255) return {ok:false,error:'Email domain length is invalid.'}; if(!/^[A-Za-z0-9](?:[A-Za-z0-9._%'+\-]{0,62}[A-Za-z0-9])?$/.test(local)) return {ok:false,error:'Invalid characters in email.'}; if(local.includes('..')) return {ok:false,error:'Email local has consecutive dots.'}; if(!/[A-Za-z]/.test(local)) return {ok:false,error:'Email must contain letters.'}; if((local.match(/\./g)||[]).length>2) return {ok:false,error:'Too many dots in email local.'}; if(domain.indexOf('.')<1) return {ok:false,error:'Email domain must contain a dot.'}; const labels=domain.split('.'); for(const lab of labels){ if(lab.length<1||lab.length>63) return {ok:false,error:'Email domain label length is invalid.'}; if(!/^[A-Za-z0-9-]+$/.test(lab)) return {ok:false,error:'Email domain contains invalid chars.'}; if(lab.startsWith('-')||lab.endsWith('-')) return {ok:false,error:'Domain label cannot start/end with -.'}; } const tld=labels[labels.length-1]; if(tld.length<2||tld.length>63) return {ok:false,error:'Email TLD invalid.'}; if(/^\d+$/.test(tld)) return {ok:false,error:'Email TLD cannot be all digits.'}; if(tld==='con') return {ok:false,error:'TLD looks mistyped (.con). Did you mean .com?'}; const info={ role:ROLE_LOCALS.has(local.toLowerCase()), plusAnywhere:local.includes('+'), gmailDot:(domain==='gmail.com'||'googlemail.com')&&local.includes('.'), freemail:FREEMAIL.has(domain) }; return { ok:true, normalized:`${local}@${domain}`, info, suggestion: DOMAIN_TYPO_MAP[domain]||null } }
-    async function validateEmailWithWorker(raw){ const base=strictEmailClient(raw); if(!base.ok) return base; try{ const r=await fetch(VALIDATE_EMAIL_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ email: base.normalized, want_mx:true })}); const j=await r.json(); if(!j.ok) return { ok:false, error:j.error||'Email validation failed.' }; return { ok:true, normalized: base.normalized, disposable: !!j.disposable, has_mx: typeof j.has_mx==='boolean'? j.has_mx: undefined, suggestion: j.suggestion||base.suggestion||null, info: base.info }; }catch{ return base; } }
-
-    // === Survey flow ===
-    const surveyFlow = {
-      start: { message: "Hello! I'm Chloe, an AI assistant for a research study. We're gathering feedback from people to better understand the debt settlement process. Would you be willing to participate?", type: "multiple-choice", options: ["Yes, I'll participate", "No, thank you"], action: (a) => (a === "Yes, I'll participate" ? goToStep("qDebtRange") : goToStep("leaveSurvey")) },
-      leaveSurvey: { message: "No problem at all. Thank you for your time. You will now be redirected.", end: true, status: 18 },
-      qDebtRange: { message: "About how much unsecured debt do you have? (credit cards, personal loans, medical bills, etc.)", type: "multiple-choice", options: ["Below $10,000", "$10,000–$40,000", "$40,000+"], action: (a) => { if (a === "Below $10,000") return goToStep("disqualify"); if (a === "$10,000–$40,000") { prefillDebtAmount = 25000; return goToStep("qIncome"); } if (a === "$40,000+") { prefillDebtAmount = 50000; return goToStep("qIncome"); } } },
-      qIncome: { message: "Do you have a steady source of income?", type: "multiple-choice", options: ["Yes", "No"], action: (a) => (a === "Yes" ? goToStep("qWilling") : goToStep("disqualify")) },
-      qWilling: { message: "As part of the study, are you willing to speak with a debt specialist for a free, no-obligation consultation?", type: "multiple-choice", options: ["Yes", "No"], action: (a) => (a === "Yes" ? goToStep("preFormInfo") : goToStep("disqualify")) },
-      preFormInfo: { message: `Fantastic! You've qualified for the study. The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist. Before I show you the form, I want to be transparent. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We've carefully researched and selected a reputable company, CuraDebt, to connect our participants with. They will be the ones to contact you. Just so you know what to expect, a debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years. It's a powerful option for many people. Your real-world experience with them is what makes this study so valuable. After you verify your phone number and submit this form, you may receive a call from a toll-free number (e.g., 800/833/844/855/866/877/888) to connect you directly to a specialist. If you miss it, you can call back from that number. Are you ready to take the next step?`, type: "multiple-choice", options: ["Yes, I'm ready"], action: () => goToStep("showApiForm") },
-      showApiForm: { message: "Excellent! Please complete the secure form below. I'll be here once you've submitted it.", type: "api-form" },
-      formSuccess: { message: "Thank you! Your information has been sent securely. Watch for a toll-free call to connect you to a debt specialist.", next: "askToContinueToFeedback" },
-      askToContinueToFeedback: { message: "Now for the final step. Ready to provide your feedback?", type: "multiple-choice", options: ["Yes, Continue to Feedback"], action: () => goToStep("askForFeedback") },
-      askForFeedback: { message: "Please complete the form below. You'll need to enter your email address so we can match your feedback to your initial submission.", type: "iframe-form", iframeSrc: "https://digitalresearch1.github.io/debt/brevo.html", next: "complete" },
-      complete: { message: "That's everything! Thank you so much for your valuable feedback. You will now be redirected to finalize your entry.", end: true, status: 21 },
-      disqualify: { message: "I appreciate you answering. Based on your responses, this study isn't the right fit. Thank you for your time. You will be redirected now.", end: true, status: 18 },
-    };
-
-    function updateProgress(index,total){ const p=Math.max(0, Math.min(100, (index/Math.max(1,total-1))*100)); progressBar.style.width=`${p}%`; }
-
-    function goToStep(stepKey){
-      const step=surveyFlow[stepKey]; if(!step) return; currentStepKey=stepKey; const keys=Object.keys(surveyFlow); updateProgress(keys.indexOf(stepKey), keys.length);
-      setQuestion(step.message || '');
-      if(step.end){ chatInputArea.innerHTML='<p class="text-center text-slate-600 text-sm">You will be redirected shortly...</p>'; const finalUrl=`https://spectrumsurveys.com/surveydone?st=${step.status}&transaction_id=${transactionId}`; setTimeout(()=>{ window.location.href=finalUrl; },2000); return; }
-      if(step.type==='multiple-choice'){
-        showOptions(step.options, (val)=>{ addAnswer(val); step.action(val); ensureBottom(); });
-      } else if(step.type==='api-form'){
-        chatWindow.innerHTML = '<div class="pointer-events-none sticky top-0 -mt-3 h-6 bg-gradient-to-b from-white to-transparent"></div>';
-        showApiForm();
-      } else if(step.type==='iframe-form'){
-        chatWindow.innerHTML = '<div class="pointer-events-none sticky top-0 -mt-3 h-6 bg-gradient-to-b from-white to-transparent"></div>';
-        showIframeForm(step.iframeSrc, ()=> goToStep(step.next));
-      } else if(step.next){
-        goToStep(step.next);
-      }
-    }
-
-    function showIntro(){ setQuestion(''); chatWindow.innerHTML=''; chatInputArea.innerHTML=''; const card=document.createElement('div'); card.className='mx-4 my-3 p-5 bg-white border border-slate-200 rounded-2xl shadow'; card.innerHTML = `<div class="space-y-4"><h1 class="text-xl font-extrabold tracking-tight">Welcome to the AI Debt Settlement Survey</h1><p class="text-slate-700">This short study helps us understand real experiences with debt settlement. It includes quick eligibility questions, secure phone verification, and an optional feedback form.</p><button id="begin-btn" class="w-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-600 hover:to-fuchsia-600 text-white font-semibold text-base py-3 rounded-xl shadow">Begin Survey</button></div>`; chatWindow.appendChild(card); document.getElementById('begin-btn').addEventListener('click', ()=>{ card.remove(); goToStep('start'); ensureBottom(); }); ensureBottom(); }
-
-    // === Form ===
-    function showApiForm(){
-      chatInputArea.innerHTML='';
-      const wrapper=document.createElement('div'); wrapper.className='w-full bg-white border border-slate-200 rounded-2xl p-4 my-2 text-slate-900 backdrop-blur';
-      const form=document.createElement('form'); form.id='cura-debt-form'; form.className='embedded-form w-full space-y-4';
-      form.innerHTML=`
-        <div class="text-center">
-          <label for="debt-slider" class="text-sm font-medium text-slate-700">Select Amount Of Unsecured Debt</label>
-          <p id="debt-amount-display" class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 my-2">$25,000</p>
-          <input type="range" id="debt-slider" class="slider" min="0" max="100000" value="25000" step="100" list="debt-ticks" aria-label="Unsecured debt amount slider">
-          <p class="text-xs text-slate-600 mt-2">Move the slider to select the exact amount you owe.</p>
-          <datalist id="debt-ticks"><option value="0"></option><option value="5000"></option><option value="10000"></option><option value="20000"></option><option value="30000"></option><option value="40000"></option><option value="50000"></option><option value="75000"></option><option value="100000"></option></datalist>
-          <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
-            <label class="text-xs text-slate-600 sm:col-span-1" for="debt-number">Or type exact amount</label>
-            <input type="text" id="debt-number" inputmode="numeric" placeholder="e.g. 12,450" class="sm:col-span-2 bg-white border border-slate-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500/60" value="25,000">
+      // --- CONVERSATIONAL AI LOGIC ---
+      const showConversationalAI = (onClose) => {
+        DOM.aiChatModal.style.display = 'flex';
+        DOM.aiChatHistory.innerHTML = `
+          <div class="flex items-end gap-2 chat-bubble">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 grid place-items-center font-extrabold text-white text-base">C</div>
+              <div class="px-4 py-3 rounded-2xl text-sm shadow ring-1 bubble-bot max-w-[85%]">
+                  Hello! I can answer general questions about debt settlement, like "What is debt settlement?" or "How will it affect my credit score?"
+                  <div class="ai-citation mt-2">I am an AI assistant and do not provide legal or financial advice. Please consult a professional.</div>
+              </div>
           </div>
-          <p id="move-hint" class="text-xs text-amber-700 mt-2">Move the slider to confirm your amount.</p>
-          <div id="debt-warning" class="text-[11px] text-amber-700 mt-2 hidden">Minimum debt is $10,000 to qualify.</div>
-          <input type="hidden" id="debt-confirmed" value="0">
-        </div>
-        <div class="grid grid-cols-2 gap-3 pt-2">
-          <input type="text" name="f_fname" placeholder="First Name" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500/60" />
-          <input type="text" name="f_lname" placeholder="Last Name" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500/60" />
-        </div>
-        <input type="email" name="f_email" id="f_email" placeholder="Email Address" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60" />
-        <div id="email-hint" class="text-[11px] mt-1 text-slate-600" aria-live="polite"></div>
-        <input type="tel" name="f_phone" id="f_phone" placeholder="Phone Number" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60" />
-        <div id="phone-hint" class="text-[11px] mt-1 text-slate-600" aria-live="polite"></div>
-        <div id="otp-ui" class="mt-2 space-y-2">
-          <div class="flex flex-wrap gap-2 items-center">
-            <button type="button" id="send-otp" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs shadow ring-1 ring-black/5">Send verification code</button>
-            <input id="otp-code" class="bg-white border border-slate-300 p-2 rounded w-36 focus:ring-2 focus:ring-indigo-500/60" placeholder="6-digit code" maxlength="6" />
-            <button type="button" id="check-otp" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs shadow ring-1 ring-black/5">Verify number</button>
-            <span id="otp-status" class="text-xs text-slate-700"></span>
+        `;
+        DOM.aiChatInput.focus();
+
+        const sendMessage = async () => {
+          const userMessage = DOM.aiChatInput.value.trim();
+          if (!userMessage) return;
+
+          // Add user bubble
+          DOM.aiChatHistory.innerHTML += `
+            <div class="flex items-end gap-2 justify-end chat-bubble">
+                <div class="px-4 py-3 rounded-2xl text-sm shadow ring-1 bubble-user max-w-[85%]">
+                    ${userMessage}
+                </div>
+            </div>
+          `;
+          DOM.aiChatInput.value = '';
+          DOM.aiChatHistory.scrollTop = DOM.aiChatHistory.scrollHeight;
+
+          // Add bot loading bubble
+          const loadingBubble = document.createElement('div');
+          loadingBubble.className = 'flex items-end gap-2 chat-bubble';
+          loadingBubble.innerHTML = `
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 grid place-items-center font-extrabold text-white text-base">C</div>
+              <div class="px-4 py-3 rounded-2xl text-sm shadow ring-1 bubble-bot max-w-[85%]">
+                  <div class="loader-sm w-4 h-4 border-2 border-slate-300 border-t-indigo-500 rounded-full animate-spin"></div>
+              </div>
+          `;
+          DOM.aiChatHistory.appendChild(loadingBubble);
+          DOM.aiChatHistory.scrollTop = DOM.aiChatHistory.scrollHeight;
+
+          try {
+            const systemPrompt = "You are a helpful AI assistant specialized in providing factual, general information about debt settlement. Be concise and conversational.";
+            const userQuery = userMessage;
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                tools: [{ "google_search": {} }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+            const response = await fetchWithExponentialBackoff(
+                `${API_CONFIG.gemini.url}${API_CONFIG.gemini.apiKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            if (!response.ok) {
+              throw new Error(`API error: ${response.status}`);
+            }
+
+            const result = await response.json();
+            const candidate = result.candidates?.[0];
+            const text = candidate?.content?.parts?.[0]?.text;
+            let sources = [];
+            const groundingMetadata = candidate?.groundingMetadata;
+            if (groundingMetadata?.groundingAttributions) {
+                sources = groundingMetadata.groundingAttributions
+                    .map(attribution => ({
+                        uri: attribution.web?.uri,
+                        title: attribution.web?.title,
+                    }))
+                    .filter(source => source.uri && source.title);
+            }
+
+            // Remove loading bubble
+            DOM.aiChatHistory.removeChild(loadingBubble);
+
+            const botBubble = document.createElement('div');
+            botBubble.className = 'flex items-end gap-2 chat-bubble';
+            const botContent = document.createElement('div');
+            botContent.className = 'px-4 py-3 rounded-2xl text-sm shadow ring-1 bubble-bot max-w-[85%]';
+            botContent.innerHTML = text ? text : 'Sorry, I could not find information on that topic. Please try another question.';
+            
+            if (sources.length > 0) {
+                const sourceList = document.createElement('div');
+                sourceList.className = 'ai-citation';
+                sourceList.innerHTML = 'Source: ';
+                sources.forEach((s, i) => {
+                    const link = document.createElement('a');
+                    link.href = s.uri;
+                    link.target = '_blank';
+                    link.textContent = s.title;
+                    sourceList.appendChild(link);
+                    if (i < sources.length - 1) {
+                        sourceList.innerHTML += ', ';
+                    }
+                });
+                botContent.appendChild(sourceList);
+            }
+
+            botBubble.innerHTML = `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 grid place-items-center font-extrabold text-white text-base">C</div>`;
+            botBubble.appendChild(botContent);
+            DOM.aiChatHistory.appendChild(botBubble);
+            DOM.aiChatHistory.scrollTop = DOM.aiChatHistory.scrollHeight;
+
+          } catch (e) {
+            console.error(e);
+            loadingBubble.remove();
+            DOM.aiChatHistory.innerHTML += `
+                <div class="flex items-end gap-2 chat-bubble">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 grid place-items-center font-extrabold text-white text-base">C</div>
+                    <div class="px-4 py-3 rounded-2xl text-sm shadow ring-1 bubble-bot max-w-[85%]">
+                        Sorry, something went wrong. Please try again.
+                    </div>
+                </div>
+            `;
+            DOM.aiChatHistory.scrollTop = DOM.aiChatHistory.scrollHeight;
+          }
+        };
+
+        DOM.aiSendBtn.addEventListener('click', sendMessage);
+        DOM.aiChatInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+        DOM.closeAiChatBtn.addEventListener('click', () => {
+          DOM.aiChatModal.style.display = 'none';
+          onClose();
+        });
+      };
+
+      // --- SURVEY FLOW LOGIC ---
+      const updateProgress = (index, total) => {
+        const p = Math.max(0, Math.min(100, (index / Math.max(1, total - 1)) * 100));
+        DOM.progressBar.style.width = `${p}%`;
+      };
+      
+      const setQuestion = (text) => {
+        DOM.qtext.className = 'text-sm font-semibold text-slate-900';
+        DOM.qtext.innerHTML = text || '';
+        DOM.qtext.dataset.gated = '0';
+        DOM.qtext.dataset.scrolled = '1';
+        DOM.qtext.classList.remove('max-h-60', 'overflow-y-auto', 'pr-2', 'leading-relaxed');
+        DOM.qtext.classList.add('font-semibold');
+        DOM.qhint.classList.add('hidden');
+        updateSticky();
+      };
+      
+      const addAnswer = (text) => {
+        if (!text) return;
+        const el = document.createElement('div');
+        el.className = 'chat-bubble flex items-end gap-2 justify-end';
+        const bubble = document.createElement('div');
+        bubble.className = 'px-4 py-3 rounded-2xl text-sm shadow ring-1 bubble-user';
+        bubble.textContent = text;
+        el.appendChild(bubble);
+        DOM.chatWindow.appendChild(el);
+      };
+      
+      const addAbandon = (container) => {
+        const abandon = document.createElement('button');
+        abandon.type = 'button';
+        abandon.className = 'block mx-auto mt-2 text-rose-600 hover:text-rose-700 text-xs';
+        abandon.textContent = 'Abandon Survey';
+        abandon.addEventListener('click', () => App.goToStep('leaveSurvey'));
+        container.appendChild(abandon);
+      };
+
+      const showOptions = (options, onSelect) => {
+        const c = document.createElement('div');
+        c.className = 'sticky bottom-0 w-full safe-bottom pt-2';
+        DOM.chatInputArea.innerHTML = '';
+        const oc = document.createElement('div');
+        oc.className = 'flex flex-col gap-2 px-1';
+        c.appendChild(oc);
+        const btns = [];
+        const finalize = v => {
+          btns.forEach(b => { b.disabled = true; b.classList.add('opacity-60', 'cursor-not-allowed'); });
+          onSelect(v);
+        };
+
+        options.forEach((t) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'w-full px-4 py-3 rounded-full font-semibold text-sm shadow-sm ring-1 transition bg-white hover:bg-slate-50 text-slate-900 ring-slate-200 border border-slate-200 text-left';
+          b.textContent = t;
+          b.addEventListener('click', () => finalize(t));
+          oc.appendChild(b);
+          btns.push(b);
+        });
+
+        const qaBtn = document.createElement('button');
+        qaBtn.type = 'button';
+        qaBtn.className = 'w-full px-4 py-3 rounded-full font-semibold text-sm shadow-sm ring-1 transition bg-white hover:bg-slate-50 text-slate-900 ring-slate-200 border border-slate-200 text-left';
+        qaBtn.textContent = "I have a question about debt relief";
+        qaBtn.addEventListener('click', () => { showConversationalAI(() => showOptions(options, onSelect)); });
+        oc.appendChild(qaBtn);
+        btns.push(qaBtn);
+
+        addAbandon(c);
+        DOM.chatInputArea.appendChild(c);
+        if (btns[0]) btns[0].focus();
+        
+        ensureBottom();
+      };
+
+      const goToStep = (stepKey) => {
+        const step = SURVEY_FLOW[stepKey];
+        if (!step) return;
+        state.currentStepKey = stepKey;
+        const keys = Object.keys(SURVEY_FLOW);
+        updateProgress(keys.indexOf(stepKey), keys.length);
+        setQuestion(step.message || '');
+        DOM.chatWindow.innerHTML = '<div class="pointer-events-none sticky top-0 -mt-3 h-6 bg-gradient-to-b from-white to-transparent"></div>';
+        if (step.end) {
+          DOM.chatInputArea.innerHTML = '<p class="text-center text-slate-600 text-sm">You will be redirected shortly...</p>';
+          const finalUrl = `https://spectrumsurveys.com/surveydone?st=${step.status}&transaction_id=${state.transactionId}`;
+          setTimeout(() => { window.location.href = finalUrl; }, 2000);
+          return;
+        }
+        if (step.type === 'multiple-choice') {
+          showOptions(step.options, (val) => { addAnswer(val); step.action(val); ensureBottom(); });
+        } else if (step.type === 'api-form') {
+          showApiForm();
+        } else if (step.type === 'iframe-form') {
+          showIframeForm(step.iframeSrc, () => goToStep(step.next));
+        } else if (step.next) {
+          goToStep(step.next);
+        }
+      };
+
+      const showIntro = () => {
+        setQuestion('');
+        DOM.chatWindow.innerHTML = '';
+        DOM.chatInputArea.innerHTML = '';
+        const card = document.createElement('div');
+        card.className = 'mx-4 my-3 p-5 bg-white border border-slate-200 rounded-2xl shadow';
+        card.innerHTML = `
+          <div class="space-y-4 text-center">
+            <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 grid place-items-center font-extrabold text-white text-4xl">C</div>
+            <h1 class="text-2xl font-extrabold tracking-tight">Debt Relief Research Study</h1>
+            <p class="text-slate-700">Help us improve the debt settlement process. Your feedback is valuable.</p>
+            <ul class="text-left text-slate-700 space-y-2 max-w-xs mx-auto list-none p-0">
+              <li class="flex items-center gap-2">
+                <span class="text-emerald-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                    <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+                Answer a few quick questions.
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-emerald-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                    <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+                Securely verify your information.
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-emerald-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                    <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+                Provide optional feedback.
+              </li>
+            </ul>
+            <button id=\"begin-btn\" class=\"w-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-600 hover:to-fuchsia-600 text-white font-semibold text-base py-3 rounded-xl shadow\">Begin Secure Survey</button>
           </div>
-          <div id="tf-call-note" class="hidden text-[12px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">✅ Number verified. You may receive a call from a <strong>toll-free</strong> number (800, 833, 844, 855, 866, 877, 888) to connect you with a specialist. If you miss it, call back from that number.</div>
-          <div id="recaptcha-container"></div>
-        </div>
-        <select name="f_whereyoulive" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60"><option value="" disabled selected>Select Your State</option></select>
-        <label class="flex items-start gap-2 text-[11px] text-slate-700"><input type="checkbox" id="tcpa" required class="mt-1"><span>By clicking, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts). Your consent is not required to purchase. Message/data rates may apply.</span></label>
-        <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-base py-3 rounded-xl transition disabled:opacity-60 disabled:cursor-not-allowed shadow">Select amount to continue</button>
-        <div id="form-error" class="text-rose-600 font-semibold text-center text-sm hidden"></div>`;
-      wrapper.appendChild(form); chatWindow.appendChild(wrapper);
-      requestAnimationFrame(()=>{ const y = wrapper.offsetTop - qbar.offsetHeight - 8; scrollBox.scrollTop = Math.max(0, y); updateSticky(); });
+        `;
+        DOM.chatWindow.appendChild(card);
+        document.getElementById('begin-btn').addEventListener('click', () => {
+          card.remove();
+          goToStep('start');
+          ensureBottom();
+        });
+        ensureBottom();
+      };
+      
+      // --- FORM & SUBMISSION LOGIC ---
+      const parseStrictNANP = (raw) => {
+          const d = digitsOnly(raw);
+          const m = d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/);
+          if (!m) return { ok: false, error: 'Enter a valid US number (NANP).' };
+          const [, area, prefix, line] = m;
+          const ten = area + prefix + line;
+          if (/^(\d)\1{9}$/.test(ten) || '0123456789'.repeat(3).includes(ten) || '9876543210'.repeat(3).includes(ten)) {
+              return { ok: false, error: 'Invalid pattern.' };
+          }
+          const TOLL_FREE = new Set(['800', '833', '844', '855', '866', '877', '888', '822']);
+          return { ok: true, e164: `+1${area}${prefix}${line}`, meta: { tollFree: TOLL_FREE.has(area) } };
+      };
+      
+      const validatePhone = async (raw) => {
+          const strict = parseStrictNANP(raw);
+          if (!strict.ok) return strict;
+          try {
+              const r = await fetchWithExponentialBackoff(API_CONFIG.validator.phone, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ phone: strict.e164 })
+              });
+              const j = await r.json();
+              if (!j.ok) return { ok: false, error: j.error || 'Validation failed.' };
+              return { ...j, e164: strict.e164, meta: { ...(strict.meta || {}) } };
+          } catch {
+              return { ok: true, e164: strict.e164, meta: strict.meta || {} };
+          }
+      };
+      
+      const validateEmail = async (raw) => {
+          const email = String(raw || '').trim();
+          const at = email.indexOf('@');
+          if (at < 1 || at === email.length - 1) return { ok: false, error: 'Enter a valid email address.' };
+          const local = email.slice(0, at), domain = email.slice(at + 1).toLowerCase();
+          const FREEMAIL = new Set(['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com', 'aol.com']);
+          const ROLE_LOCALS = new Set(['admin', 'support', 'info', 'sales', 'noreply']);
+          if (ROLE_LOCALS.has(local.toLowerCase())) return { ok: false, error: 'Role account not accepted.' };
+          if (local.includes('+')) return { ok: false, error: 'Plus-alias not accepted.' };
+          if ((domain === 'gmail.com' || domain === 'googlemail.com') && local.includes('.')) return { ok: false, error: 'Gmail dot alias not accepted.' };
+          
+          try {
+              const r = await fetchWithExponentialBackoff(API_CONFIG.validator.email, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: email })
+              });
+              const j = await r.json();
+              if (!j.ok) return { ok: false, error: j.error || 'Email validation failed.' };
+              return { ok: true, normalized: email, disposable: !!j.disposable, info: { freemail: FREEMAIL.has(domain), role: ROLE_LOCALS.has(local.toLowerCase()) } };
+          } catch {
+              return { ok: true, normalized: email, disposable: false, info: { freemail: FREEMAIL.has(domain), role: ROLE_LOCALS.has(local.toLowerCase()) } };
+          }
+      };
 
-      // Abandon on form step
-      const footer=document.createElement('div'); footer.className='text-center mt-2'; const abandon=document.createElement('button'); abandon.type='button'; abandon.className='text-rose-600 hover:text-rose-700 text-xs'; abandon.textContent='Abandon Survey'; abandon.addEventListener('click',()=>{ goToStep('leaveSurvey'); }); footer.appendChild(abandon); wrapper.appendChild(footer);
+      const showApiForm = () => {
+        DOM.chatInputArea.innerHTML = '';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'w-full max-w-4xl mx-auto bg-white border border-slate-200 rounded-2xl p-6 my-4 text-slate-900 backdrop-blur';
+        const form = document.createElement('form');
+        form.id = 'cura-debt-form';
+        form.className = 'embedded-form w-full space-y-4';
+        form.innerHTML = `
+          <div class="text-center">
+            <label for="debt-slider" class="text-sm font-medium text-slate-700">Select Amount Of Unsecured Debt</label>
+            <p id="debt-amount-display" class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 my-2">$25,000</p>
+            <input type="range" id="debt-slider" class="slider" min="0" max="100000" value="25000" step="100" aria-label="Unsecured debt amount slider">
+            <p class="text-xs text-slate-600 mt-2">Move the slider to select the exact amount you owe.</p>
+            <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
+              <label class="text-xs text-slate-600 sm:col-span-1" for="debt-number">Or type exact amount</label>
+              <input type="text" id="debt-number" inputmode="numeric" placeholder="e.g. 12,450" class="sm:col-span-2 bg-white border border-slate-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500/60" value="25,000">
+            </div>
+            <p id="move-hint" class="text-xs text-amber-700 mt-2">Move the slider to confirm your amount.</p>
+            <div id="debt-warning" class="text-[11px] text-rose-600 mt-2 hidden">Minimum debt is $10,000 to qualify.</div>
+            <input type="hidden" id="debt-confirmed" value="0">
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            <input type="text" name="f_fname" placeholder="First Name" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500/60" />
+            <input type="text" name="f_lname" placeholder="Last Name" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500/60" />
+          </div>
+          <input type="email" name="f_email" id="f_email" placeholder="Email Address" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60" />
+          <div id="email-hint" class="text-[11px] mt-1 text-slate-600" aria-live="polite"></div>
+          <input type="tel" name="f_phone" id="f_phone" placeholder="Phone Number" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60" />
+          <div id="phone-hint" class="text-[11px] mt-1 text-slate-600" aria-live="polite"></div>
+          <div id="otp-ui" class="mt-2 space-y-2">
+            <div class="flex flex-wrap gap-2 items-center">
+              <button type="button" id="send-otp" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs shadow ring-1 ring-black/5">Send verification code</button>
+              <input id="otp-code" class="bg-white border border-slate-300 p-2 rounded w-36 focus:ring-2 focus:ring-indigo-500/60" placeholder="6-digit code" maxlength="6" />
+              <button type="button" id="check-otp" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs shadow ring-1 ring-black/5">Verify number</button>
+              <span id="otp-status" class="text-xs text-slate-700"></span>
+            </div>
+            <div id="tf-call-note" class="hidden text-[12px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">✅ Number verified. You may receive a call from a <strong>toll-free</strong> number to connect you with a specialist. If you miss it, call back from that number.</div>
+            <div id="recaptcha-container"></div>
+          </div>
+          <select name="f_whereyoulive" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60"><option value="" disabled selected>Select Your State</option></select>
+          <label class="flex items-start gap-2 text-[11px] text-slate-700"><input type="checkbox" id="tcpa" required class="mt-1"><span>By clicking, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts). Your consent is not required to purchase. Message/data rates may apply.</span></label>
+          <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-base py-3 rounded-xl transition disabled:opacity-60 disabled:cursor-not-allowed shadow">Select amount to continue</button>
+          <div id="form-error" class="text-rose-600 font-semibold text-center text-sm hidden"></div>
+        `;
+        wrapper.appendChild(form);
+        DOM.chatWindow.appendChild(wrapper);
+        requestAnimationFrame(() => {
+          const y = wrapper.offsetTop - DOM.qbar.offsetHeight - 8;
+          DOM.scrollBox.scrollTop = Math.max(0, y);
+          updateSticky();
+        });
 
-      // State options
-      const stateSelect=form.querySelector('select[name="f_whereyoulive"]'); allStates.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; stateSelect.appendChild(o); });
+        const footer = document.createElement('div');
+        footer.className = 'text-center mt-2';
+        const abandon = document.createElement('button');
+        abandon.type = 'button';
+        abandon.className = 'text-rose-600 hover:text-rose-700 text-xs';
+        abandon.textContent = 'Abandon Survey';
+        abandon.addEventListener('click', () => App.goToStep('leaveSurvey'));
+        footer.appendChild(abandon);
+        wrapper.appendChild(footer);
 
-      const MIN_QUAL=10000, MAX_DEBT=100000;
-      const debtSlider=form.querySelector('#debt-slider'), debtDisplay=form.querySelector('#debt-amount-display'), debtNumber=form.querySelector('#debt-number');
-      const submitBtn=form.querySelector('#submit-btn'), debtConfirmedEl=form.querySelector('#debt-confirmed');
-      const debtWarning=form.querySelector('#debt-warning'), moveHint=form.querySelector('#move-hint');
-      const fmt=n=> new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
-      const toInt=s=>{ const n=parseInt(String(s||'').replace(/[^\d]/g,''),10); return isNaN(n)?0:n; };
+        const stateSelect = form.querySelector('select[name="f_whereyoulive"]');
+        ASSETS.allStates.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; stateSelect.appendChild(o); });
 
-      function setSubmitState(){ const v=parseInt(debtSlider?.value||'0',10)||0; const confirmed=debtConfirmedEl.value==='1'; const state=stateSelect.value; const consentOK=form.querySelector('#tcpa')?.checked; const amountOK=confirmed && v>=MIN_QUAL; const stateOK=!!state && !excludedStates.includes(state); const otpOK=window.otpOK===true; if(moveHint) moveHint.classList.toggle('hidden', confirmed); let btnText='See If I Qualify'; if(!confirmed) btnText='Select amount to continue'; else if(v<MIN_QUAL) btnText='Minimum $10,000 required'; else if(!otpOK) btnText='Verify your phone to continue'; else if(!consentOK) btnText='Consent required'; else if(!stateOK) btnText='State not serviced'; submitBtn.disabled=!(amountOK&&stateOK&&consentOK&&otpOK); submitBtn.textContent=btnText; debtWarning?.classList.toggle('hidden', v>=MIN_QUAL); }
+        const MIN_QUAL = 10000, MAX_DEBT = 100000;
+        const debtSlider = form.querySelector('#debt-slider'), debtDisplay = form.querySelector('#debt-amount-display'), debtNumber = form.querySelector('#debt-number');
+        const submitBtn = form.querySelector('#submit-btn'), debtConfirmedEl = form.querySelector('#debt-confirmed');
+        const debtWarning = form.querySelector('#debt-warning'), moveHint = form.querySelector('#move-hint');
+        
+        const setSubmitState = () => {
+          const v = parseInt(debtSlider?.value || '0', 10) || 0;
+          const confirmed = debtConfirmedEl.value === '1';
+          const stateValue = stateSelect.value;
+          const consentOK = form.querySelector('#tcpa')?.checked;
+          const amountOK = confirmed && v >= MIN_QUAL;
+          const stateOK = !!stateValue && !ASSETS.excludedStates.includes(stateValue);
+          const otpOK = state.otpVerified;
+          if (moveHint) moveHint.classList.toggle('hidden', confirmed);
+          let btnText = 'See If I Qualify';
+          if (!confirmed) btnText = 'Select amount to continue';
+          else if (v < MIN_QUAL) btnText = 'Minimum $10,000 required';
+          else if (!otpOK) btnText = 'Verify your phone to continue';
+          else if (!consentOK) btnText = 'Consent required';
+          else if (!stateOK) btnText = 'State not serviced';
+          submitBtn.disabled = !(amountOK && stateOK && consentOK && otpOK);
+          submitBtn.textContent = btnText;
+          debtWarning?.classList.toggle('hidden', v >= MIN_QUAL);
+        };
 
-      function applyAmount(raw){ const clamped=Math.max(0, Math.min(MAX_DEBT, Math.round(raw||0))); debtSlider.value=String(clamped); debtNumber.value=clamped.toLocaleString('en-US'); debtDisplay.textContent= clamped>=MAX_DEBT ? `${fmt(clamped)}+` : fmt(clamped); debtConfirmedEl.value='1'; setSubmitState(); }
+        const applyAmount = (raw) => {
+          const clamped = Math.max(0, Math.min(MAX_DEBT, Math.round(raw || 0)));
+          debtSlider.value = String(clamped);
+          debtNumber.value = clamped.toLocaleString('en-US');
+          debtDisplay.textContent = clamped >= MAX_DEBT ? `${formatCurrency(clamped)}+` : formatCurrency(clamped);
+          debtConfirmedEl.value = '1';
+          setSubmitState();
+        };
 
-      // Initialize amount (use prefill if set)
-      if (typeof prefillDebtAmount === 'number' && prefillDebtAmount > 0) { applyAmount(prefillDebtAmount); }
-      else { applyAmount(parseInt(debtSlider.value,10) || 25000); }
+        if (typeof state.prefillDebtAmount === 'number' && state.prefillDebtAmount > 0) {
+          applyAmount(state.prefillDebtAmount);
+        } else {
+          applyAmount(parseInt(debtSlider.value, 10) || 25000);
+        }
 
-      // Bind slider + input (robust across browsers)
-      const syncFromSlider=()=> applyAmount(Number(debtSlider.value)||0);
-      debtSlider.addEventListener('input', syncFromSlider, {passive:true});
-      debtSlider.addEventListener('change', syncFromSlider);
-      debtSlider.addEventListener('pointerup', syncFromSlider);
-      debtSlider.addEventListener('touchend', syncFromSlider);
-      debtSlider.addEventListener('keyup', (e)=>{ if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(e.key)) syncFromSlider(); });
-      const syncFromInput=()=> applyAmount(toInt(debtNumber.value));
-      debtNumber.addEventListener('input', syncFromInput);
-      debtNumber.addEventListener('change', syncFromInput);
-      debtNumber.addEventListener('blur', ()=>{ const v=toInt(debtNumber.value); debtNumber.value=v? v.toLocaleString('en-US'):''; });
+        const syncFromSlider = () => applyAmount(Number(debtSlider.value) || 0);
+        debtSlider.addEventListener('input', syncFromSlider, { passive: true });
+        debtSlider.addEventListener('change', syncFromSlider);
+        debtSlider.addEventListener('pointerup', syncFromSlider);
+        debtSlider.addEventListener('touchend', syncFromSlider);
+        debtSlider.addEventListener('keyup', (e) => {
+          if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(e.key)) syncFromSlider();
+        });
+        const syncFromInput = () => applyAmount(toInt(debtNumber.value));
+        debtNumber.addEventListener('input', syncFromInput);
+        debtNumber.addEventListener('change', syncFromInput);
+        debtNumber.addEventListener('blur', () => { const v = toInt(debtNumber.value); debtNumber.value = v ? v.toLocaleString('en-US') : ''; });
 
-      stateSelect.addEventListener('change', setSubmitState);
-      form.querySelector('#tcpa').addEventListener('change', setSubmitState);
+        stateSelect.addEventListener('change', setSubmitState);
+        form.querySelector('#tcpa').addEventListener('change', setSubmitState);
 
-      // Email validation UI
-      const emailInput=form.querySelector('#f_email'); const emailHint=form.querySelector('#email-hint');
-      const runEmailUI=async()=>{ if(!emailInput.value){ emailHint.textContent=''; return; } emailHint.textContent='Checking email…'; const res=await validateEmailWithWorker(emailInput.value); if(res.ok){ let msg='✅ Valid'; if(res.suggestion) msg+=` (did you mean ${emailInput.value.split('@')[0]}@${res.suggestion}?)`; if(res.disposable) msg='⚠️ Disposable address detected. Use a personal/work email.'; if(res.info?.role) msg='⚠️ Role account not accepted.'; if(res.info?.plusAnywhere) msg='⚠️ Plus-alias not accepted.'; if(res.info?.gmailDot) msg='⚠️ Gmail dot alias not accepted.'; emailHint.textContent=msg; emailHint.classList.toggle('text-emerald-700', !res.disposable && !res.info?.role && !res.info?.plusAnywhere && !res.info?.gmailDot); emailHint.classList.toggle('text-amber-700', !!(res.disposable||res.info?.role||res.info?.plusAnywhere||res.info?.gmailDot)); emailHint.classList.remove('text-rose-600'); } else { emailHint.textContent=`❌ ${res.error}`; emailHint.classList.add('text-rose-600'); emailHint.classList.remove('text-emerald-700','text-amber-700'); } };
-      emailInput.addEventListener('blur', runEmailUI); emailInput.addEventListener('change', runEmailUI);
+        const emailInput = form.querySelector('#f_email');
+        const emailHint = form.querySelector('#email-hint');
+        const runEmailUI = async () => {
+          if (!emailInput.value) { emailHint.textContent = ''; return; }
+          emailHint.textContent = 'Checking email…';
+          const res = await validateEmail(emailInput.value);
+          if (res.ok) {
+            let msg = '✅ Valid';
+            if (res.disposable) msg = '⚠️ Disposable address detected. Use a personal/work email.';
+            if (res.info?.role) msg = '⚠️ Role account not accepted.';
+            if (res.info?.plusAnywhere) msg = '⚠️ Plus-alias not accepted.';
+            if (res.info?.gmailDot) msg = '⚠️ Gmail dot alias not accepted.';
+            emailHint.textContent = msg;
+            emailHint.classList.toggle('text-emerald-700', !res.disposable && !res.info?.role && !res.info?.plusAnywhere && !res.info?.gmailDot);
+            emailHint.classList.toggle('text-amber-700', !!(res.disposable || res.info?.role || res.info?.plusAnywhere || res.info?.gmailDot));
+            emailHint.classList.remove('text-rose-600');
+          } else {
+            emailHint.textContent = `❌ ${res.error}`;
+            emailHint.classList.add('text-rose-600');
+            emailHint.classList.remove('text-emerald-700', 'text-amber-700');
+          }
+        };
+        emailInput.addEventListener('blur', runEmailUI);
+        emailInput.addEventListener('change', runEmailUI);
 
-      // Phone validation + OTP
-      const phoneInput=form.querySelector('#f_phone'); const phoneHint=form.querySelector('#phone-hint'); const tfCallNote=document.getElementById('tf-call-note');
-      const runPhoneUI=async()=>{ if(!phoneInput.value){ phoneHint.textContent=''; return; } phoneHint.textContent='Checking number…'; const res=await validatePhoneWithSignalWire(phoneInput.value); if(res.ok){ const extra=res?.meta?.tollFree?' (toll-free)':''; phoneHint.textContent=`✅ ${res.e164}${extra}`; phoneHint.classList.add('text-emerald-700'); phoneHint.classList.remove('text-rose-600','text-amber-700'); } else { phoneHint.textContent=`❌ ${res.error}`; phoneHint.classList.add('text-rose-600'); phoneHint.classList.remove('text-emerald-700','text-amber-700'); } };
-      phoneInput.addEventListener('blur', runPhoneUI); phoneInput.addEventListener('change', runPhoneUI);
+        const phoneInput = form.querySelector('#f_phone');
+        const phoneHint = form.querySelector('#phone-hint');
+        const tfCallNote = document.getElementById('tf-call-note');
+        const runPhoneUI = async () => {
+          if (!phoneInput.value) { phoneHint.textContent = ''; return; }
+          phoneHint.textContent = 'Checking number…';
+          const res = await validatePhone(phoneInput.value);
+          if (res.ok) {
+            const extra = res?.meta?.tollFree ? ' (toll-free)' : '';
+            phoneHint.textContent = `✅ ${res.e164}${extra}`;
+            phoneHint.classList.add('text-emerald-700');
+            phoneHint.classList.remove('text-rose-600', 'text-amber-700');
+          } else {
+            phoneHint.textContent = `❌ ${res.error}`;
+            phoneHint.classList.add('text-rose-600');
+            phoneHint.classList.remove('text-emerald-700', 'text-amber-700');
+          }
+        };
+        phoneInput.addEventListener('blur', runPhoneUI);
+        phoneInput.addEventListener('change', runPhoneUI);
 
-      const sendBtn=form.querySelector('#send-otp'); const checkBtn=form.querySelector('#check-otp'); const codeInput=form.querySelector('#otp-code'); const statusEl=form.querySelector('#otp-status'); const recaptchaDiv=form.querySelector('#recaptcha-container');
-      let verifier; function ensureRecaptcha(){ if(!verifier){ verifier=new RecaptchaVerifier(auth, recaptchaDiv, { size:'invisible' }); } return verifier; }
+        const sendBtn = form.querySelector('#send-otp');
+        const checkBtn = form.querySelector('#check-otp');
+        const codeInput = form.querySelector('#otp-code');
+        const statusEl = form.querySelector('#otp-status');
+        const recaptchaDiv = form.querySelector('#recaptcha-container');
+        let verifier;
+        const ensureRecaptcha = () => {
+          if (!verifier) verifier = new RecaptchaVerifier(auth, recaptchaDiv, { size: 'invisible' });
+          return verifier;
+        };
 
-      sendBtn.addEventListener('click', async ()=>{ const parsed=parseStrictNANP(phoneInput.value); if(!parsed.ok){ statusEl.textContent=parsed.error; statusEl.className='text-xs text-rose-600'; return; } try{ statusEl.textContent='Sending code…'; statusEl.className='text-xs text-slate-700'; confirmationResult=await signInWithPhoneNumber(auth, parsed.e164, ensureRecaptcha()); statusEl.textContent='Code sent. Check SMS.'; statusEl.className='text-xs text-emerald-700'; }catch(e){ statusEl.textContent=`Failed to send (${e?.code||'unknown'}): ${e?.message||e}`; statusEl.className='text-xs text-rose-600'; } });
+        sendBtn.addEventListener('click', async () => {
+          const parsed = parseStrictNANP(phoneInput.value);
+          if (!parsed.ok) { statusEl.textContent = parsed.error; statusEl.className = 'text-xs text-rose-600'; return; }
+          try {
+            statusEl.textContent = 'Sending code…';
+            statusEl.className = 'text-xs text-slate-700';
+            state.confirmationResult = await signInWithPhoneNumber(auth, parsed.e164, ensureRecaptcha());
+            statusEl.textContent = 'Code sent. Check SMS.';
+            statusEl.className = 'text-xs text-emerald-700';
+          } catch (e) {
+            statusEl.textContent = `Failed to send (${e?.code || 'unknown'}): ${e?.message || e}`;
+            statusEl.className = 'text-xs text-rose-600';
+          }
+        });
 
-      checkBtn.addEventListener('click', async ()=>{ const code=(codeInput.value||'').trim(); if(!confirmationResult){ statusEl.textContent='Click "Send verification code" first.'; statusEl.className='text-xs text-rose-600'; return; } if(code.length!==6){ statusEl.textContent='Enter the 6-digit code.'; statusEl.className='text-xs text-rose-600'; return; } try{ statusEl.textContent='Verifying…'; statusEl.className='text-xs text-slate-700'; await confirmationResult.confirm(code); window.otpOK=true; statusEl.textContent='Verified ✓'; statusEl.className='text-xs text-emerald-700'; if(tfCallNote) tfCallNote.classList.remove('hidden'); setSubmitState(); }catch(e){ window.otpOK=false; statusEl.textContent=`Verify failed. ${e?.code||''}`; statusEl.className='text-xs text-rose-600'; if(tfCallNote) tfCallNote.classList.add('hidden'); setSubmitState(); } });
+        checkBtn.addEventListener('click', async () => {
+          const code = (codeInput.value || '').trim();
+          if (!state.confirmationResult) { statusEl.textContent = 'Click "Send verification code" first.'; statusEl.className = 'text-xs text-rose-600'; return; }
+          if (code.length !== 6) { statusEl.textContent = 'Enter the 6-digit code.'; statusEl.className = 'text-xs text-rose-600'; return; }
+          try {
+            statusEl.textContent = 'Verifying…';
+            statusEl.className = 'text-xs text-slate-700';
+            await state.confirmationResult.confirm(code);
+            state.otpVerified = true;
+            statusEl.textContent = 'Verified ✓';
+            statusEl.className = 'text-xs text-emerald-700';
+            if (tfCallNote) tfCallNote.classList.remove('hidden');
+            setSubmitState();
+          } catch (e) {
+            state.otpVerified = false;
+            statusEl.textContent = `Verify failed. ${e?.code || ''}`;
+            statusEl.className = 'text-xs text-rose-600';
+            if (tfCallNote) tfCallNote.classList.add('hidden');
+            setSubmitState();
+          }
+        });
 
-      phoneInput.addEventListener('input', ()=>{ window.otpOK=false; statusEl.textContent=''; if(tfCallNote) tfCallNote.classList.add('hidden'); setSubmitState(); });
+        phoneInput.addEventListener('input', () => { state.otpVerified = false; statusEl.textContent = ''; if (tfCallNote) tfCallNote.classList.add('hidden'); setSubmitState(); });
+        form.addEventListener('submit', handleApiFormSubmit);
+      };
 
-      form.addEventListener('submit', handleApiFormSubmit);
-    }
+      const handleApiFormSubmit = async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const submitButton = form.querySelector('#submit-btn');
+        const formError = form.querySelector('#form-error');
+        formError.classList.add('hidden');
+        if (!state.otpVerified) { formError.textContent = 'Please verify your phone number to continue.'; formError.classList.remove('hidden'); return; }
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<div class="loader mx-auto"></div>';
+        
+        DOM.formSubmitOverlay.classList.remove('hidden');
+        
+        const debtAmount = parseInt(form.querySelector('#debt-slider').value, 10) || 0;
+        const selectedState = form.querySelector('select[name="f_whereyoulive"]').value;
+        const confirmed = (document.getElementById('debt-confirmed')?.value === '1');
+        
+        const errors = [];
+        if (!confirmed) errors.push('Please confirm your debt amount by moving the slider or typing the exact amount.');
+        if (debtAmount < 10000) errors.push('Minimum debt of $10,000 is required to qualify.');
+        if (ASSETS.excludedStates.includes(selectedState)) errors.push('Unfortunately, we do not service your state at this time.');
+        if (!form.querySelector('#tcpa')?.checked) errors.push('Please agree to the consent to continue.');
+        
+        const emailRaw = form.querySelector('input[name="f_email"]').value || '';
+        const emailCheck = await validateEmail(emailRaw);
+        if (!emailCheck.ok || emailCheck.disposable || emailCheck.info?.role || emailCheck.info?.plusAnywhere || emailCheck.info?.gmailDot) {
+            errors.push(emailCheck.ok ? 'Please use a personal, non-role, non-alias email.' : (emailCheck.error || 'Invalid email.'));
+        }
+        
+        const phoneRaw = form.querySelector('input[name="f_phone"]').value || '';
+        const phoneCheck = await validatePhone(phoneRaw);
+        if (!phoneCheck.ok) {
+            errors.push(phoneCheck.error || 'Please enter a valid phone number.');
+        }
+        
+        if (errors.length > 0) {
+            DOM.formSubmitOverlay.classList.add('hidden');
+            formError.innerHTML = errors.join('<br>');
+            formError.classList.remove('hidden');
+            submitButton.disabled = false;
+            submitButton.textContent = 'See If I Qualify';
+            return;
+        }
+        
+        const normalizedEmail = emailCheck.normalized;
+        let emailStatusTag = 'normal';
+        if (emailCheck.disposable) emailStatusTag = 'disposable';
+        else if (emailCheck.info?.role) emailStatusTag = 'role';
+        else if (emailCheck.info?.plusAnywhere) emailStatusTag = 'plus';
+        else if (emailCheck.info?.gmailDot) emailStatusTag = 'gmaildot';
 
-    async function handleApiFormSubmit(e){
-      e.preventDefault();
-      const form=e.target; const submitButton=form.querySelector('#submit-btn'); const formError=form.querySelector('#form-error'); formError.classList.add('hidden');
-      if(!window.otpOK){ formError.textContent='Please verify your phone number to continue.'; formError.classList.remove('hidden'); return; }
-      submitButton.disabled=true; submitButton.innerHTML='<div class="loader mx-auto"></div>';
+        const normalizedE164 = phoneCheck.e164 || phoneRaw;
+        const phoneType = phoneCheck.type || 'unknown';
+        const isTollFree = !!(phoneCheck.meta && phoneCheck.meta.tollFree);
 
-      const debtAmount=parseInt(form.querySelector('#debt-slider').value,10)||0; const selectedState=form.querySelector('select[name="f_whereyoulive"]').value; const confirmed=(document.getElementById('debt-confirmed')?.value==='1');
-      if(!confirmed){ formError.textContent='Please confirm your debt amount by moving the slider or typing the exact amount.'; formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
-      if(debtAmount<10000){ formError.textContent='Minimum debt of $10,000 is required to qualify.'; formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
-      if(['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','RI'].includes(selectedState)){ formError.textContent='Unfortunately, we do not service your state at this time.'; formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
-      if(!form.querySelector('#tcpa')?.checked){ formError.textContent='Please agree to the consent to continue.'; formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
+        const formData = new FormData(form);
+        const data1 = (new URLSearchParams(location.search).get('data1') || new URLSearchParams(location.search).get('click_id') || new URLSearchParams(location.search).get('gclid') || new URLSearchParams(location.search).get('fbclid') || new URLSearchParams(location.search).get('msclkid') || '') || state.transactionId || 'no_click_id';
 
-      const emailRaw=form.querySelector('input[name="f_email"]').value||''; const emailCheck=await validateEmailWithWorker(emailRaw); if(!emailCheck.ok||emailCheck.disposable||emailCheck.info?.role||emailCheck.info?.plusAnywhere||emailCheck.info?.gmailDot){ formError.textContent=emailCheck.ok?'Please use a personal, non-role, non-alias email.':(emailCheck.error||'Invalid email.'); formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
-      const normalizedEmail=emailCheck.normalized; let emailStatusTag='normal'; if(emailCheck.disposable) emailStatusTag='disposable'; else if(emailCheck.info?.role) emailStatusTag='role'; else if(emailCheck.info?.plusAnywhere) emailStatusTag='plus'; else if(emailCheck.info?.gmailDot) emailStatusTag='gmaildot';
+        const curadebtPayload = new URLSearchParams();
+        curadebtPayload.append('f_fname', formData.get('f_fname') || '');
+        curadebtPayload.append('f_lname', formData.get('f_lname') || '');
+        curadebtPayload.append('f_email', normalizedEmail);
+        curadebtPayload.append('f_phone', normalizedE164.startsWith('+1') ? normalizedE164.replace('+1', '') : normalizedE164);
+        curadebtPayload.append('f_whereyoulive', formData.get('f_whereyoulive') || '');
+        curadebtPayload.append('f_totaldebt', String(debtAmount));
+        curadebtPayload.append('f_comments', `Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree}`);
+        curadebtPayload.append('data1', data1);
+        curadebtPayload.append('data2', 'CLICKID2');
+        curadebtPayload.append('f_ip', state.clientIp);
 
-      const phoneRaw=form.querySelector('input[name="f_phone"]').value||''; const phoneCheck=await validatePhoneWithSignalWire(phoneRaw); if(!phoneCheck.ok){ formError.textContent=phoneCheck.error||'Please enter a valid phone number.'; formError.classList.remove('hidden'); submitButton.disabled=false; submitButton.textContent='See If I Qualify'; return; }
-      const normalizedE164=phoneCheck.e164||phoneRaw; const phoneType=phoneCheck.type||'unknown'; const isTollFree=!!(phoneCheck.meta&&phoneCheck.meta.tollFree);
+        const tdPayload = new URLSearchParams();
+        const qs = new URLSearchParams(location.search);
+        tdPayload.append('lead_token', '3346b0458309406ba4b8beac90a8a532');
+        tdPayload.append('traffic_source_id', '1000');
+        tdPayload.append('caller_id', normalizedE164);
+        tdPayload.append('call_now', '1');
+        tdPayload.append('first_name', formData.get('f_fname') || '');
+        tdPayload.append('last_name', formData.get('f_lname') || '');
+        tdPayload.append('email', normalizedEmail);
+        tdPayload.append('state', formData.get('f_whereyoulive') || '');
+        tdPayload.append('zip', formData.get('f_zip') || '');
+        tdPayload.append('ip_address', state.clientIp || '');
+        tdPayload.append('source_url', location.href);
+        tdPayload.append('useragent', navigator.userAgent || '');
+        tdPayload.append('original_lead_submit_date', new Date().toISOString().replace('T', ' ').slice(0, 19));
+        tdPayload.append('tcpa_opt_in', 'true');
+        tdPayload.append('tcpa_optin_consent_language', (document.querySelector('label[for="tcpa"] span')?.innerText || 'TCPA consent captured').trim());
+        tdPayload.append('sub_id', data1);
+        tdPayload.append('gclid', qs.get('gclid') || '');
+        tdPayload.append('fbeventid', qs.get('fbclid') || '');
+        tdPayload.append('msclkid', qs.get('msclkid') || '');
+        tdPayload.append('traffic_source_lead_id', state.transactionId);
 
-      try{ const r=await fetch('https://api.ipify.org?format=json'); const j=await r.json(); clientIp=j.ip||''; }catch{ clientIp=''; }
+        try {
+            await Promise.all([
+                fetchWithExponentialBackoff(API_CONFIG.curadebt, { method: 'POST', body: curadebtPayload }),
+                fetchWithExponentialBackoff(API_CONFIG.trackdrive, { method: 'POST', body: tdPayload })
+            ]);
+            addAnswer("Form submitted");
+            goToStep('formSuccess');
+        } catch (e) {
+            console.error('Submission failed:', e);
+            formError.textContent = 'There was a problem submitting your information. Please try again.';
+            formError.classList.remove('hidden');
+        } finally {
+            DOM.formSubmitOverlay.classList.add('hidden');
+            submitButton.disabled = false;
+            submitButton.textContent = 'See If I Qualify';
+        }
+      };
 
-      const hidden=document.getElementById('hidden-curadebt-post'); const fd=new FormData(form);
-      const data1=(new URLSearchParams(location.search).get('data1')|| new URLSearchParams(location.search).get('click_id')|| new URLSearchParams(location.search).get('gclid')|| new URLSearchParams(location.search).get('fbclid')|| new URLSearchParams(location.search).get('msclkid')|| '') || transactionId || 'no_click_id';
-      hidden.elements['f_fname'].value=fd.get('f_fname')||'';
-      hidden.elements['f_lname'].value=fd.get('f_lname')||'';
-      hidden.elements['f_email'].value=normalizedEmail;
-      hidden.elements['f_phone'].value= normalizedE164.startsWith('+1')? normalizedE164.replace('+1','') : normalizedE164;
-      hidden.elements['f_whereyoulive'].value=fd.get('f_whereyoulive')||'';
-      hidden.elements['f_totaldebt'].value=String(debtAmount);
-      hidden.elements['data1'].value=data1;
-      hidden.elements['f_comments'].value=`Lead from AI Chatbot Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree}`;
-      hidden.elements['data2'].value='CLICKID2';
-      hidden.elements['f_ip'].value=clientIp;
-      hidden.submit();
+      const showIframeForm = (iframeSrc, onContinue) => {
+        const c = document.createElement('div');
+        c.className = 'sticky bottom-0 w-full safe-bottom pt-2';
+        DOM.chatInputArea.innerHTML = '';
+        const w = document.createElement('div');
+        w.className = 'w-full h-[70vh] flex-grow bg-white rounded-xl p-1 ring-1 ring-slate-200';
+        const iframe = document.createElement('iframe');
+        const rid = state.transactionId || (window.__rid ||= ('tx_' + Date.now()));
+        iframe.src = `${iframeSrc}?rid=${encodeURIComponent(rid)}`;
+        iframe.className = 'w-full h-full border-0 rounded-md';
+        iframe.setAttribute('loading', 'lazy');
+        iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+        w.appendChild(iframe);
+        DOM.chatWindow.appendChild(w);
+        requestAnimationFrame(() => {
+          const y = w.offsetTop - DOM.qbar.offsetHeight - 8;
+          DOM.scrollBox.scrollTop = Math.max(0, y);
+          updateSticky();
+        });
+        const btn = document.createElement('button');
+        btn.className = 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-base py-3 px-6 rounded-xl transition mt-4 shadow';
+        btn.textContent = "I've Submitted My Feedback";
+        btn.onclick = () => { w.remove(); onContinue(); };
+        c.appendChild(btn);
+        addAbandon(c);
+        DOM.chatInputArea.appendChild(c);
+        ensureBottom();
+      };
 
-      const tdForm=document.getElementById('hidden-trackdrive-post'); const qs=new URLSearchParams(location.search);
-      const gclid=qs.get('gclid')||''; const fbeventid=qs.get('fbclid')||''; const msclkid=qs.get('msclkid')||'';
-      tdForm.elements['caller_id'].value=normalizedE164;
-      tdForm.elements['first_name'].value=fd.get('f_fname')||'';
-      tdForm.elements['last_name'].value=fd.get('f_lname')||'';
-      tdForm.elements['email'].value=normalizedEmail;
-      tdForm.elements['state'].value=fd.get('f_whereyoulive')||'';
-      tdForm.elements['zip'].value=fd.get('f_zip')||'';
-      tdForm.elements['ip_address'].value=clientIp||'';
-      tdForm.elements['source_url'].value=location.href;
-      tdForm.elements['useragent'].value=navigator.userAgent||'';
-      tdForm.elements['original_lead_submit_date'].value=new Date().toISOString().replace('T',' ').slice(0,19);
-      tdForm.elements['tcpa_opt_in'].value='true';
-      tdForm.elements['tcpa_optin_consent_language'].value=(document.querySelector('label[for="tcpa"] span')?.innerText||'TCPA consent captured').trim();
-      tdForm.elements['sub_id'].value=data1;
-      tdForm.elements['gclid'].value=gclid;
-      tdForm.elements['fbeventid'].value=fbeventid;
-      tdForm.elements['msclkid'].value=msclkid;
-      tdForm.elements['traffic_source_lead_id'].value=transactionId;
-      tdForm.submit();
+      const init = async () => {
+        DOM.scrollBox.addEventListener('scroll', updateSticky, { passive: true });
+        const urlParams = new URLSearchParams(window.location.search);
+        state.transactionId = urlParams.get('transaction_id') || urlParams.get('RID') || `tx_${Date.now()}`;
+        try {
+          const r = await fetchWithExponentialBackoff(API_CONFIG.ip);
+          const j = await r.json();
+          state.clientIp = j.ip;
+        } catch {
+          state.clientIp = '';
+        }
+        showIntro();
+        updateSticky();
+      };
 
-      addAnswer("Form submitted");
-      goToStep('formSuccess');
-    }
+      return { init, goToStep };
+    })();
 
-    function showIframeForm(iframeSrc, onContinue) {
-      const c=createBaseContainer();
-      const w=document.createElement('div'); w.className='w-full h-[70vh] flex-grow bg-white rounded-xl p-1 ring-1 ring-slate-200';
-      const iframe=document.createElement('iframe');
-      const rid=transactionId || (window.__rid ||= ('tx_'+Date.now()));
-      iframe.src=`${iframeSrc}?rid=${encodeURIComponent(rid)}`;
-      iframe.className='w-full h-full border-0 rounded-md';
-      iframe.setAttribute('loading','lazy');
-      iframe.setAttribute('referrerpolicy','no-referrer-when-downgrade');
-      w.appendChild(iframe);
-      chatWindow.appendChild(w);
-      requestAnimationFrame(()=>{ const y = w.offsetTop - qbar.offsetHeight - 8; scrollBox.scrollTop = Math.max(0, y); updateSticky(); });
-      const btn=document.createElement('button'); btn.className='bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-base py-3 px-6 rounded-xl transition mt-4 shadow'; btn.textContent="I've Submitted My Feedback"; btn.onclick=()=>{ w.remove(); onContinue(); };
-      c.appendChild(btn);
-      addAbandon(c); chatInputArea.innerHTML=''; chatInputArea.appendChild(c); ensureBottom();
-    }
-
-    async function init(){ const urlParams=new URLSearchParams(window.location.search); transactionId=urlParams.get('transaction_id')||urlParams.get('RID')||`tx_${Date.now()}`; try{ const r=await fetch('https://api.ipify.org?format=json'); const j=await r.json(); clientIp=j.ip; }catch{ clientIp=''; } showIntro(); updateSticky(); }
-    init();
+    window.addEventListener('DOMContentLoaded', () => {
+      App.init();
+    });
   </script>
 </body>
 </html>
-
 

@@ -135,6 +135,9 @@
         <div class="mt-4 w-full h-[600px] border-4 border-gray-200 rounded-lg overflow-hidden">
             <iframe id="brevo-iframe" src="https://digitalresearch1.github.io/debt/brevo.html" class="w-full h-full border-0"></iframe>
         </div>
+        <div class="mt-4 flex justify-center">
+            <button id="confirmBrevoButton" class="action-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg">I've Submitted My Feedback</button>
+        </div>
     </div>
     
     <div class="mt-8 flex justify-center gap-4">
@@ -194,6 +197,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const tcpaCheckbox = document.getElementById('tcpa');
     const submitBtn = document.getElementById('submit-btn');
     const formError = document.getElementById('form-error');
+    const confirmBrevoButton = document.getElementById('confirmBrevoButton');
 
     // Utility Functions
     const formatCurrency = n => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n);
@@ -410,7 +414,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             ]);
             document.getElementById('debt-form').style.display = 'none';
             brevoIframeSection.classList.remove('hidden');
-            finishSurveyButton.classList.remove('disabled-btn');
             brevoIframeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (e) {
             console.error('Submission failed:', e);
@@ -431,6 +434,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     stateSelect.addEventListener('change', setSubmitState);
     tcpaCheckbox.addEventListener('change', setSubmitState);
     debtForm.addEventListener('submit', handleFormSubmit);
+    confirmBrevoButton.addEventListener('click', () => {
+        finishSurveyButton.classList.remove('disabled-btn');
+    });
 
     // Initial setup
     applyAmount(25000);
@@ -523,3 +529,4 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+

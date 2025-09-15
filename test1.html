@@ -141,6 +141,7 @@
     </div>
     
     <div class="mt-8 flex justify-center gap-4">
+        <button id="abandonSurveyButton" class="action-btn inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg">Abandon Survey</button>
         <button id="finishSurveyButton" class="action-btn inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg disabled-btn">Finish Survey</button>
     </div>
   </div>
@@ -198,6 +199,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const submitBtn = document.getElementById('submit-btn');
     const formError = document.getElementById('form-error');
     const confirmBrevoButton = document.getElementById('confirmBrevoButton');
+    const abandonSurveyButton = document.getElementById('abandonSurveyButton');
 
     // Utility Functions
     const formatCurrency = n => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n);
@@ -518,15 +520,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Survey Control Buttons
     const finishUrl = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${transactionId}`;
+    const abandonUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${transactionId}`;
     
     finishSurveyButton.addEventListener('click', function() {
         if (!this.classList.contains('disabled-btn')) {
             window.open(finishUrl, '_blank');
         }
     });
+
+    abandonSurveyButton.addEventListener('click', function() {
+        window.open(abandonUrl, '_blank');
+    });
 });
 </script>
 
 </body>
 </html>
-

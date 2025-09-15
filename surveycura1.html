@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chloe — Debt Relief Survey (Preview Safe, Working Slider)</title>
+  <title>Chloe — Debt Relief Survey (Updated)</title>
   <style>
     :root{--bg:#f6f7fb;--ink:#0f172a;--sub:#475569;--ring:#e2e8f0;--card:#ffffff;--grad1:#6366f1;--grad2:#a78bfa;--grad3:#ec4899}
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
-    .shell{max-width:420px;margin:32px auto;padding:0 16px}
-    .frame{display:flex;flex-direction:column;height:85vh;background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(140%);border:1px solid rgba(0,0,0,.05);border-radius:24px;box-shadow:0 20px 60px rgba(15,23,42,.08);overflow:hidden}
+    .shell{}
+    .frame{display:flex;flex-direction:column;height:100vh;background:var(--card);overflow:hidden}
     header{padding:14px 20px;background:linear-gradient(#fff,#ffffffb0);border-bottom:1px solid rgba(0,0,0,.06)}
     header .title{font-weight:700}
     .progress-wrap{padding:8px 20px 6px}
@@ -18,13 +18,38 @@
     .progress>div{height:8px;width:0;background:linear-gradient(90deg,var(--grad1),var(--grad2),var(--grad3));transition:width .5s}
     .scroll-area{position:relative;flex:1;overflow:hidden}
     #scroll-box{position:absolute;inset:0;overflow-y:auto}
-    #question-bar{background:#fff;border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(0,0,0,.06);padding:12px 20px}
-    .q-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#64748b}
-    #q-text{font-size:14px;font-weight:600;color:#0f172a}
+    
+    /* --- Question Appearance (Updated) --- */
+    #question-bar {
+        background: linear-gradient(135deg, #f5f3ff, #eef2ff);
+        border: none;
+        border-bottom: 1px solid var(--ring);
+        padding: 16px 20px;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, .04);
+    }
+    .q-label {
+        font-size: 12px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--grad1);
+        font-weight: 700;
+    }
+    #q-text {
+        font-size: 16px;
+        font-weight: 500;
+        color: #1e293b;
+        line-height: 1.5;
+    }
     #q-hint{font-size:11px;color:#64748b;margin-top:4px;display:none}
+    
     .history{padding:10px 16px 20px}
+    .history > .card {
+        max-width: 560px;
+        margin-left: auto;
+        margin-right: auto;
+    }
     .bubble{display:flex;justify-content:flex-end;margin:8px 0}
-    .bubble>div{background:#f1f5f9;border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:10px 12px;font-size:14px;box-shadow:0 2px 10px rgba(15,23,42,.05)}
+    .bubble>div{background:#f1f5f9;border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:10px 12px;font-size:14px;box-shadow:0 2px 10px rgba(15,23,42,.05); max-width: 75%; word-wrap: break-word;}
     footer{padding:12px 16px;background:linear-gradient(0deg,#fff,#ffffffb0);border-top:1px solid rgba(0,0,0,.06)}
     .btn{width:100%;text-align:left;padding:12px 14px;border-radius:9999px;background:#fff;border:1px solid #e2e8f0;box-shadow:0 1px 0 rgba(0,0,0,.03);font-weight:600;cursor:pointer}
     .btn:hover{background:#f8fafc}
@@ -55,6 +80,7 @@
     .otp-verify{background:linear-gradient(90deg,#10b981,#059669)}
     .otp-code{flex:1;min-width:140px;max-width:220px}
     .spacer{height:6px}
+    .muted{color:var(--sub);font-size:14px;}
   </style>
 </head>
 <body>
@@ -170,9 +196,14 @@
       qDebtRange: { message:'About how much unsecured debt do you have? (credit cards, personal loans, medical bills, etc.)', type:'multiple-choice', options:['Below $10,000','$10,000–$40,000','$40,000+'], action:(a)=>{ if(a==='Below $10,000') return goToStep('disqualify'); if(a==='$10,000–$40,000'){ prefillDebtAmount=25000; return goToStep('qIncome'); } if(a==='$40,000+'){ prefillDebtAmount=50000; return goToStep('qIncome'); } } },
       qIncome: { message:'Do you have a steady source of income?', type:'multiple-choice', options:['Yes','No'], action:(a)=> a==='Yes'? goToStep('qWilling'): goToStep('disqualify') },
       qWilling: { message:'As part of the study, are you willing to speak with a debt specialist for a free, no-obligation consultation?', type:'multiple-choice', options:['Yes','No'], action:(a)=> a==='Yes'? goToStep('preFormInfo'): goToStep('disqualify') },
-      preFormInfo: { message:`Fantastic! You've qualified for the study. The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist. Before I show you the form, I want to be transparent. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We've carefully researched and selected a reputable company, CuraDebt, to connect our participants with. They will be the ones to contact you. Just so you know what to expect, a debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years. It's a powerful option for many people. Your real-world experience with them is what makes this study so valuable. After you verify your phone number and submit this form, you may receive a call from a toll-free number (e.g., 800/833/844/855/866/877/888) to connect you directly to a specialist. If you miss it, you can call back from that number. Are you ready to take the next step?`, type:'multiple-choice', options:["Yes, I'm ready"], action:()=> goToStep('showApiForm') },
+      preFormInfo: { message:`
+        <strong>Fantastic! You've qualified for the study.</strong>
+        <p style="margin-top: 8px; margin-bottom: 8px;">The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We've carefully researched and selected a reputable company, <strong>CuraDebt</strong>, to connect our participants with.</p>
+        <p style="margin-top: 8px; margin-bottom: 8px;">A debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years.</p>
+        <p style="margin-top: 8px; margin-bottom: 8px;">After you submit this form, you may receive a call from <strong>+18553065699</strong> to connect you to a specialist. We will also send an email to confirm your participation and follow up with reminders.</p>
+        Are you ready to take the next step?`, type:'multiple-choice', options:["Yes, I'm ready"], action:()=> goToStep('showApiForm') },
       showApiForm: { message:"Excellent! Please complete the secure form below. I'll be here once you've submitted it.", type:'api-form' },
-      formSuccess: { message:'Thank you! Your information has been sent securely. Watch for a toll-free call to connect you to a debt specialist.', next:'askToContinueToFeedback' },
+      formSuccess: { message:'Thank you! Your information has been sent securely. Watch for a call from +18553065699 to connect you to a debt specialist. Also, check your email for confirmation.', next:'askToContinueToFeedback' },
       askToContinueToFeedback: { message:'Now for the final step. Ready to provide your feedback?', type:'multiple-choice', options:['Yes, Continue to Feedback'], action:()=> goToStep('askForFeedback') },
       askForFeedback: { message:"Please complete the form below. You'll need to enter your email address so we can match your feedback to your initial submission.", type:'iframe-form', next:'complete' },
       complete: { message:"That's everything! Thank you so much for your valuable feedback. You will now be redirected to finalize your entry.", end:true, status:21 },
@@ -196,7 +227,34 @@
       } else if(step.next){ goToStep(step.next); }
     }
 
-    function showIntro(){ chatWindow.innerHTML=''; chatInputArea.innerHTML=''; const card=document.createElement('div'); card.className='card'; card.innerHTML='<h3 style="margin:0 0 8px 0">Welcome to the AI Debt Settlement Survey</h3><div class="muted">Quick eligibility questions, secure verification, and an optional feedback form.</div><button id="begin-btn" class="cta" style="margin-top:12px">Begin Survey</button>'; chatWindow.appendChild(card); document.getElementById('begin-btn').onclick=()=>{ card.remove(); goToStep('start'); ensureBottom(); }; ensureBottom(); }
+    // --- Intro Page (Updated) ---
+    function showIntro(){
+        chatWindow.innerHTML='';
+        chatInputArea.innerHTML='';
+        const card=document.createElement('div');
+        card.className='card';
+        card.style.textAlign = 'center';
+        card.style.padding = '24px';
+        card.innerHTML=`
+            <div style="width:64px;height:64px;margin:0 auto 16px;border-radius:20px;background:linear-gradient(135deg,#6366f1,#a78bfa,#ec4899);display:grid;place-items:center;color:#fff;font-weight:800;font-size:32px;">C</div>
+            <h2 style="margin:0 0 8px 0; font-size: 22px; color: var(--ink);">Debt Relief Research Study</h2>
+            <div class="muted" style="font-size:15px; max-width: 300px; margin: 0 auto 16px;">Help us improve the debt settlement process. Your feedback is valuable.</div>
+            <ul style="text-align:left; max-width: 280px; margin: 24px auto; padding-left: 20px; font-size: 14px; color: var(--sub); list-style-type: '✓  ';">
+                <li style="margin-bottom: 8px; padding-left: 8px;">Answer a few quick questions.</li>
+                <li style="margin-bottom: 8px; padding-left: 8px;">Securely verify your information.</li>
+                <li style="margin-bottom: 8px; padding-left: 8px;">Provide optional feedback.</li>
+            </ul>
+            <button id="begin-btn" class="cta" style="margin-top:12px; background: linear-gradient(90deg, var(--grad1), var(--grad2));">Begin Secure Survey</button>
+        `;
+        chatWindow.appendChild(card);
+        document.getElementById('begin-btn').onclick=()=>{
+            card.remove();
+            goToStep('start');
+            ensureBottom();
+        };
+        ensureBottom();
+    }
+
 
     // ---- Form (preview-safe) ----
     function showApiForm(){
@@ -226,7 +284,7 @@
           <input id="otp-code" class="field otp-code" placeholder="6-digit code" inputmode="numeric" maxlength="6" aria-label="6-digit code">
           <button type="button" id="check-otp" class="otp-verify" aria-label="Verify number">Verify number</button>
         </div>
-        <div id="tf-call-note" class="notice">✅ Number verified. You may receive a call from a toll-free number.</div>
+        <div id="tf-call-note" class="notice">✅ Number verified. You may receive a call from +18553065699.</div>
         <select id="state" class="field" style="margin-top:8px"><option value="" disabled selected>Select Your State</option></select>
         <label style="display:flex;gap:8px;margin-top:8px;font-size:12px;color:#334155"><input id="tcpa" type="checkbox"> <span>By clicking, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts). Your consent is not required to purchase.</span></label>
         <button id="submit-btn" class="cta" disabled style="margin-top:10px">Select amount to continue</button>
@@ -326,5 +384,6 @@
   </script>
 </body>
 </html>
+
 
 

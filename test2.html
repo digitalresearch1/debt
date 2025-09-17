@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debt‑Relief Research — Step‑by‑Step Survey (Brevo Always Visible)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;background:#f6f7fb;color:#0f172a}
+    .card{background:#fff;border-radius:1.25rem;box-shadow:0 10px 30px rgba(2,6,23,.08)}
+    .hint{font-size:.9rem;color:#475569}
+    .err{color:#dc2626;font-size:.9rem}
+    .ok{color:#16a34a;font-size:.9rem}
+    .page{transition:transform .45s ease,opacity .45s ease}
+    .out-left{transform:translateX(-30px);opacity:0}
+    .in{transform:none;opacity:1}
+    input[type=range]{-webkit-appearance:none;width:100%;background:transparent;height:34px}
+    input[type=range]::-webkit-slider-runnable-track{height:8px;background:#e5e7eb;border-radius:9999px}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:26px;width:26px;border-radius:9999px;background:#2563eb;margin-top:-9px;border:3px solid #fff;box-shadow:0 0 6px rgba(0,0,0,.15)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:.875rem 1.25rem;border-radius:.875rem;font-weight:600}
+    .btn-primary{background:#4f46e5;color:#fff}
+    .btn-primary:hover{background:#4338ca}
+    .btn-success{background:#16a34a;color:#fff}
+    .btn-success:hover{background:#15803d}
+    .btn-muted{background:#e5e7eb;color:#111827}
+    .btn-muted:hover{background:#d1d5db}
+    .disabled{opacity:.5;pointer-events:none}
+  </style>
+</head>
+<body class="min-h-screen p-5 md:p-10">
+  <!-- Hidden POST target + forms -->
+  <iframe name="hidden_post_target" style="display:none"></iframe>
+  <form id="hidden-curadebt-post" action="https://signup.curadebt.com/apkconnect/" method="POST" target="hidden_post_target" style="display:none"></form>
+  <form id="hidden-trackdrive-post" action="https://estherkasinde.trackdrive.com/api/v1/leads" method="POST" target="hidden_post_target" style="display:none"></form>
+
+  <div class="max-w-2xl mx-auto card p-6 md:p-10">
+    <!-- Progress -->
+    <div class="mb-6">
+      <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+        <div id="progress" class="h-2 bg-indigo-500 rounded-full" style="width:0%"></div>
+      </div>
+      <p id="step_label" class="mt-2 text-sm text-slate-600"></p>
+    </div>
+
+    <!-- Stage content -->
+    <div id="stage" class="relative min-h-[260px]"></div>
+
+    <!-- Nav -->
+    <div class="mt-8 flex items-center justify-between gap-3">
+      <button id="abandon" type="button" class="btn btn-muted">Abandon survey</button>
+      <button id="next" class="btn btn-primary disabled" type="button">Next</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js';
+
+    // Firebase (OTP)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE",
+      authDomain: "otp-c6311.firebaseapp.com",
+      projectId: "otp-c6311",
+      storageBucket: "otp-c6311.firebasestorage.app",
+      messagingSenderId: "637495517002",
+      appId: "1:637495517002:web:7bd220994a7611a5606bb3"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Config
+    const EXCLUDED_STATES = ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','WY'];
+    const ALL_STATES = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"];
+    const SUCCESS_URL = 'https://spectrumsurveys.com/surveydone?st=21';
+    const DQ_URL = 'https://spectrumsurveys.com/surveydone?st=18';
+
+    // State
+    const S = {
+      i: 0,
+      txid: new URLSearchParams(location.search).get('transaction_id') || `tx_${Date.now()}`,
+      ip: '',
+      otpVerified: false,
+      confirmationResult: null,
+      recaptcha: null,
+      a: {} // answers
+    };
+
+    // Elements
+    const stage = document.getElementById('stage');
+    const nextBtn = document.getElementById('next');
+    const abandonBtn = document.getElementById('abandon');
+    const progress = document.getElementById('progress');
+    const stepLabel = document.getElementById('step_label');
+
+    // Helper
+    const fmtMoney = (n)=> new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
+    const q = (sel)=> stage.querySelector(sel);
+    const digits = (s)=> String(s||'').replace(/\D+/g,'');
+    function parseUSPhone(raw){
+      const d = digits(raw); const m = d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/); if(!m) return null; return `+1${m[1]}${m[2]}${m[3]}`;
+    }
+    function setProgress(){ progress.style.width = `${Math.round((S.i+1)/STEPS.length*100)}%`; stepLabel.textContent = `Step ${S.i+1} of ${STEPS.length}`; }
+    function go(i){ if(i<0||i>=STEPS.length) return; S.i=i; render(); }
+    function dq(){ location.href = `${DQ_URL}&transaction_id=${encodeURIComponent(S.txid)}`; }
+
+    // Fetch IP
+    fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>S.ip=d.ip).catch(()=>{});
+
+    // Steps (ONE question per page; purpose explained via questions)
+    const STEPS = [
+      // 0 Purpose — willingness
+      {
+        title: 'About this study',
+        html: `
+          <h2 class="text-2xl font-bold mb-2">This study improves how debt‑settlement is explained.</h2>
+          <p class="hint mb-4">We’ll ask a few short questions, then—if you choose—connect you to a trusted partner (CuraDebt) for a free consultation and later ask for brief feedback.</p>
+          <label class="block font-semibold mb-3">Are you willing to participate?</label>
+          <div class="flex gap-3">
+            <label class="inline-flex items-center gap-2"><input type="radio" name="willing" value="Yes"> <span>Yes</span></label>
+            <label class="inline-flex items-center gap-2"><input type="radio" name="willing" value="No"> <span>No</span></label>
+          </div>
+          <p class="err mt-2 hidden" data-err>Choose an option to continue.</p>
+        `,
+        validate(){
+          const v = stage.querySelector('input[name="willing"]:checked')?.value||''; if(v==='No') { dq(); return false; }
+          return v==='Yes';
+        },
+        store(){ S.a.willing = stage.querySelector('input[name="willing"]:checked')?.value; }
+      },
+
+      // 1 Purpose — data use consent preface (not TCPA yet)
+      {
+        title: 'How your info is used',
+        html: `
+          <p class="hint mb-4">Your info is used only to connect you with a specialist and to collect research feedback. We share details with CuraDebt to contact you. We don’t sell your info.</p>
+          <label class="block font-semibold mb-3">Do you agree to continue under these terms?</label>
+          <div class="flex gap-3">
+            <label class="inline-flex items-center gap-2"><input type="radio" name="terms_ok" value="Yes"> <span>Yes</span></label>
+            <label class="inline-flex items-center gap-2"><input type="radio" name="terms_ok" value="No"> <span>No</span></label>
+          </div>
+          <p class="err mt-2 hidden" data-err>Please confirm to continue.</p>
+        `,
+        validate(){
+          const v = stage.querySelector('input[name="terms_ok"]:checked')?.value||''; if(v==='No'){ dq(); return false; } return v==='Yes';
+        },
+        store(){ S.a.terms_ok = stage.querySelector('input[name="terms_ok"]:checked')?.value; }
+      },
+
+      // 2 Seeking help
+      {
+        title: 'Seeking help',
+        html: `
+          <label class="block font-semibold mb-3">Are you actively looking for help to reduce or resolve your unsecured debt?</label>
+          <div class="flex gap-3">
+            <label class="inline-flex items-center gap-2"><input type="radio" name="seeking" value="Yes"> <span>Yes</span></label>
+            <label class="inline-flex items-center gap-2"><input type="radio" name="seeking" value="Not right now"> <span>Not right now</span></label>
+          </div>
+          <p class="err mt-2 hidden" data-err>Choose an option.</p>
+        `,
+        validate(){
+          const v = stage.querySelector('input[name="seeking"]:checked')?.value||''; if(v==='Not right now'){ dq(); return false; } return v==='Yes';
+        },
+        store(){ S.a.seeking = stage.querySelector('input[name="seeking"]:checked')?.value; }
+      },
+
+      // 3 Debt amount
+      {
+        title: 'Your debt amount',
+        html: `
+          <div class="flex items-end justify-between mb-2">
+            <label class="block font-semibold">About how much unsecured debt do you have today?</label>
+            <div class="text-xl font-bold" id="debt_display">$25,000</div>
+          </div>
+          <input id="debt_slider" type="range" min="0" max="100000" step="1000" value="25000"/>
+          <p class="hint mt-1">Move the slider to the closest amount you owe. Minimum qualifying amount is $10,000.</p>
+          <p class="err mt-2 hidden" data-err>You must select at least $10,000 to qualify.</p>
+        `,
+        onmount(){
+          const d = stage.querySelector('#debt_slider');
+          const disp = stage.querySelector('#debt_display');
+          const upd=()=>{ const v=parseInt(d.value||'0',10); disp.textContent = v>=100000? `${fmtMoney(v)}+` : fmtMoney(v); };
+          d.addEventListener('input', upd); upd();
+        },
+        validate(){
+          const v = parseInt(stage.querySelector('#debt_slider').value||'0',10); if(v<10000){ return false;} return true;
+        },
+        store(){ S.a.debt = parseInt(stage.querySelector('#debt_slider').value||'0',10); }
+      },
+
+      // 4 State
+      {
+        title: 'Your state',
+        html: `
+          <label class="block font-semibold mb-2">Where do you live?</label>
+          <select id="state" class="w-full rounded-lg border border-slate-300 p-3"></select>
+          <p class="err mt-2 hidden" data-err>Please select an eligible state.</p>
+        `,
+        onmount(){
+          const sel = stage.querySelector('#state');
+          sel.innerHTML = `<option value="">Select your state</option>`;
+          ALL_STATES.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
+          if(S.a.state) sel.value = S.a.state;
+        },
+        validate(){
+          const v = stage.querySelector('#state').value; if(!v || EXCLUDED_STATES.includes(v)){ return false;} return true;
+        },
+        store(){ S.a.state = stage.querySelector('#state').value; }
+      },
+
+      // 5 Income
+      {
+        title: 'Income',
+        html: `
+          <label class="block font-semibold mb-3">Do you have a steady monthly income (job, self‑employed, or benefits)?</label>
+          <div class="flex gap-3">
+            <label class="inline-flex items-center gap-2"><input type="radio" name="income" value="Yes"> <span>Yes</span></label>
+            <label class="inline-flex items-center gap-2"><input type="radio" name="income" value="No"> <span>No</span></label>
+          </div>
+          <p class="err mt-2 hidden" data-err>Select an option to continue.</p>
+        `,
+        validate(){
+          const v = stage.querySelector('input[name="income"]:checked')?.value||''; if(v==='No'){ dq(); return false; } return v==='Yes';
+        },
+        store(){ S.a.income = stage.querySelector('input[name="income"]:checked')?.value; }
+      },
+
+      // 6 Help timing
+      {
+        title: 'Speak to a specialist',
+        html: `
+          <label class="block font-semibold mb-2">Would you like to speak with a debt specialist now?</label>
+          <div class="flex flex-col gap-2">
+            <label class="inline-flex items-center gap-2"><input type="radio" name="help" value="Connect me now (fastest)"> <span>Connect me now (fastest)</span></label>
+            <label class="inline-flex items-center gap-2"><input type="radio" name="help" value="Later today"> <span>Later today</span></label>
+            <label class="inline-flex items-center gap-2"><input type="radio" name="help" value="This week"> <span>This week</span></label>
+            <label class="inline-flex items-center gap-2"><input type="radio" name="help" value="Not right now"> <span>Not right now</span></label>
+          </div>
+          <p class="hint mt-2">Live transfers answer fastest. If you miss the call, you can call back from the same toll‑free number.</p>
+          <div id="best_wrap" class="mt-3 hidden">
+            <label class="block font-semibold mb-2">What time is usually best to reach you?</label>
+            <div class="flex flex-wrap gap-3">
+              <label class="inline-flex items-center gap-2"><input type="radio" name="best" value="Morning"> <span>Morning</span></label>
+              <label class="inline-flex items-center gap-2"><input type="radio" name="best" value="Afternoon"> <span>Afternoon</span></label>
+              <label class="inline-flex items-center gap-2"><input type="radio" name="best" value="Evening"> <span>Evening</span></label>
+              <label class="inline-flex items-center gap-2"><input type="radio" name="best" value="Weekend OK"> <span>Weekend OK</span></label>
+            </div>
+          </div>
+          <p class="err mt-2 hidden" data-err>Please choose an option.</p>
+        `,
+        onmount(){
+          stage.querySelectorAll('input[name="help"]').forEach(r=>{
+            r.addEventListener('change', ()=>{
+              const v = stage.querySelector('input[name="help"]:checked')?.value||'';
+              stage.querySelector('#best_wrap').classList.toggle('hidden', !(v==='Later today'||v==='This week'));
+            });
+          });
+        },
+        validate(){
+          const v = stage.querySelector('input[name="help"]:checked')?.value||''; if(!v) return false;
+          if(v==='Later today'||v==='This week'){ return !!stage.querySelector('input[name="best"]:checked'); }
+          return true;
+        },
+        store(){
+          S.a.help = stage.querySelector('input[name="help"]:checked')?.value;
+          S.a.best = stage.querySelector('input[name="best"]:checked')?.value||'';
+        }
+      },
+
+      // 7 First name
+      { title:'First name', html:`
+          <label class="block font-semibold mb-2">What is your first name?</label>
+          <input id="fname" class="w-full rounded-lg border border-slate-300 p-3" placeholder="First name"/>
+          <p class="err mt-2 hidden" data-err>Please enter your first name.</p>
+        `,
+        validate(){ return !!stage.querySelector('#fname').value.trim(); },
+        store(){ S.a.first = stage.querySelector('#fname').value.trim(); }
+      },
+
+      // 8 Last name
+      { title:'Last name', html:`
+          <label class="block font-semibold mb-2">What is your last name?</label>
+          <input id="lname" class="w-full rounded-lg border border-slate-300 p-3" placeholder="Last name"/>
+          <p class="err mt-2 hidden" data-err>Please enter your last name.</p>
+        `,
+        validate(){ return !!stage.querySelector('#lname').value.trim(); },
+        store(){ S.a.last = stage.querySelector('#lname').value.trim(); }
+      },
+
+      // 9 Email
+      { title:'Email', html:`
+          <label class="block font-semibold mb-2">What is your email address?</label>
+          <input id="email" type="email" class="w-full rounded-lg border border-slate-300 p-3" placeholder="you@email.com"/>
+          <p class="err mt-2 hidden" data-err>Enter a valid email.</p>
+        `,
+        validate(){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(stage.querySelector('#email').value.trim()); },
+        store(){ S.a.email = stage.querySelector('#email').value.trim(); }
+      },
+
+      // 10 Phone + OTP (verification step)
+      { title:'Verify your phone', html:`
+          <label class="block font-semibold mb-2">What is your mobile number?</label>
+          <div class="flex gap-3">
+            <input id="phone" class="w-full rounded-lg border border-slate-300 p-3" placeholder="(555) 555‑5555"/>
+            <button id="send_otp_btn" class="btn btn-muted" type="button">Send code</button>
+          </div>
+          <div id="otp_area" class="mt-3 hidden">
+            <label class="block font-semibold mb-1">Enter 6‑digit code</label>
+            <div class="flex gap-3">
+              <input id="otp" class="w-full rounded-lg border border-slate-300 p-3" placeholder="••••••"/>
+              <button id="verify_btn" class="btn btn-success" type="button">Verify</button>
+            </div>
+            <p class="hint mt-2">You’ll verify your phone first for security, then we’ll connect you.</p>
+          </div>
+          <p id="otp_status" class="hint mt-2"></p>
+          <p class="err mt-2 hidden" data-err>Phone must be verified to continue.</p>
+        `,
+        onmount(){
+          const send = q('#send_otp_btn');
+          const phone = q('#phone');
+          const area = q('#otp_area');
+          const vbtn = q('#verify_btn');
+          const omsg = q('#otp_status');
+          send.addEventListener('click', async ()=>{
+            const e164 = parseUSPhone(phone.value);
+            if(!e164){ omsg.textContent='Please enter a valid US number.'; return; }
+            try{
+              omsg.textContent='Sending code…';
+              S.recaptcha = new RecaptchaVerifier(auth, 'send_otp_btn', { size:'invisible' });
+              S.confirmationResult = await signInWithPhoneNumber(auth, e164, S.recaptcha);
+              area.classList.remove('hidden');
+              omsg.textContent='Code sent. Check your text messages.';
+              S.a.phone = e164; // store E.164
+            }catch(err){ omsg.textContent = `Failed to send: ${err.message||err}`; }
+          });
+          vbtn.addEventListener('click', async ()=>{
+            const code=(q('#otp').value||'').trim();
+            if(!S.confirmationResult || code.length!==6){ omsg.textContent='Enter the 6‑digit code.'; return; }
+            try{
+              omsg.textContent='Verifying…';
+              await S.confirmationResult.confirm(code);
+              S.otpVerified=true; omsg.textContent='Verified!';
+            }catch(err){ S.otpVerified=false; omsg.textContent='Verification failed. Try again.'; }
+          });
+        },
+        validate(){ return !!S.otpVerified; },
+        store(){}
+      },
+
+      // 11 TCPA consent
+      { title:'Consent', html:`
+          <label class="inline-flex items-start gap-3">
+            <input id="tcpa" type="checkbox">
+            <span>By clicking Submit, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts). Consent not required to purchase. Message/data rates may apply.</span>
+          </label>
+          <p class="err mt-2 hidden" data-err>Please check this box to continue.</p>
+        `,
+        validate(){ return q('#tcpa').checked; },
+        store(){ S.a.tcpa = true; }
+      },
+
+      // 12 Brevo (ALWAYS VISIBLE — not optional)
+      { title:'Feedback & email updates', html:`
+          <p class="hint mb-2">You can use the form below for feedback or to receive email updates.</p>
+          <iframe id="brevo_iframe" src="https://digitalresearch1.github.io/debt/brevo.html" class="w-full h-96 border rounded-lg" loading="lazy"></iframe>
+          <p class="hint mt-2">You can continue to the next step after interacting with the form.</p>
+        `,
+        validate(){ return true; },
+        store(){}
+      },
+
+      // 13 Submit
+      { title:'Submit', html:`
+          <p class="hint mb-4">All set. When you submit, we’ll connect you per your choice.</p>
+          <button id="submit_now" class="btn btn-primary" type="button">Submit</button>
+          <p id="submit_status" class="hint mt-3"></p>
+        `,
+        onmount(){ q('#submit_now').addEventListener('click', submitAll); },
+        validate(){ return true; },
+        store(){}
+      }
+    ];
+
+    // Render
+    function render(){
+      nextBtn.classList.add('disabled');
+      const {title, html, onmount} = STEPS[S.i];
+      stage.innerHTML = `<div class="page in">
+        <h1 class="text-xl font-bold mb-4">${title}</h1>
+        ${html}
+      </div>`;
+      setProgress();
+      if(onmount) onmount();
+      // Enable next when valid
+      stage.addEventListener('input', toggleNext);
+      stage.addEventListener('change', toggleNext);
+      toggleNext();
+    }
+
+    function toggleNext(){
+      const valid = STEPS[S.i].validate?.()||false;
+      nextBtn.classList.toggle('disabled', !valid);
+      const errEl = stage.querySelector('[data-err]');
+      if(errEl){ errEl.classList.toggle('hidden', valid); }
+    }
+
+    nextBtn.addEventListener('click', ()=>{
+      if(nextBtn.classList.contains('disabled')) return;
+      STEPS[S.i].store?.();
+      if(S.i < STEPS.length-1) go(S.i+1);
+    });
+
+    // Abandon → redirect to DQ
+    abandonBtn.addEventListener('click', (e)=>{ e.preventDefault(); dq(); });
+
+    // Submit → posts to CuraDebt + TrackDrive then redirect
+    function submitAll(){
+      const status = q('#submit_status');
+      status.textContent = 'Submitting…';
+      const callNow = (S.a.help === 'Connect me now (fastest)') ? '1' : '0';
+      const phoneE164 = S.a.phone || '';
+
+      // CuraDebt
+      const cura = document.getElementById('hidden-curadebt-post');
+      cura.innerHTML='';
+      const cd = new FormData();
+      cd.append('f_fname', S.a.first||'');
+      cd.append('f_lname', S.a.last||'');
+      cd.append('f_email', S.a.email||'');
+      cd.append('f_phone', (phoneE164||'').replace('+1',''));
+      cd.append('f_whereyoulive', S.a.state||'');
+      cd.append('f_totaldebt', String(S.a.debt||0));
+      cd.append('f_comments', `Lead from AI Chatbot Survey — timing: ${S.a.help||''}; best time: ${S.a.best||''}`);
+      cd.append('data1', S.txid);
+      cd.append('f_ip', S.ip||'');
+      for(const [k,v] of cd.entries()){
+        const i=document.createElement('input'); i.type='hidden'; i.name=k; i.value=v; cura.appendChild(i);
+      }
+      cura.submit();
+
+      // TrackDrive
+      const tdForm = document.getElementById('hidden-trackdrive-post');
+      tdForm.innerHTML='';
+      const td = new FormData();
+      td.append('lead_token','3346b0458309406ba4b8beac90a8a532');
+      td.append('traffic_source_id','1000');
+      td.append('caller_id', phoneE164);
+      td.append('call_now', callNow);
+      td.append('first_name', S.a.first||'');
+      td.append('last_name', S.a.last||'');
+      td.append('email', S.a.email||'');
+      td.append('state', S.a.state||'');
+      td.append('unsecured_debt_total', String(S.a.debt||0));
+      td.append('ip_address', S.ip||'');
+      td.append('source_url', location.href);
+      td.append('useragent', navigator.userAgent);
+      td.append('tcpa_opt_in','true');
+      td.append('tcpa_optin_consent_language','By clicking, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts). Your consent is not required to purchase. Message/data rates may apply.');
+      td.append('sub_id', S.txid);
+      for(const [k,v] of td.entries()){
+        const i=document.createElement('input'); i.type='hidden'; i.name=k; i.value=v; tdForm.appendChild(i);
+      }
+      tdForm.submit();
+
+      // Redirect
+      location.href = `${SUCCESS_URL}&transaction_id=${encodeURIComponent(S.txid)}`;
+    }
+
+    // Kick
+    render();
+  </script>
+</body>
+</html>

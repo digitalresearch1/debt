@@ -127,27 +127,55 @@
 
             <div class="mt-6">
               <h4 class="font-semibold text-slate-900 mb-2">Independent reviews</h4>
-              <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <a href="https://uk.trustpilot.com/review/www.curadebt.com?page=3" target="_blank" class="group block border border-slate-200 rounded-xl overflow-hidden hover:shadow-lg">
-                  <div class="aspect-[3/2] flex items-center justify-center bg-slate-50">
-                    <img src="sandbox:/mnt/data/Screenshot 2025-09-18 092604.png" alt="Trustpilot rating 4.9, 160 reviews" class="w-full h-full object-contain"/>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 place-items-center">
+                <!-- Trustpilot tile (bigger, centered) -->
+                <a href="https://uk.trustpilot.com/review/www.curadebt.com?page=3" target="_blank" class="group block w-full border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl p-6 md:p-8 bg-white min-h-44">
+                  <div class="flex flex-col items-center text-center">
+                    <img src="https://logo.clearbit.com/trustpilot.com" alt="Trustpilot" class="h-7 md:h-8 w-auto object-contain mb-3"/>
+                    <div class="text-sm text-slate-700 font-medium mb-2">CuraDebt reviews</div>
+                    <div class="flex items-center gap-3">
+                      <div class="flex items-center gap-1" aria-label="4.9 out of 5 stars on Trustpilot">
+                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-emerald-600"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"/></svg>
+                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-emerald-600"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"/></svg>
+                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-emerald-600"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"/></svg>
+                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-emerald-600"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"/></svg>
+                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-emerald-600"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"/></svg>
+                      </div>
+                      <div class="text-base font-semibold">4.9</div>
+                    </div>
+                    <div class="text-xs text-slate-600 mt-2">160 reviews on Trustpilot</div>
                   </div>
-                  <div class="px-3 py-2 text-sm text-center text-slate-700">Trustpilot snapshot</div>
                 </a>
-                <a href="https://uk.trustpilot.com/review/www.curadebt.com?page=3" target="_blank" class="group block border border-slate-200 rounded-xl overflow-hidden hover:shadow-lg">
-                  <div class="aspect-[3/2] flex items-center justify-center bg-slate-50">
-                    <img src="sandbox:/mnt/data/Screenshot 2025-09-18 092939.png" alt="Curadebt on Trustpilot 4.9" class="w-full h-full object-contain"/>
+
+                <!-- Google Reviews tile (bigger, centered, with logo on top) -->
+                <a href="https://www.google.com/maps/place/CuraDebt/@25.9704379,-80.169098,9455m/data=!3m2!1e3!5s0x88d9a9be4a479643:0xf7172abdc2f82499!4m8!3m7!1s0x88d9abe11e968fab:0xede6e70fcbc1421f!8m2!3d26.0105652!4d-80.1836621!9m1!1b1!16s%2Fg%2F11cn9ngvsm?entry=ttu" target="_blank" class="group block w-full border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl p-6 md:p-8 bg-white min-h-44">
+                  <div class="flex flex-col items-center text-center">
+                    <img src="sandbox:/mnt/data/bada53e6-7227-4aa0-9173-461fac241a83.png" alt="Google" class="h-7 md:h-8 w-auto object-contain mb-3"/>
+                    <div class="text-sm text-slate-700 font-medium mb-2">CuraDebt reviews</div>
+                    <div class="flex items-center gap-3">
+                      <div class="flex items-center gap-1" aria-label="4.8 out of 5 stars on Google Reviews">
+                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-amber-400"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"/></svg>
+                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-amber-400"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"/></svg>
+                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-amber-400"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"/></svg>
+                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-amber-400"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"/></svg>
+                        <!-- Half star using gradient fill -->
+                        <svg viewBox="0 0 20 20" class="w-6 h-6">
+                          <defs>
+                            <linearGradient id="halfStarFill" x1="0%" y1="0%" x2="100%" y2="0%">
+                              <stop offset="50%" stop-color="#f59e0b"/>
+                              <stop offset="50%" stop-color="#e5e7eb"/>
+                            </linearGradient>
+                          </defs>
+                          <polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1" fill="url(#halfStarFill)"/>
+                        </svg>
+                      </div>
+                      <div class="text-base font-semibold">4.8</div>
+                    </div>
+                    <div class="text-xs text-slate-600 mt-2">336 reviews on Google</div>
                   </div>
-                  <div class="px-3 py-2 text-sm text-center text-slate-700">Trustpilot (Curadebt)</div>
-                </a>
-                <a href="https://www.yelp.com/biz/curadebt-hollywood-5" target="_blank" class="group block border border-slate-200 rounded-xl overflow-hidden hover:shadow-lg">
-                  <div class="aspect-[3/2] flex items-center justify-center bg-slate-50">
-                    <img src="https://logo.clearbit.com/yelp.com" alt="Yelp" class="w-16 opacity-90 group-hover:opacity-100"/>
-                  </div>
-                  <div class="px-3 py-2 text-sm text-center text-slate-700">Yelp reviews</div>
                 </a>
               </div>
-              <p class="text-xs text-slate-500 mt-2 text-center">Tap an image to view the source.</p>
+              <p class="text-xs text-slate-500 mt-2 text-center">Tap a tile to open the source in a new tab.</p>
             </div>
           </div>
 
@@ -227,4 +255,3 @@
   </script>
 </body>
 </html>
-

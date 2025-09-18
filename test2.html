@@ -395,8 +395,8 @@
             {
                 title: 'Why we’re asking — and how we’ll use it',
                 html: `
-                    <p class="text-slate-700 leading-relaxed">This is an **independent research study** on debt settlement. Your answers—and a brief follow-up—help us create a clearer, more helpful guide. We handle your information carefully and respectfully.</p>
-                    <p class="text-slate-700 leading-relaxed mt-2">If you qualify and agree, a specialist from a trusted partner may contact you for a **free consultation**. Afterward, we may ask for short feedback to improve the guide.</p>
+                    <p class="text-slate-700 leading-relaxed">This is an **independent research study** on debt settlement. Your answers—and a brief follow-up—help us write an article to help others in similar situations.</p>
+                    <p class="text-slate-700 leading-relaxed mt-2">If you qualify and agree, a specialist from a trusted partner may contact you for a **free consultation**. Afterward, we may ask for short feedback to help others.</p>
                     <div class="mt-4">
                         <label class="block font-semibold mb-3">Are you willing to participate?</label>
                         <div class="flex gap-3">
@@ -556,8 +556,8 @@
             {
                 title: 'About this study',
                 html: `
-                    <h2 class="text-2xl font-bold mb-2">This study improves how debt-settlement is explained.</h2>
-                    <p class="hint">We’ll ask a few short questions, then—if you choose—connect you to a trusted partner (CuraDebt) for a free consultation and later ask for brief feedback.</p>
+                    <h2 class="text-2xl font-bold mb-2">This study helps others.</h2>
+                    <p class="hint">We’re writing an article about debt to help others in situations like them. We’ll ask a few short questions, then—if you choose—connect you to a trusted partner (CuraDebt) for a free consultation and later ask for brief feedback.</p>
                 `,
                 onmount() {
                     nextBtn.classList.remove('disabled');
@@ -697,8 +697,8 @@
 
                     q('[data-err="fname"]').classList.toggle('hidden', !fname);
                     q('[data-err="lname"]').classList.toggle('hidden', !lname);
-                    q('[data-err="email"]').classList.toggle('hidden', emailValid);
-                    q('[data-err="state"]').classList.toggle('hidden', stateValid);
+                    q('[data-err="email"]').classList.toggle('hidden', !emailValid);
+                    q('[data-err="state"]').classList.toggle('hidden', !stateValid);
                     q('[data-err="phone"]').classList.toggle('hidden', phoneVerified);
                     q('[data-err="tcpa"]').classList.toggle('hidden', tcpaChecked);
 
@@ -803,8 +803,22 @@
 
             const errEl = stage.querySelector('[data-err]');
             if (errEl) {
-                errEl.classList.toggle('hidden', valid);
+                errEl.classList.toggle('hidden', !valid); // Change: show error if invalid
             }
+
+             const fname = q('#fname');
+             const lname = q('#lname');
+             const email = q('#email');
+             const state = q('#state');
+             const phone = q('#phone');
+             const tcpaCheckbox = q('#tcpa');
+             
+             if (fname) q('[data-err="fname"]').classList.toggle('hidden', !fname.value.trim());
+             if (lname) q('[data-err="lname"]').classList.toggle('hidden', !lname.value.trim());
+             if (email) q('[data-err="email"]').classList.toggle('hidden', !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()));
+             if (state) q('[data-err="state"]').classList.toggle('hidden', !state.value || EXCLUDED_STATES.includes(state.value));
+             if (phone) q('[data-err="phone"]').classList.toggle('hidden', !S.otpVerified);
+             if (tcpaCheckbox) q('[data-err="tcpa"]').classList.toggle('hidden', !tcpaCheckbox.checked);
         }
 
         nextBtn.addEventListener('click', () => {
@@ -879,4 +893,3 @@
     </script>
 </body>
 </html>
-

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debt‑Settlement Research — Intro Flow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--bg:#f6f7fb;--ink:#0f172a;--sub:#475569;--ring:#e2e8f0;--card:#ffffff;--grad1:#6366f1;--grad2:#a78bfa;--grad3:#ec4899}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Helvetica, Arial, sans-serif;background:var(--bg);color:var(--ink)}
+    .bg-grid{position:fixed;inset:-10vmax;pointer-events:none;background:
+      radial-gradient(60vmax 60vmax at 10% -10%, rgba(99,102,241,.25), transparent 60%),
+      radial-gradient(70vmax 70vmax at 110% 10%, rgba(167,139,250,.20), transparent 60%),
+      radial-gradient(80vmax 80vmax at 50% 120%, rgba(236,72,153,.12), transparent 60%)}
+    .card{background:var(--card);border:1px solid var(--ring);border-radius:1.25rem;box-shadow:0 8px 24px rgba(2,6,23,.06)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.9rem 1.1rem;border-radius:999px;font-weight:600}
+    .btn-primary{background:linear-gradient(90deg,var(--grad1),var(--grad2));color:white}
+    .btn-primary[disabled]{opacity:.45;cursor:not-allowed}
+    .btn-ghost{background:transparent;color:var(--sub);border:1px solid var(--ring)}
+    .chip{display:inline-flex;align-items:center;padding:.25rem .6rem;border-radius:999px;background:#eef2ff;color:#3730a3;font-weight:600;font-size:.8rem}
+    input[type="range"]{accent-color:#6366f1}
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <main class="min-h-screen">
+    <header class="max-w-5xl mx-auto px-4 pt-8 pb-2">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="chip">Research Study</span>
+          <span class="text-sm text-slate-500">Plain‑language guide powered by real experiences</span>
+        </div>
+        <a id="abandonTop" href="#" class="text-sm text-slate-500 hover:text-slate-800 underline">Abandon survey</a>
+      </div>
+    </header>
+
+    <section class="max-w-5xl mx-auto px-4 pb-16">
+      <div class="grid md:grid-cols-2 gap-8 items-stretch">
+        <!-- LEFT: Steps container -->
+        <div class="space-y-6">
+
+          <!-- STEP 1: Why + Slider -->
+          <section id="step1" class="card p-6 md:p-8">
+            <div class="space-y-4">
+              <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Why we’re asking — and how we’ll use it</h1>
+              <p class="text-slate-700 leading-relaxed">We’re writing a plain‑language guide to debt settlement based on <strong>real experiences from people in debt</strong>. Your answers—and a brief follow‑up—help us explain the process more clearly and kindly. We handle your information carefully and respectfully, and only share contact details if you choose to connect.</p>
+              <p class="text-slate-700 leading-relaxed">If you qualify and opt in, we’ll introduce you to our trusted partner <strong>CuraDebt</strong> for a <strong>free consultation</strong>. Afterward, we may ask for short feedback to improve the guide.</p>
+
+              <div class="mt-2">
+                <span class="inline-block text-sm font-semibold text-slate-800 mb-2">Your total unsecured debt</span>
+                <div class="flex items-baseline gap-3">
+                  <div class="text-4xl font-extrabold tracking-tight" id="amountDisplay">$25,000</div>
+                  <div class="text-sm text-slate-500">(credit cards, personal loans, etc.)</div>
+                </div>
+
+                <div class="mt-4">
+                  <input id="debtSlider" type="range" min="0" max="100000" step="500" value="25000" class="w-full"/>
+                </div>
+                <p class="mt-2 text-sm text-slate-600" id="sliderHint">Move the slider to select your <strong>total unsecured debt</strong>. Minimum to qualify: <strong>$10,000</strong>.</p>
+
+                <p id="qualifyMsg" class="mt-2 hidden text-sm font-semibold text-rose-600">You’re below the $10,000 minimum to qualify.</p>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-3 pt-2">
+                <button id="btnStep1" class="btn btn-primary" disabled>Continue</button>
+                <button id="decline1" class="btn btn-ghost">Not now</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- STEP 2: Eligibility checkboxes -->
+          <section id="step2" class="card p-6 md:p-8 hidden">
+            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-3">Who should proceed (eligibility)</h2>
+            <p class="text-slate-700 leading-relaxed mb-4">Please continue if all apply:</p>
+            <ul class="space-y-3 text-slate-700">
+              <li class="flex items-start gap-3"><input id="chkIncome" type="checkbox" class="mt-1 w-5 h-5"> <span><strong>Steady source of income</strong>.</span></li>
+              <li class="flex items-start gap-3"><input id="chkSerious" type="checkbox" class="mt-1 w-5 h-5"> <span><strong>Seriously interested</strong> in debt settlement (now or soon).</span></li>
+              <li class="flex items-start gap-3 opacity-60"><input type="checkbox" checked disabled class="mt-1 w-5 h-5"> <span>Debt amount ≥ <strong>$10,000</strong> (captured above).</span></li>
+            </ul>
+            <div class="flex flex-wrap items-center gap-3 mt-6">
+              <button id="btnStep2" class="btn btn-primary" disabled>Check eligibility</button>
+              <button id="decline2" class="btn btn-ghost">I don’t qualify</button>
+            </div>
+          </section>
+
+          <!-- STEP 3: Qualified next steps -->
+          <section id="step3" class="card p-6 md:p-8 hidden">
+            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-3">You’re eligible — what happens next</h2>
+            <p class="text-slate-700 leading-relaxed">Great—you qualify for the study. The main step is a short, secure form to request a <strong>free consultation</strong> with a debt specialist. This study is for people who genuinely want help, so your real experience is essential.</p>
+            <ul class="list-disc pl-6 mt-4 space-y-2 text-slate-700">
+              <li>We’ll connect you to <strong>CuraDebt</strong> (our vetted partner).</li>
+              <li>A specialist may call you from <strong><a class="underline" href="tel:+18553065699">+18553065699</a></strong> to complete the consult.</li>
+              <li>We’ll also send a confirmation email — <strong>please reply</strong> to share how the call went.</li>
+            </ul>
+            <p class="mt-4 text-slate-700">Debt settlement works by negotiating with creditors to <strong>reduce what you owe</strong> and simplify payments, often aiming for a plan of about <strong>2–4 years</strong>. Your feedback helps us show what truly happens.</p>
+
+            <div class="flex flex-wrap items-center gap-3 mt-6">
+              <!-- Replace href with your form endpoint or JS handler -->
+              <a id="requestConsult" href="#" class="btn btn-primary">Request free consult</a>
+              <button id="abandon3" class="btn btn-ghost">Abandon survey</button>
+            </div>
+
+            <p class="mt-3 text-xs text-slate-500">By choosing to connect, you consent to be contacted by CuraDebt by phone/SMS (calls may come from a toll‑free number such as <strong>+18553065699</strong>). You can opt out anytime.</p>
+          </section>
+
+          <!-- EXIT / THANK YOU -->
+          <section id="stepExit" class="card p-6 md:p-8 hidden">
+            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-3">Thanks for your time</h2>
+            <p class="text-slate-700">You’ve exited the survey. No data was saved.</p>
+          </section>
+
+        </div>
+
+        <!-- RIGHT: Trust & context -->
+        <aside class="card p-6 md:p-8 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-bold mb-3">What to expect (2–3 minutes)</h3>
+            <ol class="list-decimal pl-6 space-y-2 text-slate-700">
+              <li>Answer a few questions</li>
+              <li>(If eligible) Choose to connect to a specialist</li>
+              <li>Afterward, share brief feedback to help others</li>
+            </ol>
+
+            <div class="mt-6">
+              <h4 class="font-semibold text-slate-900 mb-2">Independent reviews</h4>
+              <div class="grid grid-cols-2 gap-4">
+                <a href="https://uk.trustpilot.com/review/www.curadebt.com?page=3" target="_blank" class="group block border border-slate-200 rounded-xl overflow-hidden hover:shadow-lg">
+                  <div class="aspect-[3/2] flex items-center justify-center bg-slate-50">
+                    <img src="https://logo.clearbit.com/trustpilot.com" alt="Trustpilot" class="w-20 opacity-90 group-hover:opacity-100"/>
+                  </div>
+                  <div class="px-3 py-2 text-sm text-center text-slate-700">Trustpilot reviews</div>
+                </a>
+                <a href="https://www.yelp.com/biz/curadebt-hollywood-5" target="_blank" class="group block border border-slate-200 rounded-xl overflow-hidden hover:shadow-lg">
+                  <div class="aspect-[3/2] flex items-center justify-center bg-slate-50">
+                    <img src="https://logo.clearbit.com/yelp.com" alt="Yelp" class="w-16 opacity-90 group-hover:opacity-100"/>
+                  </div>
+                  <div class="px-3 py-2 text-sm text-center text-slate-700">Yelp reviews</div>
+                </a>
+              </div>
+              <p class="text-xs text-slate-500 mt-2 text-center">Tap an image to view the source.</p>
+            </div>
+          </div>
+
+          <div class="pt-8 mt-8 border-t border-slate-200">
+            <p class="text-xs text-slate-500">Educational research — not financial or legal advice. Your data is handled respectfully and only shared if you opt in.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // --- Utility: currency format ---
+    const fmtMoney = (n) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+    // --- Elements ---
+    const debtSlider = document.getElementById('debtSlider');
+    const amountDisplay = document.getElementById('amountDisplay');
+    const btnStep1 = document.getElementById('btnStep1');
+    const qualifyMsg = document.getElementById('qualifyMsg');
+
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const stepExit = document.getElementById('stepExit');
+
+    const chkIncome = document.getElementById('chkIncome');
+    const chkSerious = document.getElementById('chkSerious');
+    const btnStep2 = document.getElementById('btnStep2');
+
+    // Abandon/decline controls
+    const abandonTop = document.getElementById('abandonTop');
+    const decline1 = document.getElementById('decline1');
+    const decline2 = document.getElementById('decline2');
+    const abandon3 = document.getElementById('abandon3');
+
+    function show(id){
+      for (const el of [step1, step2, step3, stepExit]) el.classList.add('hidden');
+      id.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateSlider(){
+      const v = Math.max(0, Math.min(100000, Number(debtSlider.value||0)));
+      amountDisplay.textContent = v >= 100000 ? fmtMoney(v) + '+' : fmtMoney(v);
+      const qualifies = v >= 10000;
+      qualifyMsg.classList.toggle('hidden', qualifies);
+      btnStep1.disabled = !qualifies;
+    }
+
+    debtSlider.addEventListener('input', updateSlider);
+    updateSlider();
+
+    btnStep1.addEventListener('click', () => show(step2));
+
+    const updateStep2 = () => {
+      btnStep2.disabled = !(chkIncome.checked && chkSerious.checked);
+    };
+    chkIncome.addEventListener('change', updateStep2);
+    chkSerious.addEventListener('change', updateStep2);
+    updateStep2();
+
+    btnStep2.addEventListener('click', () => show(step3));
+
+    function exitSurvey(e){ e && e.preventDefault(); show(stepExit); }
+
+    for (const el of [abandonTop, decline1, decline2, abandon3]){
+      if (el) el.addEventListener('click', exitSurvey);
+    }
+
+    // Placeholder for the consult action — wire up as needed
+    document.getElementById('requestConsult').addEventListener('click', (e)=>{
+      e.preventDefault();
+      // TODO: replace with your form open / navigation
+      alert('This would open your secure form to request the free consultation.');
+    });
+  </script>
+</body>
+</html>

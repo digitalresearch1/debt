@@ -349,6 +349,24 @@
         // Abandon behavior
         abandonBtn.addEventListener('click', dq);
         abandonTopBtn.addEventListener('click', dq);
+        
+        let toggleNext = () => {
+             const currentStep = STEPS[S.i];
+             const valid = currentStep.validate?.() || false;
+            
+             if (S.i >= 2) {
+                 reviewsAndInfo.classList.remove('hidden');
+             } else {
+                 reviewsAndInfo.classList.add('hidden');
+             }
+
+             if (currentStep.title === 'Submit' || currentStep.title === 'Thanks for your time') {
+                 nextBtn.classList.add('hidden');
+             } else {
+                 nextBtn.classList.remove('hidden');
+                 nextBtn.classList.toggle('disabled', !valid);
+             }
+        };
 
         // Steps (ONE question per page)
         const STEPS = [
@@ -563,27 +581,27 @@
                     S.a.terms_ok = stage.querySelector('input[name="terms_ok"]:checked')?.value;
                 }
             },
-            // 6 About this study
-            {
-                title: 'About this study',
-                html: `
-                    <h2 class="text-2xl font-bold mb-2">This study helps others.</h2>
-                    <p class="hint">We’re writing an article about debt to help others in situations like them. We’ll ask a few short questions, then—if you choose—connect you to a trusted partner (CuraDebt) for a free consultation and later ask for brief feedback.</p>
-                `,
-                onmount() {
-                    nextBtn.classList.remove('disabled');
-                },
-                validate() {
-                    return true;
-                },
-                store() {}
-            },
-            // 7 Your Information (Combined)
+            // 6 Your Information (Combined)
             {
                 title: 'Your Information',
                 html: `
+                    <p class="text-slate-700 leading-relaxed">
+                        The main step is a short, secure form to request a free consultation with a debt specialist.
+                        <ul class="list-disc pl-6 space-y-2 mt-2">
+                            <li>We’ll connect you to <strong>CuraDebt</strong> (our vetted partner).</li>
+                            <li>A specialist may call you from a toll-free number to complete the consult.</li>
+                            <li>We’ll also send a confirmation email — <strong>please reply</strong> to share how the call went.</li>
+                        </ul>
+                    </p>
+                    <p class="text-slate-700 leading-relaxed mt-4">
+                        Debt settlement works by negotiating with creditors to <strong>reduce what you owe</strong> and simplify payments, often aiming for a plan of about <strong>2–4 years</strong>. Your feedback helps us show what truly happens.
+                    </p>
+                    <p class="text-slate-700 leading-relaxed mt-4">
+                        You’ll receive a call immediately after submitting this form from a toll-free number. If you submit on a weekend, you’ll receive a call on Monday between 9 AM and 5 PM EST. When you get the call, press 1 to get connected to an agent. CuraDebt work hours are Monday-Friday from 9 AM to 5 PM EST.
+                    </p>
+                    
                     <div class="space-y-4">
-                        <label class="block font-semibold mb-2">Please enter your contact information.</label>
+                        <label class="block font-semibold mb-2 mt-6">Please enter your contact information.</label>
                         <input id="fname" class="w-full rounded-lg border border-slate-300 p-3" placeholder="First name"/>
                         <p class="err mt-2 hidden" data-err="fname">Please enter your first name.</p>
                         
@@ -639,7 +657,88 @@
                     nextBtn.classList.add('disabled');
                     const tcpaCheckbox = q('#tcpa');
 
+                    const fields = {
+                        fname: q('#fname'),
+                        lname: q('#lname'),
+                        email: q('#email'),
+                        state: q('#state'),
+                        phone: q('#phone')
+                    };
+                    const errors = {
+                        fname: q('[data-err="fname"]'),
+                        lname: q('[data-err="lname"]'),
+                        email: q('[data-err="email"]'),
+                        state: q('[data-err="state"]'),
+                        phone: q('[data-err="phone"]'),
+                        tcpa: q('[data-err="tcpa"]')
+                    };
+                    
+                    const validateField = (field, errorEl, isTouched = true) => {
+                        if (!isTouched) return true;
+                        let isValid = true;
+                        if (field === fields.fname || field === fields.lname) {
+                            isValid = !!field.value.trim();
+                        } else if (field === fields.email) {
+                            isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value.trim());
+                        } else if (field === fields.state) {
+                            isValid = !!field.value && !EXCLUDED_STATES.includes(field.value);
+                        } else if (field === tcpaCheckbox) {
+                            isValid = tcpaCheckbox.checked;
+                        } else if (field === fields.phone) {
+                            isValid = S.otpVerified;
+                        }
+                        errorEl.classList.toggle('hidden', isValid);
+                        return isValid;
+                    };
+
+                    const validateAll = () => {
+                        const fname = fields.fname.value.trim();
+                        const lname = fields.lname.value.trim();
+                        const email = fields.email.value.trim();
+                        const state = fields.state.value;
+                        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+                        const stateValid = !!state && !EXCLUDED_STATES.includes(state);
+                        const phoneValid = S.otpVerified;
+                        const tcpaValid = tcpaCheckbox.checked;
+
+                        const allValid = fname && lname && emailValid && stateValid && phoneValid && tcpaValid;
+                        nextBtn.classList.toggle('disabled', !allValid);
+                        return allValid;
+                    };
+
+                    let hasInteracted = {
+                      fname: false, lname: false, email: false, state: false, tcpa: false, phone: false
+                    };
+
+                    Object.values(fields).forEach(field => field.addEventListener('blur', () => {
+                        if (field !== fields.phone) {
+                            hasInteracted[field.id] = true;
+                            validateField(field, errors[field.id]);
+                            validateAll();
+                        }
+                    }));
+                    
+                    fields.state.addEventListener('change', () => {
+                        hasInteracted.state = true;
+                        validateField(fields.state, errors.state);
+                        validateAll();
+                    });
+                    
+                    tcpaCheckbox.addEventListener('change', () => {
+                        hasInteracted.tcpa = true;
+                        validateField(tcpaCheckbox, errors.tcpa);
+                        validateAll();
+                    });
+
+                    fields.phone.addEventListener('input', () => {
+                        omsg.textContent = '';
+                        S.otpVerified = false;
+                        errors.phone.classList.add('hidden');
+                        nextBtn.classList.add('disabled');
+                    });
+                    
                     send.addEventListener('click', async () => {
+                        hasInteracted.phone = true;
                         const e164 = parseUSPhone(phone.value);
                         if (!e164) {
                             omsg.textContent = 'Please enter a valid US number.';
@@ -658,7 +757,7 @@
                             omsg.textContent = `Failed to send: ${err.message||err}`;
                         }
                     });
-
+                    
                     vbtn.addEventListener('click', async () => {
                         const code = (q('#otp').value || '').trim();
                         if (!S.confirmationResult || code.length !== 6) {
@@ -670,31 +769,31 @@
                             await S.confirmationResult.confirm(code);
                             S.otpVerified = true;
                             omsg.textContent = 'Verified!';
-                            toggleNext();
+                            validateAll();
                         } catch (err) {
                             S.otpVerified = false;
                             omsg.textContent = 'Verification failed. Try again.';
                         }
                     });
 
-                    const allInputs = stage.querySelectorAll('input, select');
-                    const toggle = () => {
-                         const fname = q('#fname').value.trim();
-                         const lname = q('#lname').value.trim();
-                         const email = q('#email').value.trim();
-                         const state = q('#state').value;
-                         const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-                         const phoneVerified = S.otpVerified;
-                         const tcpaChecked = tcpaCheckbox.checked;
-                         nextBtn.classList.toggle('disabled', !(fname && lname && emailValid && state && !EXCLUDED_STATES.includes(state) && phoneVerified && tcpaChecked));
+                    // Overwrite the global toggleNext for this step
+                    let originalToggleNext = toggleNext;
+                    toggleNext = () => {
+                        const isValid = validateAll();
+                        if (!isValid) {
+                          Object.keys(hasInteracted).forEach(key => {
+                            const field = fields[key];
+                            const errorEl = errors[key];
+                            if (field && errorEl && hasInteracted[key]) {
+                                validateField(field, errorEl);
+                            } else if (field === undefined && key === 'tcpa' && hasInteracted[key]) {
+                                validateField(tcpaCheckbox, errors.tcpa);
+                            }
+                          });
+                        }
+                        originalToggleNext();
                     };
-                    allInputs.forEach(input => input.addEventListener('input', toggle));
-                    allInputs.forEach(input => input.addEventListener('change', toggle)); // Added for select
-                    phone.addEventListener('input', () => {
-                         q('#otp_status').textContent = '';
-                         S.otpVerified = false;
-                    });
-                    tcpaCheckbox.addEventListener('change', toggle);
+                    toggleNext();
                 },
                 validate() {
                     const fname = q('#fname').value.trim();
@@ -706,12 +805,19 @@
                     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
                     const stateValid = !!state && !EXCLUDED_STATES.includes(state);
 
-                    q('[data-err="fname"]').classList.toggle('hidden', !fname);
-                    q('[data-err="lname"]').classList.toggle('hidden', !lname);
-                    q('[data-err="email"]').classList.toggle('hidden', !emailValid);
-                    q('[data-err="state"]').classList.toggle('hidden', !stateValid);
-                    q('[data-err="phone"]').classList.toggle('hidden', phoneVerified);
-                    q('[data-err="tcpa"]').classList.toggle('hidden', tcpaChecked);
+                    const fnameErr = q('[data-err="fname"]');
+                    const lnameErr = q('[data-err="lname"]');
+                    const emailErr = q('[data-err="email"]');
+                    const stateErr = q('[data-err="state"]');
+                    const phoneErr = q('[data-err="phone"]');
+                    const tcpaErr = q('[data-err="tcpa"]');
+
+                    fnameErr.classList.toggle('hidden', !fname);
+                    lnameErr.classList.toggle('hidden', !lname);
+                    emailErr.classList.toggle('hidden', !emailValid);
+                    stateErr.classList.toggle('hidden', !stateValid);
+                    phoneErr.classList.toggle('hidden', !phoneVerified);
+                    tcpaErr.classList.toggle('hidden', !tcpaChecked);
 
                     return fname && lname && emailValid && stateValid && phoneVerified && tcpaChecked;
                 },
@@ -723,11 +829,11 @@
                     S.a.tcpa = q('#tcpa').checked;
                 }
             },
-            // 8 Brevo (always visible)
+            // 7 Brevo (always visible)
             {
                 title: 'Feedback & email updates',
                 html: `
-                    <p class="hint mb-2">Use the form below to leave feedback or receive email updates.</p>
+                    <p class="hint mb-2">You must provide your email to receive a confirmation of your participation. We will also use this email to ask for your feedback on your consultation experience. </p>
                     <iframe id="brevo_iframe" src="https://digitalresearch1.github.io/debt/brevo.html" class="w-full h-96 border rounded-lg" loading="lazy"></iframe>
                     <p class="hint mt-2">You can continue to the next step after interacting with the form.</p>
                 `,
@@ -739,7 +845,7 @@
                 },
                 store() {}
             },
-            // 9 Submit
+            // 8 Submit
             {
                 title: 'Submit',
                 html: `
@@ -756,7 +862,7 @@
                 },
                 store() {}
             },
-            // 10 Exit page
+            // 9 Exit page
             {
                 title: 'Thanks for your time',
                 html: `<p class="text-slate-700">You’ve exited the survey. No data was saved.</p>`,
@@ -770,53 +876,6 @@
                 store() {}
             }
         ];
-
-        // Render
-        function render() {
-            nextBtn.classList.remove('hidden');
-            abandonBtn.classList.remove('hidden');
-
-            const {
-                title,
-                html,
-                onmount
-            } = STEPS[S.i];
-            stage.innerHTML = `
-                <div class="page in">
-                    <h1 class="text-xl font-bold mb-4">${title}</h1>
-                    ${html}
-                </div>`;
-            setProgress();
-            if (onmount) onmount();
-            stage.removeEventListener('input', toggleNext);
-            stage.removeEventListener('change', toggleNext);
-            stage.addEventListener('input', toggleNext);
-            stage.addEventListener('change', toggleNext);
-            toggleNext();
-        }
-
-        function toggleNext() {
-            const currentStep = STEPS[S.i];
-            const valid = currentStep.validate?.() || false;
-            
-            if (S.i >= 2) {
-                reviewsAndInfo.classList.remove('hidden');
-            } else {
-                reviewsAndInfo.classList.add('hidden');
-            }
-
-            if (currentStep.title === 'Submit' || currentStep.title === 'Thanks for your time') {
-                nextBtn.classList.add('hidden');
-            } else {
-                nextBtn.classList.remove('hidden');
-                nextBtn.classList.toggle('disabled', !valid);
-            }
-
-            const errEl = stage.querySelector('[data-err]');
-            if (errEl) {
-                errEl.classList.toggle('hidden', valid); 
-            }
-        }
 
         nextBtn.addEventListener('click', () => {
             if (nextBtn.classList.contains('disabled')) return;
@@ -884,10 +943,30 @@
             // Redirect
             location.href = `${SUCCESS_URL}&transaction_id=${encodeURIComponent(S.txid)}`;
         }
+        
+        function render() {
+             nextBtn.classList.remove('hidden');
+             abandonBtn.classList.remove('hidden');
+
+             const {
+                 title,
+                 html,
+                 onmount
+             } = STEPS[S.i];
+             stage.innerHTML = `
+                 <div class="page in">
+                     <h1 class="text-xl font-bold mb-4">${title}</h1>
+                     ${html}
+                 </div>`;
+             setProgress();
+             if (onmount) onmount();
+             stage.addEventListener('input', toggleNext);
+             stage.addEventListener('change', toggleNext);
+             toggleNext();
+         }
 
         // Kick
         render();
     </script>
 </body>
 </html>
-

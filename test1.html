@@ -71,7 +71,8 @@
                         </div>
                     </div>
                     <div id="sib-container" class="sib-container--large sib-container--vertical" style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:3px; border-width:1px; border-color:#C0CCD9; border-style:solid; direction:ltr">
-                        <form id="sib-form" method="POST" action="https://52bcaf92.sibforms.com/serve/MUIFABmWYWf3cwFJgrPQjj77APgtEF8JJ634OSD8-qQ0EDQNiYN4wKPaqF51FAIz5p1vc-yLf5DzMhxB9w2mxDBu1Y0b87khoYUFn2eK-KLi_obHRBTplKxc2k8CzNCwM-uTcb6i0GlaxcU49zWeQXP5s5cGwd7q1sahZ8i6BR5E43UzfKJflMtJ7R5ild_uKdD9alhHh3f8n_Mt" data-type="subscription">
+                        <!-- The target="sib_iframe" attribute is the key change here -->
+                        <form id="sib-form" method="POST" action="https://52bcaf92.sibforms.com/serve/MUIFABmWYWf3cwFJgrPQjj77APgtEF8JJ634OSD8-qQ0EDQNiYN4wKPaqF51FAIz5p1vc-yLf5DzMhxB9w2mxDBu1Y0b87khoYUFn2eK-KLi_obHRBTplKxc2k8CzNCwM-uTcb6i0GlaxcU49zWeQXP5s5cGwd7q1sahZ8i6BR5E43UzfKJflMtJ7R5ild_uKdD9alhHh3f8n_Mt" data-type="subscription" target="sib_iframe">
                             <div style="padding: 8px 0;"><div class="sib-form-block" style="font-size:32px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;"><p>Survey Feedback</p></div></div>
                             <div style="padding: 8px 0;"><div class="sib-form-block" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;"><div class="sib-text-form-block"><p>Please provide your email to receive a reminder for the feedback of the survey</p></div></div></div>
                             <div style="padding: 8px 0;"><div class="sib-input sib-form-block"><div class="form__entry entry_block"><div class="form__label-row "><label class="entry__label" style="font-weight: 700; font-size:16px; font-family:Helvetica, sans-serif; color:#3c4858;" for="EMAIL" data-required="*">Enter your email address</label><div class="entry__field"><input class="input " type="text" id="EMAIL" name="EMAIL" autocomplete="off" placeholder="EMAIL" data-required="true" required /></div></div><label class="entry__error entry__error--primary"></label><label class="entry__specification" style="font-size:12px; font-family:Helvetica, sans-serif; color:#8390A4;">Provide your email address to subscribe. For e.g abc@xyz.com</label></div></div></div>
@@ -89,6 +90,9 @@
         <button id="continue-btn" class="cta-button" disabled>I have submitted my feedback</button>
     </div>
     
+    <!-- This hidden iframe will catch the form's redirect -->
+    <iframe name="sib_iframe" style="display: none;"></iframe>
+
     <script>
         // --- Configuration for the test page ---
         const PURESPECTRUM_COMPLETE_URL = "https://spectrumsurveys.com/surveydone?st=21";
@@ -133,5 +137,4 @@
 
 </body>
 </html>
-
 

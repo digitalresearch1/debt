@@ -1,519 +1,109 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html lang="en" class="supernova">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
-<meta name="HandheldFriendly" content="true">
-<title>Debt Relief Research Survey</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style type="text/css">
-  body { font-family: 'Inter', sans-serif; }
-  .form-all { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-  .form-header-group { background: linear-gradient(120deg, #60a5fa 0%, #a78bfa 100%); }
-  .action-btn { transition: background-color 0.3s, transform 0.2s; cursor: pointer; }
-  .action-btn:hover { transform: translateY(-2px); }
-  .qualification-list li { background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2322c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>') no-repeat left center; padding-left: 30px; margin-bottom: 8px; }
-  .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  .disabled-link, .disabled-btn { opacity: 0.5; pointer-events: none; cursor: not-allowed; }
-  /* Custom slider */
-  input[type=range].slider{ -webkit-appearance:none; appearance:none; width:100%; background:transparent; height:34px; position:relative; z-index:1; touch-action: pan-y; pointer-events:auto; }
-  input[type=range].slider::-webkit-slider-runnable-track{ height:8px; background: linear-gradient(90deg, #e5e7eb, #d1d5db); border-radius: 9999px; }
-  input[type=range].slider::-webkit-slider-thumb{ -webkit-appearance:none; height: 24px; width:24px; border-radius:50%; background: linear-gradient(135deg, #818cf8, #a78bfa); margin-top:-8px; border: 3px solid white; box-shadow: 0 6px 20px rgba(99,102,241,.35); }
-  input[type=range].slider::-moz-range-track{ height:8px; background: linear-gradient(90deg, #e5e7eb, #d1d5db); border-radius:9999px; }
-  input[type=range].slider::-moz-range-thumb{ height:24px; width:24px; border-radius:50%; background: linear-gradient(135deg, #818cf8, #a78bfa); border:3px solid white; box-shadow: 0 6px 20px rgba(99,102,241,.35); }
-</style>
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-
-<div class="form-all w-full max-w-4xl mx-auto bg-white rounded-2xl p-6 md:p-8 lg:p-12">
-  
-  <div id="mainContent">
-    <div class="form-header-group header-large mb-8 p-6 rounded-xl text-white text-center">
-      <h1 class="text-2xl md:text-3xl font-bold">Debt Relief Research Survey</h1>
-      <p class="mt-2 text-base md:text-lg">Help us understand the effectiveness of debt relief services.</p>
-    </div>
-
-    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-3">Who Can Participate?</h2>
-        <p class="text-gray-700 mb-4">We are seeking feedback from people to better understand the debt settlement process. Please proceed if you meet the following qualifications:</p>
-        <ul class="qualification-list list-none">
-            <li>You have over $10,000 in unsecured debt (credit cards, personal loans, etc.).</li>
-            <li>You have a steady source of income.</li>
-            <li>You are seriously interested in debt settlement.</li>
-        </ul>
-    </div>
-    
-    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
-        <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
-        <ol class="list-decimal list-inside text-gray-700 space-y-2">
-            <li><strong>Complete the secure form below to get a free consultation.</strong> You will be asked for your debt amount, personal details, and phone number.</li>
-            <li>After submitting the form, a debt specialist from our partner, CuraDebt, will contact you directly. You will then see an optional feedback form.</li>
-            <li>Provide your feedback in the form to proceed.</li>
-            <li>After you are contacted by the company, <strong>send us an email</strong> about your experience.</li>
-        </ol>
-    </div>
-
-    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-3">Welcome!</h2>
-        <p class="text-gray-700">Fantastic! You've qualified for the study. The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist. To get genuine feedback, this study is for people who are truly interested in getting help with their debt. We've carefully researched and selected a reputable company, <strong>CuraDebt</strong>, to connect our participants with. A debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years. After you submit this form, you may receive a call from +18553065699 to connect you to a specialist. We will also send an email to confirm your participation. Please reply to that email to let us know how your call went.</p>
-    </div>
-  
-    <form id="debt-form" class="w-full space-y-4">
-      <div class="text-center">
-        <label for="debt-slider" class="text-sm font-medium text-slate-700">Select Amount Of Unsecured Debt</label>
-        <p id="debt-amount-display" class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 my-2">$25,000</p>
-        <input type="range" id="debt-slider" class="slider" min="0" max="100000" value="25000" step="100" aria-label="Unsecured debt amount slider">
-        <p class="text-xs text-slate-600 mt-2">Move the slider to select the exact amount you owe.</p>
-        <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
-          <label class="text-xs text-slate-600 sm:col-span-1" for="debt-number">Or type exact amount</label>
-          <input type="text" id="debt-number" inputmode="numeric" placeholder="e.g. 12,450" class="sm:col-span-2 bg-white border border-slate-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500/60" value="25,000">
-        </div>
-        <p id="move-hint" class="text-xs text-amber-700 mt-2">Move the slider to confirm your amount.</p>
-        <div id="debt-warning" class="text-[11px] text-rose-600 mt-2 hidden">Minimum debt is $10,000 to qualify.</div>
-        <input type="hidden" id="debt-confirmed" value="0">
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-        <input type="text" name="f_fname" placeholder="First Name" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500/60" />
-        <input type="text" name="f_lname" placeholder="Last Name" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500/60" />
-      </div>
-      <input type="email" name="f_email" id="f_email" placeholder="Email Address" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60" />
-      <div id="email-hint" class="text-[11px] mt-1 text-slate-600" aria-live="polite"></div>
-      <input type="tel" name="f_phone" id="f_phone" placeholder="Phone Number" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60" />
-      <div id="phone-hint" class="text-[11px] mt-1 text-slate-600" aria-live="polite"></div>
-      <div id="otp-ui" class="mt-2 space-y-2">
-        <div class="flex flex-wrap gap-2 items-center">
-          <button type="button" id="send-otp" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs shadow ring-1 ring-black/5">Send verification code</button>
-          <input id="otp-code" class="bg-white border border-slate-300 p-2 rounded w-36 focus:ring-2 focus:ring-indigo-500/60" placeholder="6-digit code" maxlength="6" />
-          <button type="button" id="check-otp" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs shadow ring-1 ring-black/5">Verify number</button>
-          <span id="otp-status" class="text-xs text-slate-700"></span>
-        </div>
-        <div id="recaptcha-container"></div>
-      </div>
-      <select name="f_whereyoulive" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-indigo-500/60"><option value="" disabled selected>Select Your State</option></select>
-      <label class="flex items-start gap-2 text-[11px] text-slate-700"><input type="checkbox" id="tcpa" required class="mt-1"><span>By clicking, you agree to be contacted by CuraDebt and its partners at the number and email provided (including via automated dialing/texts). Your consent is not required to purchase. Message/data rates may apply.</span></label>
-      <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-base py-3 rounded-xl transition disabled:opacity-60 disabled:cursor-not-allowed shadow">Select amount to continue</button>
-      <div id="form-error" class="text-rose-600 font-semibold text-center text-sm hidden"></div>
-    </form>
-    
-    <!-- Brevo Iframe Section -->
-    <div id="brevo-iframe-section" class="p-4 bg-orange-50 border border-orange-200 rounded-lg mt-8 hidden">
-        <h3 class="text-lg font-semibold text-orange-800">Step 2: Provide your feedback below to finish the survey.</h3>
-        <p class="text-gray-700 mt-2">To complete the survey, please provide your feedback in the secure form below. Your insights are valuable to our research.</p>
-        <div class="mt-4 w-full h-[600px] border-4 border-gray-200 rounded-lg overflow-hidden">
-            <iframe id="brevo-iframe" src="https://digitalresearch1.github.io/debt/brevo.html" class="w-full h-full border-0"></iframe>
-        </div>
-        <div class="mt-4 flex justify-center">
-            <button id="confirmBrevoButton" class="action-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg">I've Submitted My Feedback</button>
-        </div>
-    </div>
-    
-    <div class="mt-8 flex justify-center gap-4">
-        <button id="abandonSurveyButton" class="action-btn inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg">Abandon Survey</button>
-        <button id="finishSurveyButton" class="action-btn inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg disabled-btn">Finish Survey</button>
-    </div>
-  </div>
-
-</div>
-
-<!-- Hidden forms for CORS-safe lead submission -->
-<form id="hidden-curadebt-post" action="https://signup.curadebt.com/apkconnect/" method="POST" target="hidden_post_target" style="display:none;">
-  <input name="f_fname"><input name="f_lname"><input name="f_email"><input name="f_phone"><input name="f_whereyoulive"><input name="f_totaldebt">
-  <input name="f_comments"><input name="data1"><input name="data2" value="CLICKID2"><input name="f_ip">
-</form>
-<form id="hidden-trackdrive-post" action="https://curadebt.trackdrive.com/api/v1/leads" method="POST" target="hidden_td_target" style="display:none;">
-  <input name="lead_token" value="3346b0458309406ba4b8beac90a8a532"><input name="traffic_source_id" value="1000"><input name="caller_id"><input name="call_now" value="1">
-  <input name="first_name"><input name="last_name"><input name="email"><input name="state"><input name="zip"><input name="ip_address"><input name="source_url"><input name="useragent"><input name="original_lead_submit_date"><input name="tcpa_opt_in"><input name="tcpa_optin_consent_language"><input name="sub_id"><input name="gclid"><input name="fbeventid"><input name="msclkid"><input name="traffic_source_lead_id">
-</form>
-<iframe name="hidden_post_target" style="display:none;"></iframe>
-<iframe name="hidden_td_target" style="display:none;"></iframe>
-
-<script type="module">
-// Preview-safe script: dynamically import Firebase; fall back if blocked
-
-document.addEventListener('DOMContentLoaded', async function() {
-  let firebaseOk = false;
-  let initializeApp, getAuth, RecaptchaVerifier, signInWithPhoneNumber, auth;
-  try {
-    ({ initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js'));
-    ({ getAuth, RecaptchaVerifier, signInWithPhoneNumber } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js'));
-    const firebaseConfig = { apiKey: "AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE", authDomain: "otp-c6311.firebaseapp.com", projectId: "otp-c6311", storageBucket: "otp-c6311.firebasestorage.app", messagingSenderId: "637495517002", appId: "1:637495517002:web:7bd220994a7611a5606bb3" };
-    const app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    firebaseOk = true;
-  } catch (e) {
-    console.warn('Preview mode: Firebase unavailable in sandbox. OTP disabled.', e);
-  }
-
-  const PREVIEW_MODE = !firebaseOk; // if we couldn't import Firebase, we are in preview fallback
-
-  let otpVerified = false;
-  let confirmationResult = null;
-  let clientIp = '';
-  
-  const urlParams = new URLSearchParams(window.location.search);
-  let transactionId = urlParams.get('transaction_id') || urlParams.get('RID') || `tx_${Date.now()}`;
-  
-  // Endpoints (kept for production; not needed for preview)
-  const VALIDATE_PHONE_ENDPOINT = "https://silent-sea-a717.kasindeesther.workers.dev/";
-  const VALIDATE_EMAIL_ENDPOINT = "https://solitary-base-4a8b.kasindeesther.workers.dev/";
-  
-  const ALL_STATES = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"];
-  const EXCLUDED_STATES = ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','RI'];
-
-  // DOM Elements
-  const debtForm = document.getElementById('debt-form');
-  const finishSurveyButton = document.getElementById('finishSurveyButton');
-  const brevoIframeSection = document.getElementById('brevo-iframe-section');
-  const debtSlider = document.getElementById('debt-slider');
-  const debtDisplay = document.getElementById('debt-amount-display');
-  const debtNumber = document.getElementById('debt-number');
-  const moveHint = document.getElementById('move-hint');
-  const debtConfirmedEl = document.getElementById('debt-confirmed');
-  const debtWarning = document.getElementById('debt-warning');
-  const stateSelect = debtForm.querySelector('select[name="f_whereyoulive"]');
-  const tcpaCheckbox = document.getElementById('tcpa');
-  const submitBtn = document.getElementById('submit-btn');
-  const formError = document.getElementById('form-error');
-  const confirmBrevoButton = document.getElementById('confirmBrevoButton');
-  const abandonSurveyButton = document.getElementById('abandonSurveyButton');
-
-  // Utility
-  const formatCurrency = n => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n);
-  const digitsOnly = s => String(s || '').replace(/[^0-9]+/g, '');
-  const toInt = s => { const n = parseInt(String(s || '').replace(/[^0-9]/g, ''), 10); return isNaN(n) ? 0 : n; };
-  
-  const fetchWithExponentialBackoff = async (url, options, retries = 3, delay = 1000) => {
-    for (let i = 0; i < retries; i++) {
-      try {
-        const response = await fetch(url, options);
-        if (response.status === 429 && i < retries - 1) {
-          await new Promise(res => setTimeout(res, delay * (2 ** i)));
-          continue;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brevo Form Redirect Test</title>
+    <!-- Brevo/Sendinblue styles for the feedback form -->
+    <style>
+        @font-face {
+            font-display: block;
+            font-family: Roboto;
+            src: url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/7529907e9eaf8ebb5220c5f9850e3811.woff2) format("woff2"), url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/25c678feafdc175a70922a116c9be3e7.woff) format("woff")
         }
-        return response;
-      } catch (error) {
-        if (i === retries - 1) throw error;
-        await new Promise(res => setTimeout(res, delay * (2 ** i)));
-      }
-    }
-  };
-  
-  // Validation
-  const parseStrictNANP = (raw) => {
-    const d = digitsOnly(raw);
-    const m = d.match(/^1?([2-9][0-9]{2})([2-9][0-9]{2})([0-9]{4})$/);
-    if (!m) return { ok: false, error: 'Enter a valid US number.' };
-    const [, area, prefix, line] = m;
-    const ten = area + prefix + line;
-    const allSame = ten.split('').every(ch => ch === ten[0]);
-    if (allSame || '0123456789'.repeat(3).includes(ten) || '9876543210'.repeat(3).includes(ten)) {
-      return { ok: false, error: 'Invalid pattern.' };
-    }
-    const TOLL_FREE = new Set(['800', '833', '844', '855', '866', '877', '888', '822']);
-    return { ok: true, e164: `+1${area}${prefix}${line}`, meta: { tollFree: TOLL_FREE.has(area) } };
-  };
+        @font-face {
+            font-display: fallback;
+            font-family: Roboto;
+            font-weight: 600;
+            src: url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/6e9caeeafb1f3491be3e32744bc30440.woff2) format("woff2"), url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/71501f0d8d5aa95960f6475d5487d4c2.woff) format("woff")
+        }
+        @font-face {
+            font-display: fallback;
+            font-family: Roboto;
+            font-weight: 700;
+            src: url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/3ef7cf158f310cf752d5ad08cd0e7e60.woff2) format("woff2"), url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/ece3a1d82f18b60bcce0211725c476aa.woff) format("woff")
+        }
+        #sib-container input:-ms-input-placeholder { text-align: left; font-family: Helvetica, sans-serif; color: #c0ccda; }
+        #sib-container input::placeholder { text-align: left; font-family: Helvetica, sans-serif; color: #c0ccda; }
+        #sib-container textarea::placeholder { text-align: left; font-family: Helvetica, sans-serif; color: #c0ccda; }
+        #sib-container a { text-decoration: underline; color: #2BB2FC; }
+        body { font-family: system-ui, sans-serif; background-color: #f0f2f5; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    </style>
+    <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+</head>
+<body>
 
-  const validatePhone = async (raw) => {
-    const strict = parseStrictNANP(raw);
-    if (!strict.ok) return strict;
-    try {
-      const r = await fetchWithExponentialBackoff(VALIDATE_PHONE_ENDPOINT, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: strict.e164 })
-      });
-      const j = await r.json();
-      if (!j.ok) return { ok: false, error: j.error || 'Validation failed.' };
-      return { ...j, e164: strict.e164, meta: { ...(strict.meta || {}) } };
-    } catch {
-      return { ok: true, e164: strict.e164, meta: strict.meta || {} };
-    }
-  };
-
-  const validateEmail = async (raw) => {
-    const email = String(raw || '').trim();
-    const at = email.indexOf('@');
-    if (at < 1 || at === email.length - 1) return { ok: false, error: 'Enter a valid email address.' };
-    const local = email.slice(0, at), domain = email.slice(at + 1).toLowerCase();
-    const FREEMAIL = new Set(['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com', 'aol.com']);
-    const ROLE_LOCALS = new Set(['admin', 'support', 'info', 'sales', 'noreply']);
-    if (ROLE_LOCALS.has(local.toLowerCase())) return { ok: false, error: 'Role account not accepted.' };
-    if (local.includes('+')) return { ok: false, error: 'Plus-alias not accepted.' };
-    if ((domain === 'gmail.com' || domain === 'googlemail.com') && local.includes('.')) return { ok: false, error: 'Gmail dot alias not accepted.' };
-    try {
-      const r = await fetchWithExponentialBackoff(VALIDATE_EMAIL_ENDPOINT, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email })
-      });
-      const j = await r.json();
-      if (!j.ok) return { ok: false, error: j.error || 'Email validation failed.' };
-      return { ok: true, normalized: email, disposable: !!j.disposable, info: { freemail: FREEMAIL.has(domain), role: ROLE_LOCALS.has(local.toLowerCase()) } };
-    } catch {
-      return { ok: true, normalized: email, disposable: false, info: { freemail: FREEMAIL.has(domain), role: ROLE_LOCALS.has(local.toLowerCase()) } };
-    }
-  };
-  
-  // UI enable/disable logic
-  const setSubmitState = () => {
-    const v = parseInt(debtSlider.value || '0', 10) || 0;
-    const confirmed = debtConfirmedEl.value === '1';
-    const stateValue = stateSelect.value;
-    const consentOK = tcpaCheckbox.checked;
-    const amountOK = confirmed && v >= 10000;
-    const stateOK = !!stateValue && !EXCLUDED_STATES.includes(stateValue);
-    const otpOK = PREVIEW_MODE ? true : otpVerified; // allow submit in preview
-    moveHint.classList.toggle('hidden', confirmed);
-    let btnText = 'See If I Qualify';
-    if (!confirmed) btnText = 'Select amount to continue';
-    else if (v < 10000) btnText = `Minimum ${formatCurrency(10000)} required`;
-    else if (!otpOK) btnText = 'Verify your phone to continue';
-    else if (!consentOK) btnText = 'Consent required';
-    else if (!stateOK) btnText = 'State not serviced';
-    submitBtn.disabled = !(amountOK && stateOK && consentOK && otpOK);
-    submitBtn.textContent = btnText;
-    debtWarning.classList.toggle('hidden', v >= 10000);
-  };
-
-  const applyAmount = (raw) => {
-    const clamped = Math.max(0, Math.min(100000, Math.round(raw || 0)));
-    debtSlider.value = String(clamped);
-    debtNumber.value = clamped.toLocaleString('en-US');
-    debtDisplay.textContent = clamped >= 100000 ? `${formatCurrency(clamped)}+` : formatCurrency(clamped);
-    debtConfirmedEl.value = '1';
-    setSubmitState();
-  };
-
-  // ---- SUBMIT HANDLER (CORS-safe via hidden forms) ----
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<div class="loader mx-auto"></div>';
-    formError.classList.add('hidden');
+    <div class="card">
+        <div id="form-wrapper">
+            <!-- This is the Brevo form copied from the main survey -->
+            <div class="sib-form" style="text-align: center; background-color: #EFF2F7;">
+                <div id="sib-form-container" class="sib-form-container">
+                    <div id="error-message" class="sib-form-message-panel" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949;max-width:540px; display:none;">
+                        <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                            <svg viewBox="0 0 512 512" class="sib-icon sib-notification__icon"><path d="M256 40c118.621 0 216 96.075 216 216 0 119.291-96.61 216-216 216-119.244 0-216-96.562-216-216 0-119.203 96.602-216 216-216m0-32C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm-11.49 120h22.979c6.823 0 12.274 5.682 11.99 12.5l-7 168c-.268 6.428-5.556 11.5-11.99 11.5h-8.979c-6.433 0-11.722-5.073-11.99-11.5l-7-168c-.283-6.818 5.167-12.5 11.99-12.5zM256 340c-15.464 0-28 12.536-28 28s12.536 28 28 28 28-12.536 28-28-12.536-28-28-28z" /></svg>
+                            <span class="sib-form-message-panel__inner-text">Your subscription could not be saved. Please try again.</span>
+                        </div>
+                    </div>
+                    <div id="success-message" class="sib-form-message-panel" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#085229; background-color:#e7faf0; border-radius:3px; border-color:#13ce66;max-width:540px; display:none;">
+                        <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                            <svg viewBox="0 0 512 512" class="sib-icon sib-notification__icon"><path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 464c-118.664 0-216-96.055-216-216 0-118.663 96.055-216 216-216 118.664 0 216 96.055 216 216 0 118.663-96.055 216-216 216zm141.63-274.961L217.15 376.071c-4.705 4.667-12.303 4.637-16.97-.068l-85.878-86.572c-4.667-4.705-4.637-12.303.068-16.97l8.52-8.451c4.705-4.667 12.303-4.637 16.97.068l68.976 69.533 163.441-162.13c4.705-4.667 12.303-4.637 16.97.068l8.451 8.52c4.668 4.705 4.637 12.303-.068 16.97z" /></svg>
+                            <span class="sib-form-message-panel__inner-text">Your subscription has been successful.</span>
+                        </div>
+                    </div>
+                    <div id="sib-container" class="sib-container--large sib-container--vertical" style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:3px; border-width:1px; border-color:#C0CCD9; border-style:solid; direction:ltr">
+                        <form id="sib-form" method="POST" action="https://52bcaf92.sibforms.com/serve/MUIFABmWYWf3cwFJgrPQjj77APgtEF8JJ634OSD8-qQ0EDQNiYN4wKPaqF51FAIz5p1vc-yLf5DzMhxB9w2mxDBu1Y0b87khoYUFn2eK-KLi_obHRBTplKxc2k8CzNCwM-uTcb6i0GlaxcU49zWeQXP5s5cGwd7q1sahZ8i6BR5E43UzfKJflMtJ7R5ild_uKdD9alhHh3f8n_Mt" data-type="subscription">
+                            <div style="padding: 8px 0;"><div class="sib-form-block" style="font-size:32px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;"><p>Survey Feedback</p></div></div>
+                            <div style="padding: 8px 0;"><div class="sib-form-block" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;"><div class="sib-text-form-block"><p>Please provide your email to receive a reminder for the feedback of the survey</p></div></div></div>
+                            <div style="padding: 8px 0;"><div class="sib-input sib-form-block"><div class="form__entry entry_block"><div class="form__label-row "><label class="entry__label" style="font-weight: 700; font-size:16px; font-family:Helvetica, sans-serif; color:#3c4858;" for="EMAIL" data-required="*">Enter your email address</label><div class="entry__field"><input class="input " type="text" id="EMAIL" name="EMAIL" autocomplete="off" placeholder="EMAIL" data-required="true" required /></div></div><label class="entry__error entry__error--primary"></label><label class="entry__specification" style="font-size:12px; font-family:Helvetica, sans-serif; color:#8390A4;">Provide your email address to subscribe. For e.g abc@xyz.com</label></div></div></div>
+                            <div style="padding: 8px 0;"><div class="sib-optin sib-form-block"><div class="form__entry entry_mcq"><div class="form__label-row "><div class="entry__choice"><label><input type="checkbox" class="input_replaced" value="1" id="OPT_IN" name="OPT_IN" /><span class="checkbox checkbox_tick_positive"></span><span style="font-size:14px; font-family:Helvetica, sans-serif; color:#3C4858;"><p>I agree to receive your email and accept the data privacy statement.</p></span></label></div></div><label class="entry__error entry__error--primary"></label><label class="entry__specification" style="font-size:12px; font-family:Helvetica, sans-serif; color:#8390A4;">You may unsubscribe at any time using the link in our newsletter.</label></div></div></div>
+                            <div style="padding: 8px 0;"><div class="sib-form-block" style="text-align: left"><button class="sib-form-block__button sib-form-block__button-with-loader" style="font-size:16px; font-weight:700; font-family:Helvetica, sans-serif; color:#FFFFFF; background-color:#3E4857; border-radius:3px; border-width:0px;" form="sib-form" type="submit"><svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon" viewBox="0 0 512 512"><path d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" /></svg>SUBMIT</button></div></div>
+                            <input type="text" name="email_address_check" value="" class="input--hidden"><input type="hidden" name="locale" value="en">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="redirect-message" style="display:none; text-align: center; margin-top: 20px;">
+            <h3>Thank you!</h3>
+            <p>Your feedback has been submitted. You will be redirected shortly.</p>
+        </div>
+    </div>
     
-    if (!PREVIEW_MODE && !otpVerified) {
-      formError.textContent = 'Please verify your phone number to continue.';
-      formError.classList.remove('hidden');
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = 'See If I Qualify';
-      return;
-    }
+    <script>
+        // --- Configuration for the test page ---
+        const PURESPECTRUM_COMPLETE_URL = "https://spectrumsurveys.com/surveydone?st=21";
+        const TRANSACTION_ID = new URLSearchParams(window.location.search).get('transaction_id') || 'TEST_TRANSACTION_ID';
 
-    const debtAmount = parseInt(debtSlider.value, 10) || 0;
-    const selectedState = stateSelect.value;
-    const confirmed = debtConfirmedEl.value === '1';
+        function onFormSuccess() {
+            // Hide the form and show a success message
+            document.getElementById('form-wrapper').style.display = 'none';
+            document.getElementById('redirect-message').style.display = 'block';
 
-    const errors = [];
-    if (!confirmed) errors.push('Please confirm your debt amount by moving the slider or typing the exact amount.');
-    if (debtAmount < 10000) errors.push('Minimum debt of $10,000 is required to qualify.');
-    if (EXCLUDED_STATES.includes(selectedState)) errors.push('Unfortunately, we do not service your state at this time.');
-    if (!tcpaCheckbox.checked) errors.push('Please agree to the consent to continue.');
-    
-    const emailRaw = debtForm.querySelector('input[name="f_email"]').value || '';
-    const emailCheck = await validateEmail(emailRaw);
-    if (!emailCheck.ok || emailCheck.disposable || emailCheck.info?.role || emailCheck.info?.plusAnywhere || emailCheck.info?.gmailDot) {
-      errors.push(emailCheck.ok ? 'Please use a personal, non-role, non-alias email.' : (emailCheck.error || 'Invalid email.'));
-    }
-    
-    const phoneRaw = debtForm.querySelector('input[name="f_phone"]').value || '';
-    const phoneCheck = await validatePhone(phoneRaw);
-    if (!phoneCheck.ok) {
-      errors.push(phoneCheck.error || 'Please enter a valid phone number.');
-    }
+            // Construct the final URL and redirect
+            const finalUrl = `${PURESPECTRUM_COMPLETE_URL}&transaction_id=${TRANSACTION_ID}`;
+            console.log(`Redirecting to: ${finalUrl}`);
+            setTimeout(() => {
+                window.location.href = finalUrl;
+            }, 2000); // Wait 2 seconds before redirecting
+        }
 
-    if (errors.length > 0) {
-      formError.innerHTML = errors.join('<br>');
-      formError.classList.remove('hidden');
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = 'See If I Qualify';
-      return;
-    }
+        // --- Logic to detect Brevo form submission ---
+        const successObserver = new MutationObserver(() => {
+            const successMessage = document.getElementById('success-message');
+            if (successMessage && successMessage.style.display !== 'none') {
+                onFormSuccess();
+                successObserver.disconnect();
+            }
+        });
 
-    const normalizedEmail = emailCheck.normalized;
-    let emailStatusTag = 'normal';
-    if (emailCheck.disposable) emailStatusTag = 'disposable';
-    else if (emailCheck.info?.role) emailStatusTag = 'role';
-    else if (emailCheck.info?.plusAnywhere) emailStatusTag = 'plus';
-    else if (emailCheck.info?.gmailDot) emailStatusTag = 'gmaildot';
+        const formContainer = document.getElementById('sib-form-container');
+        if (formContainer) {
+            successObserver.observe(formContainer, { subtree: true, attributes: true, attributeFilter: ['style'] });
+        }
 
-    const normalizedE164 = phoneCheck.e164 || phoneRaw;
-    const phoneType = phoneCheck.type || 'unknown';
-    const isTollFree = !!(phoneCheck.meta && phoneCheck.meta.tollFree);
-
-    try {
-      const r = await fetch('https://api.ipify.org?format=json');
-      const j = await r.json();
-      clientIp = j.ip || '';
-    } catch {
-      clientIp = '';
-    }
-
-    const formData = new FormData(debtForm);
-    const data1 = (new URLSearchParams(location.search).get('data1') || new URLSearchParams(location.search).get('click_id') || new URLSearchParams(location.search).get('gclid') || new URLSearchParams(location.search).get('fbclid') || new URLSearchParams(location.search).get('msclkid') || '') || transactionId || 'no_click_id';
-
-    // === Fill & submit hidden Curadebt form ===
-    const cform = document.getElementById('hidden-curadebt-post');
-    cform.querySelector('input[name="f_fname"]').value        = formData.get('f_fname') || '';
-    cform.querySelector('input[name="f_lname"]').value        = formData.get('f_lname') || '';
-    cform.querySelector('input[name="f_email"]').value        = normalizedEmail;
-    cform.querySelector('input[name="f_phone"]').value        = normalizedE164.startsWith('+1') ? normalizedE164.slice(2) : normalizedE164; // Curadebt expects 10 digits
-    cform.querySelector('input[name="f_whereyoulive"]').value = formData.get('f_whereyoulive') || '';
-    cform.querySelector('input[name="f_totaldebt"]').value    = String(debtAmount);
-    cform.querySelector('input[name="f_comments"]').value     = `Lead from Survey | phone_type=${phoneType} | email_status=${emailStatusTag} | toll_free=${isTollFree}`;
-    cform.querySelector('input[name="data1"]').value          = data1;
-    cform.querySelector('input[name="data2"]').value          = 'CLICKID2';
-    cform.querySelector('input[name="f_ip"]').value           = clientIp || '';
-
-    // === Fill & submit hidden TrackDrive form ===
-    const tform = document.getElementById('hidden-trackdrive-post');
-    const qs = new URLSearchParams(location.search);
-    tform.querySelector('input[name="lead_token"]').value                  = '3346b0458309406ba4b8beac90a8a532';
-    tform.querySelector('input[name="traffic_source_id"]').value           = '1000';
-    tform.querySelector('input[name="caller_id"]').value                   = normalizedE164; // E.164
-    tform.querySelector('input[name="call_now"]').value                    = '1';
-    tform.querySelector('input[name="first_name"]').value                  = formData.get('f_fname') || '';
-    tform.querySelector('input[name="last_name"]').value                   = formData.get('f_lname') || '';
-    tform.querySelector('input[name="email"]').value                       = normalizedEmail;
-    tform.querySelector('input[name="state"]').value                       = formData.get('f_whereyoulive') || '';
-    tform.querySelector('input[name="zip"]').value                         = formData.get('f_zip') || '';
-    tform.querySelector('input[name="ip_address"]').value                  = clientIp || '';
-    tform.querySelector('input[name="source_url"]').value                  = location.href;
-    tform.querySelector('input[name="useragent"]').value                   = navigator.userAgent || '';
-    tform.querySelector('input[name="original_lead_submit_date"]').value   = new Date().toISOString().replace('T', ' ').slice(0, 19);
-    tform.querySelector('input[name="tcpa_opt_in"]').value                 = 'true';
-    const consentText = document.getElementById('tcpa').parentElement.querySelector('span')?.innerText || 'TCPA consent captured';
-    tform.querySelector('input[name="tcpa_optin_consent_language"]').value = consentText.trim();
-    tform.querySelector('input[name="sub_id"]').value                      = data1;
-    tform.querySelector('input[name="gclid"]').value                       = qs.get('gclid') || '';
-    tform.querySelector('input[name="fbeventid"]').value                   = qs.get('fbclid') || '';
-    tform.querySelector('input[name="msclkid"]').value                     = qs.get('msclkid') || '';
-    tform.querySelector('input[name="traffic_source_lead_id"]').value      = transactionId;
-
-    try {
-      // Submit both via hidden iframes (avoids CORS)
-      cform.submit();
-      tform.submit();
-
-      // Continue UI flow
-      document.getElementById('debt-form').style.display = 'none';
-      brevoIframeSection.classList.remove('hidden');
-      brevoIframeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (e) {
-      console.error('Submission failed:', e);
-      alert('There was a problem submitting your information. Please try again.');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = 'See If I Qualify';
-    }
-  };
-  
-  // Populate states
-  ALL_STATES.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; stateSelect.appendChild(o); });
-  
-  // Events
-  debtSlider.addEventListener('input', () => applyAmount(Number(debtSlider.value) || 0));
-  debtNumber.addEventListener('input', () => applyAmount(toInt(debtNumber.value)));
-  debtNumber.addEventListener('blur', () => { const v = toInt(debtNumber.value); debtNumber.value = v ? v.toLocaleString('en-US') : ''; });
-  stateSelect.addEventListener('change', setSubmitState);
-  tcpaCheckbox.addEventListener('change', setSubmitState);
-  debtForm.addEventListener('submit', handleFormSubmit);
-  confirmBrevoButton.addEventListener('click', () => { finishSurveyButton.classList.remove('disabled-btn'); });
-
-  // Initial state
-  applyAmount(25000);
-  setSubmitState();
-
-  // OTP UI handlers (fallback in preview mode)
-  const phoneInput = document.getElementById('f_phone');
-  const emailInput = document.getElementById('f_email');
-  const phoneHint = document.getElementById('phone-hint');
-  const emailHint = document.getElementById('email-hint');
-  const sendBtn = document.getElementById('send-otp');
-  const checkBtn = document.getElementById('check-otp');
-  const codeInput = document.getElementById('otp-code');
-  const statusEl = document.getElementById('otp-status');
-  const recaptchaDiv = document.getElementById('recaptcha-container');
-  let verifier;
-  
-  const ensureRecaptcha = () => {
-    if (!firebaseOk) return null;
-    if (!verifier) verifier = new RecaptchaVerifier(auth, recaptchaDiv, { size: 'invisible' });
-    return verifier;
-  };
-
-  sendBtn.addEventListener('click', async () => {
-    if (!firebaseOk) { statusEl.textContent = 'Preview mode: OTP disabled here.'; statusEl.className = 'text-xs text-amber-700'; return; }
-    const parsed = parseStrictNANP(phoneInput.value);
-    if (!parsed.ok) { statusEl.textContent = parsed.error; statusEl.className = 'text-xs text-rose-600'; return; }
-    try {
-      statusEl.textContent = 'Sending code…';
-      statusEl.className = 'text-xs text-slate-700';
-      confirmationResult = await signInWithPhoneNumber(auth, parsed.e164, ensureRecaptcha());
-      statusEl.textContent = 'Code sent. Check SMS.';
-      statusEl.className = 'text-xs text-emerald-700';
-    } catch (e) {
-      statusEl.textContent = `Failed to send (${e?.code || 'unknown'}): ${e?.message || e}`;
-      statusEl.className = 'text-xs text-rose-600';
-    }
-  });
-
-  checkBtn.addEventListener('click', async () => {
-    if (!firebaseOk) { statusEl.textContent = 'Preview mode: OTP disabled here.'; statusEl.className = 'text-xs text-amber-700'; return; }
-    const code = (codeInput.value || '').trim();
-    if (!confirmationResult) { statusEl.textContent = 'Click "Send verification code" first.'; statusEl.className = 'text-xs text-rose-600'; return; }
-    if (code.length !== 6) { statusEl.textContent = 'Enter the 6-digit code.'; statusEl.className = 'text-xs text-rose-600'; return; }
-    try {
-      statusEl.textContent = 'Verifying…';
-      statusEl.className = 'text-xs text-slate-700';
-      await confirmationResult.confirm(code);
-      otpVerified = true;
-      statusEl.textContent = 'Verified ✓';
-      statusEl.className = 'text-xs text-emerald-700';
-      setSubmitState();
-    } catch (e) {
-      otpVerified = false;
-      statusEl.textContent = `Verify failed. ${e?.code || ''}`;
-      statusEl.className = 'text-xs text-rose-600';
-      setSubmitState();
-    }
-  });
-
-  phoneInput.addEventListener('input', () => { otpVerified = false; statusEl.textContent = ''; setSubmitState(); });
-  emailInput.addEventListener('blur', async () => {
-    if (!emailInput.value) { emailHint.textContent = ''; return; }
-    emailHint.textContent = 'Checking email…';
-    const res = await validateEmail(emailInput.value);
-    if (res.ok) {
-      let msg = '✅ Valid';
-      if (res.disposable) msg = '⚠️ Disposable address detected.';
-      if (res.info?.role) msg = '⚠️ Role account not accepted.';
-      if (res.info?.plusAnywhere) msg = '⚠️ Plus-alias not accepted.';
-      if (res.info?.gmailDot) msg = '⚠️ Gmail dot alias not accepted.';
-      emailHint.textContent = msg;
-      emailHint.classList.toggle('text-emerald-700', !res.disposable && !res.info?.role && !res.info?.plusAnywhere && !res.info?.gmailDot);
-      emailHint.classList.toggle('text-amber-700', !!(res.disposable || res.info?.role || res.info?.plusAnywhere || res.info?.gmailDot));
-      emailHint.classList.remove('text-rose-600');
-    } else {
-      emailHint.textContent = `❌ ${res.error}`;
-      emailHint.classList.add('text-rose-600');
-      emailHint.classList.remove('text-emerald-700','text-amber-700');
-    }
-  });
-  
-  // Survey Control Buttons
-  const finishUrl = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${transactionId}`;
-  const abandonUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${transactionId}`;
-  
-  finishSurveyButton.addEventListener('click', function() {
-    if (!this.classList.contains('disabled-btn')) {
-      window.open(finishUrl, '_blank');
-    }
-  });
-  
-  abandonSurveyButton.addEventListener('click', function() {
-    window.open(abandonUrl, '_blank');
-  });
-});
-</script>
+    </script>
+    <script src="https://sibforms.com/forms/end-form/build/main.js"></script>
 
 </body>
 </html>

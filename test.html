@@ -149,11 +149,10 @@
          * Update all the values in this section to customize the survey.
          ********************************************************************/
         const CONFIG = {
-            // Set to `true` to show a debugging box with submission details.
+            // Set to `false` for production to hide the debugging box.
             DEBUG_MODE: false,
 
-            // Your Firebase project configuration for OTP phone verification.
-            // Get this from your Firebase project settings.
+            // CRITICAL: Replace these placeholders with your actual Firebase project configuration.
             FIREBASE_CONFIG: {
                 apiKey: "AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE",
                 authDomain: "otp-c6311.firebaseapp.com",
@@ -164,8 +163,8 @@
             },
             
             // Endpoints for lead submission.
-            LEAD_POST_URL_1: "https://www.curadebt.com/submit-api.php", // e.g., CuraDebt
-            LEAD_POST_URL_2: "https://td.trackdrive.com/api/v1/leads",  // e.g., TrackDrive
+            LEAD_POST_URL_1: "https://www.curadebt.com/submit-api.php", // CuraDebt
+            LEAD_POST_URL_2: "https://td.trackdrive.com/api/v1/leads",  // TrackDrive
             
             // TrackDrive specific campaign ID.
             TRACKDRIVE_CAMPAIGN_ID: "1000",
@@ -173,9 +172,11 @@
             // Brevo (Sendinblue) form action URL for feedback collection.
             BREVO_FORM_URL: "https://52bcaf92.sibforms.com/serve/MUIFABmWYWf3cwFJgrPQjj77APgtEF8JJ634OSD8-qQ0EDQNiYN4wKPaqF51FAIz5p1vc-yLf5DzMhxB9w2mxDBu1Y0b87khoYUFn2eK-KLi_obHRBTplKxc2k8CzNCwM-uTcb6i0GlaxcU49zWeQXP5s5cGwd7q1sahZ8i6BR5E43UzfKJflMtJ7R5ild_uKdD9alhHh3f8n_Mt",
             
-            // The final URL to redirect users to after they complete the survey.
-            // Replace this placeholder with your actual PureSpectrum completion link.
-            PURESPECTRUM_COMPLETE_URL: "https://www.purespectrum.com/survey-complete",
+            // The final URL for users who successfully complete the entire survey.
+            PURESPECTRUM_COMPLETE_URL: "https://spectrumsurveys.com/surveydone?st=21",
+
+            // The URL for users who are disqualified or abandon the survey.
+            PURESPECTRUM_TERMINATE_URL: "https://spectrumsurveys.com/surveydone?st=18",
 
             // Minimum debt amount required to qualify for the survey.
             MIN_DEBT_AMOUNT: 10000,
@@ -189,6 +190,10 @@
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        // --- Capture Transaction ID on load ---
+        const URL_PARAMS = new URLSearchParams(window.location.search);
+        const TRANSACTION_ID = URL_PARAMS.get('transaction_id') || '';
 
         // Initialize Firebase
         const app = initializeApp(CONFIG.FIREBASE_CONFIG);
@@ -300,7 +305,7 @@
         let prefillDebtAmount = null;
         const surveyFlow = {
             start: { message: "Hello! I'm Chloe, an AI assistant for a research study on the debt settlement process. Would you be willing to participate?", type: 'multiple-choice', options: ["Yes, I'll participate", "No, thank you"], action: (a) => a.startsWith('Yes') ? goToStep('qDebtRange') : goToStep('leaveSurvey') },
-            leaveSurvey: { message: 'No problem. Thank you for your time.', end: true },
+            leaveSurvey: { message: 'No problem. Thank you for your time. Redirecting...', terminate: true },
             qDebtRange: { message: `About how much unsecured debt do you have (credit cards, personal loans, etc.)?`, type: 'multiple-choice', options: [`Below $${(CONFIG.MIN_DEBT_AMOUNT).toLocaleString()}`, `$${(CONFIG.MIN_DEBT_AMOUNT).toLocaleString()}–$40,000`, '$40,000+'], action: (a) => { if (a.startsWith('Below')) return goToStep('disqualify'); prefillDebtAmount = a.includes('$40,000') ? 50000 : 25000; return goToStep('qIncome'); } },
             qIncome: { message: 'Do you have a steady source of income?', type: 'multiple-choice', options: ['Yes', 'No'], action: (a) => a === 'Yes' ? goToStep('qWilling') : goToStep('disqualify') },
             qWilling: { message: 'As part of the study, would you speak with a debt specialist for a free, no-obligation consultation?', type: 'multiple-choice', options: ['Yes', 'No'], action: (a) => a === 'Yes' ? goToStep('preFormInfo') : goToStep('disqualify') },
@@ -308,8 +313,11 @@
             showApiForm: { message: "Excellent! Please complete the secure form below.", type: 'api-form' },
             formSuccess: { message: 'Thank you! Your information has been sent. Watch for a call from a toll free number and check your email for confirmation.', next: 'askForFeedback' },
             askForFeedback: { message: "This is the final step. Please submit your email below to complete the survey.", type: 'brevo-form' },
-            complete: { message: "That's everything! Thank you for your valuable feedback. You will now be redirected...", action: () => { setTimeout(() => { window.location.href = CONFIG.PURESPECTRUM_COMPLETE_URL; }, 1500); } },
-            disqualify: { message: "Based on your responses, this study isn't the right fit. Thank you for your time.", end: true }
+            complete: { message: "That's everything! Thank you for your valuable feedback. You will now be redirected...", action: () => { 
+                const finalUrl = `${CONFIG.PURESPECTRUM_COMPLETE_URL}&transaction_id=${TRANSACTION_ID}`;
+                setTimeout(() => { window.location.href = finalUrl; }, 1500); 
+            }},
+            disqualify: { message: "Based on your responses, this study isn't the right fit. Thank you for your time. Redirecting...", terminate: true }
         };
 
         function updateProgress(stepKey) { 
@@ -325,8 +333,10 @@
             
             const action = step.action || (() => step.next ? goToStep(step.next) : null);
 
-            if (step.end) { 
-                chatInputArea.innerHTML = `<div class="muted" style="text-align:center">You may now close this window.</div>`; 
+            if (step.terminate) { 
+                chatInputArea.innerHTML = `<div class="muted" style="text-align:center">You will be redirected shortly.</div>`; 
+                const finalUrl = `${CONFIG.PURESPECTRUM_TERMINATE_URL}&transaction_id=${TRANSACTION_ID}`;
+                setTimeout(() => { window.location.href = finalUrl; }, 1500);
                 return; 
             }
             
@@ -456,21 +466,8 @@
             const digitsOnly = s => String(s||'').replace(/\D+/g,'');
             const toE164US = raw => { const d = digitsOnly(raw); const m = d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/); return m ? `+1${m[1]}${m[2]}${m[3]}` : null; }
             
-            // --- Debug Logger ---
-            let debugBox;
-            if (CONFIG.DEBUG_MODE) {
-                if (!document.getElementById('td_debug_box')) {
-                    debugBox = document.createElement('div');
-                    debugBox.id = 'td_debug_box';
-                    debugBox.style.cssText = 'position:fixed;right:12px;bottom:12px;max-width:360px;background:#111827;color:#e5e7eb;padding:10px 12px;border-radius:12px;font:12px/1.4 monospace;z-index:70;opacity:.9;';
-                    debugBox.innerHTML = '<b>DEBUG</b><div id="dbg"></div>';
-                    document.body.appendChild(debugBox);
-                }
-            }
-            const dbg = msg => { if(CONFIG.DEBUG_MODE){ const d=document.getElementById('dbg'); if(d) d.innerHTML += `<div>${String(msg).replace(/[<>]/g, c=>({"<":"&lt;",">":"&gt;"}[c]))}</div>`; } };
-            
             // --- IP Capture ---
-            fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(j=>{ clientIp = j.ip || ''; dbg(`IP captured: ${clientIp}`); }).catch(()=>{ clientIp=''; dbg('IP capture failed.'); });
+            fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(j=>{ clientIp = j.ip || ''; }).catch(()=>{ clientIp=''; });
 
             // --- Form state and submission gating ---
             function updateSubmitEnabled() {
@@ -518,11 +515,9 @@
                     setupRecaptcha();
                     confirmationResult = await signInWithPhoneNumber(auth, e164, recaptchaVerifier);
                     otpStatus.textContent = 'Code sent. Check SMS.';
-                    dbg('OTP code sent.');
                 } catch(e) {
                     console.error('OTP send error:', e);
                     otpStatus.textContent = `Failed: ${e.code || 'unknown'}`;
-                    dbg(`OTP send error: ${e.message}`);
                     if (window.grecaptcha && recaptchaVerifier) {
                         recaptchaVerifier.render().then(widgetId => grecaptcha.reset(widgetId));
                     }
@@ -539,14 +534,12 @@
                     isOtpVerified = true;
                     otpStatus.textContent='Verified ✓';
                     otpStatus.style.color = '#166534';
-                    dbg('OTP verified successfully.');
                     updateSubmitEnabled();
                 } catch(e) {
                     isOtpVerified = false;
                     console.error('OTP verify error:', e);
                     otpStatus.textContent='Verification failed. Try again.';
                     otpStatus.style.color = '#b91c1c';
-                    dbg(`OTP verify error: ${e.message}`);
                     updateSubmitEnabled();
                 }
             });
@@ -576,8 +569,7 @@
                 const leadData = {};
                 formData.forEach((value, key) => leadData[key] = value);
                 const debtAmount = toInt(debtHidden.value);
-                const params = new URLSearchParams(location.search);
-
+                
                 // Populate Form 1 (CuraDebt)
                 const form1 = document.getElementById('hidden-lead-form-1');
                 form1.action = CONFIG.LEAD_POST_URL_1;
@@ -587,7 +579,7 @@
                 form1.elements['f_phone'].value = digitsOnly(leadData.f_phone);
                 form1.elements['f_whereyoulive'].value = leadData.f_whereyoulive || '';
                 form1.elements['f_totaldebt'].value = String(debtAmount);
-                form1.elements['data1'].value = params.get('data1') || params.get('gclid') || 'N/A';
+                form1.elements['data1'].value = TRANSACTION_ID || URL_PARAMS.get('data1') || URL_PARAMS.get('gclid') || 'N/A';
                 form1.elements['f_ip'].value = clientIp;
 
                 // Populate Form 2 (TrackDrive)
@@ -602,19 +594,16 @@
                 form2.elements['unsecured_debt_total'].value = String(debtAmount);
                 form2.elements['ip_address'].value = clientIp;
                 form2.elements['useragent'].value = navigator.userAgent;
-                form2.elements['gclid'].value = params.get('gclid') || '';
-                form2.elements['fbeventid'].value = params.get('fbclid') || '';
-                form2.elements['msclkid'].value = params.get('msclkid') || '';
+                form2.elements['gclid'].value = URL_PARAMS.get('gclid') || '';
+                form2.elements['fbeventid'].value = URL_PARAMS.get('fbclid') || '';
+                form2.elements['msclkid'].value = URL_PARAMS.get('msclkid') || '';
                 form2.elements['tcpa_opt_in'].value = 'true';
                 form2.elements['tcpa_optin_consent_language'].value = formWrapper.querySelector('#tcpa + span')?.innerText || 'TCPA consent captured';
                 form2.elements['otp_verified'].value = '1';
 
                 try {
-                    dbg('Submitting to Form 1...');
                     form1.submit();
-                    dbg('Submitting to Form 2...');
                     form2.submit();
-                    dbg('Submissions sent.');
                     goToStep('formSuccess');
                 } catch(err) {
                     console.error('Submission failed:', err);
@@ -622,7 +611,6 @@
                     formError.classList.remove('hidden');
                     submitButton.disabled = false;
                     submitButton.textContent = 'See My Savings Estimate →';
-                    dbg(`Submission error: ${err.message}`);
                 }
             });
         }
@@ -702,5 +690,6 @@
     </script>
 </body>
 </html>
+
 
 

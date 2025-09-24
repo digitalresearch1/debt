@@ -672,16 +672,19 @@
             
             // This observer watches for Brevo's success message to become visible.
             // When it does, we know the form was submitted, and we can proceed.
-            const successObserver = new MutationObserver((mutations) => {
-                for (const mutation of mutations) {
-                    if (mutation.target.id === 'success-message' && mutation.target.style.display !== 'none') {
-                        onContinue(); // This triggers the final redirection step
-                        successObserver.disconnect(); // Stop observing
-                        return;
-                    }
+            const successObserver = new MutationObserver(() => {
+                const successMessage = document.getElementById('success-message');
+                // A more robust check to see if the success message is visible
+                if (successMessage && successMessage.style.display !== 'none') {
+                    onContinue(); // This triggers the final redirection step
+                    successObserver.disconnect(); // Stop observing
                 }
             });
-            successObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+            // We'll watch the form container for any style changes in its children
+            const formContainer = box.querySelector('#sib-form-container');
+            if (formContainer) {
+                 successObserver.observe(formContainer, { subtree: true, attributes: true, attributeFilter: ['style'] });
+            }
         }
 
         // --- Initial Load ---
@@ -690,6 +693,5 @@
     </script>
 </body>
 </html>
-
 
 

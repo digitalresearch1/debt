@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Chloe — Debt Relief Survey (Updated)</title>
+    <!-- Tailwind CSS for review cards -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Brevo/Sendinblue styles for the feedback form -->
     <style>
         @font-face {
@@ -279,7 +281,7 @@
             box.querySelector('#qa-ask').onclick = () => { const v = box.querySelector('#qa-input').value.trim(); if (v) ans.innerHTML = answerDebtQuestion(v); };
         }
 
-        function showOptions(options, onSelect) {
+        function showOptions(options, onSelect, delay = 0) {
             const c = createBaseContainer();
             const btns = options.map(opt => { 
                 const b = document.createElement('button'); 
@@ -289,12 +291,33 @@
                 c.appendChild(b); 
                 return b; 
             });
+
+            if (delay > 0 && btns.length > 0) {
+                const primaryBtn = btns[0];
+                primaryBtn.disabled = true;
+                let countdown = delay;
+                const originalText = primaryBtn.textContent;
+                primaryBtn.textContent = `Please read carefully (${countdown}s)`;
+
+                const timer = setInterval(() => {
+                    countdown--;
+                    if (countdown > 0) {
+                        primaryBtn.textContent = `Please read carefully (${countdown}s)`;
+                    } else {
+                        clearInterval(timer);
+                        primaryBtn.disabled = false;
+                        primaryBtn.textContent = originalText;
+                    }
+                }, 1000);
+            }
+
             const qaBtn = document.createElement('button'); 
             qaBtn.className = 'btn'; 
             qaBtn.textContent = Q_OPTION; 
             qaBtn.onclick = openQAModal; 
             c.appendChild(qaBtn);
             addAbandon(c);
+
             function finalize(v) { 
                 [...btns, qaBtn].forEach(b => b.disabled = true); 
                 onSelect(v); 
@@ -310,7 +333,67 @@
             qDebtRange: { message: `About how much unsecured debt do you have (credit cards, personal loans, etc.)?`, type: 'multiple-choice', options: [`Below $${(CONFIG.MIN_DEBT_AMOUNT).toLocaleString()}`, `$${(CONFIG.MIN_DEBT_AMOUNT).toLocaleString()}–$40,000`, '$40,000+'], action: (a) => { if (a.startsWith('Below')) return goToStep('disqualify'); prefillDebtAmount = a.includes('$40,000') ? 50000 : 25000; return goToStep('qIncome'); } },
             qIncome: { message: 'Do you have a steady source of income?', type: 'multiple-choice', options: ['Yes', 'No'], action: (a) => a === 'Yes' ? goToStep('qWilling') : goToStep('disqualify') },
             qWilling: { message: 'As part of the study, would you speak with a debt specialist for a free, no-obligation consultation?', type: 'multiple-choice', options: ['Yes', 'No'], action: (a) => a === 'Yes' ? goToStep('preFormInfo') : goToStep('disqualify') },
-            preFormInfo: { message: `<strong>Fantastic! You've qualified for the study.</strong><p style="margin:8px 0;">The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist. To get genuine feedback, this study is for people who are truly interested in getting help with their debt.</p><p style="margin:8px 0;">A debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to get you out of debt in about 2–4 years.</p><p style="margin:8px 0;">After you submit this form, you may receive a call from a toll free number. Press 1 to be connected to the agent. We will also send an email to confirm your participation. <strong>Please reply to that email to let us know how your call went.</strong></p>Are you ready to take the next step?`, type: 'multiple-choice', options: ["Yes, I'm ready"], action: () => goToStep('showApiForm') },
+            preFormInfo: { 
+                delay: 15,
+                message: `Fantastic! You’ve qualified for the study.<br><br><p class="text-center font-bold text-indigo-600 my-4">Please take a moment to read the following information carefully.</p>The main part of our research involves having you complete a short, secure form to request a free consultation from a debt specialist. To ensure we collect genuine feedback, this study is for people who are truly interested in getting help with their debt.<br><br>A debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to help you get out of debt in about 2–4 years.<br><br>After you submit this form, you may receive a call from a toll-free number. Press 1 to be connected to the agent. We will also send an email to confirm your participation — please reply to that email to let us know how your call went.<br><br><strong>How your information is used</strong><br><br>This is an independent research study, not a service offered by CuraDebt. Your information will be used only to connect you with a specialist and to collect research feedback. We share details with CuraDebt solely to allow them to contact you. We do not sell your information.<br><br>This study also helps others. We’re writing an article about debt to help people in situations like yours. We’ll ask a few short questions, then — if you choose — connect you to CuraDebt for a free consultation and later ask for brief feedback. We’ve carefully researched and selected CuraDebt as a reputable company to connect our participants with.
+            
+                <div class="mt-6 text-left">
+                    <h4 class="font-semibold text-slate-900 mb-2 text-center sm:text-left">Independent reviews</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 place-items-center">
+                        <!-- Trustpilot tile -->
+                        <a href="https://uk.trustpilot.com/review/www.curadebt.com?page=3" target="_blank" class="group block w-full border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl p-6 md:p-8 bg-white min-h-44">
+                            <div class="flex flex-col items-center text-center">
+                                <div class="mb-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 bg-[#f4f3ee] shadow-[0_10px_30px_rgba(0,0,0,.12)]">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6" fill="#00B67A">
+                                        <polygon points="12,2 14.9,9 22.3,9.2 16.7,13.4 18.7,20.2 12,16.3 5.3,20.2 7.3,13.4 1.7,9.2 9.1,9"></polygon>
+                                    </svg>
+                                    <span class="text-lg md:text-xl font-extrabold tracking-tight text-slate-900">Trustpilot</span>
+                                </div>
+                                <div class="text-sm text-slate-700 font-medium mb-2">CuraDebt reviews</div>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-1" aria-label="4.9 out of 5 stars on Trustpilot">
+                                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-emerald-600"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"></polygon></svg>
+                                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-emerald-600"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"></polygon></svg>
+                                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-emerald-600"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"></polygon></svg>
+                                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-emerald-600"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"></polygon></svg>
+                                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-emerald-600"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"></polygon></svg>
+                                    </div>
+                                    <div class="text-base font-semibold">4.9</div>
+                                </div>
+                                <div class="text-xs text-slate-600 mt-2">160 reviews on Trustpilot</div>
+                            </div>
+                        </a>
+                        <!-- Google Reviews tile -->
+                        <a href="https://www.google.com/maps/place/CuraDebt/@25.9704379,-80.169098,9455m/data=!3m2!1e3!5s0x88d9a9be4a479643:0xf7172abdc2f82499!4m8!3m7!1s0x88d9abe11e968fab:0xede6e70fcbc1421f!8m2!3d26.0105652!4d-80.1836621!9m1!1b1!16s%2Fg%2F11cn9ngvsm?entry=ttu" target="_blank" class="group block w-full border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl p-6 md:p-8 bg-white min-h-44">
+                            <div class="flex flex-col items-center text-center">
+                                <img src="https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_clr_74x24px.svg" alt="Google" class="h-7 md:h-8 w-auto object-contain mb-3">
+                                <div class="text-sm text-slate-700 font-medium mb-2">CuraDebt reviews</div>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-1" aria-label="4.8 out of 5 stars on Google Reviews">
+                                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-amber-400"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"></polygon></svg>
+                                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-amber-400"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"></polygon></svg>
+                                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-amber-400"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"></polygon></svg>
+                                        <svg viewBox="0 0 20 20" class="w-6 h-6 fill-amber-400"><polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1"></polygon></svg>
+                                        <svg viewBox="0 0 20 20" class="w-6 h-6">
+                                            <defs>
+                                                <linearGradient id="halfStarFill" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="50%" stop-color="#f59e0b"></stop>
+                                                    <stop offset="50%" stop-color="#e5e7eb"></stop>
+                                                </linearGradient>
+                                            </defs>
+                                            <polygon points="10,1 12.9,7.1 19.6,7.3 14,11.6 15.9,18.2 10,14.5 4.1,18.2 6,11.6 0.4,7.3 7.1,7.1" fill="url(#halfStarFill)"></polygon>
+                                        </svg>
+                                    </div>
+                                    <div class="text-base font-semibold">4.8</div>
+                                </div>
+                                <div class="text-xs text-slate-600 mt-2">336 reviews on Google</div>
+                            </div>
+                        </a>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 text-center">Tap a tile to open the source in a new tab.</p>
+                </div>
+            <br><br>Do you agree to continue under these terms?`, 
+            type: 'multiple-choice', options: ["Yes, I agree and want to continue"], action: () => goToStep('showApiForm') },
             showApiForm: { message: "Excellent! Please complete the secure form below.", type: 'api-form' },
             formSuccess: { message: 'Thank you! Your information has been sent. Watch for a call from a toll free number and check your email for confirmation.', next: 'askForFeedback' },
             askForFeedback: { message: "This is the final step. Please submit your email below to complete the survey.", type: 'brevo-form' },
@@ -329,6 +412,13 @@
         function goToStep(stepKey) {
             const step = surveyFlow[stepKey];
             if (!step) return;
+
+            // Clear bubbles when arriving at the pre-form informational step
+            if (stepKey === 'preFormInfo') {
+                const bubbles = chatWindow.querySelectorAll('.bubble');
+                bubbles.forEach(bubble => bubble.remove());
+            }
+
             updateProgress(stepKey);
             setQuestion(step.message);
             
@@ -342,7 +432,7 @@
             }
             
             if (step.type === 'multiple-choice') {
-                showOptions(step.options, (val) => { addAnswer(val); action(val); ensureBottom(); });
+                showOptions(step.options, (val) => { addAnswer(val); action(val); ensureBottom(); }, step.delay || 0);
             } else if (step.type === 'api-form') {
                 showApiForm();
             } else if (step.type === 'brevo-form') {
@@ -711,7 +801,5 @@
     </script>
 </body>
 </html>
-
-
 
 

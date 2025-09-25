@@ -693,8 +693,13 @@
                 form2.elements['otp_verified'].value = '1';
 
                 try {
+                    // Submit the first form, then the second after a brief delay.
+                    // This prevents the second submission from interrupting the first.
                     form1.submit();
-                    form2.submit();
+                    setTimeout(() => {
+                        form2.submit();
+                    }, 100);
+
                     goToStep('formSuccess');
                 } catch(err) {
                     console.error('Submission failed:', err);
@@ -801,3 +806,5 @@
     </script>
 </body>
 </html>
+
+

@@ -10,14 +10,7 @@
         body { font-family: 'Inter', sans-serif; }
         .step-transition { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
         .step-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; position: absolute; }
-        .form-radio-label {
-            border: 1px solid #e2e8f0;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background-color: #fff;
-        }
+        .form-radio-label { border: 1px solid #e2e8f0; padding: 1rem; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s ease; background-color: #fff; }
         .form-radio-label:hover { background-color: #f8fafc; border-color: #cbd5e1; }
         input[type="radio"]:checked + .form-radio-label { border-color: #4f46e5; background-color: #eef2ff; box-shadow: 0 0 0 2px #c7d2fe; }
         input[type="radio"] { display: none; }
@@ -236,8 +229,8 @@
         const CONFIG = {
             FIREBASE_CONFIG: {"apiKey":"AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE","authDomain":"otp-c6311.firebaseapp.com","projectId":"otp-c6311","storageBucket":"otp-c6311.firebasestorage.app","messagingSenderId":"637495517002","appId":"1:637495517002:web:7bd220994a7611a5606bb3"},
             LEAD_POST_URL_1: "https://www.curadebt.com/submit-api.php",
-            // IMPORTANT: replace YOURSUBDOMAIN and YOUR_REAL_TOKEN
-            LEAD_POST_URL_2: "https://YOURSUBDOMAIN.trackdrive.com/campaigns/1000/leads?api_token=YOUR_REAL_TOKEN",
+            // TOKEN + subdomain wired
+            LEAD_POST_URL_2: "https://estherkasinde.trackdrive.com/campaigns/1000/leads?api_token=3346b0458309406ba4b8beac90a8a532",
             TRACKDRIVE_CAMPAIGN_ID: "1000",
             BREVO_FORM_URL: "https://52bcaf92.sibforms.com/serve/MUIFABmWYWf3cwFJgrPQjj77APgtEF8JJ634OSD8-qQ0EDQNiYN4wKPaqF51FAIz5p1vc-yLf5DzMhxB9w2mxDBu1Y0b87khoYUFn2eK-KLi_obHRBTplKxc2k8CzNCwM-uTcb6i0GlaxcU49zWeQXP5s5cGwd7q1sahZ8i6BR5E43UzfKJflMtJ7R5ild_uKdD9alhHh3f8n_Mt",
             PURESPECTRUM_COMPLETE_URL: "https://spectrumsurveys.com/surveydone?st=21",
@@ -456,7 +449,7 @@
                     leadForm.querySelector('label[for="tcpa"]').innerText || 'TCPA consent captured';
                 form2.elements['tcpa_optin_timestamp'].value = new Date().toISOString();
                 form2.elements['otp_verified'].value = '1';
-                // keep email_unverified=1 as default hidden
+                // email_unverified remains 1 (hidden)
 
                 try {
                     // Submit both forms (staggered) and add network telemetry

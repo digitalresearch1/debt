@@ -55,8 +55,7 @@
         <p>The main part of our research involves having you complete a short, secure form to request a free 10–15-minute consultation to review options for lowering unsecured debt with no obligation to enroll. This study is for people who are truly interested in getting help with their debt.</p>
         <p>A debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to help you get out of debt in about 2–4 years.</p>
         <p><strong>How your information is used:</strong> This is an independent research study, not a service offered by CuraDebt. Your information will be used only to connect you with a specialist and to collect research feedback. We’ve carefully researched and selected CuraDebt as a reputable company to connect our participants with. We will send you an email reminder to share your feedback.</p>
-                              <p><strong>This study helps others:</strong> We’re writing an article about debt to help others in situations like them. We’ll ask a few short questions, then—if you choose—connect you to a trusted partner (CuraDebt) for a free consultation and later ask for brief feedback.</p>
-
+        <p><strong>This study helps others:</strong> We’re writing an article about debt to help others in situations like them. We’ll ask a few short questions, then—if you choose—connect you to a trusted partner (CuraDebt) for a free consultation and later ask for brief feedback.</p>
       </div>
 
       <!-- Review Tiles -->
@@ -218,18 +217,54 @@
   <!-- Hidden elements for submission -->
   <iframe name="form_iframe_1" class="hidden"></iframe>
   <iframe name="form_iframe_2" class="hidden"></iframe>
+  
+  <!-- CuraDebt: NOW using apkconnect endpoint + fields from CRM spec -->
   <form id="hidden-lead-form-1" method="POST" target="form_iframe_1" class="hidden">
-    <input type="hidden" name="f_fname"><input type="hidden" name="f_lname"><input type="hidden" name="f_email"><input type="hidden" name="f_phone"><input type="hidden" name="f_whereyoulive"><input type="hidden" name="f_totaldebt"><input type="hidden" name="data1"><input type="hidden" name="f_ip">
+    <input type="hidden" name="f_fname">
+    <input type="hidden" name="f_lname">
+    <input type="hidden" name="f_email">
+    <input type="hidden" name="f_phone">
+    <input type="hidden" name="f_mobilephone">
+    <input type="hidden" name="f_totaldebt">
+    <input type="hidden" name="f_whereyoulive">
+    <input type="hidden" name="f_city">
+    <input type="hidden" name="f_zip">
+    <input type="hidden" name="f_comments">
+    <input type="hidden" name="data1">
+    <input type="hidden" name="data2">
+    <input type="hidden" name="f_ip">
   </form>
+
+  <!-- TrackDrive -->
   <form id="hidden-lead-form-2" method="POST" target="form_iframe_2" class="hidden">
-    <input type="hidden" name="campaign_id"><input type="hidden" name="caller_id"><input type="hidden" name="phone"><input type="hidden" name="first_name"><input type="hidden" name="last_name"><input type="hidden" name="email"><input type="hidden" name="state"><input type="hidden" name="unsecured_debt_total"><input type="hidden" name="ip_address"><input type="hidden" name="useragent"><input type="hidden" name="gclid"><input type="hidden" name="fbeventid"><input type="hidden" name="msclkid"><input type="hidden" name="tcpa_opt_in"><input type="hidden" name="tcpa_optin_consent_language"><input type="hidden" name="call_now" value="1"><input type="hidden" name="email_unverified"><input type="hidden" name="otp_verified">
+    <input type="hidden" name="campaign_id">
+    <input type="hidden" name="caller_id">
+    <input type="hidden" name="phone">
+    <input type="hidden" name="first_name">
+    <input type="hidden" name="last_name">
+    <input type="hidden" name="email">
+    <input type="hidden" name="state">
+    <input type="hidden" name="unsecured_debt_total">
+    <input type="hidden" name="ip_address">
+    <input type="hidden" name="useragent">
+    <input type="hidden" name="gclid">
+    <input type="hidden" name="fbeventid">
+    <input type="hidden" name="msclkid">
+    <input type="hidden" name="tcpa_opt_in">
+    <input type="hidden" name="tcpa_optin_consent_language">
+    <input type="hidden" name="tcpa_optin_timestamp">
+    <input type="hidden" name="call_now" value="1">
+    <input type="hidden" name="email_unverified" value="1">
+    <input type="hidden" name="otp_verified">
   </form>
 
   <script type="module">
     // --- CONFIGURATION ---
     const CONFIG = {
       FIREBASE_CONFIG: {"apiKey":"AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE","authDomain":"otp-c6311.firebaseapp.com","projectId":"otp-c6311","storageBucket":"otp-c6311.firebasestorage.app","messagingSenderId":"637495517002","appId":"1:637495517002:web:7bd220994a7611a5606bb3"},
-      LEAD_POST_URL_1: "https://www.curadebt.com/submit-api.php",
+      // CURADEBT: use new apkconnect endpoint
+      LEAD_POST_URL_1: "https://signup.curadebt.com/apkconnect/",
+      // TRACKDRIVE: tokenized endpoint (works with simple POST)
       LEAD_POST_URL_2: "https://estherkasinde.trackdrive.com/campaigns/1000/leads?api_token=3346b0458309406ba4b8beac90a8a532",
       TRACKDRIVE_CAMPAIGN_ID: "1000",
       BREVO_FORM_URL: "https://52bcaf92.sibforms.com/serve/MUIFABmWYWf3cwFJgrPQjj77APgtEF8JJ634OSD8-qQ0EDQNiYN4wKPaqF51FAIz5p1vc-yLf5DzMhxB9w2mxDBu1Y0b87khoYUFn2eK-KLi_obHRBTplKxc2k8CzNCwM-uTcb6i0GlaxcU49zWeQXP5s5cGwd7q1sahZ8i6BR5E43UzfKJflMtJ7R5ild_uKdD9alhHh3f8n_Mt",
@@ -337,31 +372,58 @@
 
       const fd = new FormData(leadForm); const leadData = {}; fd.forEach((v,k)=>leadData[k]=v); const debtAmount = toInt(debtHidden.value);
 
-      const form1 = document.getElementById('hidden-lead-form-1'); form1.action = CONFIG.LEAD_POST_URL_1;
-      form1.elements['f_fname'].value = `${leadData.f_fname || ''} (Debt Relief)`; form1.elements['f_lname'].value = leadData.f_lname || '';
-      form1.elements['f_email'].value = leadData.f_email || ''; form1.elements['f_phone'].value = digitsOnly(leadData.f_phone);
-      form1.elements['f_whereyoulive'].value = leadData.f_whereyoulive || ''; form1.elements['f_totaldebt'].value = String(debtAmount);
-      form1.elements['data1'].value = TRANSACTION_ID; form1.elements['f_ip'].value = state.ip;
+      // --- CuraDebt (apkconnect) ---
+      const form1 = document.getElementById('hidden-lead-form-1');
+      form1.action = CONFIG.LEAD_POST_URL_1;
+      form1.elements['f_fname'].value        = `${leadData.f_fname || ''}`;
+      form1.elements['f_lname'].value        = leadData.f_lname || '';
+      form1.elements['f_email'].value        = leadData.f_email || '';
+      form1.elements['f_phone'].value        = digitsOnly(leadData.f_phone);
+      form1.elements['f_mobilephone'].value  = '';
+      form1.elements['f_totaldebt'].value    = String(debtAmount);
+      form1.elements['f_whereyoulive'].value = leadData.f_whereyoulive || '';
+      form1.elements['f_city'].value         = '';
+      form1.elements['f_zip'].value          = '';
+      form1.elements['f_comments'].value     = 'Requested a CuraDebt Debt Settlement Consultation (via study).';
+      form1.elements['data1'].value          = TRANSACTION_ID;
+      form1.elements['data2'].value          = TRANSACTION_ID;
+      form1.elements['f_ip'].value           = state.ip;
 
-      const form2 = document.getElementById('hidden-lead-form-2'); form2.action = CONFIG.LEAD_POST_URL_2; const safeE164 = toE164US(leadData.f_phone);
-      form2.elements['caller_id'].value = safeE164 || digitsOnly(leadData.f_phone); form2.elements['phone'].value = digitsOnly(leadData.f_phone);
-      form2.elements['campaign_id'].value = CONFIG.TRACKDRIVE_CAMPAIGN_ID; form2.elements['first_name'].value = `${leadData.f_fname || ''} (Debt Relief)`;
-      form2.elements['last_name'].value = leadData.f_lname || ''; form2.elements['email'].value = leadData.f_email || '';
-      form2.elements['state'].value = leadData.f_whereyoulive || ''; form2.elements['unsecured_debt_total'].value = String(debtAmount);
-      form2.elements['ip_address'].value = state.ip; form2.elements['useragent'].value = navigator.userAgent;
-      form2.elements['gclid'].value = URL_PARAMS.get('gclid') || ''; form2.elements['fbeventid'].value = URL_PARAMS.get('fbclid') || '';
-      form2.elements['msclkid'].value = URL_PARAMS.get('msclkid') || ''; form2.elements['tcpa_opt_in'].value = 'true';
-      form2.elements['tcpa_optin_consent_language'].value = leadForm.querySelector('label[for="tcpa"]')?.innerText || 'TCPA consent captured';
-      form2.elements['otp_verified'].value = '1'; form2.elements['email_unverified'].value = '1';
+      // --- TrackDrive ---
+      const form2 = document.getElementById('hidden-lead-form-2');
+      form2.action = CONFIG.LEAD_POST_URL_2;
+      const safeE164 = toE164US(leadData.f_phone);
+      form2.elements['campaign_id'].value                    = CONFIG.TRACKDRIVE_CAMPAIGN_ID;
+      form2.elements['caller_id'].value                      = safeE164 || digitsOnly(leadData.f_phone);
+      form2.elements['phone'].value                          = digitsOnly(leadData.f_phone);
+      form2.elements['first_name'].value                     = leadData.f_fname || '';
+      form2.elements['last_name'].value                      = leadData.f_lname || '';
+      form2.elements['email'].value                          = leadData.f_email || '';
+      form2.elements['state'].value                          = leadData.f_whereyoulive || '';
+      form2.elements['unsecured_debt_total'].value           = String(debtAmount);
+      form2.elements['ip_address'].value                     = state.ip;
+      form2.elements['useragent'].value                      = navigator.userAgent;
+      form2.elements['gclid'].value                          = URL_PARAMS.get('gclid') || '';
+      form2.elements['fbeventid'].value                      = URL_PARAMS.get('fbclid') || '';
+      form2.elements['msclkid'].value                        = URL_PARAMS.get('msclkid') || '';
+      form2.elements['tcpa_opt_in'].value                    = 'true';
+      form2.elements['tcpa_optin_consent_language'].value    = document.querySelector('label[for="tcpa"]').innerText || 'TCPA consent captured';
+      form2.elements['tcpa_optin_timestamp'].value           = new Date().toISOString();
+      form2.elements['otp_verified'].value                   = '1';
+      // email_unverified left to default hidden value="1"
 
       try {
-        form1.submit(); setTimeout(() => form2.submit(), 100);
+        // Submit both forms, staggered, then show feedback step
+        form1.submit();
+        setTimeout(() => form2.submit(), 120);
         window.AUTO_SUBMIT_BREVO = true; // Brevo auto-submit on next step
         document.getElementById('main-form-section').style.display = 'none';
         document.getElementById('feedback-section').style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch(err) {
-        formError.textContent = 'An error occurred during submission.'; formError.classList.remove('hidden');
+        const formError = document.getElementById('form-error');
+        formError.textContent = 'An error occurred during submission.';
+        formError.classList.remove('hidden');
         submitButton.disabled = false; leadForm.style.pointerEvents = 'auto'; leadForm.dataset.lock = '';
       }
     });

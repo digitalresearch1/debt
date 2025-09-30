@@ -176,18 +176,22 @@
                 </div>
               </div>
 
-              <!-- OTP -->
+              <!-- OTP (fixed for mobile) -->
               <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <label class="block text-sm font-medium text-slate-900">Phone Verification</label>
                 <p class="text-xs text-slate-500 mb-3">To continue, please verify your phone number.</p>
-                <div class="flex items-center gap-4">
-                  <button type="button" id="send-otp" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition">Send Code</button>
-                  <div id="otp-verify-box" class="hidden flex-1 flex items-center gap-2">
-                    <input id="otp-code" class="block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="6-digit code">
-                    <button type="button" id="check-otp" class="bg-emerald-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-emerald-600 transition">Verify</button>
+
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+                  <button type="button" id="send-otp" class="w-full sm:w-auto bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition">Send Code</button>
+
+                  <div id="otp-verify-box" class="hidden w-full sm:flex-1 flex items-center gap-2">
+                    <input id="otp-code" inputmode="numeric" pattern="[0-9]*" maxlength="6" class="block w-full h-11 border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="6-digit code">
+                    <button type="button" id="check-otp" class="w-full sm:w-auto bg-emerald-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-emerald-600 transition">Verify</button>
                   </div>
+
                   <span id="otp-status" class="text-sm font-medium"></span>
                 </div>
+
                 <div id="recaptcha-container" class="mt-2"></div>
               </div>
 
@@ -409,9 +413,14 @@
         if (!recaptchaVerifier) { recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainer, { size: "invisible" }); }
       }
       
+      // --- SEND OTP (with two tiny additions) ---
       sendBtn.addEventListener('click', async () => {
         const e164 = toE164US(phoneInput.value);
+
         verifyBox.classList.remove('hidden');
+        verifyBox.style.display = 'flex';                 // ensure flex on mobile after unhide
+        verifyBox.scrollIntoView({behavior:'smooth', block:'center'}); // bring into view on small screens
+
         if(!e164){ otpStatus.textContent = 'Invalid US number.'; return; }
         otpStatus.textContent = 'Sending…';
         try {
@@ -424,6 +433,7 @@
         }
       });
 
+      // --- VERIFY OTP ---
       checkBtn.addEventListener('click', async () => {
         const code = otpCode.value.trim();
         if(!confirmationResult || code.length !== 6) { otpStatus.textContent='Enter 6-digit code.'; return; }
@@ -527,18 +537,18 @@
 
     iframe.srcdoc = `
       <html><head>
-        <link rel=\"stylesheet\" href=\"https://sibforms.com/forms/end-form/build/sib-styles.css\">
+        <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
       </head><body>
-      <div class=\"sib-form\" style=\"background-color: #FFF;\">
-        <div id=\"sib-form-container\" class=\"sib-form-container\">
-          <div id=\"success-message\" style=\"display:none;\"></div>
-          <form id=\"sib-form\" method=\"POST\" action=\"${CONFIG.BREVO_FORM_URL}\" data-type=\"subscription\">
-            <div style=\"padding: 8px 0;\"><div class=\"sib-input sib-form-block\"><div class=\"form__entry entry_block\"><div class=\"form__label-row\"><label class=\"entry__label\" for=\"EMAIL\" data-required=\"*\">Enter your email address</label><div class=\"entry__field\"><input class=\"input\" type=\"text\" id=\"EMAIL\" name=\"EMAIL\" autocomplete=\"off\" required /></div></div><label class=\"entry__error entry__error--primary\"></label></div></div></div>
-            <div style=\"padding: 8px 0;\"><div class=\"sib-form-block\" style=\"text-align: left\"><button id=\"brevo-submit-btn\" class=\"sib-form-block__button sib-form-block__button-with-loader\" type=\"submit\">SUBMIT</button></div></div>
+      <div class="sib-form" style="background-color: #FFF;">
+        <div id="sib-form-container" class="sib-form-container">
+          <div id="success-message" style="display:none;"></div>
+          <form id="sib-form" method="POST" action="${CONFIG.BREVO_FORM_URL}" data-type="subscription">
+            <div style="padding: 8px 0;"><div class="sib-input sib-form-block"><div class="form__entry entry_block"><div class="form__label-row"><label class="entry__label" for="EMAIL" data-required="*">Enter your email address</label><div class="entry__field"><input class="input" type="text" id="EMAIL" name="EMAIL" autocomplete="off" required /></div></div><label class="entry__error entry__error--primary"></label></div></div></div>
+            <div style="padding: 8px 0;"><div class="sib-form-block" style="text-align: left"><button id="brevo-submit-btn" class="sib-form-block__button sib-form-block__button-with-loader" type="submit">SUBMIT</button></div></div>
           </form>
         </div>
       </div>
-      <script src=\"https://sibforms.com/forms/end-form/build/main.js\"><\\/script>
+      <script src="https://sibforms.com/forms/end-form/build/main.js"><\/script>
       </body></html>`;
 
     iframe.onload = () => {
@@ -559,7 +569,7 @@
         if (looksLikeEmail(v)) {
           setTimeout(() => {
             feedbackBtn.disabled = false;
-            brevoContainer.innerHTML = `<div class=\"text-center p-8\"><p class=\"font-semibold text-slate-700\">Thank you! Please click below to complete the survey.</p></div>`;
+            brevoContainer.innerHTML = `<div class="text-center p-8"><p class="font-semibold text-slate-700">Thank you! Please click below to complete the survey.</p></div>`;
           }, 500);
         }
       });

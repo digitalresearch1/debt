@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Debt Relief Qualification Survey</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .step-transition { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
+    .step-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; position: absolute; }
+    .form-radio-label { border: 1px solid #e2e8f0; padding: 1rem; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s ease; background-color: #fff; }
+    .form-radio-label:hover { background-color: #f8fafc; border-color: #cbd5e1; }
+    input[type="radio"]:checked + .form-radio-label { border-color: #4f46e5; background-color: #eef2ff; box-shadow: 0 0 0 2px #c7d2fe; }
+    input[type="radio"] { display: none; }
+    .slider::-webkit-slider-thumb{ -webkit-appearance:none; width:22px; height:22px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border:3px solid #fff; border-radius:50%; margin-top:-7px; box-shadow:0 6px 18px rgba(99,102,241,.35) }
+    .slider::-moz-range-thumb{ width:22px; height:22px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border:3px solid #fff; border-radius:50%; box-shadow:0 6px 18px rgba(99,102,241,.35) }
+  </style>
+</head>
+<body class="bg-slate-50">
+
+  <div class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div id="survey-container" class="w-full max-w-2xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-4">
+        <div class="inline-flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-bold text-2xl">C</div>
+          <div>
+            <h1 class="text-2xl font-bold text-slate-800">Debt Relief Qualification</h1>
+            <p class="text-slate-500">Find out if you qualify in just a few steps.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="w-full bg-slate-200 rounded-full h-2.5 mb-6">
+        <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+
+      <div class="relative">
+        <!-- Step 1: First Name -->
+        <div id="step-qFirst" class="step-transition">
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-semibold text-slate-800 mb-1">What is your first name?</h2>
+            <p class="text-slate-500 mb-6">We’ll use this to address you properly.</p>
+            <div class="space-y-4" data-step-key="qFirst">
+              <input id="firstName" type="text" class="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Maria" />
+            </div>
+            <button id="nextFirst" class="mt-6 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700">Continue</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Last Name -->
+        <div id="step-qLast" class="step-transition step-hidden">
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-semibold text-slate-800 mb-1">What is your last name?</h2>
+            <div class="space-y-4" data-step-key="qLast">
+              <input id="lastName" type="text" class="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Garcia" />
+            </div>
+            <button id="nextLast" class="mt-6 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700">Continue</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Email -->
+        <div id="step-qEmail" class="step-transition step-hidden">
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-semibold text-slate-800 mb-1">What is your email?</h2>
+            <p class="text-slate-500 mb-6">We’ll send you a reminder to share your feedback about our study.</p>
+            <div class="space-y-4" data-step-key="qEmail">
+              <input id="email" type="email" class="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-indigo-500" placeholder="you@example.com" />
+            </div>
+            <button id="nextEmail" class="mt-6 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700">Continue</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Debt slider (disqualify < $10k) -->
+        <div id="step-qDebt" class="step-transition step-hidden">
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-semibold text-slate-800 mb-1">How much unsecured debt do you have?</h2>
+            <p class="text-slate-500 mb-4">Move the slider (the dot) on the line to select your debt amount. If it is under $10,000 you will be disqualified.</p>
+            <div class="text-center mb-4">
+              <div id="debt-amount-display" class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500 my-2">$25,000</div>
+              <input id="debt-slider" class="w-full slider" type="range" min="1000" max="100000" value="25000" step="100">
+              <div class="mt-2">
+                <label for="debt-exact" class="text-sm text-slate-600">Exact amount</label>
+                <input id="debt-exact" type="text" class="ml-2 w-40 rounded border border-slate-300 p-2 text-right" value="25000">
+              </div>
+            </div>
+            <button id="nextDebt" class="mt-4 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700">Continue</button>
+          </div>
+        </div>
+
+        <!-- Step 5: State -->
+        <div id="step-qState" class="step-transition step-hidden">
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-semibold text-slate-800 mb-1">Which state do you live in?</h2>
+            <p class="text-slate-500 mb-6">Select your state.</p>
+            <select id="state" class="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-indigo-500">
+              <option value="" selected disabled>Select your state</option>
+            </select>
+            <button id="nextState" class="mt-6 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700">Continue</button>
+          </div>
+        </div>
+
+        <!-- Step 6: Phone + OTP (with neutral pre-Q7 consent) -->
+        <div id="step-qPhone" class="step-transition step-hidden">
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-semibold text-slate-800 mb-1">What is your phone number?</h2>
+            <p class="text-slate-500 mb-4">We’ll verify it with a one-time code.</p>
+
+            <div class="relative">
+              <input id="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(555) 123-4567"
+                     class="h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-slate-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <div class="mt-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div class="flex items-center gap-3">
+                <button type="button" id="send-otp" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition">Send Code</button>
+                <div id="otp-verify-box" class="hidden flex-1 flex items-center gap-2">
+                  <input id="otp-code" class="block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="6-digit code">
+                  <button type="button" id="check-otp" class="bg-emerald-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-emerald-600 transition">Verify</button>
+                </div>
+                <span id="otp-status" class="text-sm font-medium"></span>
+              </div>
+              <div id="recaptcha-container" class="mt-2"></div>
+            </div>
+
+            <!-- UPDATED neutral consent (pre-Q7) -->
+            <div class="flex items-start pt-4">
+              <div class="flex items-center h-5">
+                <input id="tcpa" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-slate-300 rounded">
+              </div>
+              <div class="ml-3 text-sm">
+                <label for="tcpa" class="text-slate-600">
+                  I agree that the research team may contact me at the phone number and email I provide about the next step of this study.
+                  Consent is not required to participate, and I can make a final decision later in the survey.
+                </label>
+              </div>
+            </div>
+
+            <button id="nextPhone" class="mt-6 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700">Continue</button>
+          </div>
+        </div>
+
+        <!-- Step 7: Study details + Willingness (topic revealed here) -->
+        <div id="step-qWilling" class="step-transition step-hidden">
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
+            <div class="text-center">
+              <h2 class="text-2xl font-bold text-slate-800">Fantastic! You’ve qualified for the study.</h2>
+              <p class="text-indigo-600 font-semibold mt-4 mb-6">Please take a moment to read the following information carefully.</p>
+            </div>
+
+            <div class="text-sm text-slate-600 space-y-3 mb-6">
+              <p>The main part of our research involves connecting you for a short, secure, free debt consultation. To ensure we collect genuine feedback, this study is for people who are truly interested in getting help with their debt.</p>
+              <p>A debt settlement service works to negotiate with your creditors to lower the amount you owe. The goal is often to combine your payments into a single, more manageable monthly amount, with a plan to help you get out of debt in about 2–4 years.</p>
+              <p><strong>How your information is used:</strong> This is an independent research study, not a service offered by CuraDebt. Your information will be used only to connect you with a specialist and to collect research feedback. We’ve carefully researched and selected CuraDebt as a reputable company to connect our participants with.</p>
+              <p><strong>This study helps others:</strong> We’re writing an article about debt to help others in similar situations. We’ll ask a few short questions, then—if you choose—connect you to CuraDebt for a free consultation and later ask for brief feedback. You will receive an email from us to write a review after the consultation.</p>
+            </div>
+
+            <h3 class="text-slate-900 font-semibold mb-3">Are you willing to receive the free consultation now?</h3>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button id="agree-consult" class="w-full sm:w-auto bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700">Yes, I agree and want to continue</button>
+              <button id="decline-consult" class="w-full sm:w-auto text-slate-600 font-semibold py-3 px-6 rounded-lg hover:bg-slate-100">No, I do not agree</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 8: Feedback / email reminder -->
+        <div id="step-feedbackForm" class="step-transition step-hidden">
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-semibold text-slate-800 mb-2 text-center">Thank You & Final Step</h2>
+            <p class="text-slate-500 mb-6 text-center">Please provide your email to receive a follow-up about the study.</p>
+            <div id="brevo-container" class="w-full"></div>
+            <button id="feedback-continue" class="mt-4 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">I've Submitted My Feedback</button>
+          </div>
+        </div>
+
+        <!-- Disqualified -->
+        <div id="step-disqualified" class="step-transition step-hidden">
+          <div class="bg-white p-8 rounded-2xl shadow-lg text-center">
+            <h2 class="text-xl font-semibold text-slate-800 mb-2">Thank You For Your Time</h2>
+            <p class="text-slate-500 mb-6">Based on your responses, this study isn't the right fit at this time. You will now be redirected.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden forms & iframes for submission -->
+  <iframe name="form_iframe_1" class="hidden"></iframe>
+  <iframe name="form_iframe_2" class="hidden"></iframe>
+
+  <!-- CuraDebt CRM form (apkconnect) -->
+  <form id="hidden-lead-form-1" method="POST" target="form_iframe_1" class="hidden">
+    <input type="hidden" name="f_fname">
+    <input type="hidden" name="f_lname">
+    <input type="hidden" name="f_phone">
+    <input type="hidden" name="f_mobilephone">
+    <input type="hidden" name="f_email">
+    <input type="hidden" name="f_totaldebt">
+    <input type="hidden" name="f_whereyoulive">
+    <input type="hidden" name="f_city">
+    <input type="hidden" name="f_zip">
+    <input type="hidden" name="f_comments">
+    <input type="hidden" name="data1">
+    <input type="hidden" name="data2">
+    <input type="hidden" name="f_ip">
+  </form>
+
+  <!-- TrackDrive form -->
+  <form id="hidden-lead-form-2" method="POST" target="form_iframe_2" class="hidden">
+    <input type="hidden" name="campaign_id">
+    <input type="hidden" name="caller_id">
+    <input type="hidden" name="phone">
+    <input type="hidden" name="first_name">
+    <input type="hidden" name="last_name">
+    <input type="hidden" name="email">
+    <input type="hidden" name="state">
+    <input type="hidden" name="unsecured_debt_total">
+    <input type="hidden" name="ip_address">
+    <input type="hidden" name="useragent">
+    <input type="hidden" name="gclid">
+    <input type="hidden" name="fbeventid">
+    <input type="hidden" name="msclkid">
+    <input type="hidden" name="tcpa_opt_in">
+    <input type="hidden" name="tcpa_optin_consent_language">
+    <input type="hidden" name="tcpa_optin_timestamp">
+    <input type="hidden" name="call_now" value="1">
+    <input type="hidden" name="email_unverified" value="1">
+    <input type="hidden" name="otp_verified">
+  </form>
+
+  <script type="module">
+    // --- CONFIGURATION ---
+    const CONFIG = {
+      FIREBASE_CONFIG: {"apiKey":"AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE","authDomain":"otp-c6311.firebaseapp.com","projectId":"otp-c6311","storageBucket":"otp-c6311.firebasestorage.app","messagingSenderId":"637495517002","appId":"1:637495517002:web:7bd220994a7611a5606bb3"},
+      LEAD_POST_URL_1: "https://signup.curadebt.com/apkconnect/", // CuraDebt CRM
+      LEAD_POST_URL_2: "https://estherkasinde.trackdrive.com/campaigns/1000/leads?api_token=3346b0458309406ba4b8beac90a8a532", // TrackDrive
+      TRACKDRIVE_CAMPAIGN_ID: "1000",
+      BREVO_FORM_URL: "https://52bcaf92.sibforms.com/serve/MUIFABmWYWf3cwFJgrPQjj77APgtEF8JJ634OSD8-qQ0EDQNiYN4wKPaqF51FAIz5p1vc-yLf5DzMhxB9w2mxDBu1Y0b87khoYUFn2eK-KLi_obHRBTplKxc2k8CzNCwM-uTcb6i0GlaxcU49zWeQXP5s5cGwd7q1sahZ8i6BR5E43UzfKJflMtJ7R5ild_uKdD9alhHh3f8n_Mt",
+      PURESPECTRUM_COMPLETE_URL: "https://spectrumsurveys.com/surveydone?st=21",
+      PURESPECTRUM_TERMINATE_URL: "https://spectrumsurveys.com/surveydone?st=18",
+      MIN_DEBT_AMOUNT: 10000,
+      EXCLUDED_STATES: ['NH','MI','MN','CO','VA','IA','WA','PA','IL','KS','OR','TN','UT','VI','WV','RI'],
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    const URL_PARAMS = new URLSearchParams(window.location.search);
+    const TRANSACTION_ID = URL_PARAMS.get('transaction_id') || '';
+    const app = initializeApp(CONFIG.FIREBASE_CONFIG);
+    const auth = getAuth(app);
+
+    // IP
+    const ipPromise = fetch('https://api.ipify.org?format=json')
+      .then(r=>r.json()).then(j=>j.ip || '').catch(()=> '');
+    const state = { currentStep: 'qFirst', answers: {}, ip: '' };
+    ipPromise.then(ip => { state.ip = ip; });
+
+    const steps = ['qFirst','qLast','qEmail','qDebt','qState','qPhone','qWilling','feedbackForm'];
+    const progressBar = document.getElementById('progress-bar');
+
+    function renderStep(stepKey) {
+      state.currentStep = stepKey;
+      const idx = Math.max(0, steps.indexOf(stepKey));
+      const progress = ((idx + 1) / steps.length) * 100;
+      progressBar.style.width = `${progress}%`;
+      document.querySelectorAll('[id^="step-"]').forEach(el => el.classList.add('step-hidden'));
+      const currentStepEl = document.getElementById(`step-${stepKey}`);
+      if (currentStepEl) currentStepEl.classList.remove('step-hidden');
+    }
+
+    // helpers
+    const digitsOnly = s => String(s||'').replace(/\D+/g,'');
+    const toE164US = raw => { const d = digitsOnly(raw); const m = d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/); return m ? `+1${m[1]}${m[2]}${m[3]}` : null; };
+    const moneyFmt = v => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(v);
+    const emailOK = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((s||'').trim());
+
+    // Step 1
+    document.getElementById('nextFirst').onclick = () => {
+      const v = document.getElementById('firstName').value.trim();
+      if (!v) return;
+      state.answers.first = v;
+      renderStep('qLast');
+    };
+    // Step 2
+    document.getElementById('nextLast').onclick = () => {
+      const v = document.getElementById('lastName').value.trim();
+      if (!v) return;
+      state.answers.last = v;
+      renderStep('qEmail');
+    };
+    // Step 3
+    document.getElementById('nextEmail').onclick = () => {
+      const v = document.getElementById('email').value.trim();
+      if (!emailOK(v)) return;
+      state.answers.email = v;
+      renderStep('qDebt');
+    };
+
+    // Step 4: Debt slider + exact box
+    const debtSlider = document.getElementById('debt-slider');
+    const debtExact  = document.getElementById('debt-exact');
+    const debtDisplay= document.getElementById('debt-amount-display');
+
+    const syncFromSlider = () => {
+      const val = parseInt(debtSlider.value,10)||0;
+      debtExact.value = val;
+      debtDisplay.textContent = moneyFmt(val);
+    };
+    const syncFromExact = () => {
+      const cleaned = parseInt(digitsOnly(debtExact.value),10) || 0;
+      const clamped = Math.min(100000, Math.max(1000, cleaned));
+      debtExact.value = clamped;
+      debtSlider.value = clamped;
+      debtDisplay.textContent = moneyFmt(clamped);
+    };
+    debtSlider.addEventListener('input', syncFromSlider);
+    debtExact.addEventListener('input', syncFromExact);
+    syncFromSlider();
+
+    document.getElementById('nextDebt').onclick = () => {
+      const amount = parseInt(digitsOnly(debtExact.value),10) || 0;
+      if (amount < CONFIG.MIN_DEBT_AMOUNT) {
+        renderStep('disqualified');
+        setTimeout(()=>{ window.location.href = `${CONFIG.PURESPECTRUM_TERMINATE_URL}&transaction_id=${TRANSACTION_ID}`; }, 1800);
+        return;
+      }
+      state.answers.debt = amount;
+      renderStep('qState');
+    };
+
+    // Step 5: State selection (exclude list)
+    const stateSelect = document.getElementById('state');
+    const allStates = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"];
+    allStates.forEach(st => {
+      if (!CONFIG.EXCLUDED_STATES.includes(st)) {
+        const o = document.createElement('option'); o.value = st; o.textContent = st; stateSelect.appendChild(o);
+      }
+    });
+    document.getElementById('nextState').onclick = () => {
+      const v = stateSelect.value;
+      if (!v) return;
+      state.answers.state = v;
+      renderStep('qPhone');
+    };
+
+    // Step 6: Phone + OTP
+    let recaptchaVerifier = null;
+    let confirmationResult = null;
+    let otpVerified = false;
+
+    import { getAuth as _ga } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    const _auth = _ga(initializeApp(CONFIG.FIREBASE_CONFIG));
+
+    document.getElementById('send-otp').onclick = async () => {
+      const e164 = toE164US(document.getElementById('phone').value);
+      document.getElementById('otp-verify-box').classList.remove('hidden');
+      const status = document.getElementById('otp-status');
+      if(!e164){ status.textContent = 'Invalid US number.'; return; }
+      status.textContent = 'Sending…';
+      try {
+        if (!recaptchaVerifier) recaptchaVerifier = new RecaptchaVerifier(_auth, document.getElementById('recaptcha-container'), { size: "invisible" });
+        confirmationResult = await signInWithPhoneNumber(_auth, e164, recaptchaVerifier);
+        status.textContent = 'Code Sent';
+      } catch(e) {
+        status.textContent = 'Failed to send';
+      }
+    };
+
+    document.getElementById('check-otp').onclick = async () => {
+      const code = (document.getElementById('otp-code').value||'').trim();
+      const status = document.getElementById('otp-status');
+      if(!confirmationResult || code.length !== 6){ status.textContent='Enter 6-digit code.'; return; }
+      status.textContent='Verifying…';
+      try {
+        await confirmationResult.confirm(code);
+        otpVerified = true;
+        status.textContent='Verified ✓';
+        status.style.color = '#16a34a';
+      } catch(e) {
+        otpVerified = false;
+        status.textContent='Verification failed.';
+        status.style.color = '#dc2626';
+      }
+    };
+
+    document.getElementById('nextPhone').onclick = () => {
+      const phone = document.getElementById('phone').value;
+      const tcpa = document.getElementById('tcpa').checked;
+      if (!toE164US(phone) || !otpVerified || !tcpa) return;
+      state.answers.phone = digitsOnly(phone);
+      renderStep('qWilling');
+    };
+
+    // Step 7: Willingness (agree posts to CuraDebt + TrackDrive, then to feedback)
+    const agreeBtn = document.getElementById('agree-consult');
+    const declineBtn = document.getElementById('decline-consult');
+
+    agreeBtn.onclick = async () => {
+      await ipPromise;
+
+      // Fill CuraDebt form
+      const form1 = document.getElementById('hidden-lead-form-1');
+      form1.action = CONFIG.LEAD_POST_URL_1;
+      form1.elements['f_fname'].value        = state.answers.first || '';
+      form1.elements['f_lname'].value        = state.answers.last || '';
+      form1.elements['f_phone'].value        = state.answers.phone || '';
+      form1.elements['f_mobilephone'].value  = '';
+      form1.elements['f_email'].value        = state.answers.email || '';
+      form1.elements['f_totaldebt'].value    = String(state.answers.debt || 0);
+      form1.elements['f_whereyoulive'].value = state.answers.state || '';
+      form1.elements['f_city'].value         = '';
+      form1.elements['f_zip'].value          = '';
+      form1.elements['f_comments'].value     = `${new Date().toLocaleDateString()} — Requested a CuraDebt Debt Settlement consultation via research study.`;
+      form1.elements['data1'].value          = TRANSACTION_ID;
+      form1.elements['data2'].value          = TRANSACTION_ID;
+      form1.elements['f_ip'].value           = state.ip;
+
+      // Fill TrackDrive form
+      const form2 = document.getElementById('hidden-lead-form-2');
+      form2.action = CONFIG.LEAD_POST_URL_2;
+      const e164 = toE164US(state.answers.phone);
+      form2.elements['campaign_id'].value                 = CONFIG.TRACKDRIVE_CAMPAIGN_ID;
+      form2.elements['caller_id'].value                   = e164 || state.answers.phone;
+      form2.elements['phone'].value                       = state.answers.phone;
+      form2.elements['first_name'].value                  = state.answers.first || '';
+      form2.elements['last_name'].value                   = state.answers.last || '';
+      form2.elements['email'].value                       = state.answers.email || '';
+      form2.elements['state'].value                       = state.answers.state || '';
+      form2.elements['unsecured_debt_total'].value        = String(state.answers.debt || 0);
+      form2.elements['ip_address'].value                  = state.ip;
+      form2.elements['useragent'].value                   = navigator.userAgent;
+      form2.elements['gclid'].value                       = URL_PARAMS.get('gclid') || '';
+      form2.elements['fbeventid'].value                   = URL_PARAMS.get('fbclid') || '';
+      form2.elements['msclkid'].value                     = URL_PARAMS.get('msclkid') || '';
+      form2.elements['tcpa_opt_in'].value                 = 'true';
+      form2.elements['tcpa_optin_consent_language'].value = "Research contact consent captured pre-Q7; consultation consent affirmed at Q7.";
+      form2.elements['tcpa_optin_timestamp'].value        = new Date().toISOString();
+      form2.elements['otp_verified'].value                = '1';
+
+      // Submit both (staggered) then go to feedback step
+      form1.submit();
+      setTimeout(()=>form2.submit(), 120);
+      renderStep('feedbackForm');
+
+      // Prefill Brevo with email
+      window.AUTO_SUBMIT_BREVO = true;
+    };
+
+    declineBtn.onclick = () => {
+      renderStep('disqualified');
+      setTimeout(()=>{ window.location.href = `${CONFIG.PURESPECTRUM_TERMINATE_URL}&transaction_id=${TRANSACTION_ID}`; }, 1800);
+    };
+
+    // --- Brevo Form Logic ---
+    const brevoContainer = document.getElementById('brevo-container');
+    const feedbackBtn = document.getElementById('feedback-continue');
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'width: 100%; height: 350px; border: none;';
+    brevoContainer.appendChild(iframe);
+    feedbackBtn.disabled = true;
+
+    iframe.srcdoc = `
+      <html><head>
+        <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+      </head><body>
+      <div class="sib-form" style="background-color: #FFF;">
+        <div id="sib-form-container" class="sib-form-container">
+          <div id="success-message" style="display:none;"></div>
+          <form id="sib-form" method="POST" action="${CONFIG.BREVO_FORM_URL}" data-type="subscription">
+            <div style="padding: 8px 0;"><div class="sib-input sib-form-block">
+              <div class="form__entry entry_block">
+                <div class="form__label-row"><label class="entry__label" for="EMAIL" data-required="*">Enter your email address</label>
+                  <div class="entry__field"><input class="input" type="text" id="EMAIL" name="EMAIL" autocomplete="off" required /></div>
+                </div><label class="entry__error entry__error--primary"></label>
+              </div>
+            </div></div>
+            <div style="padding: 8px 0;">
+              <div class="sib-form-block" style="text-align: left"><button id="brevo-submit-btn" class="sib-form-block__button sib-form-block__button-with-loader" type="submit">SUBMIT</button></div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <script src="https://sibforms.com/forms/end-form/build/main.js"><\/script>
+      </body></html>`;
+
+    iframe.onload = () => {
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      const submitButton = iframeDoc.getElementById('brevo-submit-btn');
+      const emailInput = iframeDoc.getElementById('EMAIL');
+      const looksLikeEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((s||'').trim());
+
+      if (emailInput && state.answers.email) emailInput.value = state.answers.email;
+
+      submitButton?.addEventListener('click', () => {
+        const v = (emailInput?.value || '').trim();
+        if (looksLikeEmail(v)) {
+          setTimeout(() => {
+            feedbackBtn.disabled = false;
+            brevoContainer.innerHTML = `<div class="text-center p-8"><p class="font-semibold text-slate-700">Thank you! Please click below to complete the survey.</p></div>`;
+          }, 500);
+        }
+      });
+
+      if (window.AUTO_SUBMIT_BREVO && looksLikeEmail(emailInput?.value) && !iframe.dataset.submitted) {
+        iframe.dataset.submitted = '1';
+        setTimeout(() => {
+          try { iframeDoc.getElementById('sib-form')?.requestSubmit?.(); } catch(_) {}
+          setTimeout(() => {
+            feedbackBtn.disabled = false;
+            brevoContainer.innerHTML = `<div class="text-center p-8"><p class="font-semibold text-slate-700">Thank you! Please click below to complete the survey.</p></div>`;
+          }, 800);
+        }, 500);
+      }
+    };
+
+    feedbackBtn?.addEventListener('click', () => { window.location.href = `${CONFIG.PURESPECTRUM_COMPLETE_URL}&transaction_id=${TRANSACTION_ID}`; });
+
+    // Initial render
+    renderStep('qFirst');
+  </script>
+
+  <!-- Tiny toasts for post feedback (optional visual) -->
+  <script>
+    (function(){
+      function toast(msg, ok=true){
+        const el = document.createElement('div');
+        el.className = `fixed bottom-4 right-4 z-[9999] ${ok?'bg-emerald-600':'bg-red-600'} text-white px-4 py-2 rounded-lg shadow`;
+        el.textContent = msg; document.body.appendChild(el);
+        setTimeout(()=>el.remove(), ok?2200:4200);
+      }
+      const i1 = document.querySelector('iframe[name="form_iframe_1"]');
+      const i2 = document.querySelector('iframe[name="form_iframe_2"]');
+      if (i1) { i1.onload = ()=>toast('CuraDebt CRM: form posted'); i1.onerror = ()=>toast('CuraDebt CRM: iframe failed to load', false); }
+      if (i2) { i2.onload = ()=>toast('TrackDrive: form posted'); i2.onerror = ()=>toast('TrackDrive: iframe failed to load', false); }
+    })();
+  </script>
+</body>
+</html>

@@ -83,7 +83,7 @@
         <div id="step-qDebtTypes" class="step-transition step-hidden">
           <div class="bg-white p-8 rounded-2xl shadow-lg">
             <h2 class="text-xl font-semibold text-slate-800 mb-1">What type(s) of unsecured debt do you have?</h2>
-            <p class="text-slate-500">Select <strong>exactly 3</strong> — your top debts — then enter an approximate amount next to each.</p>
+            <p class="text-slate-500">Select <strong>exactly 3</strong> — your top debts — then enter an approximate amount of debt you owe next to each.</p>
             <div class="mt-2 text-xs text-slate-500 flex items-center justify-between">
               <span id="cap-hint">0/3 selected</span>
               <span id="cap-error" class="text-red-600 hidden">Please select exactly 3 types.</span>
@@ -95,7 +95,7 @@
           </div>
         </div>
 
-        <!-- NEW Step 3.6: Attitudes & Budget & Timing (with silent DQ) -->
+        <!-- NEW Step 3.6: Attitudes (NO TIMING) -->
         <div id="step-qAttitudes" class="step-transition step-hidden">
           <div class="bg-white p-8 rounded-2xl shadow-lg">
             <h2 class="text-xl font-semibold text-slate-800 mb-1">A few questions about getting help</h2>
@@ -106,17 +106,12 @@
               <div class="grid sm:grid-cols-2 gap-2" id="ever-group"></div>
             </div>
 
-            <div class="mb-6">
-              <h3 class="font-semibold text-slate-800 mb-2">If you chose to get help, what monthly payment could you afford?</h3>
-              <div class="grid sm:grid-cols-2 gap-2" id="budget-group"></div>
-            </div>
-
             <div class="mb-2">
-              <h3 class="font-semibold text-slate-800 mb-2">When would you use a debt settlement service?</h3>
-              <div class="grid sm:grid-cols-2 gap-2" id="timing-group"></div>
+              <h3 class="font-semibold text-slate-800 mb-2">Can you afford a monthly payment of at least $300?</h3>
+              <div class="grid sm:grid-cols-2 gap-2" id="afford-group"></div>
             </div>
 
-            <p id="attn-error" class="text-sm text-red-600 mt-2 hidden">Please answer all three questions to continue.</p>
+            <p id="attn-error" class="text-sm text-red-600 mt-2 hidden">Please answer both questions to continue.</p>
 
             <button id="nextAttitudes" class="mt-6 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700">Continue</button>
           </div>
@@ -380,10 +375,10 @@
       const row = document.createElement('div');
       row.className = 'debt-pill';
       row.innerHTML = `
-        <input type=\"checkbox\" id=\"cb_${dt.key}\" class=\"h-4 w-4 text-indigo-600 rounded border-slate-300\">
+        <input type=\"checkbox\" id=\"cb_${dt.key}\" class=\"h-4 w-4 text-indigo-600 rounded border-slate-300\"> 
         <label for=\"cb_${dt.key}\" class=\"flex-1 select-none\">${dt.label}</label>
-        <div class=\"flex items-center gap-2\">
-          <span class=\"text-sm text-slate-500\">$</span>
+        <div class=\"flex items-center gap-2\"> 
+          <span class=\"text-sm text-slate-500\">$</span> 
           <input type=\"text\" id=\"amt_${dt.key}\" class=\"amount-box rounded border border-slate-300 p-2 text-right disabled:opacity-50\" placeholder=\"0\" disabled>
         </div>`;
       grid.appendChild(row);
@@ -450,10 +445,9 @@
       renderStep('qAttitudes');
     };
 
-    // === Attitudes step (with silent disqualifier) ===
+    // === Attitudes step (NO TIMING) ===
     const EVER_OPTIONS = ['Definitely yes', 'Probably yes', 'Not sure', 'Probably not', 'Definitely not'];
-    const BUDGET_OPTIONS = ['Under $150/mo', '$150–$249/mo', '$250–$349/mo', '$350–$499/mo', '$500–$699/mo', '$700+/mo', "I'm not sure"];
-    const TIMING_OPTIONS = ['Ready now', 'Within 30 days', '1–3 months', '3–6 months', '6+ months', 'Only researching for now'];
+    const AFFORD_OPTIONS = ['Definitely yes', 'Probably yes', 'Not sure', 'Probably not', 'Definitely not'];
 
     function buildRadioGroup(containerId, name, options){
       const container = document.getElementById(containerId);
@@ -469,27 +463,24 @@
       });
     }
 
-    // Build attitude groups once
+    // Build radio groups once
     buildRadioGroup('ever-group', 'ever_use', EVER_OPTIONS);
-    buildRadioGroup('budget-group', 'budget_range', BUDGET_OPTIONS);
-    buildRadioGroup('timing-group', 'timing_use', TIMING_OPTIONS);
+    buildRadioGroup('afford-group', 'afford_300', AFFORD_OPTIONS);
 
     document.getElementById('nextAttitudes').onclick = () => {
       const getSelected = n => { const el = document.querySelector(`input[name="${n}"]:checked`); return el ? el.value : ''; };
       const ever = getSelected('ever_use');
-      const budget = getSelected('budget_range');
-      const timing = getSelected('timing_use');
+      const afford = getSelected('afford_300');
       const err = document.getElementById('attn-error');
-      if (!ever || !budget || !timing) { err.classList.remove('hidden'); return; }
+      if (!ever || !afford) { err.classList.remove('hidden'); return; }
       err.classList.add('hidden');
-      state.answers.attitudes = { ever, budget, timing };
+      state.answers.attitudes = { ever, afford };
 
       // Silent attitude-based DQ
       const lowEver = (ever === 'Probably not' || ever === 'Definitely not');
-      const lowBudget = (budget === 'Under $150/mo' || budget === "I'm not sure");
-      const lowTiming = (timing === '6+ months' || timing === 'Only researching for now');
+      const lowAfford = (afford === 'Probably not' || afford === 'Definitely not' || afford === 'Not sure');
 
-      if (lowEver || (lowTiming && lowBudget)) {
+      if (lowEver || lowAfford) {
         renderStep('disqualified');
         setTimeout(()=>{ window.location.href = `${CONFIG.PURESPECTRUM_TERMINATE_URL}&transaction_id=${TRANSACTION_ID}`; }, 1800);
         return;
@@ -707,4 +698,5 @@
   </script>
 </body>
 </html>
+
 

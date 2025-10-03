@@ -77,20 +77,6 @@
           </div>
         </div>
 
-        <!-- Step 3.5: Debt Types + amounts -->
-        <div id="step-qDebtTypes" class="step-transition step-hidden">
-          <div class="bg-white p-8 rounded-2xl shadow-lg">
-            <h2 class="text-xl font-semibold text-slate-800 mb-1">What type(s) of unsecured debt do you have?</h2>
-            <p class="text-slate-500 mb-4">Select all types that apply to you, then enter the approximate amount you owe next to each selected type of debt you have.</p>
-
-            <div class="debt-grid" id="debt-type-grid"><!-- items via JS --></div>
-            <!-- Your requested error line (exact) -->
-            <p id="select-error" class="text-xs text-red-600 mt-2 hidden">Please select at least one type.</p>
-
-            <button id="nextDebtTypes" class="btn mt-6 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700" disabled>Continue</button>
-          </div>
-        </div>
-
         <!-- Step 4: Debt slider (disqualify < $10k) -->
         <div id="step-qDebt" class="step-transition step-hidden">
           <div class="bg-white p-8 rounded-2xl shadow-lg">
@@ -277,7 +263,7 @@
     const state = { currentStep: 'qFirst', answers: {}, ip: '' };
     ipPromise.then(ip => { state.ip = ip; });
 
-    const steps = ['qFirst','qLast','qEmail','qDebtTypes','qDebt','qState','qPhone','qWilling','feedbackForm'];
+    const steps = ['qFirst','qLast','qEmail','qDebt','qState','qPhone','qWilling','feedbackForm'];
     const progressBar = document.getElementById('progress-bar');
 
     function renderStep(stepKey) {
@@ -319,101 +305,7 @@
       emailErr.classList.toggle('hidden', ok);
       enable(nextEmail, ok);
     });
-    nextEmail.onclick = () => { state.answers.email = emailEl.value.trim(); renderStep('qDebtTypes'); };
-
-    // ===== Debt Types step =====
-    const debtTypes = [
-      { key:'credit_card',   label:'Credit Card' },
-      { key:'personal',      label:'Personal Loan' },
-      { key:'medical',       label:'Medical' },
-      { key:'payday',        label:'Payday / Cash Advance' },
-      { key:'student',       label:'Student Loan (private)' },
-      { key:'auto_def',      label:'Auto Loan (deficiency after repo)' },
-      { key:'collections',   label:'Collections / Charge-offs' },
-    ];
-    const targetKeys = new Set(['personal','credit_card','medical']);
-
-    const grid = document.getElementById('debt-type-grid');
-    const nextDebtTypes = document.getElementById('nextDebtTypes');
-    const selectError = document.getElementById('select-error');
-
-    function updateDebtTypesCta(){
-      const { allSum, count } = getDebtTypeSums(true);
-      const ok = count > 0 && allSum > 0;
-      enable(nextDebtTypes, ok);
-      // Show a single generic error when not ok (per your request)
-      selectError.classList.toggle('hidden', ok);
-    }
-
-    debtTypes.forEach(dt => {
-      const row = document.createElement('div');
-      row.className = 'debt-pill';
-      row.innerHTML = `
-        <input type="checkbox" id="cb_${dt.key}" class="h-4 w-4 text-indigo-600 rounded border-slate-300">
-        <label for="cb_${dt.key}" class="flex-1 select-none">${dt.label}</label>
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-slate-500">$</span>
-          <input type="text" id="amt_${dt.key}" class="amount-box rounded border border-slate-300 p-2 text-right disabled:opacity-50" placeholder="0" disabled>
-        </div>`;
-      grid.appendChild(row);
-
-      const cb = row.querySelector(`#cb_${dt.key}`);
-      const amt = row.querySelector(`#amt_${dt.key}`);
-
-      cb.addEventListener('change', () => {
-        if (cb.checked) {
-          row.classList.add('active');
-          amt.disabled = false;
-          if (!digitsOnly(amt.value)) amt.value = '1000';
-          amt.focus();
-          amt.select();
-        } else {
-          row.classList.remove('active');
-          amt.disabled = true;
-          amt.value = '';
-        }
-        updateDebtTypesCta();
-      });
-
-      amt.addEventListener('input', () => {
-        const n = parseInt(digitsOnly(amt.value),10) || 0;
-        amt.value = String(n);
-        updateDebtTypesCta();
-      });
-    });
-
-    function getDebtTypeSums(includeCount=false){
-      let targetSum = 0, allSum = 0, count = 0; const breakdown = {};
-      debtTypes.forEach(dt => {
-        const cb = document.getElementById(`cb_${dt.key}`);
-        const amt = document.getElementById(`amt_${dt.key}`);
-        const val = cb?.checked ? (parseInt(digitsOnly(amt.value),10) || 0) : 0;
-        if (cb?.checked) {
-          count++;
-          breakdown[dt.key] = val;
-          allSum += val;
-          if (targetKeys.has(dt.key)) targetSum += val;
-        }
-      });
-      return includeCount ? { targetSum, allSum, breakdown, count } : { targetSum, allSum, breakdown };
-    }
-
-    nextDebtTypes.onclick = () => {
-      const { targetSum, allSum, breakdown, count } = getDebtTypeSums(true);
-      if (count === 0 || allSum === 0) { updateDebtTypesCta(); return; }
-      if (targetSum < CONFIG.MIN_DEBT_AMOUNT) {
-        renderStep('disqualified');
-        setTimeout(()=>{ window.location.href = `${CONFIG.PURESPECTRUM_TERMINATE_URL}&transaction_id=${TRANSACTION_ID}`; }, 1800);
-        return;
-      }
-      state.answers.debtBreakdown = breakdown;
-      state.answers.debt = Math.max(allSum, CONFIG.MIN_DEBT_AMOUNT);
-      renderStep('qDebt');
-      const prefillVal = Math.min(100000, Math.max(1000, state.answers.debt || 25000));
-      debtSlider.value = prefillVal;
-      debtExact.value  = prefillVal;
-      debtDisplay.textContent = moneyFmt(prefillVal);
-    };
+    nextEmail.onclick = () => { state.answers.email = emailEl.value.trim(); renderStep('qDebt'); };
 
     // ===== Step 4: Debt slider + exact box =====
     const debtSlider = document.getElementById('debt-slider');
@@ -452,13 +344,47 @@
     const nextStateBtn = document.getElementById('nextState');
     const stateErr = document.getElementById('state-err');
     const allStates = ["AK","AL","AR","AS","AZ","CA","CO","CT","DC","DE","FL","GA","GU","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX","UT","VA","VI","VT","WA","WI","WV","WY"];
-    allStates.forEach(st => {
-      if (!CONFIG.EXCLUDED_STATES.includes(st)) {
-        const o = document.createElement('option'); o.value = st; o.textContent = st; stateSelect.appendChild(o);
+
+    // Populate options (run once)
+    if (stateSelect && stateSelect.options.length <= 1) {
+      allStates.forEach(st => {
+        if (!CONFIG.EXCLUDED_STATES.includes(st)) {
+          const o = document.createElement('option');
+          o.value = st; o.textContent = st; stateSelect.appendChild(o);
+        }
+      });
+    }
+
+    // Enable the button if a state is already selected (e.g., back navigation)
+    enable(nextStateBtn, !!stateSelect.value);
+
+    // On change, hide error and enable button
+    stateSelect.addEventListener('change', ()=>{
+      stateErr.classList.add('hidden');
+      enable(nextStateBtn, !!stateSelect.value);
+    });
+
+    // Allow Enter key to advance
+    stateSelect.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter' && stateSelect.value) {
+        e.preventDefault();
+        nextStateBtn.click();
       }
     });
-    stateSelect.addEventListener('change', ()=>{ stateErr.classList.add('hidden'); enable(nextStateBtn, !!stateSelect.value); });
-    nextStateBtn.onclick = () => { if (!stateSelect.value){ stateErr.classList.remove('hidden'); return; } state.answers.state = stateSelect.value; renderStep('qPhone'); };
+
+    // Make the button resilient even if disabled styling lingers
+    nextStateBtn.addEventListener('click', (e)=>{
+      const v = stateSelect.value;
+      if (!v) {
+        stateErr.classList.remove('hidden');
+        enable(nextStateBtn, false);
+        return;
+      }
+      state.answers.state = v;
+      // Force-enable before moving on, in case the disabled attribute was not removed by the browser
+      nextStateBtn.removeAttribute('disabled');
+      renderStep('qPhone');
+    });
 
     // Step 6: Phone + OTP
     const phoneEl = document.getElementById('phone');
@@ -647,4 +573,5 @@
   </script>
 </body>
 </html>
+
 

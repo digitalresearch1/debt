@@ -79,18 +79,15 @@
           </div>
         </div>
 
-        <!-- Step 3.5: Debt Types + amounts (EXACTLY 3) -->
+        <!-- Step 3.5: Debt Types + amounts (SELECT ALL THAT APPLY) -->
         <div id="step-qDebtTypes" class="step-transition step-hidden">
           <div class="bg-white p-8 rounded-2xl shadow-lg">
             <h2 class="text-xl font-semibold text-slate-800 mb-1">What type(s) of unsecured debt do you have?</h2>
-            <p class="text-slate-500">Select <strong>exactly 3</strong> — your top debts — then enter an approximate amount of debt you owe next to each.</p>
-            <div class="mt-2 text-xs text-slate-500 flex items-center justify-between">
-              <span id="cap-hint">0/3 selected</span>
-              <span id="cap-error" class="text-red-600 hidden">Please select exactly 3 types.</span>
-            </div>
+            <p class="text-slate-500">Select all types that apply to you, then enter the approximate amount you owe next to each selected type of debt you have.</p>
 
             <div class="debt-grid mt-3" id="debt-type-grid"><!-- items via JS --></div>
 
+            <p id="select-error" class="text-xs text-red-600 mt-2 hidden">Please select at least one type.</p>
             <button id="nextDebtTypes" class="mt-6 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700" disabled>Continue</button>
           </div>
         </div>
@@ -342,7 +339,7 @@
       renderStep('qDebtTypes');
     };
 
-    // ===== Debt Types step (EXACTLY 3 + silent target check) =====
+    // ===== Debt Types step (SELECT ALL + silent target check) =====
     const debtTypes = [
       { key:'credit_card',   label:'Credit Card' },
       { key:'personal',      label:'Personal Loan' },
@@ -353,22 +350,15 @@
       { key:'collections',   label:'Collections / Charge-offs' },
     ];
     const targetKeys = new Set(['personal','credit_card','medical']);
-    const MAX_SELECTED = 3;
 
     const grid = document.getElementById('debt-type-grid');
-    const capHintEl = document.getElementById('cap-hint');
-    const capErrorEl = document.getElementById('cap-error');
     const nextDebtTypesBtn = document.getElementById('nextDebtTypes');
+    const selectError = document.getElementById('select-error');
 
-    function updateCapUI(){
-      const checked = Array.from(document.querySelectorAll('#debt-type-grid input[type=checkbox]:checked'));
-      const count = checked.length;
-      capHintEl.textContent = `${count}/${MAX_SELECTED} selected`;
-      nextDebtTypesBtn.disabled = count !== MAX_SELECTED;
-      capErrorEl.classList.toggle('hidden', count === MAX_SELECTED);
-      document.querySelectorAll('#debt-type-grid input[type=checkbox]').forEach(cb => {
-        if (!cb.checked) cb.disabled = count >= MAX_SELECTED; else cb.disabled = false;
-      });
+    function updateSelectUI(){
+      const count = document.querySelectorAll('#debt-type-grid input[type=checkbox]:checked').length;
+      nextDebtTypesBtn.disabled = count < 1;
+      selectError.classList.toggle('hidden', count >= 1);
     }
 
     debtTypes.forEach(dt => {
@@ -387,13 +377,6 @@
       const amt = row.querySelector(`#amt_${dt.key}`);
 
       cb.addEventListener('change', () => {
-        const currentCount = document.querySelectorAll('#debt-type-grid input[type=checkbox]:checked').length;
-        if (cb.checked && currentCount > MAX_SELECTED) {
-          cb.checked = false; // prevent exceeding cap
-          capErrorEl.classList.remove('hidden');
-          updateCapUI();
-          return;
-        }
         if (cb.checked) {
           row.classList.add('active');
           amt.disabled = false;
@@ -404,7 +387,7 @@
           row.classList.remove('active');
           amt.disabled = true;
         }
-        updateCapUI();
+        updateSelectUI();
       });
 
       amt.addEventListener('input', () => {
@@ -429,8 +412,8 @@
     }
 
     document.getElementById('nextDebtTypes').onclick = () => {
-      const checkedCount = document.querySelectorAll('#debt-type-grid input[type=checkbox]:checked').length;
-      if (checkedCount !== MAX_SELECTED) { capErrorEl.classList.remove('hidden'); return; }
+      const selectedCount = document.querySelectorAll('#debt-type-grid input[type=checkbox]:checked').length;
+      if (selectedCount < 1) { selectError.classList.remove('hidden'); return; }
 
       const { targetSum, allSum, breakdown } = getDebtTypeSums();
       // silent disqualify if target sum < min (Personal + Credit Card + Medical)
@@ -439,7 +422,7 @@
         setTimeout(()=>{ window.location.href = `${CONFIG.PURESPECTRUM_TERMINATE_URL}&transaction_id=${TRANSACTION_ID}`; }, 1800);
         return;
       }
-      // carry forward, but route to Attitudes step
+      // carry forward, then route to Attitudes step
       state.answers.debtBreakdown = breakdown;
       state.answers.debt = Math.max(allSum, CONFIG.MIN_DEBT_AMOUNT);
       renderStep('qAttitudes');
@@ -673,10 +656,10 @@
     // Initial render
     renderStep('qFirst');
 
-    // Initialize cap UI when arriving at debt-type step
+    // Initialize select UI when arriving at debt-type step
     const observer = new MutationObserver(() => {
       const step = document.getElementById('step-qDebtTypes');
-      if (step && !step.classList.contains('step-hidden')) { updateCapUI(); }
+      if (step && !step.classList.contains('step-hidden')) { updateSelectUI(); }
     });
     observer.observe(document.body, { attributes:true, subtree:true, attributeFilter:['class'] });
   </script>
@@ -698,5 +681,4 @@
   </script>
 </body>
 </html>
-
 

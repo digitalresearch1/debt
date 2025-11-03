@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Debt Relief Options — See If You Qualify</title>
+  <meta name="description" content="Check eligibility for trusted debt relief options. No hard credit pull. Quick, secure, and confidential." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,'Apple Color Emoji','Segoe UI Emoji';}
+    .glass{backdrop-filter:saturate(180%) blur(10px); background: rgba(255,255,255,0.75);} 
+    .gradient{background: radial-gradient(1200px 600px at 10% -20%, rgba(99,102,241,0.25), transparent 60%),
+                         radial-gradient(1200px 600px at 90% 120%, rgba(14,165,233,0.25), transparent 60%);} 
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 gradient">
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-indigo-600"><path d="M12 2l3 6 6 .9-4.5 4.4 1 6.3L12 17l-5.5 2.6 1-6.3L3 8.9 9 8l3-6z" stroke="currentColor" stroke-width="1.2"/></svg>
+        <span class="font-extrabold tracking-tight text-slate-900">Trusted Debt Options</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a href="#how" class="hover:text-indigo-600">How it works</a>
+        <a href="#benefits" class="hover:text-indigo-600">Benefits</a>
+        <a href="#faq" class="hover:text-indigo-600">FAQ</a>
+      </nav>
+      <a href="#start" class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow hover:bg-indigo-700">Check Eligibility</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 rounded-full bg-indigo-50 text-indigo-700 px-3 py-1 text-xs font-medium">No hard credit pull • Takes 60–90 seconds</div>
+        <h1 class="mt-4 text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900">See If You Qualify for a <span class="text-indigo-600">Debt Relief Program</span></h1>
+        <p class="mt-4 text-base sm:text-lg text-slate-600">Answer a few quick questions and connect with licensed partner providers. Private and secure. You can pause or opt out any time.</p>
+        <ul class="mt-6 space-y-2 text-sm sm:text-base">
+          <li class="flex items-start gap-2"><span class="mt-1 h-5 w-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">✓</span> $15,000+ in unsecured debt typically required</li>
+          <li class="flex items-start gap-2"><span class="mt-1 h-5 w-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">✓</span> Employed or consistent income preferred</li>
+          <li class="flex items-start gap-2"><span class="mt-1 h-5 w-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">✓</span> No hard credit inquiry to check eligibility</li>
+        </ul>
+        <div class="mt-8 flex flex-col sm:flex-row gap-3" id="start">
+          <a href="https://quote.cliqsilver.com/enrollment/1" class="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-white font-semibold shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Start Eligibility Check</a>
+          <a href="#how" class="inline-flex items-center justify-center rounded-2xl bg-white px-6 py-3 text-slate-700 font-semibold border border-slate-200 hover:border-slate-300">Learn how it works</a>
+        </div>
+        <p class="mt-3 text-xs text-slate-500">By proceeding you agree to be contacted by phone/SMS by partner providers. Message & data rates may apply. You can opt out at any time.</p>
+      </div>
+      <div class="relative">
+        <div class="glass rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-8">
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-semibold text-slate-700">Eligibility Progress</div>
+            <div class="text-xs text-slate-500">Step 1 of 3</div>
+          </div>
+          <div class="mt-3 w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+            <div class="h-full w-1/3 bg-indigo-600"></div>
+          </div>
+          <div class="mt-6 grid grid-cols-2 gap-4 text-sm">
+            <div class="rounded-xl border border-slate-200 p-4">
+              <div class="text-slate-500">Debt Amount</div>
+              <div class="font-semibold text-slate-900">$15,000+</div>
+            </div>
+            <div class="rounded-xl border border-slate-200 p-4">
+              <div class="text-slate-500">Employment</div>
+              <div class="font-semibold text-slate-900">Current Income</div>
+            </div>
+            <div class="rounded-xl border border-slate-200 p-4">
+              <div class="text-slate-500">Credit Impact</div>
+              <div class="font-semibold text-slate-900">No Hard Pull</div>
+            </div>
+            <div class="rounded-xl border border-slate-200 p-4">
+              <div class="text-slate-500">Time to Check</div>
+              <div class="font-semibold text-slate-900">~90 Seconds</div>
+            </div>
+          </div>
+          <a href="https://quote.cliqsilver.com/enrollment/1" class="mt-6 w-full inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-white font-semibold shadow-lg hover:bg-indigo-700">Continue</a>
+          <p class="mt-3 text-[11px] leading-4 text-slate-500">We partner only with vetted providers. Eligibility does not guarantee enrollment. Terms vary by provider and state.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Bar -->
+  <section class="bg-white border-y border-slate-200/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-wrap items-center justify-center gap-6">
+      <div class="flex items-center gap-2 text-slate-500 text-sm"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor"/></svg> No hard credit pull</div>
+      <div class="flex items-center gap-2 text-slate-500 text-sm"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2"/></svg> Licensed partner providers</div>
+      <div class="flex items-center gap-2 text-slate-500 text-sm"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 1v22M1 12h22" stroke="currentColor"/></svg> Secure & private</div>
+    </div>
+  </section>
+
+  <!-- Benefits -->
+  <section id="benefits" class="py-14 sm:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Why people choose debt relief</h2>
+      <p class="mt-2 text-slate-600">Programs may reduce monthly payments, stop late fees, and help you become debt‑free faster than minimums. Results vary.</p>
+      <div class="mt-8 grid md:grid-cols-3 gap-6">
+        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+          <div class="font-semibold">One Simple Program</div>
+          <p class="mt-2 text-sm text-slate-600">Work with a dedicated team to consolidate eligible unsecured debts into a structured plan.</p>
+        </div>
+        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+          <div class="font-semibold">Reduced Stress</div>
+          <p class="mt-2 text-sm text-slate-600">Clear next steps and real human support — without hard credit checks to see if you qualify.</p>
+        </div>
+        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+          <div class="font-semibold">Faster Path Forward</div>
+          <p class="mt-2 text-sm text-slate-600">Many clients finish in 24–48 months depending on balances and program type. Not a quick fix, but a real plan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how" class="bg-white py-14 sm:py-20 border-t border-slate-200/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">How it works</h2>
+      <div class="mt-8 grid lg:grid-cols-3 gap-6">
+        <div class="rounded-2xl border border-slate-200 p-6">
+          <div class="text-indigo-600 font-bold">1</div>
+          <div class="mt-2 font-semibold">Check eligibility</div>
+          <p class="mt-1 text-sm text-slate-600">Click “Start Eligibility Check” and answer a few questions to see if you’re a match.</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 p-6">
+          <div class="text-indigo-600 font-bold">2</div>
+          <div class="mt-2 font-semibold">Verify by phone/SMS</div>
+          <p class="mt-1 text-sm text-slate-600">You may receive a quick phone call or text from a licensed partner to confirm details.</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 p-6">
+          <div class="text-indigo-600 font-bold">3</div>
+          <div class="mt-2 font-semibold">Review your options</div>
+          <p class="mt-1 text-sm text-slate-600">If you qualify, discuss program terms, timelines, and costs before you make a decision.</p>
+        </div>
+      </div>
+      <div class="mt-8">
+        <a href="https://quote.cliqsilver.com/enrollment/1" class="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-white font-semibold shadow-lg hover:bg-indigo-700">Start Eligibility Check</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonial -->
+  <section class="py-14 sm:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="rounded-3xl bg-gradient-to-br from-indigo-600 to-sky-500 text-white p-8 sm:p-10 shadow-xl">
+        <div class="text-sm uppercase tracking-wider/loose opacity-90">Real Stories</div>
+        <blockquote class="mt-3 text-xl sm:text-2xl font-semibold leading-relaxed">“I felt stuck making only minimum payments. The eligibility check was quick, and talking to a specialist helped me see a real plan forward.”</blockquote>
+        <div class="mt-4 text-sm opacity-90">— A., Enrolled 2025</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="bg-white py-14 sm:py-20 border-t border-slate-200/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Frequently asked questions</h2>
+      <div class="mt-6 grid md:grid-cols-2 gap-6">
+        <details class="rounded-2xl border border-slate-200 p-5 bg-white">
+          <summary class="font-semibold cursor-pointer">Will checking eligibility affect my credit?</summary>
+          <p class="mt-2 text-sm text-slate-600">No hard credit pull is used to check eligibility. Discuss details with your specialist for your specific situation.</p>
+        </details>
+        <details class="rounded-2xl border border-slate-200 p-5 bg-white">
+          <summary class="font-semibold cursor-pointer">What debts are usually eligible?</summary>
+          <p class="mt-2 text-sm text-slate-600">Typically unsecured debts like credit cards, personal loans, or medical bills. Secured debts (auto, mortgage) usually don’t qualify.</p>
+        </details>
+        <details class="rounded-2xl border border-slate-200 p-5 bg-white">
+          <summary class="font-semibold cursor-pointer">How soon can I get help?</summary>
+          <p class="mt-2 text-sm text-slate-600">Initial review is fast. Program timelines vary. You’ll discuss specifics with a licensed partner before choosing.</p>
+        </details>
+        <details class="rounded-2xl border border-slate-200 p-5 bg-white">
+          <summary class="font-semibold cursor-pointer">Are there risks?</summary>
+          <p class="mt-2 text-sm text-slate-600">All programs have pros/cons and potential credit/collection impacts. Make sure you understand fees, timelines, and obligations before enrolling.</p>
+        </details>
+      </div>
+      <div class="mt-8">
+        <a href="https://quote.cliqsilver.com/enrollment/1" class="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-white font-semibold shadow-lg hover:bg-indigo-700">Start Eligibility Check</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs text-slate-500 space-y-3">
+      <p>© <span id="yr"></span> Trusted Debt Options. For informational purposes only. We may receive compensation from partner providers if you enroll. This site does not offer legal, tax, or credit advice.</p>
+      <p>By clicking buttons on this page, you agree to be contacted by partner providers via phone/SMS regarding debt relief options. Message & data rates may apply. You can opt out at any time.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

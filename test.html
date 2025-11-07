@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -182,6 +183,41 @@
           </div>
         </div>
 
+        <!-- Step 7-NEW: Watch & Confirm (Facebook + Program page) -->
+        <section id="step-qMedia" class="step-transition step-hidden">
+          <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-semibold text-slate-800 mb-2 text-center">Please watch this before continuing</h2>
+            <p class="text-slate-500 mb-4 text-center">Watch the short video and preview the program page. Then confirm you saw this on Facebook.</p>
+
+            <!-- Facebook video -->
+            <div class="aspect-video w-full max-w-2xl mx-auto rounded-xl overflow-hidden border border-slate-200 mb-4">
+              <iframe 
+                src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1205740158030889%2F&show_text=true&width=560&t=0"
+                width="100%" height="100%" style="border:0;overflow:hidden" scrolling="no" frameborder="0"
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen>
+              </iframe>
+            </div>
+
+            <!-- Program page -->
+            <div class="w-full max-w-2xl mx-auto rounded-xl overflow-hidden border border-slate-200 mb-3" style="height:520px;">
+              <iframe src="https://digitalresearch1.github.io/debt/curadebtexemple.html" width="100%" height="100%" style="border:0;"></iframe>
+            </div>
+
+            <!-- Confirmation + timer -->
+            <div class="flex items-start gap-3 mt-4">
+              <input id="confirm-fb" type="checkbox" class="mt-1 h-4 w-4 text-indigo-600 border-slate-300 rounded">
+              <label for="confirm-fb" class="text-sm text-slate-700">
+                I watched the video and I saw this program on <strong>Facebook</strong>.
+              </label>
+            </div>
+            <p id="media-timer" class="text-xs text-slate-500 mt-2 text-center">Please watch for <b>00:20</b> to unlock Continue.</p>
+
+            <button id="nextMedia" class="mt-5 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700 disabled:opacity-50" disabled>
+              Continue
+            </button>
+          </div>
+        </section>
+
         <!-- Step 7: Study details + Willingness -->
         <div id="step-qWilling" class="step-transition step-hidden">
           <div class="bg-white p-8 rounded-2xl shadow-lg">
@@ -284,9 +320,9 @@
     <input type="hidden" name="call_now" value="1">
     <input type="hidden" name="email_unverified" value="1">
     <input type="hidden" name="otp_verified">
-  
+    <input type="hidden" name="source">
     <input type="hidden" name="external_lead_id" id="td_external_lead_id">
-</form>
+  </form>
 
   <script type="module">
 // === TrackDrive Call Gate config ===
@@ -326,10 +362,11 @@ function uuidv4(){
     const state = { currentStep: 'qFirst', answers: {}, ip: '' };
     ipPromise.then(ip => { state.ip = ip; });
 
-    const steps = ['qFirst','qLast','qEmail','qDebtTypes','qAttitudes','qDebt','qState','qPhone','qWilling','feedbackForm'];
+    // UPDATED steps: include qMedia before qWilling
+    const steps = ['qFirst','qLast','qEmail','qDebtTypes','qAttitudes','qDebt','qState','qPhone','qMedia','qWilling','feedbackForm'];
     const progressBar = document.getElementById('progress-bar');
 
-    function renderStep(stepKey) {
+    function _baseRenderStep(stepKey) {
       state.currentStep = stepKey;
       const idx = Math.max(0, steps.indexOf(stepKey));
       const progress = ((idx + 1) / steps.length) * 100;
@@ -344,6 +381,51 @@ function uuidv4(){
     const toE164US = raw => { const d = digitsOnly(raw); const m = d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/); return m ? `+1${m[1]}${m[2]}${m[3]}` : null; };
     const moneyFmt = v => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(v);
     const emailOK = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((s||'').trim());
+
+    // ===== Watch gate for qMedia (20s + checkbox) =====
+    let mediaTimerDone = false;
+    function startMediaTimer() {
+      mediaTimerDone = false;
+      const label = document.getElementById('media-timer');
+      const btn   = document.getElementById('nextMedia');
+      const cb    = document.getElementById('confirm-fb');
+
+      if (!label || !btn || !cb) return;
+
+      let remaining = 20; // seconds to watch
+      label.innerHTML = `Please watch for <b>00:${String(remaining).padStart(2,'0')}</b> to unlock Continue.`;
+      btn.disabled = true;
+
+      const tick = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          clearInterval(tick);
+          mediaTimerDone = true;
+          label.textContent = 'Ready! Check the box to continue.';
+          btn.disabled = !cb.checked;
+        } else {
+          label.innerHTML = `Please watch for <b>00:${String(remaining).padStart(2,'0')}</b> to unlock Continue.`;
+        }
+      }, 1000);
+
+      cb.addEventListener('change', () => {
+        btn.disabled = !(mediaTimerDone && cb.checked);
+      });
+
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        state.answers.source_fb = cb.checked ? 'Facebook' : '';
+        renderStep('qWilling');
+      }, { once:true });
+    }
+
+    // renderStep wrapper that auto-starts media timer when showing qMedia
+    function renderStep(stepKey) {
+      _baseRenderStep(stepKey);
+      if (stepKey === 'qMedia') {
+        setTimeout(startMediaTimer, 150);
+      }
+    }
 
     // Step 1
     document.getElementById('nextFirst').onclick = () => {
@@ -578,7 +660,10 @@ function uuidv4(){
 
     document.getElementById('nextPhone').onclick = () => {
       const phone = document.getElementById('phone').value; const tcpa = document.getElementById('tcpa').checked;
-      if (!toE164US(phone) || !otpVerified || !tcpa) return; state.answers.phone = digitsOnly(phone); renderStep('qWilling'); };
+      if (!toE164US(phone) || !otpVerified || !tcpa) return;
+      state.answers.phone = digitsOnly(phone);
+      renderStep('qMedia');
+    };
 
     // Step 7: Willingness (posting)
     const agreeBtn = document.getElementById('agree-consult');
@@ -619,7 +704,7 @@ function uuidv4(){
   form1.elements['f_whereyoulive'].value = state.answers.state || '';
   form1.elements['f_city'].value         = '';
   form1.elements['f_zip'].value          = '';
-  form1.elements['f_comments'].value     = `${new Date().toLocaleDateString()} — Requested a CuraDebt Debt Settlement consultation via research study.`;
+  form1.elements['f_comments'].value     = `${new Date().toLocaleDateString()} — Requested a CuraDebt Debt Settlement consultation via research study.` + (state.answers.source_fb ? ` Source: ${state.answers.source_fb}.` : '');
   form1.elements['data1'].value          = TRANSACTION_ID;
   form1.elements['data2'].value          = TRANSACTION_ID;
   form1.elements['f_ip'].value           = state.ip;
@@ -646,6 +731,7 @@ function uuidv4(){
   form2.elements['tcpa_optin_consent_language'].value = "Research contact consent captured pre-Q7; consultation consent affirmed at Q7.";
   form2.elements['tcpa_optin_timestamp'].value        = new Date().toISOString();
   form2.elements['otp_verified'].value                = '1';
+  form2.elements['source'].value                      = state.answers.source_fb || '';
 
   // IMPORTANT: pass our external id to TrackDrive so webhooks can match this lead
   const extInput = document.getElementById('td_external_lead_id');

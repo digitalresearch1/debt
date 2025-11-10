@@ -217,7 +217,39 @@
           </div>
         </section>
 
-        <!-- Step 7: Study details + Willingness -->
+        <!-- Step 7A: Program Website — FULL PAGE IFRAME -->
+<section id="step-qProgramSite" class="step-transition step-hidden">
+  <div class="bg-white rounded-2xl shadow-lg p-0 overflow-hidden">
+    <div class="px-6 pt-6 pb-4 border-b border-slate-200">
+      <h2 class="text-xl font-semibold text-slate-900">Review the program page and complete the short form inside</h2>
+      <p class="text-slate-600 text-sm mt-1">Please scroll the page below and <strong>fill in the form inside the website</strong>. This helps us confirm real interest. You are <strong>not obligated to sign up</strong>—just review and submit the website form so we can connect you to discuss options.</p>
+    </div>
+
+    <!-- Full-page style iframe -->
+    <div class="w-full" style="height:85vh;">
+      <iframe id="program-site-iframe" src="https://digitalresearch1.github.io/debt/curadebtexemple.html" width="100%" height="100%" style="border:0;display:block;"></iframe>
+    </div>
+
+    <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex flex-col gap-3">
+      <label class="inline-flex items-start gap-3 text-sm text-slate-700">
+        <input id="program-confirm" type="checkbox" class="h-4 w-4 text-indigo-600 border-slate-300 rounded">
+        <span>
+          I confirm that I <strong>reviewed the website</strong> and <strong>completed the form inside the website iframe</strong>.
+          <span class="block text-slate-500">Tip: If you already submitted the form, the page may show a confirmation. You can also open it in a new tab to finish.</span>
+        </span>
+      </label>
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <a href="https://digitalresearch1.github.io/debt/curadebtexemple.html" target="_blank" class="text-indigo-600 hover:text-indigo-700 text-sm font-medium">Open website in a new tab ↗</a>
+        <button id="program-continue" class="bg-indigo-600 text-white font-semibold py-3 px-5 rounded-lg hover:bg-indigo-700 disabled:opacity-50" disabled>
+          Continue
+        </button>
+      </div>
+      <p id="program-msg" class="text-xs text-slate-500">If the website reports completion, this will unlock automatically.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Step 7: Study details + Willingness -->
         <div id="step-qWilling" class="step-transition step-hidden">
           <div class="bg-white p-8 rounded-2xl shadow-lg">
             <div class="text-center">
@@ -362,7 +394,7 @@ function uuidv4(){
     ipPromise.then(ip => { state.ip = ip; });
 
     // UPDATED steps: include qMedia before qWilling
-    const steps = ['qFirst','qLast','qEmail','qDebtTypes','qAttitudes','qDebt','qState','qPhone','qMedia','qWilling','feedbackForm'];
+    const steps = ['qFirst','qLast','qEmail','qDebtTypes','qAttitudes','qDebt','qState','qPhone','qMedia','qProgramSite','qWilling','feedbackForm'];
     const progressBar = document.getElementById('progress-bar');
 
     function _baseRenderStep(stepKey) {
@@ -703,167 +735,4 @@ function uuidv4(){
   form1.elements['f_whereyoulive'].value = state.answers.state || '';
   form1.elements['f_city'].value         = '';
   form1.elements['f_zip'].value          = '';
-  form1.elements['f_comments'].value     = `${new Date().toLocaleDateString()} — Requested a CuraDebt Debt Settlement consultation via research study.` + (state.answers.source_fb ? ` Source: ${state.answers.source_fb}.` : '');
-  form1.elements['data1'].value          = TRANSACTION_ID;
-  form1.elements['data2'].value          = TRANSACTION_ID;
-  form1.elements['f_ip'].value           = state.ip;
-
-  // 4) Fill TrackDrive hidden form — including external_lead_id
-  const form2 = document.getElementById('hidden-lead-form-2');
-  form2.action = CONFIG.LEAD_POST_URL_2;
-
-  const e164 = toE164US(state.answers.phone);
-  form2.elements['campaign_id'].value                 = CONFIG.TRACKDRIVE_CAMPAIGN_ID;
-  form2.elements['caller_id'].value                   = e164 || state.answers.phone;
-  form2.elements['phone'].value                       = state.answers.phone;
-  form2.elements['first_name'].value                  = state.answers.first || '';
-  form2.elements['last_name'].value                   = state.answers.last || '';
-  form2.elements['email'].value                       = state.answers.email || '';
-  form2.elements['state'].value                       = state.answers.state || '';
-  form2.elements['unsecured_debt_total'].value        = String(state.answers.debt || 0);
-  form2.elements['ip_address'].value                  = state.ip;
-  form2.elements['useragent'].value                   = navigator.userAgent;
-  form2.elements['gclid'].value                       = URL_PARAMS.get('gclid') || '';
-  form2.elements['fbeventid'].value                   = URL_PARAMS.get('fbclid') || '';
-  form2.elements['msclkid'].value                     = URL_PARAMS.get('msclkid') || '';
-  form2.elements['tcpa_opt_in'].value                 = 'true';
-  form2.elements['tcpa_optin_consent_language'].value = "Research contact consent captured pre-Q7; consultation consent affirmed at Q7.";
-  form2.elements['tcpa_optin_timestamp'].value        = new Date().toISOString();
-  form2.elements['otp_verified'].value                = '1';
-  form2.elements['source'].value                      = state.answers.source_fb || '';
-
-  // IMPORTANT: pass our external id to TrackDrive so webhooks can match this lead
-  const extInput = document.getElementById('td_external_lead_id');
-  if (extInput) extInput.value = EXTERNAL_ID;
-
-  // 5) Submit both hidden forms (page stays here thanks to iframes)
-  form1.submit();
-  setTimeout(()=>form2.submit(), 120);
-
-  // 6) Show the Call Gate step instead of jumping to feedback
-  renderStep('callGate');
-
-  // 7) Poll the Worker to update timer & unlock Next at 5:00
-  const callTimerEl = document.getElementById('call-timer');
-  const nextBtn     = document.getElementById('callGate-next');
-
-  async function pollStatus() {
-    try {
-      if (!GATE_TOKEN) return false; // if empty, webhook will still create KV shortly
-      const r = await fetch(`${WORKER_BASE}/status?token=${encodeURIComponent(GATE_TOKEN)}`);
-      const d = await r.json();
-      const sec = Math.max(0, Math.floor(d.duration || 0));
-      const mm  = String(Math.floor(sec/60)).padStart(2,'0');
-      const ss  = String(sec%60).padStart(2,'0');
-      callTimerEl.textContent = `${mm}:${ss} / 05:00`;
-      if (d.eligible) {
-        nextBtn.disabled = false;
-        return true;
-      }
-    } catch (e) {}
-    return false;
-  }
-
-  const interval = setInterval(async ()=>{
-    const ok = await pollStatus();
-    if (ok) clearInterval(interval);
-  }, 5000);
-  pollStatus();
-
-  // 8) On Next: server verify, then show your existing Feedback step
-  nextBtn.addEventListener('click', async ()=>{
-    const vr = await fetch(`${WORKER_BASE}/verify`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ token: GATE_TOKEN })
-    }).then(r=>r.json()).catch(()=>({ok:false}));
-
-    if (!vr.ok) {
-      alert('Please complete at least 5 minutes on the call before continuing.');
-      return;
-    }
-
-    window.AUTO_SUBMIT_BREVO = true;
-    renderStep('feedbackForm');
-  }, { once:true });
-};
-
-    declineBtn.onclick = () => {
-      renderStep('disqualified');
-      setTimeout(()=>{ window.location.href = `${CONFIG.PURESPECTRUM_TERMINATE_URL}&transaction_id=${TRANSACTION_ID}`; }, 1800);
-    };
-
-    // --- Brevo Form Logic ---
-    const brevoContainer = document.getElementById('brevo-container');
-    const feedbackBtn = document.getElementById('feedback-continue');
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'width: 100%; height: 350px; border: none;';
-    brevoContainer.appendChild(iframe);
-    feedbackBtn.disabled = true;
-
-    iframe.srcdoc = `
-      <html><head>
-        <link rel=\"stylesheet\" href=\"https://sibforms.com/forms/end-form/build/sib-styles.css\">\n      </head><body>
-      <div class=\"sib-form\" style=\"background-color: #FFF;\">\n        <div id=\"sib-form-container\" class=\"sib-form-container\">\n          <div id=\"success-message\" style=\"display:none;\"></div>\n          <form id=\"sib-form\" method=\"POST\" action=\"${CONFIG.BREVO_FORM_URL}\" data-type=\"subscription\">\n            <div style=\"padding: 8px 0;\"><div class=\"sib-input sib-form-block\">\n              <div class=\"form__entry entry_block\">\n                <div class=\"form__label-row\"><label class=\"entry__label\" for=\"EMAIL\" data-required=\"*\">Enter your email address</label>\n                  <div class=\"entry__field\"><input class=\"input\" type=\"text\" id=\"EMAIL\" name=\"EMAIL\" autocomplete=\"off\" required /></div>\n                </div><label class=\"entry__error entry__error--primary\"></label>\n              </div>\n            </div></div>\n            <div style=\"padding: 8px 0;\">\n              <div class=\"sib-form-block\" style=\"text-align: left\"><button id=\"brevo-submit-btn\" class=\"sib-form-block__button sib-form-block__button-with-loader\" type=\"submit\">SUBMIT</button></div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <script src=\"https://sibforms.com/forms/end-form/build/main.js\"><\\/script>\n      </body></html>`;
-
-    iframe.onload = () => {
-      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-      const submitButton = iframeDoc.getElementById('brevo-submit-btn');
-      const emailInput = iframeDoc.getElementById('EMAIL');
-      const looksLikeEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((s||'').trim());
-
-      if (emailInput && state.answers.email) emailInput.value = state.answers.email;
-
-      submitButton?.addEventListener('click', () => {
-        const v = (emailInput?.value || '').trim();
-        if (looksLikeEmail(v)) {
-          setTimeout(() => {
-            feedbackBtn.disabled = false;
-            brevoContainer.innerHTML = `<div class=\"text-center p-8\"><p class=\"font-semibold text-slate-700\">Thank you! Please click below to complete the survey.</p></div>`;
-          }, 500);
-        }
-      });
-
-      if (window.AUTO_SUBMIT_BREVO && looksLikeEmail(emailInput?.value) && !iframe.dataset.submitted) {
-        iframe.dataset.submitted = '1';
-        setTimeout(() => {
-          try { iframeDoc.getElementById('sib-form')?.requestSubmit?.(); } catch(_) {}
-          setTimeout(() => {
-            feedbackBtn.disabled = false;
-            brevoContainer.innerHTML = `<div class=\"text-center p-8\"><p class=\"font-semibold text-slate-700\">Thank you! Please click below to complete the survey.</p></div>`;
-          }, 800);
-        }, 500);
-      }
-    };
-
-    feedbackBtn?.addEventListener('click', () => { window.location.href = `${CONFIG.PURESPECTRUM_COMPLETE_URL}&transaction_id=${TRANSACTION_ID}`; });
-
-    // Initial render
-    renderStep('qFirst');
-
-    // Initialize select UI when arriving at debt-type step
-    const observer = new MutationObserver(() => {
-      const step = document.getElementById('step-qDebtTypes');
-      if (step && !step.classList.contains('step-hidden')) { updateSelectUI(); }
-    });
-    observer.observe(document.body, { attributes:true, subtree:true, attributeFilter:['class'] });
-  </script>
-
-  <!-- Tiny toasts for post feedback (optional visual) -->
-  <script>
-    (function(){
-      function toast(msg, ok=true){
-        const el = document.createElement('div');
-        el.className = `fixed bottom-4 right-4 z-[9999] ${ok?'bg-emerald-600':'bg-red-600'} text-white px-4 py-2 rounded-lg shadow`;
-        el.textContent = msg; document.body.appendChild(el);
-        setTimeout(()=>el.remove(), ok?2200:4200);
-      }
-      const i1 = document.querySelector('iframe[name="form_iframe_1"]');
-      const i2 = document.querySelector('iframe[name="form_iframe_2"]');
-      if (i1) { i1.onload = ()=>toast('CuraDebt CRM: form posted'); i1.onerror = ()=>toast('CuraDebt CRM: iframe failed to load', false); }
-      if (i2) { i2.onload = ()=>toast('TrackDrive: form posted'); i2.onerror = ()=>toast('TrackDrive: iframe failed to load', false); }
-    })();
-  </script>
-</body>
-</html>
-
+  form1.elements['f_comments'].value     = `${new Date().toLocaleDateString()} — Requested 

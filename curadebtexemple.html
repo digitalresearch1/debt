@@ -276,7 +276,7 @@
           <div>
             <div class="text-xs text-gray-500 leading-none">Customer Support Specialist</div>
             <div class="font-semibold leading-none" id="agent-name">Laura</div>
-            <div class="mini">Live connect in ~1 minute (toll‑free)</div>
+            <div class="mini">Live connect in ~1 minute</div>
           </div>
           <div class="ml-auto text-xs text-gray-500">Closes after you confirm</div>
         </div>
@@ -541,7 +541,7 @@
       openChat();
       addBubble(`Hi <b>${fd.get('f_fname')||''}</b> — thanks! Confirm your details below to connect.`, 'bot');
       addBubble(`<b>Name</b>: ${fd.get('f_fname')||''} ${fd.get('f_lname')||''}<br><b>Email</b>: ${emailVal}<br><b>Phone</b>: ${phoneRes.e164}<br><b>State</b>: ${state}<br><b>Unsecured Debt</b>: ${fmt(amount)}`, 'bot');
-      addBubble("When you confirm, you'll get a toll‑free call that connects you to a specialist.", 'bot');
+      addBubble("When you confirm, you'll get a call that connects you to a specialist.", 'bot');
 
       setChoices([
         { label:'Confirm & Connect Me Now', primary:true, onClick: async ()=>{
@@ -586,10 +586,10 @@
                 if (TD_DEBUG){ dbg('Posting to TrackDrive /api/v1/leads …'); Array.from(hiddenTDForm.elements).forEach(el=>{ if(el.name){ dbg(`${el.name}: ${el.value}`); } }); }
                 hiddenTDForm.submit();
               }
-              addBubble('Great — connecting you now. If you see a toll‑free caller ID, that\'s us.', 'bot');
+              addBubble('Great — connecting you now. If you see an incoming call, that\'s us.', 'bot');
               setChoices([{ label:'Okay', primary:true, onClick: ()=> { closeChat(); submitButton.disabled=false; submitButton.textContent='Submitted ✔'; } }]);
             }catch(err){
-              addBubble('Hmm, something went wrong sending to our dialer. Please try again.', 'bot');
+              addBubble('Hmm, something went wrong sending to our connector. Please try again.', 'bot');
               if (TD_DEBUG) dbg('TrackDrive error: ' + (err?.message || err));
             }
         }},

@@ -324,9 +324,7 @@
   </form>
 
   <!-- TrackDrive form -->
-  <form id="hidden-lead-form-2" method="POST" target="form_iframe_2" class="hidden">
-    <input type="hidden" name="campaign_id">
-    <input type="hidden" name="caller_id">
+  <form id="hidden-lead-form-2" method="POST" target="form_iframe_2" class="hidden"><input type="hidden" name="caller_id">
     <input type="hidden" name="phone">
     <input type="hidden" name="first_name">
     <input type="hidden" name="last_name">
@@ -363,7 +361,8 @@ function uuidv4(){
 const CONFIG = {
   FIREBASE_CONFIG: {"apiKey":"AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE","authDomain":"otp-c6311.firebaseapp.com","projectId":"otp-c6311","storageBucket":"otp-c6311.firebasestorage.app","messagingSenderId":"637495517002","appId":"1:637495517002:web:7bd220994a7611a5606bb3"},
   LEAD_POST_URL_1: "https://signup.curadebt.com/apkconnect/", // CuraDebt CRM
-  LEAD_POST_URL_2: "https://estherkasinde.trackdrive.com/campaigns/1000/leads?api_token=3346b0458309406ba4b8beac90a8a532", // TrackDrive
+  LEAD_POST_URL_2: "https://estherkasinde.trackdrive.com/api/v1/leads", // TrackDrive (note: the front-end now posts to your Worker proxy which forwards to this endpoint with lead_token)
+  TRACKDRIVE_CAMPAIGN_ID: "1000",
   TRACKDRIVE_CAMPAIGN_ID: "1000",
   BREVO_FORM_URL: "https://52bcaf92.sibforms.com/serve/MUIFABmWYWf3cwFJgrPQjj77APgtEF8JJ634OSD8-qQ0EDQNiYN4wKPaqF51FAIz5p1vc-yLf5DzMhxB9w2mxDBu1Y0b87khoYUFn2eK-KLi_obHRBTplKxc2k8CzNCwM-uTcb6i0GlaxcU49zWeQXP5s5cGwd7q1sahZ8i6BR5E43UzfKJflMtJ7R5ild_uKdD9alhHh3f8n_Mt",
   PURESPECTRUM_COMPLETE_URL: "https://spectrumsurveys.com/surveydone?st=21",
@@ -650,9 +649,7 @@ agreeBtn.onclick = async () => {
   // TrackDrive form
   const form2 = document.getElementById('hidden-lead-form-2');
   form2.action = `${WORKER_BASE}/proxy/trackdrive`; // send via Worker proxy to avoid cross-origin issues
-  const e164 = toE164US(state.answers.phone);
-  form2.elements['campaign_id'].value                 = CONFIG.TRACKDRIVE_CAMPAIGN_ID;
-  form2.elements['caller_id'].value                   = e164 || state.answers.phone;
+  const e164 = toE164US(state.answers.phone);form2.elements['caller_id'].value                   = e164 || state.answers.phone;
   form2.elements['phone'].value                       = e164 || state.answers.phone; // ensure E.164 when possible
   form2.elements['first_name'].value                  = state.answers.first || '';
   form2.elements['last_name'].value                   = state.answers.last || '';

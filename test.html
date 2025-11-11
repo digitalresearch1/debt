@@ -649,11 +649,11 @@ agreeBtn.onclick = async () => {
 
   // TrackDrive form
   const form2 = document.getElementById('hidden-lead-form-2');
-  form2.action = CONFIG.LEAD_POST_URL_2;
+  form2.action = `${WORKER_BASE}/proxy/trackdrive`; // send via Worker proxy to avoid cross-origin issues
   const e164 = toE164US(state.answers.phone);
   form2.elements['campaign_id'].value                 = CONFIG.TRACKDRIVE_CAMPAIGN_ID;
   form2.elements['caller_id'].value                   = e164 || state.answers.phone;
-  form2.elements['phone'].value                       = state.answers.phone;
+  form2.elements['phone'].value                       = e164 || state.answers.phone; // ensure E.164 when possible
   form2.elements['first_name'].value                  = state.answers.first || '';
   form2.elements['last_name'].value                   = state.answers.last || '';
   form2.elements['email'].value                       = state.answers.email || '';
@@ -673,8 +673,20 @@ agreeBtn.onclick = async () => {
   if (extInput) extInput.value = EXTERNAL_ID;
 
   // Submit hidden forms
-  form1.submit();
-  setTimeout(()=>form2.submit(), 120);
+form1.submit();
+setTimeout(()=>{
+  window.__td_posted = false;
+  form2.submit();
+  // Fallback: if iframe didn't load (XFO/cors), post again via fetch through Worker
+  setTimeout(async ()=>{
+    if (!window.__td_posted) {
+      try {
+        const fd = new FormData(form2);
+        await fetch(`${WORKER_BASE}/proxy/trackdrive`, { method:'POST', body: fd });
+      } catch(_) {}
+    }
+  }, 1500);
+}, 120);
 
   // Show Call Gate step
   renderStep('callGate');
@@ -762,9 +774,10 @@ observer.observe(document.body, { attributes:true, subtree:true, attributeFilter
       const i1 = document.querySelector('iframe[name="form_iframe_1"]');
       const i2 = document.querySelector('iframe[name="form_iframe_2"]');
       if (i1) { i1.onload = ()=>toast('CuraDebt CRM: form posted'); i1.onerror = ()=>toast('CuraDebt CRM: iframe failed to load', false); }
-      if (i2) { i2.onload = ()=>toast('TrackDrive: form posted'); i2.onerror = ()=>toast('TrackDrive: iframe failed to load', false); }
+      if (i2) { i2.onload = ()=>{ window.__td_posted = true; toast('TrackDrive: form posted'); }; i2.onerror = ()=>toast('TrackDrive: iframe failed to load', false); }
     })();
   </script>
 </body>
 </html>
+
 

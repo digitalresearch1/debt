@@ -1,6 +1,3 @@
-Here you go — full page with the relaxed phone normalization (last 10 digits → `+1XXXXXXXXXX`) and the softened error message. I didn’t change anything else.
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,7 +52,7 @@ Here you go — full page with the relaxed phone normalization (last 10 digits �
     <input name="f_zip">
   </form>
 
-  <!-- Hidden background POST (TrackDrive API) — client-side fallback -->
+  <!-- Hidden background POST (TrackDrive API) — client-side -->
   <form id="hidden-trackdrive-post" action="https://estherkasinde.trackdrive.com/api/v1/leads" method="POST" target="hidden_post_target" style="display:none;">
     <input data-field="lead_token" name="lead_token" value="3346b0458309406ba4b8beac90a8a532">
     <input data-field="caller_id" name="caller_id">
@@ -236,27 +233,6 @@ Here you go — full page with the relaxed phone normalization (last 10 digits �
           </div>
         </div>
       </section>
-
-      <!-- FAQ Section -->
-      <section class="py-16 md:py-24 bg-gray-50">
-        <div class="container mx-auto px-6 max-w-3xl">
-          <h2 class="text-3xl font-bold text-center mb-10">Frequently Asked Questions</h2>
-          <div class="space-y-4">
-            <div class="bg-white p-5 rounded-lg shadow-sm">
-              <h3 class="font-semibold">How does debt relief affect my credit score?</h3>
-              <p class="text-gray-600 mt-2">While a debt relief program can cause a temporary dip in your credit score, successfully completing the program and reducing your debt can lead to a significant improvement in the long run as you build healthier financial habits.</p>
-            </div>
-            <div class="bg-white p-5 rounded-lg shadow-sm">
-              <h3 class="font-semibold">Is this a loan?</h3>
-              <p class="text-gray-600 mt-2">No, this is not a loan. A debt relief program works to negotiate your existing unsecured debts with your creditors to reduce the amount you owe. You make one lower monthly payment into a dedicated savings account that is then used to pay off your settled debts.</p>
-            </div>
-            <div class="bg-white p-5 rounded-lg shadow-sm">
-              <h3 class="font-semibold">How long does the program take?</h3>
-              <p class="text-gray-600 mt-2">The duration of the program varies depending on your total debt amount and your ability to save. Most clients successfully complete their program in 24 to 48 months.</p>
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
 
     <footer class="bg-gray-800 text-white">
@@ -300,8 +276,7 @@ Here you go — full page with the relaxed phone normalization (last 10 digits �
     /*********************
      * Config
      *********************/
-    const TD_DEBUG = true;          // toggle debug box
-    const WORKER_URL = '';          // optional: your Cloudflare Worker endpoint for server-side TrackDrive post
+    const TD_DEBUG = true;  // toggle debug box
 
     // Firebase config (your project)
     const firebaseConfig = {
@@ -371,33 +346,15 @@ Here you go — full page with the relaxed phone normalization (last 10 digits �
       return `+1${core10}`;
     }
 
-    // Remote validators you already have
-    const VALIDATE_PHONE_ENDPOINT = 'https://silent-sea-a717.kasindeesther.workers.dev/';
-    const VALIDATE_EMAIL_ENDPOINT = 'https://solitary-base-4a8b.kasindeesther.workers.dev/';
-
+    /* Phone check now ONLY normalizes; no remote validation since OTP will verify ownership */
     async function validatePhone(raw){
       const e164 = toE164US(raw);
       if(!e164) return { ok:false, error:'Enter a valid US number (10 digits).' };
-      try{
-        const r = await fetch(VALIDATE_PHONE_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: e164 }) });
-        const j = await r.json();
-        if(!j.ok) return { ok:false, error:j.error||'Validation failed' };
-        return { ...j, e164 };
-      }catch{
-        // fail-open if your endpoint is down
-        return { ok:true, e164 };
-      }
+      return { ok:true, e164 };
     }
     async function validateEmail(raw){
       const basic = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(raw||''));
-      try{
-        const r = await fetch(VALIDATE_EMAIL_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: String(raw||'').trim() }) });
-        const j = await r.json();
-        if(typeof j.ok === 'boolean') return j;
-        return { ok: basic, normalized: String(raw||'').trim() };
-      }catch{
-        return { ok: basic, normalized: String(raw||'').trim() };
-      }
+      return { ok: basic, normalized: String(raw||'').trim() };
     }
 
     // IP capture
@@ -405,7 +362,7 @@ Here you go — full page with the relaxed phone normalization (last 10 digits �
     const ipPromise = fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(j=>{ clientIp = j.ip || ''; }).catch(()=>{ clientIp=''; });
 
     /*********************
-     * Submit button gating
+     * Submit button gating (OTP required)
      *********************/
     window.otpOK = false;
     function updateSubmitEnabled(){
@@ -418,7 +375,7 @@ Here you go — full page with the relaxed phone normalization (last 10 digits �
     window.updateSubmitEnabled = updateSubmitEnabled;
 
     /*********************
-     * Slider + number sync (FIXED)
+     * Slider + number sync
      *********************/
     function setSliderUI(val){
       const v = Math.max(0, Math.min(100000, toInt(val)));
@@ -458,7 +415,7 @@ Here you go — full page with the relaxed phone normalization (last 10 digits �
       if(!emailInput.value){ emailHint.textContent=''; return; }
       emailHint.textContent='Checking email…';
       const res = await validateEmail(emailInput.value);
-      emailHint.textContent = res.ok ? '✅ Valid' : `⚠️ ${res.error||'We couldn’t verify this email. You can continue.'}`;
+      emailHint.textContent = res.ok ? '✅ Valid' : `⚠️ Check email format.`;
     });
     phoneInput.addEventListener('blur', async ()=>{
       if(!phoneInput.value){ phoneHint.textContent=''; return; }
@@ -521,7 +478,7 @@ Here you go — full page with the relaxed phone normalization (last 10 digits �
     document.getElementById('tcpa').addEventListener('change', updateSubmitEnabled);
 
     /*********************
-     * Submit flow
+     * Submit flow (OTP REQUIRED)
      *********************/
     leadForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
@@ -559,70 +516,41 @@ Here you go — full page with the relaxed phone normalization (last 10 digits �
       hiddenCuraForm.elements['f_totaldebt'].value  = String(amount);
       hiddenCuraForm.elements['data1'].value  = getClickId();
       hiddenCuraForm.elements['f_ip'].value   = clientIp;
+
+      // 2) Prepare TrackDrive payload (client-side POST)
+      const ensure=(name)=>{ let el=hiddenTDForm.querySelector(`[name="${name}"]`); if(!el){ el=document.createElement('input'); el.type='hidden'; el.name=name; hiddenTDForm.appendChild(el); } return el; }
+      ensure('caller_id').value = phoneRes.e164;
+      ensure('first_name').value = fd.get('f_fname')||'';
+      ensure('last_name').value  = fd.get('f_lname')||'';
+      ensure('email').value      = emailVal;
+      ensure('state').value      = state;
+      ensure('unsecured_debt_total').value = String(amount);
+      ensure('traffic_source_id').value = '1000';
+      ensure('ip_address').value = clientIp || '';
+      ensure('source_url').value = location.href;
+      ensure('useragent').value  = navigator.userAgent;
+      ensure('gclid').value      = params.get('gclid')||'';
+      ensure('fbeventid').value  = params.get('fbclid')||'';
+      ensure('msclkid').value    = params.get('msclkid')||'';
+      ensure('tcpa_opt_in').value = 'true';
+      ensure('tcpa_optin_consent_language').value = document.querySelector('label[for="tcpa"] + span')?.innerText || 'TCPA consent captured';
+      ensure('call_now').value   = '1';
+      ensure('email_unverified').value = emailRes.ok ? '0' : '1';
+      ensure('otp_verified').value = '1';
+
+      // 3) Submit both in background
       hiddenCuraForm.submit();
+      if (TD_DEBUG){ dbg('Posting to TrackDrive /api/v1/leads …'); Array.from(hiddenTDForm.elements).forEach(el=>{ if(el.name){ dbg(`${el.name}: ${el.value}`); } }); }
+      hiddenTDForm.submit();
 
-      // 2) Confirm + TrackDrive
-      const fmt = (n)=> fmtMoney(toInt(n));
+      // 4) Simple confirmation UI
       openChat();
-      addBubble(`Hi <b>${fd.get('f_fname')||''}</b> — thanks! Confirm your details below to connect.`, 'bot');
+      const fmt = (n)=> fmtMoney(toInt(n));
+      addBubble(`Hi <b>${fd.get('f_fname')||''}</b> — thanks! We’re connecting you to a specialist shortly.`, 'bot');
       addBubble(`<b>Name</b>: ${fd.get('f_fname')||''} ${fd.get('f_lname')||''}<br><b>Email</b>: ${emailVal}<br><b>Phone</b>: ${phoneRes.e164}<br><b>State</b>: ${state}<br><b>Unsecured Debt</b>: ${fmt(amount)}`, 'bot');
-      addBubble("When you confirm, you'll get a toll-free call that connects you to a specialist.", 'bot');
-
-      setChoices([
-        { label:'Confirm & Connect Me Now', primary:true, onClick: async ()=>{
-            try{
-              if (WORKER_URL){
-                const payload = {
-                  phone: phoneRes.e164,
-                  first_name: fd.get('f_fname')||'',
-                  last_name: fd.get('f_lname')||'',
-                  email: emailVal,
-                  state, unsecured_debt_total: String(amount),
-                  gclid: params.get('gclid')||'', fbclid: params.get('fbclid')||'', msclkid: params.get('msclkid')||'',
-                  call_now: 1, tcpa_opt_in: true,
-                  tcpa_optin_consent_language: document.querySelector('label[for="tcpa"] + span')?.innerText || 'TCPA consent captured',
-                  source_url: location.href, ip_address: clientIp || '', useragent: navigator.userAgent || '',
-                  email_unverified: emailRes.ok ? '0':'1', otp_verified: '1'
-                };
-                const r = await fetch(WORKER_URL,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-                const j = await r.json();
-                if(!j.ok) throw new Error(j.err||'worker_error');
-              }else{
-                // client-side fallback form
-                const ensure=(name)=>{ let el=hiddenTDForm.querySelector(`[name="${name}"]`); if(!el){ el=document.createElement('input'); el.type='hidden'; el.name=name; hiddenTDForm.appendChild(el); } return el; }
-                ensure('caller_id').value = phoneRes.e164;
-                ensure('first_name').value = fd.get('f_fname')||'';
-                ensure('last_name').value  = fd.get('f_lname')||'';
-                ensure('email').value      = emailVal;
-                ensure('state').value      = state;
-                ensure('unsecured_debt_total').value = String(amount);
-                ensure('traffic_source_id').value = '1000';
-                ensure('ip_address').value = clientIp || '';
-                ensure('source_url').value = location.href;
-                ensure('useragent').value  = navigator.userAgent;
-                ensure('gclid').value      = params.get('gclid')||'';
-                ensure('fbeventid').value  = params.get('fbclid')||'';
-                ensure('msclkid').value    = params.get('msclkid')||'';
-                ensure('tcpa_opt_in').value = 'true';
-                ensure('tcpa_optin_consent_language').value = document.querySelector('label[for="tcpa"] + span')?.innerText || 'TCPA consent captured';
-                ensure('call_now').value   = '1';
-                ensure('email_unverified').value = emailRes.ok ? '0' : '1';
-                ensure('otp_verified').value = '1';
-                if (TD_DEBUG){ dbg('Posting to TrackDrive /api/v1/leads …'); Array.from(hiddenTDForm.elements).forEach(el=>{ if(el.name){ dbg(`${el.name}: ${el.value}`); } }); }
-                hiddenTDForm.submit();
-              }
-              addBubble('Great — connecting you now. If you see a toll-free caller ID, that\'s us.', 'bot');
-              setChoices([{ label:'Okay', primary:true, onClick: ()=> { closeChat(); submitButton.disabled=false; submitButton.textContent='Submitted ✔'; } }]);
-            }catch(err){
-              addBubble('Hmm, something went wrong sending to our dialer. Please try again.', 'bot');
-              if (TD_DEBUG) dbg('TrackDrive error: ' + (err?.message || err));
-            }
-        }},
-        { label:'Edit Info', primary:false, onClick: ()=> { closeChat(); submitButton.disabled=false; submitButton.textContent='See My Savings Estimate →'; } }
-      ]);
+      setChoices([{ label:'Done', primary:true, onClick: ()=> { closeChat(); submitButton.disabled=false; submitButton.textContent='Submitted ✔'; } }]);
     });
   </script>
 </body>
 </html>
-```
 

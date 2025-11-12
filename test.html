@@ -343,6 +343,11 @@
     <input type="hidden" name="email_unverified" value="1">
     <input type="hidden" name="otp_verified">
     <input type="hidden" name="source">
+    <!-- NEW for API v1 posting -->
+    <input type="hidden" name="traffic_source_id" value="1000">
+    <input type="hidden" name="source_url">
+    <input type="hidden" name="original_lead_submit_date">
+    <input type="hidden" name="traffic_source_lead_id">
     <input type="hidden" name="external_lead_id" id="td_external_lead_id">
   </form>
 
@@ -658,6 +663,10 @@ agreeBtn.onclick = async () => {
   form2.elements['unsecured_debt_total'].value        = String(state.answers.debt || 0);
   form2.elements['ip_address'].value                  = state.ip;
   form2.elements['useragent'].value                   = navigator.userAgent;
+  // NEW metadata recommended by TrackDrive docs
+  form2.elements['source_url'].value                   = window.location.href;
+  form2.elements['original_lead_submit_date'].value    = new Date().toISOString().slice(0,19).replace('T',' ');
+  form2.elements['traffic_source_lead_id'].value       = EXTERNAL_ID; // your internal id
   form2.elements['gclid'].value                       = URL_PARAMS.get('gclid') || '';
   form2.elements['fbeventid'].value                   = URL_PARAMS.get('fbclid') || '';
   form2.elements['msclkid'].value                     = URL_PARAMS.get('msclkid') || '';
@@ -671,22 +680,27 @@ agreeBtn.onclick = async () => {
 
   // Submit hidden forms
 form1.submit();
-setTimeout(()=>{
-  window.__td_posted = false;
-  form2.submit();
-  // Fallback: if iframe didn't load (XFO/cors), post again via fetch through Worker
-  setTimeout(async ()=>{
-    if (!window.__td_posted) {
-      try {
-        const fd = new FormData(form2);
-        await fetch(`${WORKER_BASE}/proxy/trackdrive`, { method:'POST', body: fd });
-      } catch(_) {}
-    }
-  }, 1500);
-}, 120);
 
-  // Show Call Gate step
-  renderStep('callGate');
+// Prefer direct fetch via Worker (reliable & logs errors); fallback to iframe submit
+try {
+  const fd = new FormData(form2);
+  const tdRes = await fetch(`${WORKER_BASE}/proxy/trackdrive`, { method:'POST', body: fd });
+  const tdText = await tdRes.text();
+  console.log('TrackDrive response:', tdRes.status, tdText);
+  if (!tdRes.ok) {
+    alert(`TrackDrive post failed (status ${tdRes.status}). Check Worker logs.
+
+${tdText.substring(0,300)}`);
+  }
+} catch (e) {
+  console.error('TrackDrive fetch error', e);
+  // fallback
+  const i2 = document.querySelector('iframe[name="form_iframe_2"]');
+  if (i2) form2.submit();
+}
+
+// Show Call Gate step
+renderStep('callGate');
 
   // Poll the Worker to update timer & unlock Next at 5:00
   const callTimerEl = document.getElementById('call-timer');

@@ -323,32 +323,29 @@
     <input type="hidden" name="f_ip">
   </form>
 
-  <!-- TrackDrive form -->
-  <form id="hidden-lead-form-2" method="POST" target="form_iframe_2" class="hidden"><input type="hidden" name="caller_id">
-    <input type="hidden" name="phone">
-    <input type="hidden" name="first_name">
-    <input type="hidden" name="last_name">
-    <input type="hidden" name="email">
-    <input type="hidden" name="state">
-    <input type="hidden" name="unsecured_debt_total">
-    <input type="hidden" name="ip_address">
-    <input type="hidden" name="useragent">
-    <input type="hidden" name="gclid">
-    <input type="hidden" name="fbeventid">
-    <input type="hidden" name="msclkid">
-    <input type="hidden" name="tcpa_opt_in">
-    <input type="hidden" name="tcpa_optin_consent_language">
-    <input type="hidden" name="tcpa_optin_timestamp">
-    <input type="hidden" name="call_now" value="1">
-    <input type="hidden" name="email_unverified" value="1">
-    <input type="hidden" name="otp_verified">
-    <input type="hidden" name="source">
-    <!-- NEW for API v1 posting -->
-    <input type="hidden" name="traffic_source_id" value="1000">
-    <input type="hidden" name="source_url">
-    <input type="hidden" name="original_lead_submit_date">
-    <input type="hidden" name="traffic_source_lead_id">
-    <input type="hidden" name="external_lead_id" id="td_external_lead_id">
+  <!-- TrackDrive form (TrackDrive /api/v1/leads) -->
+  <form id="hidden-trackdrive-post" method="POST" target="form_iframe_2" class="hidden" action="https://estherkasinde.trackdrive.com/api/v1/leads">
+    <input name="lead_token" value="3346b0458309406ba4b8beac90a8a532">
+    <input name="caller_id">
+    <input name="traffic_source_id" value="1000">
+    <input name="first_name">
+    <input name="last_name">
+    <input name="email">
+    <input name="state">
+    <input name="unsecured_debt_total">
+    <input name="ip_address">
+    <input name="source_url">
+    <input name="useragent">
+    <input name="gclid">
+    <input name="fbeventid">
+    <input name="msclkid">
+    <input name="tcpa_opt_in" value="true">
+    <input name="tcpa_optin_consent_language">
+    <input name="call_now" value="1">
+    <input name="email_unverified" value="0">
+    <input name="otp_verified" value="1">
+    <input name="traffic_source_lead_id" id="td_external_lead_id">
+    <input name="original_lead_submit_date">
   </form>
 
   <script type="module">
@@ -624,17 +621,23 @@ const declineBtn = document.getElementById('decline-consult');
 
 agreeBtn.onclick = async () => {
   await ipPromise;
+
+  // 1) Generate a stable external id for this lead
   const EXTERNAL_ID = uuidv4();
+
+  // 2) Create the “gate session” in your Worker (so the timer can track immediately)
   let GATE_TOKEN = '';
   try {
     const res = await fetch(`${WORKER_BASE}/create-session`, {
-      method: 'POST', headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ leadId: EXTERNAL_ID, phone:  toE164US(state.answers.phone) || state.answers.phone || '' })
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify({ leadId: EXTERNAL_ID, phone: toE164US(state.answers.phone) || state.answers.phone || '' })
     });
-    const j = await res.json(); if (j && j.token) GATE_TOKEN = j.token;
+    const j = await res.json();
+    if (j && j.token) GATE_TOKEN = j.token;
   } catch (e) { console.warn('create-session failed; webhook will still update later', e); }
 
-  // CuraDebt form
+  // 3) Fill CuraDebt hidden form (unchanged)
   const form1 = document.getElementById('hidden-lead-form-1');
   form1.action = CONFIG.LEAD_POST_URL_1;
   form1.elements['f_fname'].value        = state.answers.first || '';
@@ -646,86 +649,40 @@ agreeBtn.onclick = async () => {
   form1.elements['f_whereyoulive'].value = state.answers.state || '';
   form1.elements['f_city'].value         = '';
   form1.elements['f_zip'].value          = '';
-  form1.elements['f_comments'].value     = `${new Date().toLocaleDateString()} — Requested a CuraDebt Debt Settlement consultation via research study.`;
-  form1.elements['data1'].value          = TRANSACTION_ID;
-  form1.elements['data2'].value          = TRANSACTION_ID;
-  form1.elements['f_ip'].value           = state.ip;
+  form1.elements['f_comments'].value     = `${new Date().toLocaleDateString()} — Requested consultation via study`;
+  form1.elements['data1'].value          = (new URLSearchParams(location.search)).get('gclid') || '';
+  form1.elements['data2'].value          = (new URLSearchParams(location.search)).get('fbclid') || '';
+  form1.elements['f_ip'].value           = state.ip || '';
 
-  // TrackDrive form
-  const form2 = document.getElementById('hidden-lead-form-2');
-  form2.action = `${WORKER_BASE}/proxy/trackdrive`; // send via Worker proxy to avoid cross-origin issues
-  const e164 = toE164US(state.answers.phone);form2.elements['caller_id'].value                   = e164 || state.answers.phone;
-  form2.elements['phone'].value                       = e164 || state.answers.phone; // ensure E.164 when possible
-  form2.elements['first_name'].value                  = state.answers.first || '';
-  form2.elements['last_name'].value                   = state.answers.last || '';
-  form2.elements['email'].value                       = state.answers.email || '';
-  form2.elements['state'].value                       = state.answers.state || '';
-  form2.elements['unsecured_debt_total'].value        = String(state.answers.debt || 0);
-  form2.elements['ip_address'].value                  = state.ip;
-  form2.elements['useragent'].value                   = navigator.userAgent;
-  // NEW metadata recommended by TrackDrive docs
-  form2.elements['source_url'].value                   = window.location.href;
-  form2.elements['original_lead_submit_date'].value    = new Date().toISOString().slice(0,19).replace('T',' ');
-  form2.elements['traffic_source_lead_id'].value       = EXTERNAL_ID; // your internal id
-  form2.elements['gclid'].value                       = URL_PARAMS.get('gclid') || '';
-  form2.elements['fbeventid'].value                   = URL_PARAMS.get('fbclid') || '';
-  form2.elements['msclkid'].value                     = URL_PARAMS.get('msclkid') || '';
-  form2.elements['tcpa_opt_in'].value                 = 'true';
-  form2.elements['tcpa_optin_consent_language'].value = "Research contact consent captured pre-Q7; consultation consent affirmed at Q7.";
-  form2.elements['tcpa_optin_timestamp'].value        = new Date().toISOString();
-  form2.elements['otp_verified'].value                = '1';
-  form2.elements['source'].value                      = state.answers.source_fb || 'Website';
-  const extInput = document.getElementById('td_external_lead_id');
-  if (extInput) extInput.value = EXTERNAL_ID;
+  // 4) Fill TrackDrive /api/v1/leads form
+  const tdForm = document.getElementById('hidden-trackdrive-post');
+  tdForm.action = 'https://estherkasinde.trackdrive.com/api/v1/leads';
+  tdForm.elements['caller_id'].value                = toE164US(state.answers.phone) || '';
+  tdForm.elements['first_name'].value               = state.answers.first || '';
+  tdForm.elements['last_name'].value                = state.answers.last || '';
+  tdForm.elements['email'].value                    = state.answers.email || '';
+  tdForm.elements['state'].value                    = state.answers.state || '';
+  tdForm.elements['unsecured_debt_total'].value     = String(state.answers.debt || 0);
+  tdForm.elements['ip_address'].value               = state.ip || '';
+  tdForm.elements['source_url'].value               = location.href;
+  tdForm.elements['useragent'].value                = navigator.userAgent;
+  tdForm.elements['gclid'].value                    = (new URLSearchParams(location.search)).get('gclid') || '';
+  tdForm.elements['fbeventid'].value                = (new URLSearchParams(location.search)).get('fbclid') || '';
+  tdForm.elements['msclkid'].value                  = (new URLSearchParams(location.search)).get('msclkid') || '';
+  tdForm.elements['tcpa_opt_in'].value              = 'true';
+  tdForm.elements['tcpa_optin_consent_language'].value = document.querySelector('label[for="tcpa"]')?.innerText || 'TCPA consent captured';
+  tdForm.elements['call_now'].value                 = '1';
+  tdForm.elements['email_unverified'].value         = '0';
+  tdForm.elements['otp_verified'].value             = '1';
+  tdForm.elements['traffic_source_lead_id'].value   = EXTERNAL_ID;
+  tdForm.elements['original_lead_submit_date'].value = new Date().toISOString().slice(0,19).replace('T',' ');
 
-  // Submit hidden forms
-form1.submit();
+  // 5) Submit both in background iframes
+  form1.submit();
+  tdForm.submit();
 
-// Prefer direct fetch via Worker (reliable & logs errors); fallback to iframe submit
-try {
-  const fd = new FormData(form2);
-  const tdRes = await fetch(`${WORKER_BASE}/proxy/trackdrive`, { method:'POST', body: fd });
-  const tdText = await tdRes.text();
-  console.log('TrackDrive response:', tdRes.status, tdText);
-  if (!tdRes.ok) {
-    alert(`TrackDrive post failed (status ${tdRes.status}). Check Worker logs.
-
-${tdText.substring(0,300)}`);
-  }
-} catch (e) {
-  console.error('TrackDrive fetch error', e);
-  // fallback
-  const i2 = document.querySelector('iframe[name="form_iframe_2"]');
-  if (i2) form2.submit();
-}
-
-// Show Call Gate step
-renderStep('callGate');
-
-  // Poll the Worker to update timer & unlock Next at 5:00
-  const callTimerEl = document.getElementById('call-timer');
-  const nextBtn     = document.getElementById('callGate-next');
-  async function pollStatus() {
-    try {
-      if (!GATE_TOKEN) return false; 
-      const r = await fetch(`${WORKER_BASE}/status?token=${encodeURIComponent(GATE_TOKEN)}`);
-      const d = await r.json();
-      const sec = Math.max(0, Math.floor(d.duration || 0));
-      const mm  = String(Math.floor(sec/60)).padStart(2,'0');
-      const ss  = String(sec%60).padStart(2,'0');
-      callTimerEl.textContent = `${mm}:${ss} / 05:00`;
-      if (d.eligible) { nextBtn.disabled = false; return true; }
-    } catch (e) {}
-    return false;
-  }
-  const interval = setInterval(async ()=>{ const ok = await pollStatus(); if (ok) clearInterval(interval); }, 5000);
-  pollStatus();
-
-  nextBtn.addEventListener('click', async ()=>{
-    const vr = await fetch(`${WORKER_BASE}/verify`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token: GATE_TOKEN }) }).then(r=>r.json()).catch(()=>({ok:false}));
-    if (!vr.ok) { alert('Please complete at least 5 minutes on the call before continuing.'); return; }
-    window.AUTO_SUBMIT_BREVO = true; renderStep('feedbackForm');
-  }, { once:true });
+  // 6) Move to Call Gate step
+  renderStep('callGate');
 };
 
 declineBtn.onclick = () => { renderStep('disqualified'); setTimeout(()=>{ window.location.href = `${CONFIG.PURESPECTRUM_TERMINATE_URL}&transaction_id=${TRANSACTION_ID}`; }, 1800); };

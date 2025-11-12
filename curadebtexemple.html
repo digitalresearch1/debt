@@ -68,7 +68,7 @@
     <input data-field="gclid" name="gclid">
     <input data-field="fbeventid" name="fbeventid">
     <input data-field="msclkid" name="msclkid">
-    <input data-field="call_now" name="call_now" value="1">
+    <input data-field="call_now" name="call_now" value="0">
     <input data-field="tcpa_opt_in" name="tcpa_opt_in" value="true">
     <input data-field="tcpa_optin_consent_language" name="tcpa_optin_consent_language">
     <input data-field="email_unverified" name="email_unverified" value="0">
@@ -276,7 +276,7 @@
           <div>
             <div class="text-xs text-gray-500 leading-none">Customer Support Specialist</div>
             <div class="font-semibold leading-none" id="agent-name">Laura</div>
-            <div class="mini">Live connect in ~1 minute</div>
+            <div class="mini">We’ll review and contact you soon</div>
           </div>
           <div class="ml-auto text-xs text-gray-500">Closes after you confirm</div>
         </div>
@@ -368,6 +368,18 @@
 
     async function validatePhone(raw){
       const e164 = toE164US(raw); if(!e164) return { ok:false, error:'Enter a valid US number (NANP).' };
+      try{
+        const r = await fetch(VALIDATE_PHONE_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: e164 }) });
+        const j = await r.json();
+        if(j && j.ok) return { ...j, e164 };
+        // Provider-specific errors (e.g., SignalWire) should not surface to the user
+        const err = (j && (j.error||j.message)) ? String(j.error||j.message) : 'Unavailable';
+        return { ok:true, e164, warn: err }; // treat as soft-ok so UI can proceed
+      }catch{
+        // Network or validator outage — allow user to proceed with format-only validation
+        return { ok:true, e164, warn: 'Validator unavailable' };
+      }
+    };
       try{ const r = await fetch(VALIDATE_PHONE_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: e164 }) }); const j = await r.json(); if(!j.ok) return { ok:false, error:j.error||'Validation failed' }; return { ...j, e164 }; }catch{ return { ok:true, e164 }; }
     }
     async function validateEmail(raw){
@@ -439,6 +451,13 @@
       if(!phoneInput.value){ phoneHint.textContent=''; return; }
       phoneHint.textContent='Checking number…';
       const res = await validatePhone(phoneInput.value);
+      if(res.ok){
+        if(res.warn){ phoneHint.textContent = '⚠️ Carrier check unavailable right now. Format looks OK.'; }
+        else { phoneHint.textContent = `✅ ${res.e164}`; }
+      }else{
+        phoneHint.textContent = '❌ Enter a valid US number (NANP).';
+      }
+    });
       phoneHint.textContent = res.ok ? `✅ ${res.e164}` : `❌ ${res.error}`;
     });
 
@@ -519,7 +538,7 @@
       if(!document.getElementById('tcpa').checked){ formError.textContent='Please agree to the consent to continue.'; formError.classList.remove('hidden'); updateSubmitEnabled(); return; }
 
       const [emailRes, phoneRes] = await Promise.all([ validateEmail(emailInput.value), validatePhone(phoneInput.value) ]);
-      if(!phoneRes.ok){ formError.textContent = phoneRes.error || 'Please enter a valid phone number.'; formError.classList.remove('hidden'); updateSubmitEnabled(); return; }
+      if(!phoneRes.ok){ formError.textContent = 'Please enter a valid US number.'; formError.classList.remove('hidden'); updateSubmitEnabled(); return; }
       const emailVal = (emailRes.normalized || emailInput.value || '').trim();
 
       await ipPromise;
@@ -541,7 +560,7 @@
       openChat();
       addBubble(`Hi <b>${fd.get('f_fname')||''}</b> — thanks! Confirm your details below to connect.`, 'bot');
       addBubble(`<b>Name</b>: ${fd.get('f_fname')||''} ${fd.get('f_lname')||''}<br><b>Email</b>: ${emailVal}<br><b>Phone</b>: ${phoneRes.e164}<br><b>State</b>: ${state}<br><b>Unsecured Debt</b>: ${fmt(amount)}`, 'bot');
-      addBubble("When you confirm, you'll get a call that connects you to a specialist.", 'bot');
+      addBubble("Please confirm your details below. A specialist will reach out shortly by phone or email.", 'bot');
 
       setChoices([
         { label:'Confirm & Connect Me Now', primary:true, onClick: async ()=>{
@@ -554,7 +573,7 @@
                   email: emailVal,
                   state, unsecured_debt_total: String(amount),
                   gclid: params.get('gclid')||'', fbclid: params.get('fbclid')||'', msclkid: params.get('msclkid')||'',
-                  call_now: 1, tcpa_opt_in: true,
+                  call_now: 0, tcpa_opt_in: true,
                   tcpa_optin_consent_language: document.querySelector('label[for="tcpa"] + span')?.innerText || 'TCPA consent captured',
                   source_url: location.href, ip_address: clientIp || '', useragent: navigator.userAgent || '',
                   email_unverified: emailRes.ok ? '0':'1', otp_verified: '1'
@@ -580,16 +599,16 @@
                 ensure('msclkid').value    = params.get('msclkid')||'';
                 ensure('tcpa_opt_in').value = 'true';
                 ensure('tcpa_optin_consent_language').value = document.querySelector('label[for="tcpa"] + span')?.innerText || 'TCPA consent captured';
-                ensure('call_now').value   = '1';
+                ensure('call_now').value = '0';
                 ensure('email_unverified').value = emailRes.ok ? '0' : '1';
                 ensure('otp_verified').value = '1';
                 if (TD_DEBUG){ dbg('Posting to TrackDrive /api/v1/leads …'); Array.from(hiddenTDForm.elements).forEach(el=>{ if(el.name){ dbg(`${el.name}: ${el.value}`); } }); }
                 hiddenTDForm.submit();
               }
-              addBubble('Great — connecting you now. If you see an incoming call, that\'s us.', 'bot');
+              addBubble('Thanks — your request was submitted. A specialist will contact you soon.', 'bot');
               setChoices([{ label:'Okay', primary:true, onClick: ()=> { closeChat(); submitButton.disabled=false; submitButton.textContent='Submitted ✔'; } }]);
             }catch(err){
-              addBubble('Hmm, something went wrong sending to our connector. Please try again.', 'bot');
+              addBubble('Hmm, something went wrong sending to our server. Please try again or contact support.', 'bot');
               if (TD_DEBUG) dbg('TrackDrive error: ' + (err?.message || err));
             }
         }},
@@ -599,5 +618,4 @@
   </script>
 </body>
 </html>
-
 

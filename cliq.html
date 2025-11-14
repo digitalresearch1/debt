@@ -1,0 +1,379 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en" class="supernova">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
+  <meta name="HandheldFriendly" content="true">
+  <title>Financial Wellness Research Study</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style type="text/css">
+    body { font-family: 'Inter', sans-serif; }
+    .action-btn { transition: background-color 0.3s, transform 0.2s; cursor: pointer; }
+    .action-btn:hover { transform: translateY(-2px); }
+    .chat-bubble {
+      max-width: 80%;
+      border-radius: 1rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .chat-bot { background-color: #eef2ff; color: #111827; align-self: flex-start; }
+    .chat-user { background-color: #4f46e5; color: white; align-self: flex-end; }
+    .chat-container { overflow-y: auto; }
+    .media-wrapper { width: 100%; max-width: 1200px; margin: 0 auto; box-shadow: 0 20px 40px rgba(15,23,42,0.35); border-radius: 0.75rem; overflow: hidden; }
+    .media-wrapper iframe { width: 100%; height: 100%; display: block; border: 0; }
+    @media (max-width: 768px) {
+      .media-wrapper { height: 260px; }
+    }
+    @media (min-width: 769px) {
+      .media-wrapper { height: 900px; }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<!-- FULLSCREEN CHAT ONLY -->
+<div id="chatOverlay" class="fixed inset-0 bg-white z-50 flex flex-col">
+  <!-- Chat header -->
+  <div class="p-4 bg-indigo-600 text-white text-center shadow">
+    <h1 class="text-xl font-bold">Financial Wellness Screening Chat</h1>
+    <p class="text-xs mt-1 text-indigo-100">
+      Please answer a few quick questions so we can see if this private study is a good fit for you.
+    </p>
+  </div>
+
+  <!-- Chat body -->
+  <div class="flex-1 flex flex-col bg-slate-50">
+    <!-- Chat messages -->
+    <div id="chatWindow"
+         class="flex-1 chat-container p-4 flex flex-col space-y-2">
+    </div>
+
+    <!-- Chat reply buttons -->
+    <div id="chatControls"
+         class="p-4 flex flex-wrap gap-2 bg-white border-t border-slate-200">
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
+
+  if (!transactionId) {
+    transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
+  }
+
+  const chatWindow = document.getElementById('chatWindow');
+  const chatControls = document.getElementById('chatControls');
+
+  // URLs
+  const abandonUrl =
+    `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${transactionId}`;
+  // TODO: REPLACE WITH YOUR REAL WORKER URL
+  const workerFinishUrl =
+    `https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev/finish?transaction_id=${transactionId}`;
+
+  const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
+  const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
+
+  let disqualified = false;
+
+  // ----- Helpers -----
+  function addBotMessage(text) {
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble chat-bot';
+    bubble.textContent = text;
+    chatWindow.appendChild(bubble);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function addUserMessage(text) {
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble chat-user ml-auto';
+    bubble.textContent = text;
+    chatWindow.appendChild(bubble);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function clearControls() {
+    chatControls.innerHTML = '';
+  }
+
+  function renderOptions(options) {
+    clearControls();
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className =
+        'px-3 py-2 text-xs md:text-sm rounded-full border border-slate-300 bg-white hover:bg-slate-100 text-slate-900';
+      btn.textContent = opt.label;
+      btn.addEventListener('click', () => opt.onClick());
+      chatControls.appendChild(btn);
+    });
+  }
+
+  function addVideoBubble() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'w-full mb-3';
+
+    const title = document.createElement('p');
+    title.className = 'text-[11px] font-semibold text-slate-700 mb-1';
+    title.textContent = 'Here is a short video explaining the program for people with high balances:';
+    wrapper.appendChild(title);
+
+    const videoContainer = document.createElement('div');
+    videoContainer.className = 'w-full bg-black rounded-lg overflow-hidden media-wrapper';
+    // aspect ratio handled via CSS media-wrapper
+
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://www.facebook.com/plugins/video.php?height=314&href=' +
+      encodeURIComponent('https://www.facebook.com/reel/1205740158030889/') +
+      '&show_text=true&width=860&t=0';
+    iframe.width = '100%';
+    iframe.height = '100%';
+    iframe.style.border = 'none';
+    iframe.style.overflow = 'hidden';
+    iframe.scrolling = 'no';
+    iframe.frameBorder = '0';
+    iframe.allowFullscreen = true;
+    iframe.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share');
+
+    videoContainer.appendChild(iframe);
+    wrapper.appendChild(videoContainer);
+
+    chatWindow.appendChild(wrapper);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function addOfferIframeBubble() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'w-full mb-3';
+
+    const title = document.createElement('p');
+    title.className = 'text-[11px] font-semibold text-slate-700 mb-1';
+    title.textContent = 'Please complete this secure form with accurate information:';
+    wrapper.appendChild(title);
+
+    const frameContainer = document.createElement('div');
+    frameContainer.className = 'w-full bg-white rounded-lg overflow-hidden border border-slate-200 media-wrapper';
+    // height handled via CSS media-wrapper
+
+    const iframe = document.createElement('iframe');
+    iframe.src = offerTrackedUrl;
+    iframe.width = '100%';
+    iframe.height = '100%';
+    iframe.style.border = '0';
+    iframe.frameBorder = '0';
+
+    frameContainer.appendChild(iframe);
+    wrapper.appendChild(frameContainer);
+
+    chatWindow.appendChild(wrapper);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function disqualify(reasonText) {
+    disqualified = true;
+    addBotMessage(
+      reasonText ||
+      'Based on your answers, you do not match the profile for this particular research study.'
+    );
+    addBotMessage(
+      'Please click the button below to exit this survey. Thank you for your time.'
+    );
+    renderOptions([
+      {
+        label: 'Exit survey',
+        onClick: () => {
+          window.open(abandonUrl, '_blank');
+        }
+      }
+    ]);
+  }
+
+  // ----- Steps -----
+  function startChat() {
+    addBotMessage("Hi, I'm Chloe. I'll quickly check if this private financial study is a good fit for you.");
+    setTimeout(stepBalanceAmount, 700);
+  }
+
+  function stepBalanceAmount() {
+    addBotMessage(
+      'First, roughly how much do you currently owe on unsecured balances like credit cards or personal loans?'
+    );
+    renderOptions([
+      {
+        label: 'Less than $15,000',
+        onClick: () => {
+          addUserMessage('Less than $15,000');
+          disqualify('For this specific project, we are focusing on people with at least $15,000 in unsecured balances.');
+        }
+      },
+      {
+        label: '$15,000 - $24,999',
+        onClick: () => {
+          addUserMessage('$15,000 - $24,999');
+          stepPaymentAbility();
+        }
+      },
+      {
+        label: '$25,000 - $39,999',
+        onClick: () => {
+          addUserMessage('$25,000 - $39,999');
+          stepPaymentAbility();
+        }
+      },
+      {
+        label: '$40,000 or more',
+        onClick: () => {
+          addUserMessage('$40,000 or more');
+          stepPaymentAbility();
+        }
+      }
+    ]);
+  }
+
+  function stepPaymentAbility() {
+    addBotMessage(
+      'Could you realistically afford to put at least about $300 per month toward a structured payment plan if it helped you get out of high balances faster?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I could afford that',
+        onClick: () => {
+          addUserMessage('Yes, I could afford that');
+          stepInterest();
+        }
+      },
+      {
+        label: 'No, I really cannot',
+        onClick: () => {
+          addUserMessage('No, I really cannot');
+          disqualify('This project focuses on people who are able to commit at least around $300/month to a structured plan.');
+        }
+      }
+    ]);
+  }
+
+  function stepInterest() {
+    addBotMessage(
+      'Are you genuinely interested in speaking with a financial specialist in the next 24–48 hours to explore your options?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I want to speak to someone',
+        onClick: () => {
+          addUserMessage('Yes, I want to speak to someone');
+          stepLocation();
+        }
+      },
+      {
+        label: "No, I'm just browsing",
+        onClick: () => {
+          addUserMessage("No, I'm just browsing");
+          disqualify('This project is only for people who are actively looking for help and open to a call with a specialist.');
+        }
+      }
+    ]);
+  }
+
+  function stepLocation() {
+    addBotMessage(
+      'Last question: Are you currently living in the United States? Most of our partners can only help U.S. residents.'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I live in the U.S.',
+        onClick: () => {
+          addUserMessage('Yes, I live in the U.S.');
+          finishQual();
+        }
+      },
+      {
+        label: 'No, I live outside the U.S.',
+        onClick: () => {
+          addUserMessage('No, I live outside the U.S.');
+          disqualify('Right now this particular project is limited to U.S. residents only.');
+        }
+      }
+    ]);
+  }
+
+  // Qualified → show video (step) → then iframe (step) → then finish/abandon
+  function finishQual() {
+    addBotMessage('Great, you look like a strong match for this study. 🎉');
+    addBotMessage('Before we move forward, please watch this short video about the program.');
+    addVideoBubble();
+
+    renderOptions([
+      {
+        label: "I've watched the video",
+        onClick: () => {
+          addUserMessage("I've watched the video");
+          stepIframeForm();
+        }
+      }
+    ]);
+  }
+
+  function stepIframeForm() {
+    addBotMessage(
+      'Next, please complete the secure form below with accurate information about your current balances and contact details.'
+    );
+    addOfferIframeBubble();
+
+    renderOptions([
+      {
+        label: 'I completed the form',
+        onClick: () => {
+          addUserMessage('I completed the form');
+          finalStep();
+        }
+      },
+      {
+        label: "I don't want to continue",
+        onClick: () => {
+          addUserMessage("I don't want to continue");
+          disqualify('No problem at all. We will not count this as a full participation.');
+        }
+      }
+    ]);
+  }
+
+  function finalStep() {
+    addBotMessage(
+      'Thank you. After the company contacts you and you have your call, please send a short email about your experience to apkconnex@gmail.com.'
+    );
+    addBotMessage(
+      'Participants who complete the form and send feedback will have a chance to win a $500 prepaid card.'
+    );
+    addBotMessage('You can now finish or abandon the survey below.');
+
+    renderOptions([
+      {
+        label: 'Finish Survey',
+        onClick: () => {
+          addUserMessage('Finish Survey');
+          window.open(workerFinishUrl, '_blank');
+        }
+      },
+      {
+        label: 'Abandon Survey',
+        onClick: () => {
+          addUserMessage('Abandon Survey');
+          window.open(abandonUrl, '_blank');
+        }
+      }
+    ]);
+  }
+
+  // Start chatbot
+  startChat();
+});
+</script>
+
+</body>
+</html>
+

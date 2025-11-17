@@ -21,13 +21,34 @@
     .chat-bot { background-color: #eef2ff; color: #111827; align-self: flex-start; }
     .chat-user { background-color: #4f46e5; color: white; align-self: flex-end; }
     .chat-container { overflow-y: auto; }
-    .media-wrapper { width: 100%; max-width: 1200px; margin: 0 auto; box-shadow: 0 20px 40px rgba(15,23,42,0.35); border-radius: 0.75rem; overflow: hidden; }
-    .media-wrapper iframe { width: 100%; height: 100%; display: block; border: 0; }
+    .media-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+    .media-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+    }
     @media (max-width: 768px) {
       .media-wrapper { height: 260px; }
     }
     @media (min-width: 769px) {
       .media-wrapper { height: 900px; }
+    }
+
+    /* 🔥 Fade-out animation for Option A */
+    .fade-out {
+      animation: fadeOutUp 0.35s forwards ease-out;
+    }
+    @keyframes fadeOutUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-6px); }
     }
   </style>
 </head>
@@ -72,9 +93,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // URLs
   const abandonUrl =
     `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${transactionId}`;
-  // TODO: REPLACE WITH YOUR REAL WORKER URL
+
+  // ✅ REAL WORKER URL
   const workerFinishUrl =
-    `https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev/finish?transaction_id=${transactionId}`;
+    `https://marketcall.kayembakasongo.workers.dev/finish?transaction_id=${transactionId}`;
 
   const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
@@ -114,6 +136,20 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // 🔁 Fade out all current messages, then run next step
+  function fadeOutAllAndThen(nextFn) {
+    const nodes = Array.from(chatWindow.children);
+    if (nodes.length === 0) {
+      nextFn();
+      return;
+    }
+    nodes.forEach(node => node.classList.add('fade-out'));
+    setTimeout(() => {
+      chatWindow.innerHTML = '';
+      nextFn();
+    }, 360); // match CSS animation duration
+  }
+
   function addVideoBubble() {
     const wrapper = document.createElement('div');
     wrapper.className = 'w-full mb-3';
@@ -125,7 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const videoContainer = document.createElement('div');
     videoContainer.className = 'w-full bg-black rounded-lg overflow-hidden media-wrapper';
-    // aspect ratio handled via CSS media-wrapper
 
     const iframe = document.createElement('iframe');
     iframe.src = 'https://www.facebook.com/plugins/video.php?height=314&href=' +
@@ -158,7 +193,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const frameContainer = document.createElement('div');
     frameContainer.className = 'w-full bg-white rounded-lg overflow-hidden border border-slate-200 media-wrapper';
-    // height handled via CSS media-wrapper
 
     const iframe = document.createElement('iframe');
     iframe.src = offerTrackedUrl;
@@ -208,28 +242,30 @@ document.addEventListener('DOMContentLoaded', function() {
         label: 'Less than $15,000',
         onClick: () => {
           addUserMessage('Less than $15,000');
-          disqualify('For this specific project, we are focusing on people with at least $15,000 in unsecured balances.');
+          fadeOutAllAndThen(() => {
+            disqualify('For this specific project, we are focusing on people with at least $15,000 in unsecured balances.');
+          });
         }
       },
       {
         label: '$15,000 - $24,999',
         onClick: () => {
           addUserMessage('$15,000 - $24,999');
-          stepPaymentAbility();
+          fadeOutAllAndThen(stepPaymentAbility);
         }
       },
       {
         label: '$25,000 - $39,999',
         onClick: () => {
           addUserMessage('$25,000 - $39,999');
-          stepPaymentAbility();
+          fadeOutAllAndThen(stepPaymentAbility);
         }
       },
       {
         label: '$40,000 or more',
         onClick: () => {
           addUserMessage('$40,000 or more');
-          stepPaymentAbility();
+          fadeOutAllAndThen(stepPaymentAbility);
         }
       }
     ]);
@@ -244,14 +280,16 @@ document.addEventListener('DOMContentLoaded', function() {
         label: 'Yes, I could afford that',
         onClick: () => {
           addUserMessage('Yes, I could afford that');
-          stepInterest();
+          fadeOutAllAndThen(stepInterest);
         }
       },
       {
         label: 'No, I really cannot',
         onClick: () => {
           addUserMessage('No, I really cannot');
-          disqualify('This project focuses on people who are able to commit at least around $300/month to a structured plan.');
+          fadeOutAllAndThen(() => {
+            disqualify('This project focuses on people who are able to commit at least around $300/month to a structured plan.');
+          });
         }
       }
     ]);
@@ -266,14 +304,16 @@ document.addEventListener('DOMContentLoaded', function() {
         label: 'Yes, I want to speak to someone',
         onClick: () => {
           addUserMessage('Yes, I want to speak to someone');
-          stepLocation();
+          fadeOutAllAndThen(stepLocation);
         }
       },
       {
         label: "No, I'm just browsing",
         onClick: () => {
           addUserMessage("No, I'm just browsing");
-          disqualify('This project is only for people who are actively looking for help and open to a call with a specialist.');
+          fadeOutAllAndThen(() => {
+            disqualify('This project is only for people who are actively looking for help and open to a call with a specialist.');
+          });
         }
       }
     ]);
@@ -288,14 +328,16 @@ document.addEventListener('DOMContentLoaded', function() {
         label: 'Yes, I live in the U.S.',
         onClick: () => {
           addUserMessage('Yes, I live in the U.S.');
-          finishQual();
+          fadeOutAllAndThen(finishQual);
         }
       },
       {
         label: 'No, I live outside the U.S.',
         onClick: () => {
           addUserMessage('No, I live outside the U.S.');
-          disqualify('Right now this particular project is limited to U.S. residents only.');
+          fadeOutAllAndThen(() => {
+            disqualify('Right now this particular project is limited to U.S. residents only.');
+          });
         }
       }
     ]);
@@ -312,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
         label: "I've watched the video",
         onClick: () => {
           addUserMessage("I've watched the video");
-          stepIframeForm();
+          fadeOutAllAndThen(stepIframeForm);
         }
       }
     ]);
@@ -329,14 +371,16 @@ document.addEventListener('DOMContentLoaded', function() {
         label: 'I completed the form',
         onClick: () => {
           addUserMessage('I completed the form');
-          finalStep();
+          fadeOutAllAndThen(finalStep);
         }
       },
       {
         label: "I don't want to continue",
         onClick: () => {
           addUserMessage("I don't want to continue");
-          disqualify('No problem at all. We will not count this as a full participation.');
+          fadeOutAllAndThen(() => {
+            disqualify('No problem at all. We will not count this as a full participation.');
+          });
         }
       }
     ]);
@@ -376,4 +420,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-

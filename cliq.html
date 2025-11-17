@@ -21,6 +21,7 @@
     .chat-bot { background-color: #eef2ff; color: #111827; align-self: flex-start; }
     .chat-user { background-color: #4f46e5; color: white; align-self: flex-end; }
     .chat-container { overflow-y: auto; }
+
     .media-wrapper {
       width: 100%;
       max-width: 1200px;
@@ -39,7 +40,8 @@
       .media-wrapper { height: 260px; }
     }
     @media (min-width: 769px) {
-      .media-wrapper { height: 900px; }
+      /* ✅ Use viewport height so buttons are still visible */
+      .media-wrapper { height: 70vh; }
     }
 
     /* 🔥 Fade-out animation for Option A */
@@ -181,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Extra little instruction directly under the video
     const hint = document.createElement('p');
     hint.className = 'text-[11px] text-slate-600 mt-2';
-    hint.textContent = 'When you finish watching, click “I\'ve watched the video” below to keep going.';
+    hint.textContent = 'When you finish watching, click “I\'ve watched the video” at the bottom to keep going.';
     wrapper.appendChild(hint);
 
     chatWindow.appendChild(wrapper);
@@ -213,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Extra instruction under the form iframe
     const hint = document.createElement('p');
     hint.className = 'text-[11px] text-slate-600 mt-2';
-    hint.textContent = 'Once you submit the form, click “I completed the form” below to continue.';
+    hint.textContent = 'Once you submit the form, click “I completed the form” at the bottom to continue.';
     wrapper.appendChild(hint);
 
     chatWindow.appendChild(wrapper);
@@ -360,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
     addBotMessage('Great, you look like a strong match for this study. 🎉');
     addBotMessage(
       'Before we move forward, please watch this short video about the program. ' +
-      'When you’re done, click “I’ve watched the video” below to continue.'
+      'When you’re done, click “I’ve watched the video” at the bottom to continue.'
     );
     addVideoBubble();
 
@@ -378,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function stepIframeForm() {
     addBotMessage(
       'Next, please complete the secure form below with accurate information about your current balances and contact details. ' +
-      'Once you submit the form, click “I completed the form” below to continue.'
+      'Once you submit the form, click “I completed the form” at the bottom to continue.'
     );
     addOfferIframeBubble();
 
@@ -436,3 +438,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+

@@ -20,7 +20,12 @@
     }
     .chat-bot { background-color: #eef2ff; color: #111827; align-self: flex-start; }
     .chat-user { background-color: #4f46e5; color: white; align-self: flex-end; }
-    .chat-container { overflow-y: auto; }
+
+    /* Important: allow the flex chat area to actually scroll */
+    .chat-container {
+      overflow-y: auto;
+      min-height: 0;
+    }
 
     .media-wrapper {
       width: 100%;
@@ -37,11 +42,11 @@
       border: 0;
     }
     @media (max-width: 768px) {
-      .media-wrapper { height: 260px; }
+      .media-wrapper { height: 220px; }
     }
     @media (min-width: 769px) {
-      /* ✅ Use viewport height so buttons are still visible */
-      .media-wrapper { height: 70vh; }
+      /* smaller than before to leave more room for buttons */
+      .media-wrapper { height: 60vh; }
     }
 
     /* 🔥 Fade-out animation for Option A */
@@ -68,9 +73,9 @@
 
   <!-- Chat body -->
   <div class="flex-1 flex flex-col bg-slate-50">
-    <!-- Chat messages -->
+    <!-- Chat messages (now explicitly scrollable + min-h-0) -->
     <div id="chatWindow"
-         class="flex-1 chat-container p-4 flex flex-col space-y-2">
+         class="flex-1 chat-container p-4 flex flex-col space-y-2 overflow-y-auto min-h-0">
     </div>
 
     <!-- Chat reply buttons -->
@@ -180,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
     videoContainer.appendChild(iframe);
     wrapper.appendChild(videoContainer);
 
-    // Extra little instruction directly under the video
+    // Little instruction directly under the video
     const hint = document.createElement('p');
     hint.className = 'text-[11px] text-slate-600 mt-2';
     hint.textContent = 'When you finish watching, click “I\'ve watched the video” at the bottom to keep going.';

@@ -21,8 +21,20 @@
     .chat-bot { background-color: #eef2ff; color: #111827; align-self: flex-start; }
     .chat-user { background-color: #4f46e5; color: white; align-self: flex-end; }
     .chat-container { overflow-y: auto; }
-    .media-wrapper { width: 100%; max-width: 1200px; margin: 0 auto; box-shadow: 0 20px 40px rgba(15,23,42,0.35); border-radius: 0.75rem; overflow: hidden; }
-    .media-wrapper iframe { width: 100%; height: 100%; display: block; border: 0; }
+    .media-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+    .media-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+    }
     @media (max-width: 768px) {
       .media-wrapper { height: 260px; }
     }
@@ -72,9 +84,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // URLs
   const abandonUrl =
     `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${transactionId}`;
-  // TODO: REPLACE WITH YOUR REAL WORKER URL
+
+  // ✅ USE YOUR REAL WORKER URL HERE
   const workerFinishUrl =
-    `https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev/finish?transaction_id=${transactionId}`;
+    `https://marketcall.kayembakasongo.workers.dev/finish?transaction_id=${transactionId}`;
 
   const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
@@ -125,7 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const videoContainer = document.createElement('div');
     videoContainer.className = 'w-full bg-black rounded-lg overflow-hidden media-wrapper';
-    // aspect ratio handled via CSS media-wrapper
 
     const iframe = document.createElement('iframe');
     iframe.src = 'https://www.facebook.com/plugins/video.php?height=314&href=' +
@@ -158,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const frameContainer = document.createElement('div');
     frameContainer.className = 'w-full bg-white rounded-lg overflow-hidden border border-slate-200 media-wrapper';
-    // height handled via CSS media-wrapper
 
     const iframe = document.createElement('iframe');
     iframe.src = offerTrackedUrl;
@@ -376,4 +387,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
 

@@ -48,12 +48,12 @@
 
     /* Separate sizing for video and form iframes */
     @media (max-width: 768px) {
-      .video-wrapper { height: 200px; }
+      .video-wrapper { height: 260px; }  /* taller on mobile */
       .form-wrapper  { height: 450px; }
     }
     @media (min-width: 769px) {
-      .video-wrapper { height: 55vh; }  /* shorter */
-      .form-wrapper  { height: 75vh; }  /* taller */
+      .video-wrapper { height: 55vh; }  /* 🔥 taller Facebook video */
+      .form-wrapper  { height: 75vh; }  /* keep form tall */
     }
 
     /* Fade-out animation for "Option A" */
@@ -447,5 +447,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
 
 

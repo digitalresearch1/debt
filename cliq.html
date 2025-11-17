@@ -1,396 +1,443 @@
-<!DOCTYPE HTML>
-<html lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en" class="supernova">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
+  <meta name="HandheldFriendly" content="true">
   <title>Financial Wellness Research Study</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
+  <style type="text/css">
     body { font-family: 'Inter', sans-serif; }
-
+    .action-btn { transition: background-color 0.3s, transform 0.2s; cursor: pointer; }
+    .action-btn:hover { transform: translateY(-2px); }
     .chat-bubble {
       max-width: 80%;
       border-radius: 1rem;
       padding: 0.75rem 1rem;
-      margin-bottom: 0.75rem;
-      font-size: 0.95rem;
-      opacity: 0;
-      transition: opacity 0.4s ease-in-out;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
     }
-    .chat-bot { background: #eef2ff; color: #111827; align-self: flex-start; }
-    .chat-user { background: #4f46e5; color: #fff; align-self: flex-end; }
+    .chat-bot { background-color: #eef2ff; color: #111827; align-self: flex-start; }
+    .chat-user { background-color: #4f46e5; color: white; align-self: flex-end; }
 
-    .fade-in { opacity: 1 !important; }
+    /* Important: allow the flex chat area to actually scroll */
+    .chat-container {
+      overflow-y: auto;
+      min-height: 0;
+    }
 
-    .full-media-wrapper {
+    .media-wrapper {
       width: 100%;
-      max-width: 1300px;
+      max-width: 1200px;
       margin: 0 auto;
-      border-radius: 1rem;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
+      border-radius: 0.75rem;
       overflow: hidden;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
     }
-
-    /* Facebook Video Height */
-    .video-block {
-      height: 1000px;
+    .media-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
     }
     @media (max-width: 768px) {
-      .video-block {
-        height: 480px;
-      }
+      .media-wrapper { height: 220px; }
+    }
+    @media (min-width: 769px) {
+      /* smaller than before to leave more room for buttons */
+      .media-wrapper { height: 60vh; }
     }
 
-    /* Offer Iframe */
-    .offer-block {
-      height: 1200px;
+    /* 🔥 Fade-out animation for Option A */
+    .fade-out {
+      animation: fadeOutUp 0.35s forwards ease-out;
+    }
+    @keyframes fadeOutUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-6px); }
     }
   </style>
 </head>
-
 <body class="bg-gray-100 min-h-screen">
 
-<div id="chatOverlay" class="fixed inset-0 bg-white z-50 flex flex-col overflow-y-auto">
-  <!-- HEADER -->
+<!-- FULLSCREEN CHAT ONLY -->
+<div id="chatOverlay" class="fixed inset-0 bg-white z-50 flex flex-col">
+  <!-- Chat header -->
   <div class="p-4 bg-indigo-600 text-white text-center shadow">
     <h1 class="text-xl font-bold">Financial Wellness Screening Chat</h1>
-    <p class="text-xs mt-1 text-indigo-100">We just need a few answers before continuing.</p>
+    <p class="text-xs mt-1 text-indigo-100">
+      Please answer a few quick questions so we can see if this private study is a good fit for you.
+    </p>
   </div>
 
-  <!-- CHAT BODY -->
-  <div id="chatWindow" class="flex-1 flex flex-col p-4 space-y-2"></div>
+  <!-- Chat body -->
+  <div class="flex-1 flex flex-col bg-slate-50">
+    <!-- Chat messages (now explicitly scrollable + min-h-0) -->
+    <div id="chatWindow"
+         class="flex-1 chat-container p-4 flex flex-col space-y-2 overflow-y-auto min-h-0">
+    </div>
 
-  <!-- CONTROLS -->
-  <div id="chatControls" class="p-4 bg-white border-t border-slate-200 flex flex-wrap gap-2 sticky bottom-0"></div>
+    <!-- Chat reply buttons -->
+    <div id="chatControls"
+         class="p-4 flex flex-wrap gap-2 bg-white border-t border-slate-200">
+    </div>
+  </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-  const chatWindow = document.getElementById("chatWindow");
-  const chatControls = document.getElementById("chatControls");
+document.addEventListener('DOMContentLoaded', function() {
   const urlParams = new URLSearchParams(window.location.search);
+  let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
 
-  let transactionId =
-    urlParams.get("transaction_id") ||
-    urlParams.get("RID") ||
-    "tx_" + Date.now().toString(36);
+  if (!transactionId) {
+    transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
+  }
 
-  const offerTrackedUrl =
-    "https://trkmcl.com/wy8odpg43k/p98vjj0e83?subid=" +
-    encodeURIComponent(transactionId);
+  const chatWindow = document.getElementById('chatWindow');
+  const chatControls = document.getElementById('chatControls');
 
+  // URLs
   const abandonUrl =
     `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${transactionId}`;
 
-  const finishUrl =
-    `https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev/finish?transaction_id=${transactionId}`;
+  // ✅ REAL WORKER URL
+  const workerFinishUrl =
+    `https://marketcall.kayembakasongo.workers.dev/finish?transaction_id=${transactionId}`;
 
-  /* -------------------------
-     BASIC CHAT MESSAGE SYSTEM
-  ---------------------------*/
+  const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
+  const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
+
+  let disqualified = false;
+
+  // ----- Helpers -----
   function addBotMessage(text) {
-    clearControls();
-    const bubble = document.createElement("div");
-    bubble.className = "chat-bubble chat-bot";
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble chat-bot';
     bubble.textContent = text;
     chatWindow.appendChild(bubble);
-    setTimeout(() => bubble.classList.add("fade-in"), 50);
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
 
   function addUserMessage(text) {
-    const bubble = document.createElement("div");
-    bubble.className = "chat-bubble chat-user";
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble chat-user ml-auto';
     bubble.textContent = text;
     chatWindow.appendChild(bubble);
-    setTimeout(() => bubble.classList.add("fade-in"), 50);
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
 
-  function replaceStep(contentElement) {
-    chatWindow.innerHTML = "";
-    chatWindow.appendChild(contentElement);
-  }
-
   function clearControls() {
-    chatControls.innerHTML = "";
+    chatControls.innerHTML = '';
   }
 
-  function addButtons(buttons) {
+  function renderOptions(options) {
     clearControls();
-    buttons.forEach(btn => {
-      const b = document.createElement("button");
-      b.textContent = btn.label;
-      b.className =
-        "px-4 py-2 rounded-full border border-slate-300 bg-white hover:bg-slate-100 text-slate-900 text-sm";
-      b.onclick = btn.onClick;
-      chatControls.appendChild(b);
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className =
+        'px-3 py-2 text-xs md:text-sm rounded-full border border-slate-300 bg-white hover:bg-slate-100 text-slate-900';
+      btn.textContent = opt.label;
+      btn.addEventListener('click', () => opt.onClick());
+      chatControls.appendChild(btn);
     });
   }
 
-  /* -------------------------
-     VIDEO STEP WITH SCROLL + TIMER
-  ---------------------------*/
-  function showVideoStep() {
-    clearControls();
+  // 🔁 Fade out all current messages, then run next step
+  function fadeOutAllAndThen(nextFn) {
+    const nodes = Array.from(chatWindow.children);
+    if (nodes.length === 0) {
+      nextFn();
+      return;
+    }
+    nodes.forEach(node => node.classList.add('fade-out'));
+    setTimeout(() => {
+      chatWindow.innerHTML = '';
+      nextFn();
+    }, 360); // match CSS animation duration
+  }
 
-    const wrapper = document.createElement("div");
-    wrapper.className = "w-full flex flex-col items-center gap-4 pb-8";
+  function addVideoBubble() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'w-full mb-3';
 
-    const text = document.createElement("p");
-    text.className = "text-sm text-slate-700 mb-2";
-    text.textContent =
-      "Please watch this short video. Scroll through it and stay for 10 seconds to continue.";
+    const title = document.createElement('p');
+    title.className = 'text-[11px] font-semibold text-slate-700 mb-1';
+    title.textContent = 'Here is a short video explaining the program for people with high balances:';
+    wrapper.appendChild(title);
 
-    const container = document.createElement("div");
-    container.className = "full-media-wrapper video-block overflow-y-auto";
-    container.style.position = "relative";
+    const videoContainer = document.createElement('div');
+    videoContainer.className = 'w-full bg-black rounded-lg overflow-hidden media-wrapper';
 
-    const iframe = document.createElement("iframe");
-    iframe.src =
-      "https://www.facebook.com/plugins/video.php?height=314&href=" +
-      encodeURIComponent("https://www.facebook.com/reel/1205740158030889/") +
-      "&show_text=false&width=900";
-    iframe.width = "100%";
-    iframe.height = "100%";
-    iframe.style.border = "0";
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://www.facebook.com/plugins/video.php?height=314&href=' +
+      encodeURIComponent('https://www.facebook.com/reel/1205740158030889/') +
+      '&show_text=true&width=860&t=0';
+    iframe.width = '100%';
+    iframe.height = '100%';
+    iframe.style.border = 'none';
+    iframe.style.overflow = 'hidden';
+    iframe.scrolling = 'no';
+    iframe.frameBorder = '0';
     iframe.allowFullscreen = true;
+    iframe.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share');
 
-    container.appendChild(iframe);
+    videoContainer.appendChild(iframe);
+    wrapper.appendChild(videoContainer);
 
-    // Countdown area
-    const countdownMsg = document.createElement("p");
-    countdownMsg.className = "text-center text-indigo-700 font-semibold mt-4";
-    countdownMsg.textContent = "Scroll the video to start verification…";
+    // Little instruction directly under the video
+    const hint = document.createElement('p');
+    hint.className = 'text-[11px] text-slate-600 mt-2';
+    hint.textContent = 'When you finish watching, click “I\'ve watched the video” at the bottom to keep going.';
+    wrapper.appendChild(hint);
 
-    wrapper.appendChild(text);
-    wrapper.appendChild(container);
-    wrapper.appendChild(countdownMsg);
-
-    replaceStep(wrapper);
-
-    let scrolled = false;
-    let timerStarted = false;
-    let seconds = 10;
-
-    container.addEventListener("scroll", function () {
-      const scrollPos = container.scrollTop + container.clientHeight;
-      const scrollHeight = container.scrollHeight;
-
-      if (!scrolled && scrollPos >= scrollHeight * 0.85) {
-        scrolled = true;
-        countdownMsg.textContent = "Verification started… 10 seconds left";
-
-        if (!timerStarted) {
-          timerStarted = true;
-
-          let timerInterval = setInterval(() => {
-            seconds -= 1;
-            countdownMsg.textContent = `Verification… ${seconds} seconds left`;
-
-            if (seconds <= 0) {
-              clearInterval(timerInterval);
-              countdownMsg.textContent =
-                "Verification complete. Click the button below.";
-              showVideoCompleteButton();
-            }
-          }, 1000);
-        }
-      }
-    });
+    chatWindow.appendChild(wrapper);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
   }
 
-  function showVideoCompleteButton() {
-    addButtons([
+  function addOfferIframeBubble() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'w-full mb-3';
+
+    const title = document.createElement('p');
+    title.className = 'text-[11px] font-semibold text-slate-700 mb-1';
+    title.textContent = 'Please complete this secure form with accurate information:';
+    wrapper.appendChild(title);
+
+    const frameContainer = document.createElement('div');
+    frameContainer.className = 'w-full bg-white rounded-lg overflow-hidden border border-slate-200 media-wrapper';
+
+    const iframe = document.createElement('iframe');
+    iframe.src = offerTrackedUrl;
+    iframe.width = '100%';
+    iframe.height = '100%';
+    iframe.style.border = '0';
+    iframe.frameBorder = '0';
+
+    frameContainer.appendChild(iframe);
+    wrapper.appendChild(frameContainer);
+
+    // Extra instruction under the form iframe
+    const hint = document.createElement('p');
+    hint.className = 'text-[11px] text-slate-600 mt-2';
+    hint.textContent = 'Once you submit the form, click “I completed the form” at the bottom to continue.';
+    wrapper.appendChild(hint);
+
+    chatWindow.appendChild(wrapper);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function disqualify(reasonText) {
+    disqualified = true;
+    addBotMessage(
+      reasonText ||
+      'Based on your answers, you do not match the profile for this particular research study.'
+    );
+    addBotMessage(
+      'Please click the button below to exit this survey. Thank you for your time.'
+    );
+    renderOptions([
       {
-        label: "I've watched the video",
-        onClick: function () {
-          addUserMessage("I've watched the video");
-          showOfferStep();
+        label: 'Exit survey',
+        onClick: () => {
+          window.open(abandonUrl, '_blank');
         }
       }
     ]);
   }
 
-  /* -------------------------
-     OFFER IFRAME STEP
-  ---------------------------*/
-  function showOfferStep() {
-    const wrapper = document.createElement("div");
-    wrapper.className = "w-full flex flex-col gap-4 pb-8";
+  // ----- Steps -----
+  function startChat() {
+    addBotMessage("Hi, I'm Chloe. I'll quickly check if this private financial study is a good fit for you.");
+    setTimeout(stepBalanceAmount, 700);
+  }
 
-    const title = document.createElement("p");
-    title.className = "text-sm text-slate-700";
-    title.textContent =
-      "Please complete the secure form below with accurate information.";
-
-    const container = document.createElement("div");
-    container.className = "full-media-wrapper offer-block";
-
-    const iframe = document.createElement("iframe");
-    iframe.src = offerTrackedUrl;
-    iframe.width = "100%";
-    iframe.height = "100%";
-    iframe.style.border = "0";
-
-    container.appendChild(iframe);
-    wrapper.appendChild(title);
-    wrapper.appendChild(container);
-
-    replaceStep(wrapper);
-
-    addButtons([
+  function stepBalanceAmount() {
+    addBotMessage(
+      'First, roughly how much do you currently owe on unsecured balances like credit cards or personal loans?'
+    );
+    renderOptions([
       {
-        label: "I completed the form",
-        onClick: function () {
-          addUserMessage("I completed the form");
-          showFinishStep();
+        label: 'Less than $15,000',
+        onClick: () => {
+          addUserMessage('Less than $15,000');
+          fadeOutAllAndThen(() => {
+            disqualify('For this specific project, we are focusing on people with at least $15,000 in unsecured balances.');
+          });
+        }
+      },
+      {
+        label: '$15,000 - $24,999',
+        onClick: () => {
+          addUserMessage('$15,000 - $24,999');
+          fadeOutAllAndThen(stepPaymentAbility);
+        }
+      },
+      {
+        label: '$25,000 - $39,999',
+        onClick: () => {
+          addUserMessage('$25,000 - $39,999');
+          fadeOutAllAndThen(stepPaymentAbility);
+        }
+      },
+      {
+        label: '$40,000 or more',
+        onClick: () => {
+          addUserMessage('$40,000 or more');
+          fadeOutAllAndThen(stepPaymentAbility);
+        }
+      }
+    ]);
+  }
+
+  function stepPaymentAbility() {
+    addBotMessage(
+      'Could you realistically afford to put at least about $300 per month toward a structured payment plan if it helped you get out of high balances faster?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I could afford that',
+        onClick: () => {
+          addUserMessage('Yes, I could afford that');
+          fadeOutAllAndThen(stepInterest);
+        }
+      },
+      {
+        label: 'No, I really cannot',
+        onClick: () => {
+          addUserMessage('No, I really cannot');
+          fadeOutAllAndThen(() => {
+            disqualify('This project focuses on people who are able to commit at least around $300/month to a structured plan.');
+          });
+        }
+      }
+    ]);
+  }
+
+  function stepInterest() {
+    addBotMessage(
+      'Are you genuinely interested in speaking with a financial specialist in the next 24–48 hours to explore your options?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I want to speak to someone',
+        onClick: () => {
+          addUserMessage('Yes, I want to speak to someone');
+          fadeOutAllAndThen(stepLocation);
+        }
+      },
+      {
+        label: "No, I'm just browsing",
+        onClick: () => {
+          addUserMessage("No, I'm just browsing");
+          fadeOutAllAndThen(() => {
+            disqualify('This project is only for people who are actively looking for help and open to a call with a specialist.');
+          });
+        }
+      }
+    ]);
+  }
+
+  function stepLocation() {
+    addBotMessage(
+      'Last question: Are you currently living in the United States? Most of our partners can only help U.S. residents.'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I live in the U.S.',
+        onClick: () => {
+          addUserMessage('Yes, I live in the U.S.');
+          fadeOutAllAndThen(finishQual);
+        }
+      },
+      {
+        label: 'No, I live outside the U.S.',
+        onClick: () => {
+          addUserMessage('No, I live outside the U.S.');
+          fadeOutAllAndThen(() => {
+            disqualify('Right now this particular project is limited to U.S. residents only.');
+          });
+        }
+      }
+    ]);
+  }
+
+  // Qualified → show video (step) → then iframe (step) → then finish/abandon
+  function finishQual() {
+    addBotMessage('Great, you look like a strong match for this study. 🎉');
+    addBotMessage(
+      'Before we move forward, please watch this short video about the program. ' +
+      'When you’re done, click “I’ve watched the video” at the bottom to continue.'
+    );
+    addVideoBubble();
+
+    renderOptions([
+      {
+        label: "I've watched the video",
+        onClick: () => {
+          addUserMessage("I've watched the video");
+          fadeOutAllAndThen(stepIframeForm);
+        }
+      }
+    ]);
+  }
+
+  function stepIframeForm() {
+    addBotMessage(
+      'Next, please complete the secure form below with accurate information about your current balances and contact details. ' +
+      'Once you submit the form, click “I completed the form” at the bottom to continue.'
+    );
+    addOfferIframeBubble();
+
+    renderOptions([
+      {
+        label: 'I completed the form',
+        onClick: () => {
+          addUserMessage('I completed the form');
+          fadeOutAllAndThen(finalStep);
         }
       },
       {
         label: "I don't want to continue",
-        onClick: function () {
-          window.open(abandonUrl, "_blank");
+        onClick: () => {
+          addUserMessage("I don't want to continue");
+          fadeOutAllAndThen(() => {
+            disqualify('No problem at all. We will not count this as a full participation.');
+          });
         }
       }
     ]);
   }
 
-  /* -------------------------
-     FINAL STEP
-  ---------------------------*/
-  function showFinishStep() {
-    const wrapper = document.createElement("div");
-    wrapper.className = "w-full flex flex-col gap-4 pb-8";
-
-    const msg = document.createElement("p");
-    msg.className = "text-sm text-slate-700";
-    msg.textContent =
-      "Thank you. After your call, email apkconnex@gmail.com with your experience.";
-
-    wrapper.appendChild(msg);
-    replaceStep(wrapper);
-
-    addButtons([
-      {
-        label: "Finish Survey",
-        onClick: function () {
-          window.open(finishUrl, "_blank");
-        }
-      },
-      {
-        label: "Abandon Survey",
-        onClick: function () {
-          window.open(abandonUrl, "_blank");
-        }
-      }
-    ]);
-  }
-
-  /* -------------------------
-     QUALIFICATION STEPS
-  ---------------------------*/
-  function askBalance() {
-    addBotMessage("How much do you currently owe on unsecured balances?");
-    addButtons([
-      {
-        label: "< $15,000",
-        onClick: () =>
-          disqualify("This project requires at least $15,000 in unsecured balances.")
-      },
-      {
-        label: "$15,000 - $24,999",
-        onClick: () => showNextStep(askAbility)
-      },
-      {
-        label: "$25,000 - $39,999",
-        onClick: () => showNextStep(askAbility)
-      },
-      {
-        label: "$40,000+",
-        onClick: () => showNextStep(askAbility)
-      }
-    ]);
-  }
-
-  function askAbility() {
-    addBotMessage("Can you afford about $300/month toward a structured plan?");
-    addButtons([
-      {
-        label: "Yes",
-        onClick: () => showNextStep(askInterest)
-      },
-      {
-        label: "No",
-        onClick: () =>
-          disqualify("This project requires ability to commit to at least ~$300/mo.")
-      }
-    ]);
-  }
-
-  function askInterest() {
+  function finalStep() {
     addBotMessage(
-      "Are you open to speaking with a financial specialist in the next 24–48 hours?"
+      'Thank you. After the company contacts you and you have your call, please send a short email about your experience to apkconnex@gmail.com.'
     );
-    addButtons([
+    addBotMessage(
+      'Participants who complete the form and send feedback will have a chance to win a $500 prepaid card.'
+    );
+    addBotMessage('You can now finish or abandon the survey below.');
+
+    renderOptions([
       {
-        label: "Yes",
-        onClick: () => showNextStep(askLocation)
+        label: 'Finish Survey',
+        onClick: () => {
+          addUserMessage('Finish Survey');
+          window.open(workerFinishUrl, '_blank');
+        }
       },
       {
-        label: "No",
-        onClick: () =>
-          disqualify("This project is only for people actively seeking help.")
-      }
-    ]);
-  }
-
-  function askLocation() {
-    addBotMessage("Do you currently live in the United States?");
-    addButtons([
-      {
-        label: "Yes",
-        onClick: () => showVideoStep()
-      },
-      {
-        label: "No",
-        onClick: () =>
-          disqualify("This particular study is limited to U.S. residents.")
-      }
-    ]);
-  }
-
-  /* -------------------------
-     HELPER — Fade transition
-  ---------------------------*/
-  function showNextStep(stepFunction) {
-    chatWindow.innerHTML = "";
-    chatControls.innerHTML = "";
-    setTimeout(stepFunction, 80);
-  }
-
-  function disqualify(reason) {
-    chatWindow.innerHTML = "";
-    addBotMessage(reason);
-    addButtons([
-      {
-        label: "Exit survey",
-        onClick: function () {
-          window.open(abandonUrl, "_blank");
+        label: 'Abandon Survey',
+        onClick: () => {
+          addUserMessage('Abandon Survey');
+          window.open(abandonUrl, '_blank');
         }
       }
     ]);
   }
 
-  /* -------------------------
-     START
-  ---------------------------*/
-  addBotMessage("Hi, I'm Chloe. Let's run a quick screening.");
-  setTimeout(askBalance, 600);
-
+  // Start chatbot
+  startChat();
 });
 </script>
 

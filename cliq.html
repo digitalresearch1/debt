@@ -178,6 +178,12 @@ document.addEventListener('DOMContentLoaded', function() {
     videoContainer.appendChild(iframe);
     wrapper.appendChild(videoContainer);
 
+    // Extra little instruction directly under the video
+    const hint = document.createElement('p');
+    hint.className = 'text-[11px] text-slate-600 mt-2';
+    hint.textContent = 'When you finish watching, click “I\'ve watched the video” below to keep going.';
+    wrapper.appendChild(hint);
+
     chatWindow.appendChild(wrapper);
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
@@ -203,6 +209,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     frameContainer.appendChild(iframe);
     wrapper.appendChild(frameContainer);
+
+    // Extra instruction under the form iframe
+    const hint = document.createElement('p');
+    hint.className = 'text-[11px] text-slate-600 mt-2';
+    hint.textContent = 'Once you submit the form, click “I completed the form” below to continue.';
+    wrapper.appendChild(hint);
 
     chatWindow.appendChild(wrapper);
     chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -346,7 +358,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Qualified → show video (step) → then iframe (step) → then finish/abandon
   function finishQual() {
     addBotMessage('Great, you look like a strong match for this study. 🎉');
-    addBotMessage('Before we move forward, please watch this short video about the program.');
+    addBotMessage(
+      'Before we move forward, please watch this short video about the program. ' +
+      'When you’re done, click “I’ve watched the video” below to continue.'
+    );
     addVideoBubble();
 
     renderOptions([
@@ -362,7 +377,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function stepIframeForm() {
     addBotMessage(
-      'Next, please complete the secure form below with accurate information about your current balances and contact details.'
+      'Next, please complete the secure form below with accurate information about your current balances and contact details. ' +
+      'Once you submit the form, click “I completed the form” below to continue.'
     );
     addOfferIframeBubble();
 

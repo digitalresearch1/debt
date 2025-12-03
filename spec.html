@@ -5,6 +5,8 @@
   <title>TheoremReach Result Tester</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SHA3 library for enc calculation -->
+  <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.2/build/sha3.min.js"></script>
 </head>
 <body class="bg-slate-100 min-h-screen flex items-center justify-center">
 
@@ -12,6 +14,13 @@
     <h1 class="text-xl font-bold text-slate-800 mb-2">
       TheoremReach Survey Control
     </h1>
+    <p class="text-xs text-slate-500">
+      Open this page like:
+      <br>
+      <code class="text-[11px] break-words">
+        https://digitalresearch1.github.io/debt/spec.html?transaction_id=TEST123
+      </code>
+    </p>
 
     <div class="space-y-3 mt-6">
       <button
@@ -28,44 +37,57 @@
         ❌ DISQUALIFY (result=4)
       </button>
     </div>
+
+    <p id="debug" class="mt-4 text-[11px] text-slate-500 break-words"></p>
   </div>
 
   <script>
+    // 1) Grab transaction_id from URL (?transaction_id=...)
     const params = new URLSearchParams(window.location.search);
     const transactionId = params.get('transaction_id') || 'TEST123';
+
+    // 2) Your TheoremReach company SECRET key (NOT the API key)
+    const SECRET_KEY = 'b747a0bc7e7e618c2df9abdd0ab6e2fa89736c86';
 
     const COMPLETE_REASON = 'survey_complete';
     const DQ_REASON = 'screen_out';
 
-    function buildCompleteUrl() {
-      return (
-        'https://surveys.theoremreach.com/respondent_result' +
-        '?result=10' +
-        '&transaction_id=' + encodeURIComponent(transactionId) +
-        '&reason=' + encodeURIComponent(COMPLETE_REASON) +
-        '&enc=63ca3386e1f4bad34c667b464d51023b75a06e6193bef05c780bc8176145f0d0'
-      );
-    }
+    const debugEl = document.getElementById('debug');
 
-    function buildDisqualifyUrl() {
-      return (
+    /**
+     * Build a TheoremReach /respondent_result URL with correct SHA3 enc
+     * enc = SHA3-256( fullUrlWithoutEnc + SECRET_KEY )
+     */
+    function buildResultUrl(result, reason) {
+      // Base URL with params but without enc
+      const baseUrl =
         'https://surveys.theoremreach.com/respondent_result' +
-        '?result=4' +
+        '?result=' + encodeURIComponent(result) +
         '&transaction_id=' + encodeURIComponent(transactionId) +
-        '&reason=' + encodeURIComponent(DQ_REASON) +
-        '&enc=3b7a2072e14d5e0d6a91e44c0a1d679a496b88a624c4fcf52893a94d1e91df11'
-      );
+        '&reason=' + encodeURIComponent(reason);
+
+      // Hash input = full URL (without enc) + secret key
+      const hashInput = baseUrl + SECRET_KEY;
+
+      // SHA3-256 from js-sha3
+      const enc = sha3_256(hashInput);
+
+      const finalUrl = baseUrl + '&enc=' + enc;
+
+      debugEl.textContent = 'Redirecting to: ' + finalUrl;
+      return finalUrl;
     }
 
     document.getElementById('completeBtn').addEventListener('click', () => {
-      window.location.href = buildCompleteUrl();
+      window.location.href = buildResultUrl(10, COMPLETE_REASON);
     });
 
     document.getElementById('dqBtn').addEventListener('click', () => {
-      window.location.href = buildDisqualifyUrl();
+      window.location.href = buildResultUrl(4, DQ_REASON);
     });
   </script>
 
 </body>
 </html>
+
 

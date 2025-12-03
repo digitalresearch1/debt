@@ -2,65 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>TheoremReach Test Result Page</title>
+  <title>TheoremReach Result Tester</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Optional: quick Tailwind styling via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-100 min-h-screen flex items-center justify-center">
 
-  <div class="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
+  <div class="bg-white shadow-xl rounded-2xl p-8 max-w-md w-full text-center">
     <h1 class="text-xl font-bold text-slate-800 mb-2">
-      TheoremReach Test Survey
+      TheoremReach Survey Control
     </h1>
-    <p class="text-sm text-slate-600 mb-6">
-      This page is only for testing SHA3 result URLs.  
-      The <code>transaction_id</code> will be read from the URL.
-    </p>
 
-    <p id="txStatus" class="text-xs text-slate-500 mb-6"></p>
-
-    <div class="space-y-3">
+    <div class="space-y-3 mt-6">
       <button
         id="completeBtn"
-        class="w-full py-3 rounded-full bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full py-3 rounded-full bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700"
       >
-        ✅ Mark as COMPLETE (result=10)
+        ✅ COMPLETE (result=10)
       </button>
 
       <button
         id="dqBtn"
-        class="w-full py-3 rounded-full bg-red-600 text-white font-semibold text-sm hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full py-3 rounded-full bg-red-600 text-white font-semibold text-sm hover:bg-red-700"
       >
-        ❌ Mark as DISQUALIFIED (result=4)
+        ❌ DISQUALIFY (result=4)
       </button>
     </div>
   </div>
 
   <script>
-    // Get transaction_id from URL (?transaction_id=...)
     const params = new URLSearchParams(window.location.search);
-    const transactionId = params.get('transaction_id');
+    const transactionId = params.get('transaction_id') || 'TEST123';
 
-    const txStatus = document.getElementById('txStatus');
-    const completeBtn = document.getElementById('completeBtn');
-    const dqBtn = document.getElementById('dqBtn');
+    const COMPLETE_REASON = 'survey_complete';
+    const DQ_REASON = 'screen_out';
 
-    if (!transactionId) {
-      txStatus.textContent =
-        '⚠️ No transaction_id found in URL. Add ?transaction_id=YOUR_ID to test.';
-      completeBtn.disabled = true;
-      dqBtn.disabled = true;
-    } else {
-      txStatus.textContent = 'transaction_id detected: ' + transactionId;
-    }
-
-    // Fixed reasons for testing – you can change these strings if you want
-    const COMPLETE_REASON = 'test_complete';
-    const DQ_REASON = 'test_disqualify';
-
-    // URLs from you, with {REPLACE_ME} filled in
     function buildCompleteUrl() {
       return (
         'https://surveys.theoremreach.com/respondent_result' +
@@ -81,16 +57,15 @@
       );
     }
 
-    completeBtn.addEventListener('click', () => {
-      if (!transactionId) return;
+    document.getElementById('completeBtn').addEventListener('click', () => {
       window.location.href = buildCompleteUrl();
     });
 
-    dqBtn.addEventListener('click', () => {
-      if (!transactionId) return;
+    document.getElementById('dqBtn').addEventListener('click', () => {
       window.location.href = buildDisqualifyUrl();
     });
   </script>
 
 </body>
 </html>
+

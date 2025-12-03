@@ -1,93 +1,633 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en" class="supernova">
 <head>
-  <meta charset="UTF-8">
-  <title>TheoremReach Result Tester</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
+  <meta name="HandheldFriendly" content="true">
+  <title>Financial Wellness Research Study</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SHA3 library for enc calculation -->
-  <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.2/build/sha3.min.js"></script>
-</head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center">
+  <style type="text/css">
+    body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
 
-  <div class="bg-white shadow-xl rounded-2xl p-8 max-w-md w-full text-center">
-    <h1 class="text-xl font-bold text-slate-800 mb-2">
-      TheoremReach Survey Control
-    </h1>
-    <p class="text-xs text-slate-500">
-      Open this page like:
-      <br>
-      <code class="text-[11px] break-words">
-        https://digitalresearch1.github.io/debt/spec.html?transaction_id=TEST123
-      </code>
-    </p>
+    .action-btn { transition: background-color 0.3s, transform 0.2s; cursor: pointer; }
+    .action-btn:hover { transform: translateY(-2px); }
 
-    <div class="space-y-3 mt-6">
-      <button
-        id="completeBtn"
-        class="w-full py-3 rounded-full bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700"
-      >
-        ✅ COMPLETE (result=10)
-      </button>
+    .chat-bubble {
+      max-width: 80%;
+      border-radius: 1rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .chat-bot { background-color: #eef2ff; color: #111827; align-self: flex-start; }
+    .chat-user { background-color: #4f46e5; color: white; align-self: flex-end; }
 
-      <button
-        id="dqBtn"
-        class="w-full py-3 rounded-full bg-red-600 text-white font-semibold text-sm hover:bg-red-700"
-      >
-        ❌ DISQUALIFY (result=4)
-      </button>
-    </div>
-
-    <p id="debug" class="mt-4 text-[11px] text-slate-500 break-words"></p>
-  </div>
-
-  <script>
-    // 1) Grab transaction_id from URL (?transaction_id=...)
-    const params = new URLSearchParams(window.location.search);
-    const transactionId = params.get('transaction_id') || 'TEST123';
-
-    // 2) Your TheoremReach company SECRET key (NOT the API key)
-    const SECRET_KEY = 'b747a0bc7e7e618c2df9abdd0ab6e2fa89736c86';
-
-    const COMPLETE_REASON = 'survey_complete';
-    const DQ_REASON = 'screen_out';
-
-    const debugEl = document.getElementById('debug');
-
-    /**
-     * Build a TheoremReach /respondent_result URL with correct SHA3 enc
-     * enc = SHA3-256( fullUrlWithoutEnc + SECRET_KEY )
-     */
-    function buildResultUrl(result, reason) {
-      // Base URL with params but without enc
-      const baseUrl =
-        'https://surveys.theoremreach.com/respondent_result' +
-        '?result=' + encodeURIComponent(result) +
-        '&transaction_id=' + encodeURIComponent(transactionId) +
-        '&reason=' + encodeURIComponent(reason);
-
-      // Hash input = full URL (without enc) + secret key
-      const hashInput = baseUrl + SECRET_KEY;
-
-      // SHA3-256 from js-sha3
-      const enc = sha3_256(hashInput);
-
-      const finalUrl = baseUrl + '&enc=' + enc;
-
-      debugEl.textContent = 'Redirecting to: ' + finalUrl;
-      return finalUrl;
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
-    document.getElementById('completeBtn').addEventListener('click', () => {
-      window.location.href = buildResultUrl(10, COMPLETE_REASON);
-    });
+    .video-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      background: #000;
+    }
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+    }
 
-    document.getElementById('dqBtn').addEventListener('click', () => {
-      window.location.href = buildResultUrl(4, DQ_REASON);
+    @media (max-width: 768px) {
+      .video-wrapper { height: 220px; }
+    }
+    @media (min-width: 769px) {
+      .video-wrapper { height: 480px; }
+    }
+
+    /* Option A – fade out & remove previous messages */
+    .fade-out {
+      animation: fadeOutUp 0.35s forwards ease-out;
+    }
+    @keyframes fadeOutUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-6px); }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<!-- CHAT IN CENTERED, SCROLLABLE CONTAINER -->
+<div id="chatOverlay" class="w-full bg-white flex flex-col max-w-5xl mx-auto min-h-screen shadow-lg">
+  <!-- Chat header -->
+  <div class="p-4 bg-indigo-600 text-white text-center shadow">
+    <h1 class="text-xl font-bold">Financial Wellness Screening Chat</h1>
+    <p class="text-xs mt-1 text-indigo-100">
+      Please answer a few quick questions so we can see if this private study is a good fit for you.
+    </p>
+  </div>
+
+  <!-- Chat body -->
+  <div class="flex-1 flex flex-col bg-slate-50 p-4">
+    <!-- Chat messages -->
+    <div id="chatWindow" class="chat-container"></div>
+
+    <!-- Reply buttons live after content -->
+    <div id="chatControls" class="mt-4 flex flex-wrap gap-2 bg-white border-t border-slate-200 p-3 rounded-lg"></div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
+
+  if (!transactionId) {
+    transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
+  }
+
+  const chatWindow = document.getElementById('chatWindow');
+  const chatControls = document.getElementById('chatControls');
+
+  // URLs
+  // 👉 Replace this later with your TheoremReach screenout link (or Worker "screenout" route) if needed
+  const abandonUrl =
+    `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${transactionId}`;
+
+  // ✅ Your MarketCall + TheoremReach worker (checks HOLD + redirects)
+  const workerFinishUrl =
+    `https://marketcall.kayembakasongo.workers.dev/finish?transaction_id=${transactionId}`;
+
+  // 👉 MarketCall offer link with subid = transaction_id
+  const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
+  const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
+
+  let disqualified = false;
+
+  // ----- Helpers -----
+  function scrollToBottom() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  function addBotMessage(text) {
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble chat-bot';
+    bubble.textContent = text;
+    chatWindow.appendChild(bubble);
+    scrollToBottom();
+  }
+
+  function addUserMessage(text) {
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble chat-user ml-auto';
+    bubble.textContent = text;
+    chatWindow.appendChild(bubble);
+    scrollToBottom();
+  }
+
+  function clearControls() {
+    chatControls.innerHTML = '';
+  }
+
+  function renderOptions(options) {
+    clearControls();
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className =
+        'px-3 py-2 text-xs md:text-sm rounded-full border border-slate-300 bg-white hover:bg-slate-100 text-slate-900';
+      btn.textContent = opt.label;
+      btn.addEventListener('click', () => opt.onClick());
+      chatControls.appendChild(btn);
     });
-  </script>
+    scrollToBottom();
+  }
+
+  // Fade out all current messages, then run next step
+  function fadeOutAllAndThen(nextFn) {
+    const nodes = Array.from(chatWindow.children);
+    if (!nodes.length) {
+      nextFn();
+      return;
+    }
+    nodes.forEach(node => node.classList.add('fade-out'));
+    setTimeout(() => {
+      chatWindow.innerHTML = '';
+      nextFn();
+    }, 360);
+  }
+
+  function addVideoBubble() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'w-full mb-4';
+
+    const title = document.createElement('p');
+    title.className = 'text-[11px] font-semibold text-slate-700 mb-2';
+    title.textContent = 'Here is a short video explaining the program for people with high balances:';
+    wrapper.appendChild(title);
+
+    const videoContainer = document.createElement('div');
+    videoContainer.className = 'video-wrapper';
+
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://www.facebook.com/plugins/video.php?height=314&href=' +
+      encodeURIComponent('https://www.facebook.com/reel/1205740158030889/') +
+      '&show_text=true&width=860&t=0';
+    iframe.style.border = 'none';
+    iframe.style.overflow = 'hidden';
+    iframe.scrolling = 'no';
+    iframe.frameBorder = '0';
+    iframe.allowFullscreen = true;
+    iframe.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share');
+
+    videoContainer.appendChild(iframe);
+    wrapper.appendChild(videoContainer);
+
+    const hint = document.createElement('p');
+    hint.className = 'text-[11px] text-slate-600 mt-2';
+    hint.textContent = 'When you finish watching, scroll down and click “I\'ve watched the video” to keep going.';
+    wrapper.appendChild(hint);
+
+    chatWindow.appendChild(wrapper);
+    scrollToBottom();
+  }
+
+  // Website link instead of iframe
+  function addOfferLinkBubble() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'w-full mb-4';
+
+    const title = document.createElement('p');
+    title.className = 'text-[11px] font-semibold text-slate-700 mb-2';
+    title.textContent = 'Next, open the secure website in a new tab and complete the full form:';
+    wrapper.appendChild(title);
+
+    const card = document.createElement('div');
+    card.className = 'w-full max-w-xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col items-center gap-3';
+
+    const desc = document.createElement('p');
+    desc.className = 'text-xs text-slate-700 text-center';
+    desc.textContent = 'Click the button below to open the form. Fill everything out honestly, then return here.';
+    card.appendChild(desc);
+
+    const linkBtn = document.createElement('a');
+    linkBtn.href = offerTrackedUrl;
+    linkBtn.target = '_blank';
+    linkBtn.rel = 'noopener noreferrer';
+    linkBtn.className = 'action-btn inline-flex items-center justify-center px-5 py-3 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700';
+    linkBtn.textContent = 'Open Secure Form';
+    card.appendChild(linkBtn);
+
+    const note = document.createElement('p');
+    note.className = 'text-[11px] text-slate-500 text-center';
+    note.textContent = 'After submitting the form, come back and click “I completed the form” below.';
+    card.appendChild(note);
+
+    wrapper.appendChild(card);
+    chatWindow.appendChild(wrapper);
+    scrollToBottom();
+  }
+
+  function disqualify(reasonText) {
+    disqualified = true;
+    addBotMessage(
+      reasonText ||
+      'Based on your answers, you do not match the profile for this particular research study.'
+    );
+    addBotMessage(
+      'Please click the button below to exit this survey. Thank you for your time.'
+    );
+    renderOptions([
+      {
+        label: 'Exit survey',
+        onClick: () => {
+          window.open(abandonUrl, '_blank');
+        }
+      }
+    ]);
+  }
+
+  // ----- Chat Steps (based on your qualification rules) -----
+
+  // Q1 — Debt amount (MUST be >= $15,000)
+  function startChat() {
+    addBotMessage("Hi, I'm Chloe. I'll quickly check if this private financial study is a good fit for you.");
+    setTimeout(stepDebtAmount, 700);
+  }
+
+  function stepDebtAmount() {
+    addBotMessage(
+      'First, roughly how much unsecured debt do you currently have? (Credit cards, personal loans, etc. — not including mortgage or auto loans.)'
+    );
+    renderOptions([
+      {
+        label: 'Less than $5,000',
+        onClick: () => {
+          addUserMessage('Less than $5,000');
+          fadeOutAllAndThen(() => {
+            disqualify('For this specific project, we are focusing on people with more than $15,000 in unsecured balances.');
+          });
+        }
+      },
+      {
+        label: '$5,000 - $9,999',
+        onClick: () => {
+          addUserMessage('$5,000 - $9,999');
+          fadeOutAllAndThen(() => {
+            disqualify('For this specific project, we are focusing on people with more than $15,000 in unsecured balances.');
+          });
+        }
+      },
+      {
+        label: '$10,000 - $14,999',
+        onClick: () => {
+          addUserMessage('$10,000 - $14,999');
+          fadeOutAllAndThen(() => {
+            disqualify('For this specific project, we are focusing on people with more than $15,000 in unsecured balances.');
+          });
+        }
+      },
+      {
+        label: '$15,000 - $24,999',
+        onClick: () => {
+          addUserMessage('$15,000 - $24,999');
+          fadeOutAllAndThen(stepUSResidency);
+        }
+      },
+      {
+        label: '$25,000 - $39,999',
+        onClick: () => {
+          addUserMessage('$25,000 - $39,999');
+          fadeOutAllAndThen(stepUSResidency);
+        }
+      },
+      {
+        label: '$40,000 or more',
+        onClick: () => {
+          addUserMessage('$40,000 or more');
+          fadeOutAllAndThen(stepUSResidency);
+        }
+      }
+    ]);
+  }
+
+  // Q2 — US resident
+  function stepUSResidency() {
+    addBotMessage(
+      'Do you currently live in the United States?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I live in the U.S.',
+        onClick: () => {
+          addUserMessage('Yes, I live in the U.S.');
+          fadeOutAllAndThen(stepStateAvailability);
+        }
+      },
+      {
+        label: 'No, I live outside the U.S.',
+        onClick: () => {
+          addUserMessage('No, I live outside the U.S.');
+          fadeOutAllAndThen(() => {
+            disqualify('Right now this particular project is limited to U.S. residents only.');
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q3 — “Operating states” check (simple yes/no)
+  function stepStateAvailability() {
+    addBotMessage(
+      'Our partners only operate in certain U.S. states. To the best of your knowledge, do you live in a state where debt relief programs like this are allowed? (Most states are included, but not all.)'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I believe my state is eligible',
+        onClick: () => {
+          addUserMessage('Yes, my state is eligible');
+          fadeOutAllAndThen(stepPaymentAbility);
+        }
+      },
+      {
+        label: 'No, I know my state does not allow this',
+        onClick: () => {
+          addUserMessage('No, my state does not allow this');
+          fadeOutAllAndThen(() => {
+            disqualify('This project is limited to states where our partners are allowed to operate.');
+          });
+        }
+      },
+      {
+        label: "I'm not sure",
+        onClick: () => {
+          addUserMessage("I'm not sure");
+          fadeOutAllAndThen(() => {
+            disqualify('For compliance reasons, this project requires participants who are confident that their state allows these programs.');
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q4 — Payment ability (>= $300/month)
+  function stepPaymentAbility() {
+    addBotMessage(
+      'Could you realistically afford to put at least about $300 per month toward a structured plan if it helped you resolve your high balances faster?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I could afford that',
+        onClick: () => {
+          addUserMessage('Yes, I could afford that');
+          fadeOutAllAndThen(stepTCPA1);
+        }
+      },
+      {
+        label: 'No, I really cannot',
+        onClick: () => {
+          addUserMessage('No, I really cannot');
+          fadeOutAllAndThen(() => {
+            disqualify('This project focuses on people who are able to commit at least around $300/month to a structured plan.');
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q5 — TCPA consent (willing to receive call)
+  function stepTCPA1() {
+    addBotMessage(
+      'Are you willing to receive a phone call from a financial specialist to discuss your situation and possible options?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I’m willing to receive a call',
+        onClick: () => {
+          addUserMessage('Yes, I’m willing to receive a call');
+          fadeOutAllAndThen(stepTCPA2);
+        }
+      },
+      {
+        label: 'No, I do not want any calls',
+        onClick: () => {
+          addUserMessage('No, I do not want any calls');
+          fadeOutAllAndThen(() => {
+            disqualify('This project is only for people who are open to being contacted by phone.');
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q6 — TCPA consent (automated/prerecorded)
+  function stepTCPA2() {
+    addBotMessage(
+      'Do you agree that you may be contacted by phone or text, including automated or prerecorded messages, regarding financial services related to this program?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I agree',
+        onClick: () => {
+          addUserMessage('Yes, I agree');
+          fadeOutAllAndThen(stepPhoneValidity);
+        }
+      },
+      {
+        label: 'No, I do not agree',
+        onClick: () => {
+          addUserMessage('No, I do not agree');
+          fadeOutAllAndThen(() => {
+            disqualify('For legal reasons, we can only include people who consent to being contacted about this program.');
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q7 — Valid personal phone
+  function stepPhoneValidity() {
+    addBotMessage(
+      'Will you be providing your real personal mobile phone number that you can actually answer?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, it will be my real mobile',
+        onClick: () => {
+          addUserMessage('Yes, it will be my real mobile');
+          fadeOutAllAndThen(stepDuplicate);
+        }
+      },
+      {
+        label: 'No, it might be a fake / other number',
+        onClick: () => {
+          addUserMessage('No, it might be a fake / other number');
+          fadeOutAllAndThen(() => {
+            disqualify('This project requires valid contact information so the specialist can actually reach you.');
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q8 — Duplicate check (already applied recently)
+  function stepDuplicate() {
+    addBotMessage(
+      'Have you already applied for a debt relief or consolidation program in the last 30 days with your current phone number?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I already applied recently',
+        onClick: () => {
+          addUserMessage('Yes, I already applied recently');
+          fadeOutAllAndThen(() => {
+            disqualify('This project is not accepting recent duplicate applications.');
+          });
+        }
+      },
+      {
+        label: 'No, this is my first time applying',
+        onClick: () => {
+          addUserMessage('No, this is my first time applying');
+          fadeOutAllAndThen(stepLanguage);
+        }
+      }
+    ]);
+  }
+
+  // Q9 — Language (English)
+  function stepLanguage() {
+    addBotMessage(
+      'Are you able to comfortably complete the call and discussion in English?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I can speak English',
+        onClick: () => {
+          addUserMessage('Yes, I can speak English');
+          fadeOutAllAndThen(stepIntent);
+        }
+      },
+      {
+        label: 'No, I only speak Spanish or another language',
+        onClick: () => {
+          addUserMessage('No, I only speak Spanish or another language');
+          fadeOutAllAndThen(() => {
+            disqualify('Right now this particular project is only set up for English-language calls.');
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q10 — Intent (actively looking for help)
+  function stepIntent() {
+    addBotMessage(
+      'Are you actively looking for real help with your debt right now (not just testing or clicking for a reward)?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I’m seriously looking for help',
+        onClick: () => {
+          addUserMessage('Yes, I’m seriously looking for help');
+          fadeOutAllAndThen(finishQual);
+        }
+      },
+      {
+        label: 'No, I’m just testing / curious',
+        onClick: () => {
+          addUserMessage('No, I’m just testing / curious');
+          fadeOutAllAndThen(() => {
+            disqualify('This project is only for people who are actively looking for real help with their debt.');
+          });
+        }
+      }
+    ]);
+  }
+
+  // Qualified → video → website link → final
+  function finishQual() {
+    addBotMessage('Great, you look like a strong match for this study. 🎉');
+    addBotMessage(
+      'Before we move forward, please watch this short video about the program. When you\'re done, scroll down and click “I\'ve watched the video” to continue.'
+    );
+    addVideoBubble();
+
+    renderOptions([
+      {
+        label: "I've watched the video",
+        onClick: () => {
+          addUserMessage("I've watched the video");
+          fadeOutAllAndThen(stepWebsiteLinkStep);
+        }
+      }
+    ]);
+  }
+
+  function stepWebsiteLinkStep() {
+    addBotMessage(
+      'Next, you\'ll open a secure website in a new tab to complete the full financial form. Please fill it out with accurate information, then return to this page. ⚠️ We automatically verify if the form was successfully submitted. If it is not submitted, your participation will NOT be approved.'
+    );
+    addOfferLinkBubble();
+
+    renderOptions([
+      {
+        label: 'I completed the form',
+        onClick: () => {
+          addUserMessage('I completed the form');
+          fadeOutAllAndThen(finalStep);
+        }
+      },
+      {
+        label: "I don't want to continue",
+        onClick: () => {
+          addUserMessage("I don't want to continue");
+          fadeOutAllAndThen(() => {
+            disqualify('No problem at all. We will not count this as a full participation.');
+          });
+        }
+      }
+    ]);
+  }
+
+  function finalStep() {
+    addBotMessage(
+      'Thank you. After the company contacts you and you have your call, please send a short email about your experience to apkconnex@gmail.com.'
+    );
+    addBotMessage(
+      'We will now verify with our system whether your form was successfully submitted. Only participants with a verified submission will be approved for the study.'
+    );
+    addBotMessage('You can now finish or abandon the survey below.');
+
+    renderOptions([
+      {
+        label: 'Finish Survey',
+        onClick: () => {
+          addUserMessage('Finish Survey');
+          window.open(workerFinishUrl, '_blank');
+        }
+      },
+      {
+        label: 'Abandon Survey',
+        onClick: () => {
+          addUserMessage('Abandon Survey');
+          window.open(abandonUrl, '_blank');
+        }
+      }
+    ]);
+  }
+
+  // Start chatbot
+  startChat();
+});
+</script>
 
 </body>
 </html>
-
 

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TheoremReach Test Result Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Optional: quick Tailwind styling via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
+    <h1 class="text-xl font-bold text-slate-800 mb-2">
+      TheoremReach Test Survey
+    </h1>
+    <p class="text-sm text-slate-600 mb-6">
+      This page is only for testing SHA3 result URLs.  
+      The <code>transaction_id</code> will be read from the URL.
+    </p>
+
+    <p id="txStatus" class="text-xs text-slate-500 mb-6"></p>
+
+    <div class="space-y-3">
+      <button
+        id="completeBtn"
+        class="w-full py-3 rounded-full bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        ✅ Mark as COMPLETE (result=10)
+      </button>
+
+      <button
+        id="dqBtn"
+        class="w-full py-3 rounded-full bg-red-600 text-white font-semibold text-sm hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        ❌ Mark as DISQUALIFIED (result=4)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Get transaction_id from URL (?transaction_id=...)
+    const params = new URLSearchParams(window.location.search);
+    const transactionId = params.get('transaction_id');
+
+    const txStatus = document.getElementById('txStatus');
+    const completeBtn = document.getElementById('completeBtn');
+    const dqBtn = document.getElementById('dqBtn');
+
+    if (!transactionId) {
+      txStatus.textContent =
+        '⚠️ No transaction_id found in URL. Add ?transaction_id=YOUR_ID to test.';
+      completeBtn.disabled = true;
+      dqBtn.disabled = true;
+    } else {
+      txStatus.textContent = 'transaction_id detected: ' + transactionId;
+    }
+
+    // Fixed reasons for testing – you can change these strings if you want
+    const COMPLETE_REASON = 'test_complete';
+    const DQ_REASON = 'test_disqualify';
+
+    // URLs from you, with {REPLACE_ME} filled in
+    function buildCompleteUrl() {
+      return (
+        'https://surveys.theoremreach.com/respondent_result' +
+        '?result=10' +
+        '&transaction_id=' + encodeURIComponent(transactionId) +
+        '&reason=' + encodeURIComponent(COMPLETE_REASON) +
+        '&enc=63ca3386e1f4bad34c667b464d51023b75a06e6193bef05c780bc8176145f0d0'
+      );
+    }
+
+    function buildDisqualifyUrl() {
+      return (
+        'https://surveys.theoremreach.com/respondent_result' +
+        '?result=4' +
+        '&transaction_id=' + encodeURIComponent(transactionId) +
+        '&reason=' + encodeURIComponent(DQ_REASON) +
+        '&enc=3b7a2072e14d5e0d6a91e44c0a1d679a496b88a624c4fcf52893a94d1e91df11'
+      );
+    }
+
+    completeBtn.addEventListener('click', () => {
+      if (!transactionId) return;
+      window.location.href = buildCompleteUrl();
+    });
+
+    dqBtn.addEventListener('click', () => {
+      if (!transactionId) return;
+      window.location.href = buildDisqualifyUrl();
+    });
+  </script>
+
+</body>
+</html>

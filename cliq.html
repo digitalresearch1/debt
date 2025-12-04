@@ -7,6 +7,9 @@
   <title>Financial Wellness Research Study</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- ✅ SHA3 library for TheoremReach enc -->
+  <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.2/build/sha3.min.js"></script>
+
   <style type="text/css">
     body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
 
@@ -29,8 +32,7 @@
       gap: 0.5rem;
     }
 
-    /* Shared wrapper for media */
-    .media-wrapper {
+    .video-wrapper {
       width: 100%;
       max-width: 1200px;
       margin: 0 auto;
@@ -39,24 +41,21 @@
       overflow: hidden;
       background: #000;
     }
-    .media-wrapper iframe {
+    .video-wrapper iframe {
       width: 100%;
       height: 100%;
       display: block;
       border: 0;
     }
 
-    /* Separate sizing for video and form iframes */
     @media (max-width: 768px) {
-      .video-wrapper { height: 260px; }  /* taller on mobile */
-      .form-wrapper  { height: 450px; }
+      .video-wrapper { height: 220px; }
     }
     @media (min-width: 769px) {
-      .video-wrapper { height: 55vh; }  /* 🔥 taller Facebook video */
-      .form-wrapper  { height: 75vh; }  /* keep form tall */
+      .video-wrapper { height: 480px; }
     }
 
-    /* Fade-out animation for "Option A" */
+    /* Fade-out animation */
     .fade-out {
       animation: fadeOutUp 0.35s forwards ease-out;
     }
@@ -64,13 +63,24 @@
       0% { opacity: 1; transform: translateY(0); }
       100% { opacity: 0; transform: translateY(-6px); }
     }
+
+    /* 🔕 Hide Brevo success/error message panels visually */
+    #brevo-step #success-message,
+    #brevo-step #error-message {
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: 0 !important;
+      background: transparent !important;
+      color: transparent !important;
+    }
   </style>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen">
 
-<!-- PAGE IS NOW SCROLLABLE -->
-<div id="chatOverlay" class="min-h-screen bg-white flex flex-col max-w-5xl mx-auto shadow-lg">
-
+<!-- CHAT IN CENTERED, SCROLLABLE CONTAINER -->
+<div id="chatOverlay" class="w-full bg-white flex flex-col max-w-5xl mx-auto min-h-screen shadow-lg">
   <!-- Chat header -->
   <div class="p-4 bg-indigo-600 text-white text-center shadow">
     <h1 class="text-xl font-bold">Financial Wellness Screening Chat</h1>
@@ -82,14 +92,10 @@
   <!-- Chat body -->
   <div class="flex-1 flex flex-col bg-slate-50 p-4">
     <!-- Chat messages -->
-    <div id="chatWindow"
-         class="chat-container">
-    </div>
+    <div id="chatWindow" class="chat-container"></div>
 
-    <!-- Reply buttons live AFTER content, so you can scroll to them -->
-    <div id="chatControls"
-         class="mt-4 flex flex-wrap gap-2 bg-white border-t border-slate-200 p-3 rounded-lg">
-    </div>
+    <!-- Reply buttons live after content -->
+    <div id="chatControls" class="mt-4 flex flex-wrap gap-2 bg-white border-t border-slate-200 p-3 rounded-lg"></div>
   </div>
 </div>
 
@@ -105,26 +111,67 @@ document.addEventListener('DOMContentLoaded', function() {
   const chatWindow = document.getElementById('chatWindow');
   const chatControls = document.getElementById('chatControls');
 
-  // URLs
-  const abandonUrl =
-    `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${transactionId}`;
+  // =========================
+  //  THEOREMREACH CONSTANTS
+  // =========================
 
-  // ✅ Your Worker URL
+  const TR_BASE = 'https://surveys.theoremreach.com/respondent_result';
+
+  // ✅ Same secret key that worked in your tester
+  const SECRET_KEY = 'b747a0bc7e7e618c2df9abdd0ab6e2fa89736c86';
+
+  /**
+   * Build a TheoremReach /respondent_result URL with correct SHA3 enc
+   * enc = SHA3-256( fullUrlWithoutEnc + SECRET_KEY )
+   * (Same logic as your working tester)
+   */
+  function buildTRUrl(result, reason) {
+    const baseUrl =
+      TR_BASE +
+      '?result=' + encodeURIComponent(result) +
+      '&transaction_id=' + encodeURIComponent(transactionId) +
+      '&reason=' + encodeURIComponent(reason || 'screen_out');
+
+    const hashInput = baseUrl + SECRET_KEY;
+    const enc = sha3_256(hashInput);
+
+    return baseUrl + '&enc=' + enc;
+  }
+
+  // All screenout/disqualify paths use this
+  function getScreenoutUrl(reasonCode) {
+    return buildTRUrl(4, reasonCode || 'screen_out');
+  }
+
+  // =========================
+  //  OTHER URLS
+  // =========================
+
+  // All “pre-screener fail” / generic exits go to TheoremReach screenout
+  const abandonUrl = getScreenoutUrl('pre_screener_fail');
+
+  // Your MarketCall + TheoremReach worker (checks HOLD + redirects COMPLETE/SCREENOUT or PureSpectrum)
   const workerFinishUrl =
-    `https://marketcall.kayembakasongo.workers.dev/finish?transaction_id=${transactionId}`;
+    `https://marketcall.kayembakasongo.workers.dev/finish?transaction_id=${encodeURIComponent(transactionId)}`;
 
+  // MarketCall offer link with subid = transaction_id
   const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
 
   let disqualified = false;
+  let emailSubscribed = false; // ✅ becomes true after Brevo successful submit
 
   // ----- Helpers -----
+  function scrollToBottom() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
   function addBotMessage(text) {
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble chat-bot';
     bubble.textContent = text;
     chatWindow.appendChild(bubble);
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    scrollToBottom();
   }
 
   function addUserMessage(text) {
@@ -132,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
     bubble.className = 'chat-bubble chat-user ml-auto';
     bubble.textContent = text;
     chatWindow.appendChild(bubble);
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    scrollToBottom();
   }
 
   function clearControls() {
@@ -149,14 +196,13 @@ document.addEventListener('DOMContentLoaded', function() {
       btn.addEventListener('click', () => opt.onClick());
       chatControls.appendChild(btn);
     });
-    // ensure buttons are visible
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    scrollToBottom();
   }
 
   // Fade out all current messages, then run next step
   function fadeOutAllAndThen(nextFn) {
     const nodes = Array.from(chatWindow.children);
-    if (nodes.length === 0) {
+    if (!nodes.length) {
       nextFn();
       return;
     }
@@ -177,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
     wrapper.appendChild(title);
 
     const videoContainer = document.createElement('div');
-    videoContainer.className = 'media-wrapper video-wrapper';
+    videoContainer.className = 'video-wrapper';
 
     const iframe = document.createElement('iframe');
     iframe.src = 'https://www.facebook.com/plugins/video.php?height=314&href=' +
@@ -199,74 +245,113 @@ document.addEventListener('DOMContentLoaded', function() {
     wrapper.appendChild(hint);
 
     chatWindow.appendChild(wrapper);
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    scrollToBottom();
   }
 
-  function addOfferIframeBubble() {
+  // Website link instead of iframe
+  function addOfferLinkBubble() {
     const wrapper = document.createElement('div');
     wrapper.className = 'w-full mb-4';
 
     const title = document.createElement('p');
     title.className = 'text-[11px] font-semibold text-slate-700 mb-2';
-    title.textContent = 'Please complete this secure form with accurate information:';
+    title.textContent = 'Next, open the secure website in a new tab and complete the full form:';
     wrapper.appendChild(title);
 
-    const frameContainer = document.createElement('div');
-    frameContainer.className = 'media-wrapper form-wrapper';
+    const card = document.createElement('div');
+    card.className = 'w-full max-w-xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col items-center gap-3';
 
-    const iframe = document.createElement('iframe');
-    iframe.src = offerTrackedUrl;
-    iframe.style.border = '0';
-    iframe.frameBorder = '0';
+    const desc = document.createElement('p');
+    desc.className = 'text-xs text-slate-700 text-center';
+    desc.textContent = 'Click the button below to open the form. Fill everything out honestly, then return here.';
+    card.appendChild(desc);
 
-    frameContainer.appendChild(iframe);
-    wrapper.appendChild(frameContainer);
+    const linkBtn = document.createElement('a');
+    linkBtn.href = offerTrackedUrl;
+    linkBtn.target = '_blank';
+    linkBtn.rel = 'noopener noreferrer';
+    linkBtn.className = 'action-btn inline-flex items-center justify-center px-5 py-3 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700';
+    linkBtn.textContent = 'Open Secure Form';
+    card.appendChild(linkBtn);
 
-    const hint = document.createElement('p');
-    hint.className = 'text-[11px] text-slate-600 mt-2';
-    hint.textContent = 'Once you submit the form, scroll down and click “I completed the form” to continue.';
-    wrapper.appendChild(hint);
+    const note = document.createElement('p');
+    note.className = 'text-[11px] text-slate-500 text-center';
+    note.textContent = 'After submitting the form, come back and click “I completed the form” below.';
+    card.appendChild(note);
 
+    wrapper.appendChild(card);
     chatWindow.appendChild(wrapper);
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    scrollToBottom();
   }
 
-  function disqualify(reasonText) {
+  function disqualify(reasonText, reasonCode) {
     disqualified = true;
-    addBotMessage(
-      reasonText ||
-      'Based on your answers, you do not match the profile for this particular research study.'
-    );
+    const finalReason = reasonText ||
+      'Based on your answers, you do not match the profile for this particular research study.';
+
+    addBotMessage(finalReason);
     addBotMessage(
       'Please click the button below to exit this survey. Thank you for your time.'
     );
+
+    const screenoutUrl = getScreenoutUrl(reasonCode || 'pre_screener_fail');
+
     renderOptions([
       {
         label: 'Exit survey',
         onClick: () => {
-          window.open(abandonUrl, '_blank');
+          window.location.href = screenoutUrl;
         }
       }
     ]);
   }
 
-  // ----- Chat Steps -----
+  // ----- Chat Steps (based on your qualification rules) -----
+
+  // Q1 — Debt amount (MUST be >= $15,000)
   function startChat() {
     addBotMessage("Hi, I'm Chloe. I'll quickly check if this private financial study is a good fit for you.");
-    setTimeout(stepBalanceAmount, 700);
+    setTimeout(stepDebtAmount, 700);
   }
 
-  function stepBalanceAmount() {
+  function stepDebtAmount() {
     addBotMessage(
-      'First, roughly how much do you currently owe on unsecured balances like credit cards or personal loans?'
+      'First, roughly how much unsecured debt do you currently have? (Credit cards, personal loans, etc. — not including mortgage or auto loans.)'
     );
     renderOptions([
       {
-        label: 'Less than $15,000',
+        label: 'Less than $5,000',
         onClick: () => {
-          addUserMessage('Less than $15,000');
+          addUserMessage('Less than $5,000');
           fadeOutAllAndThen(() => {
-            disqualify('For this specific project, we are focusing on people with at least $15,000 in unsecured balances.');
+            disqualify(
+              'For this specific project, we are focusing on people with more than $15,000 in unsecured balances.',
+              'debt_too_low'
+            );
+          });
+        }
+      },
+      {
+        label: '$5,000 - $9,999',
+        onClick: () => {
+          addUserMessage('$5,000 - $9,999');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'For this specific project, we are focusing on people with more than $15,000 in unsecured balances.',
+              'debt_too_low'
+            );
+          });
+        }
+      },
+      {
+        label: '$10,000 - $14,999',
+        onClick: () => {
+          addUserMessage('$10,000 - $14,999');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'For this specific project, we are focusing on people with more than $15,000 in unsecured balances.',
+              'debt_too_low'
+            );
           });
         }
       },
@@ -274,84 +359,37 @@ document.addEventListener('DOMContentLoaded', function() {
         label: '$15,000 - $24,999',
         onClick: () => {
           addUserMessage('$15,000 - $24,999');
-          fadeOutAllAndThen(stepPaymentAbility);
+          fadeOutAllAndThen(stepUSResidency);
         }
       },
       {
         label: '$25,000 - $39,999',
         onClick: () => {
           addUserMessage('$25,000 - $39,999');
-          fadeOutAllAndThen(stepPaymentAbility);
+          fadeOutAllAndThen(stepUSResidency);
         }
       },
       {
         label: '$40,000 or more',
         onClick: () => {
           addUserMessage('$40,000 or more');
-          fadeOutAllAndThen(stepPaymentAbility);
+          fadeOutAllAndThen(stepUSResidency);
         }
       }
     ]);
   }
 
-  function stepPaymentAbility() {
+  // Q2 — US resident
+  function stepUSResidency() {
     addBotMessage(
-      'Could you realistically afford to put at least about $300 per month toward a structured payment plan if it helped you get out of high balances faster?'
-    );
-    renderOptions([
-      {
-        label: 'Yes, I could afford that',
-        onClick: () => {
-          addUserMessage('Yes, I could afford that');
-          fadeOutAllAndThen(stepInterest);
-        }
-      },
-      {
-        label: 'No, I really cannot',
-        onClick: () => {
-          addUserMessage('No, I really cannot');
-          fadeOutAllAndThen(() => {
-            disqualify('This project focuses on people who are able to commit at least around $300/month to a structured plan.');
-          });
-        }
-      }
-    ]);
-  }
-
-  function stepInterest() {
-    addBotMessage(
-      'Are you genuinely interested in speaking with a financial specialist in the next 24–48 hours to explore your options?'
-    );
-    renderOptions([
-      {
-        label: 'Yes, I want to speak to someone',
-        onClick: () => {
-          addUserMessage('Yes, I want to speak to someone');
-          fadeOutAllAndThen(stepLocation);
-        }
-      },
-      {
-        label: "No, I'm just browsing",
-        onClick: () => {
-          addUserMessage("No, I'm just browsing");
-          fadeOutAllAndThen(() => {
-            disqualify('This project is only for people who are actively looking for help and open to a call with a specialist.');
-          });
-        }
-      }
-    ]);
-  }
-
-  function stepLocation() {
-    addBotMessage(
-      'Last question: Are you currently living in the United States? Most of our partners can only help U.S. residents.'
+      'Do you currently live in the United States?'
     );
     renderOptions([
       {
         label: 'Yes, I live in the U.S.',
         onClick: () => {
           addUserMessage('Yes, I live in the U.S.');
-          fadeOutAllAndThen(finishQual);
+          fadeOutAllAndThen(stepStateAvailability);
         }
       },
       {
@@ -359,19 +397,257 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('No, I live outside the U.S.');
           fadeOutAllAndThen(() => {
-            disqualify('Right now this particular project is limited to U.S. residents only.');
+            disqualify(
+              'Right now this particular project is limited to U.S. residents only.',
+              'non_us'
+            );
           });
         }
       }
     ]);
   }
 
-  // Qualified → video → form → finish
+  // Q3 — “Operating states” check (simple yes/no)
+  function stepStateAvailability() {
+    addBotMessage(
+      'Our partners only operate in certain U.S. states. To the best of your knowledge, do you live in a state where debt relief programs like this are allowed? (Most states are included, but not all.)'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I believe my state is eligible',
+        onClick: () => {
+          addUserMessage('Yes, my state is eligible');
+          fadeOutAllAndThen(stepPaymentAbility);
+        }
+      },
+      {
+        label: 'No, I know my state does not allow this',
+        onClick: () => {
+          addUserMessage('No, my state does not allow this');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'This project is limited to states where our partners are allowed to operate.',
+              'state_not_allowed'
+            );
+          });
+        }
+      },
+      {
+        label: "I'm not sure",
+        onClick: () => {
+          addUserMessage("I'm not sure");
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'For compliance reasons, this project requires participants who are confident that their state allows these programs.',
+              'state_unknown'
+            );
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q4 — Payment ability (>= $300/month)
+  function stepPaymentAbility() {
+    addBotMessage(
+      'Could you realistically afford to put at least about $300 per month toward a structured plan if it helped you resolve your high balances faster?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I could afford that',
+        onClick: () => {
+          addUserMessage('Yes, I could afford that');
+          fadeOutAllAndThen(stepTCPA1);
+        }
+      },
+      {
+        label: 'No, I really cannot',
+        onClick: () => {
+          addUserMessage('No, I really cannot');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'This project focuses on people who are able to commit at least around $300/month to a structured plan.',
+              'cannot_afford'
+            );
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q5 — TCPA consent (willing to receive call)
+  function stepTCPA1() {
+    addBotMessage(
+      'Are you willing to receive a phone call from a financial specialist to discuss your situation and possible options?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I’m willing to receive a call',
+        onClick: () => {
+          addUserMessage('Yes, I’m willing to receive a call');
+          fadeOutAllAndThen(stepTCPA2);
+        }
+      },
+      {
+        label: 'No, I do not want any calls',
+        onClick: () => {
+          addUserMessage('No, I do not want any calls');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'This project is only for people who are open to being contacted by phone.',
+              'no_call_consent'
+            );
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q6 — TCPA consent (automated/prerecorded)
+  function stepTCPA2() {
+    addBotMessage(
+      'Do you agree that you may be contacted by phone or text, including automated or prerecorded messages, regarding financial services related to this program?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I agree',
+        onClick: () => {
+          addUserMessage('Yes, I agree');
+          fadeOutAllAndThen(stepPhoneValidity);
+        }
+      },
+      {
+        label: 'No, I do not agree',
+        onClick: () => {
+          addUserMessage('No, I do not agree');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'For legal reasons, we can only include people who consent to being contacted about this program.',
+              'no_tcp_consent'
+            );
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q7 — Valid personal phone
+  function stepPhoneValidity() {
+    addBotMessage(
+      'Will you be providing your real personal mobile phone number that you can actually answer?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, it will be my real mobile',
+        onClick: () => {
+          addUserMessage('Yes, it will be my real mobile');
+          fadeOutAllAndThen(stepDuplicate);
+        }
+      },
+      {
+        label: 'No, it might be a fake / other number',
+        onClick: () => {
+          addUserMessage('No, it might be a fake / other number');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'This project requires valid contact information so the specialist can actually reach you.',
+              'invalid_contact'
+            );
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q8 — Duplicate check (already applied recently)
+  function stepDuplicate() {
+    addBotMessage(
+      'Have you already applied for a debt relief or consolidation program in the last 30 days with your current phone number?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I already applied recently',
+        onClick: () => {
+          addUserMessage('Yes, I already applied recently');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'This project is not accepting recent duplicate applications.',
+              'duplicate'
+            );
+          });
+        }
+      },
+      {
+        label: 'No, this is my first time applying',
+        onClick: () => {
+          addUserMessage('No, this is my first time applying');
+          fadeOutAllAndThen(stepLanguage);
+        }
+      }
+    ]);
+  }
+
+  // Q9 — Language (English)
+  function stepLanguage() {
+    addBotMessage(
+      'Are you able to comfortably complete the call and discussion in English?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I can speak English',
+        onClick: () => {
+          addUserMessage('Yes, I can speak English');
+          fadeOutAllAndThen(stepIntent);
+        }
+      },
+      {
+        label: 'No, I only speak Spanish or another language',
+        onClick: () => {
+          addUserMessage('No, I only speak Spanish or another language');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'Right now this particular project is only set up for English-language calls.',
+              'language'
+            );
+          });
+        }
+      }
+    ]);
+  }
+
+  // Q10 — Intent (actively looking for help)
+  function stepIntent() {
+    addBotMessage(
+      'Are you actively looking for real help with your debt right now (not just testing or clicking for a reward)?'
+    );
+    renderOptions([
+      {
+        label: 'Yes, I’m seriously looking for help',
+        onClick: () => {
+          addUserMessage('Yes, I’m seriously looking for help');
+          fadeOutAllAndThen(finishQual);
+        }
+      },
+      {
+        label: 'No, I’m just testing / curious',
+        onClick: () => {
+          addUserMessage('No, I’m just testing / curious');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'This project is only for people who are actively looking for real help with their debt.',
+              'incentivized_or_test'
+            );
+          });
+        }
+      }
+    ]);
+  }
+
+  // Qualified → video → website link → Brevo email → final
   function finishQual() {
     addBotMessage('Great, you look like a strong match for this study. 🎉');
     addBotMessage(
-      'Before we move forward, please watch this short video about the program. ' +
-      'When you’re done, scroll down and click “I’ve watched the video” to continue.'
+      'Before we move forward, please watch this short video about the program. When you\'re done, scroll down and click “I\'ve watched the video” to continue.'
     );
     addVideoBubble();
 
@@ -380,25 +656,25 @@ document.addEventListener('DOMContentLoaded', function() {
         label: "I've watched the video",
         onClick: () => {
           addUserMessage("I've watched the video");
-          fadeOutAllAndThen(stepIframeForm);
+          fadeOutAllAndThen(stepWebsiteLinkStep);
         }
       }
     ]);
   }
 
-  function stepIframeForm() {
+  function stepWebsiteLinkStep() {
     addBotMessage(
-      'Next, please complete the secure form below with accurate information about your current balances and contact details. ' +
-      'Once you submit the form, scroll down and click “I completed the form” to continue.'
+      'Next, you\'ll open a secure website in a new tab to complete the full financial form. Please fill it out with accurate information, then return to this page. ⚠️ We automatically verify if the form was successfully submitted. If it is not submitted, your participation will NOT be approved.'
     );
-    addOfferIframeBubble();
+    addOfferLinkBubble();
 
     renderOptions([
       {
         label: 'I completed the form',
         onClick: () => {
           addUserMessage('I completed the form');
-          fadeOutAllAndThen(finalStep);
+          // ⬇️ Go to feedback email step (Brevo)
+          fadeOutAllAndThen(stepFeedbackEmail);
         }
       },
       {
@@ -406,19 +682,119 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage("I don't want to continue");
           fadeOutAllAndThen(() => {
-            disqualify('No problem at all. We will not count this as a full participation.');
+            disqualify('No problem at all. We will not count this as a full participation.', 'user_quit');
           });
         }
       }
     ]);
   }
 
+  // ✅ NEW: Brevo feedback email step – must be successfully submitted
+  function stepFeedbackEmail() {
+    addBotMessage(
+      'One last step: please enter your email so we can send you a follow-up feedback survey after your call.'
+    );
+
+    const brevoStep = document.getElementById('brevo-step');
+    if (brevoStep) {
+      brevoStep.style.display = 'block';
+      chatWindow.appendChild(brevoStep);
+      scrollToBottom();
+    }
+
+    clearControls();
+    const continueBtn = document.createElement('button');
+    continueBtn.textContent = 'Continue';
+    continueBtn.disabled = true;
+    continueBtn.className =
+      'px-4 py-2 text-sm rounded-full bg-slate-300 text-slate-500 cursor-not-allowed';
+    chatControls.appendChild(continueBtn);
+    scrollToBottom();
+
+    const successPanel = brevoStep ? brevoStep.querySelector('#success-message') : null;
+
+    function markSubscribed() {
+      if (!emailSubscribed) {
+        emailSubscribed = true;
+        continueBtn.disabled = false;
+        continueBtn.className =
+          'px-4 py-2 text-sm rounded-full bg-emerald-600 text-white hover:bg-emerald-700';
+      }
+    }
+
+    if (successPanel) {
+      const observer = new MutationObserver(() => {
+        const style = window.getComputedStyle(successPanel);
+        const visible = style.display !== 'none' && successPanel.textContent.trim().length > 0;
+        if (visible) {
+          markSubscribed();
+        }
+      });
+
+      observer.observe(successPanel, {
+        attributes: true,
+        attributeFilter: ['class', 'style']
+      });
+    }
+
+    continueBtn.addEventListener('click', () => {
+      if (!emailSubscribed) return;
+      addUserMessage('I entered my email for feedback');
+      fadeOutAllAndThen(finalStep);
+    });
+  }
+
+  // ✅ 60s waiting screen BEFORE sending to Worker
+  function stepWaitAndFinish() {
+    let seconds = 60;
+
+    addBotMessage(
+      'Please wait a moment while we confirm your submission with our partner system. ' +
+      'This usually takes under a minute.'
+    );
+
+    const countdownBubble = document.createElement('div');
+    countdownBubble.className = 'chat-bubble chat-bot';
+    countdownBubble.id = 'countdownBubble';
+    countdownBubble.textContent = 'Checking your submission... 60 seconds remaining';
+    chatWindow.appendChild(countdownBubble);
+    scrollToBottom();
+
+    renderOptions([
+      {
+        label: 'Cancel and exit',
+        onClick: () => {
+          window.location.href = getScreenoutUrl('user_cancel_wait');
+        }
+      }
+    ]);
+
+    const interval = setInterval(() => {
+      seconds--;
+      if (seconds <= 0) {
+        clearInterval(interval);
+        countdownBubble.textContent = 'Done! Redirecting now...';
+        scrollToBottom();
+        setTimeout(() => {
+          window.location.href = workerFinishUrl;
+        }, 800);
+      } else {
+        countdownBubble.textContent =
+          'Checking your submission... ' + seconds + ' seconds remaining';
+      }
+    }, 1000);
+  }
+
   function finalStep() {
     addBotMessage(
-      'Thank you. After the company contacts you and you have your call, please send a short email about your experience to apkconnex@gmail.com.'
+      'Thank you. After the company contacts you and you have your call, you will receive an automatic email asking for feedback about your experience.'
     );
     addBotMessage(
-      'Participants who complete the form and send feedback will have a chance to win a $500 prepaid card.'
+      'We will now verify with our system whether your form was successfully submitted. Only participants with a verified submission will be approved for the study.'
+    );
+    addBotMessage(
+      '⚠️ Please only click "Finish Survey" if you have submitted the full form and completed your call. ' +
+      'If our system does not detect a valid submission, this study cannot approve your participation.'
     );
     addBotMessage('You can now finish or abandon the survey below.');
 
@@ -427,14 +803,14 @@ document.addEventListener('DOMContentLoaded', function() {
         label: 'Finish Survey',
         onClick: () => {
           addUserMessage('Finish Survey');
-          window.open(workerFinishUrl, '_blank');
+          fadeOutAllAndThen(stepWaitAndFinish);
         }
       },
       {
         label: 'Abandon Survey',
         onClick: () => {
           addUserMessage('Abandon Survey');
-          window.open(abandonUrl, '_blank');
+          window.location.href = getScreenoutUrl('user_abandon');
         }
       }
     ]);
@@ -444,6 +820,174 @@ document.addEventListener('DOMContentLoaded', function() {
   startChat();
 });
 </script>
+
+<!-- 🔽 Brevo feedback form block (hidden at start) -->
+<div id="brevo-step" style="display:none; margin-top:12px;">
+  <!-- Begin Brevo Form -->
+  <style>
+    @font-face {
+      font-display: block;
+      font-family: Roboto;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/7529907e9eaf8ebb5220c5f9850e3811.woff2) format("woff2"),
+           url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/25c678feafdc175a70922a116c9be3e7.woff) format("woff");
+    }
+    @font-face {
+      font-display: fallback;
+      font-family: Roboto;
+      font-weight: 600;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/6e9caeeafb1f3491be3e32744bc30440.woff2) format("woff2"),
+           url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/71501f0d8d5aa95960f6475d5487d4c2.woff) format("woff");
+    }
+    @font-face {
+      font-display: fallback;
+      font-family: Roboto;
+      font-weight: 700;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/3ef7cf158f310cf752d5ad08cd0e7e60.woff2) format("woff2"),
+           url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/ece3a1d82f18b60bcce0211725c476aa.woff) format("woff");
+    }
+    #sib-container input:-ms-input-placeholder {
+      text-align: left;
+      font-family: Helvetica, sans-serif;
+      color: #c0ccda;
+    }
+    #sib-container input::placeholder {
+      text-align: left;
+      font-family: Helvetica, sans-serif;
+      color: #c0ccda;
+    }
+    #sib-container textarea::placeholder {
+      text-align: left;
+      font-family: Helvetica, sans-serif;
+      color: #c0ccda;
+    }
+    #sib-container a {
+      text-decoration: underline;
+      color: #2BB2FC;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+
+  <div class="sib-form" style="text-align: center; background-color: #EFF2F7;">
+    <div id="sib-form-container" class="sib-form-container">
+      <div id="error-message" class="sib-form-message-panel" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949;max-width:540px;">
+        <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+          <svg viewBox="0 0 512 512" class="sib-icon sib-notification__icon">
+            <path d="M256 40c118.621 0 216 96.075 216 216 0 119.291-96.61 216-216 216-119.244 0-216-96.562-216-216 0-119.203 96.602-216 216-216m0-32C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm-11.49 120h22.979c6.823 0 12.274 5.682 11.99 12.5l-7 168c-.268 6.428-5.556 11.5-11.99 11.5h-8.979c-6.433 0-11.722-5.073-11.99-11.5l-7-168c-.283-6.818 5.167-12.5 11.99-12.5zM256 340c-15.464 0-28 12.536-28 28s12.536 28 28 28 28-12.536 28-28-12.536-28-28-28z" />
+          </svg>
+          <span class="sib-form-message-panel__inner-text">
+            Your subscription could not be saved. Please try again.
+          </span>
+        </div>
+      </div>
+      <div></div>
+      <div id="success-message" class="sib-form-message-panel" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#085229; background-color:#e7faf0; border-radius:3px; border-color:#13ce66;max-width:540px;">
+        <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+          <svg viewBox="0 0 512 512" class="sib-icon sib-notification__icon">
+            <path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 464c-118.664 0-216-96.055-216-216 0-118.663 96.055-216 216-216 118.664 0 216 96.055 216 216 0 118.663-96.055 216-216 216zm141.63-274.961L217.15 376.071c-4.705 4.667-12.303 4.637-16.97-.068l-85.878-86.572c-4.667-4.705-4.637-12.303.068-16.97l8.52-8.451c4.705-4.667 12.303-4.637 16.97.068l68.976 69.533 163.441-162.13c4.705-4.667 12.303-4.637 16.97.068l8.451 8.52c4.668 4.705 4.637 12.303-.068 16.97z" />
+          </svg>
+          <span class="sib-form-message-panel__inner-text">
+            Your subscription has been successful.
+          </span>
+        </div>
+      </div>
+      <div></div>
+
+      <div id="sib-container" class="sib-container--large sib-container--vertical" style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:3px; border-width:1px; border-color:#C0CCD9; border-style:solid; direction:ltr">
+        <form id="sib-form" method="POST" action="https://52bcaf92.sibforms.com/serve/MUIFAO5vlejSCs-rWtk8_hSGgyILb9Oi-aOLbS_zI5_FjrtRovBWkBZlGVuoCXxEbmOMZMrdo0ZllgcfYtt7jPnKOHgyHT2TYdf3Q-xFXArnK8ikp21kPr7-iXsfMeK4CtD4cAPf2oHHMJLw5OtgVzgyKMt0hXTJ3UiMJVGUXzHbWENuGdgb7j-x2xeZ6iW5f9ix4gocwCjOBdct" data-type="subscription">
+          <div style="padding: 8px 0;">
+            <div class="sib-form-block" style="font-size:32px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent; text-align:left">
+              <p>Survey Feedback</p>
+            </div>
+          </div>
+          <div style="padding: 8px 0;">
+            <div class="sib-form-block" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent; text-align:left">
+              <div class="sib-text-form-block">
+                <p>Please provide your email to receive a reminder for the feedback of the survey</p>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 8px 0;">
+            <div class="sib-input sib-form-block">
+              <div class="form__entry entry_block">
+                <div class="form__label-row ">
+                  <label class="entry__label" style="font-weight: 700; text-align:left; font-size:16px; font-family:Helvetica, sans-serif; color:#3c4858;" for="EMAIL" data-required="*">Enter your email address</label>
+                  <div class="entry__field">
+                    <input class="input " type="text" id="EMAIL" name="EMAIL" autocomplete="off" placeholder="EMAIL" data-required="true" required />
+                  </div>
+                </div>
+                <label class="entry__error entry__error--primary" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949;">
+                </label>
+                <label class="entry__specification" style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
+                  Provide your email address to subscribe. For e.g abc@xyz.com
+                </label>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 8px 0;">
+            <div class="sib-optin sib-form-block">
+              <div class="form__entry entry_mcq">
+                <div class="form__label-row ">
+                  <div class="entry__choice">
+                    <label>
+                      <input type="checkbox" class="input_replaced" value="1" id="OPT_IN" name="OPT_IN" />
+                      <span class="checkbox checkbox_tick_positive"></span>
+                      <span style="font-size:14px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;">
+                        <p>I agree to receive your email and accept the data privacy statement.</p>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+                <label class="entry__error entry__error--primary" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949;">
+                </label>
+                <label class="entry__specification" style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
+                  You may unsubscribe at any time using the link in our newsletter.
+                </label>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 8px 0;">
+            <div class="sib-form-block" style="text-align: left">
+              <button class="sib-form-block__button sib-form-block__button-with-loader" style="font-size:16px; font-weight:700; font-family:Helvetica, sans-serif; color:#FFFFFF; background-color:#3E4857; border-radius:3px; border-width:0px;" form="sib-form" type="submit">
+                <svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon" viewBox="0 0 512 512">
+                  <path d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" />
+                </svg>
+                SUBMIT
+              </button>
+            </div>
+          </div>
+
+          <input type="text" name="email_address_check" value="" class="input--hidden">
+          <input type="hidden" name="locale" value="en">
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.REQUIRED_CODE_ERROR_MESSAGE = 'Please choose a country code';
+    window.LOCALE = 'en';
+    window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE =
+      "The information provided is invalid. Please review the field format and try again.";
+    window.REQUIRED_ERROR_MESSAGE = "This field cannot be left blank. ";
+    window.GENERIC_INVALID_MESSAGE =
+      "The information provided is invalid. Please review the field format and try again.";
+
+    window.translation = {
+      common: {
+        selectedList: '{quantity} list selected',
+        selectedLists: '{quantity} lists selected',
+        selectedOption: '{quantity} selected',
+        selectedOptions: '{quantity} selected',
+      }
+    };
+
+    var AUTOHIDE = Boolean(1);
+  </script>
+
+  <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
+  <!-- End Brevo Form -->
+</div>
 
 </body>
 </html>

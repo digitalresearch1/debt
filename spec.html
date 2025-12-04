@@ -102,20 +102,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const TR_BASE = 'https://surveys.theoremreach.com/respondent_result';
 
-  // 🔴 IMPORTANT: replace these two with the SHA3 enc values
-  // that you already tested and TheoremReach said "SUCCESS".
-  // - COMPLETE: result=10
-  // - SCREENOUT / DISQUALIFY: result=4
-  const TR_COMPLETE_ENC  = 'YOUR_COMPLETE_ENC_HERE';
-  const TR_SCREENOUT_ENC = 'YOUR_SCREENOUT_ENC_HERE';
+  // ⬇️⬇️ PASTE YOUR REAL SHA3 enc VALUES HERE (the ones that gave "success" in your tester) ⬇️⬇️
+  const TR_COMPLETE_ENC  = 'PASTE_YOUR_COMPLETE_ENC_FROM_TESTER_HERE';   // result=10
+  const TR_SCREENOUT_ENC = 'PASTE_YOUR_SCREENOUT_ENC_FROM_TESTER_HERE'; // result=4
 
   function buildTheoremreachUrl(result, enc, reason) {
     const params = new URLSearchParams();
     params.set('result', String(result));
     params.set('transaction_id', transactionId);
-    if (reason) {
-      params.set('reason', reason);
-    }
+    if (reason) params.set('reason', reason);
     params.set('enc', enc);
     return `${TR_BASE}?${params.toString()}`;
   }
@@ -126,21 +121,23 @@ document.addEventListener('DOMContentLoaded', function() {
     return buildTheoremreachUrl(4, TR_SCREENOUT_ENC, reason || 'screenout');
   }
 
-  // If you ever want to call complete directly from front-end (not via worker), use:
-  // buildTheoremreachUrl(10, TR_COMPLETE_ENC, 'survey_complete')
+  // (If you ever want to send complete directly from front-end instead of worker:)
+  // function getCompleteUrl() {
+  //   return buildTheoremreachUrl(10, TR_COMPLETE_ENC, 'survey_complete');
+  // }
 
   // =========================
   //  OTHER URLS
   // =========================
 
-  // 👉 All DQ paths now go to TheoremReach screenout
+  // All "abandon" / non-qualification exits route to TheoremReach screenout
   const abandonUrl = getScreenoutUrl('pre_screener_fail');
 
-  // ✅ Your MarketCall + TheoremReach worker (checks HOLD + redirects COMPLETE/SCREENOUT)
+  // Your MarketCall + TheoremReach worker (checks HOLD + redirects COMPLETE / SCREENOUT)
   const workerFinishUrl =
     `https://marketcall.kayembakasongo.workers.dev/finish?transaction_id=${encodeURIComponent(transactionId)}`;
 
-  // 👉 MarketCall offer link with subid = transaction_id
+  // MarketCall offer link with subid = transaction_id
   const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
 
@@ -710,4 +707,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-

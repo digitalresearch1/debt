@@ -125,9 +125,14 @@ document.addEventListener('DOMContentLoaded', function() {
     return baseUrl + '&enc=' + enc;
   }
 
-  // All screenout/disqualify paths use this
+  // ✅ SCREENOUT = 5
   function getScreenoutUrl(reasonCode) {
-    return buildTRUrl(4, reasonCode || 'screen_out');
+    return buildTRUrl(5, reasonCode || 'screen_out');
+  }
+
+  // (Optional) true disqualify path: DISQUALIFIED = 4
+  function getDisqualifyUrl(reasonCode) {
+    return buildTRUrl(4, reasonCode || 'disqualified');
   }
 
   // =========================
@@ -280,6 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
       'Please click the button below to exit this survey. Thank you for your time.'
     );
 
+    // For this flow, pre-screener fails are treated as SCREENOUT (result=5)
     const screenoutUrl = getScreenoutUrl(reasonCode || 'pre_screener_fail');
 
     renderOptions([
@@ -690,7 +696,7 @@ document.addEventListener('DOMContentLoaded', function() {
           addUserMessage('Finish Survey');
           // Worker will check MarketCall status and then redirect to:
           // - TheoremReach COMPLETE (result=10, using same SHA3 logic)
-          // - OR TheoremReach SCREENOUT (result=4)
+          // - OR TheoremReach SCREENOUT (result=5)
           window.location.href = workerFinishUrl;
         }
       },
@@ -698,7 +704,7 @@ document.addEventListener('DOMContentLoaded', function() {
         label: 'Abandon Survey',
         onClick: () => {
           addUserMessage('Abandon Survey');
-          // Direct screenout with SHA3 enc
+          // Direct screenout with SHA3 enc (result=5)
           window.location.href = getScreenoutUrl('user_abandon');
         }
       }
@@ -712,4 +718,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-

@@ -125,14 +125,9 @@ document.addEventListener('DOMContentLoaded', function() {
     return baseUrl + '&enc=' + enc;
   }
 
-  // ✅ SCREENOUT = 5
+  // All screenout/disqualify paths use this
   function getScreenoutUrl(reasonCode) {
-    return buildTRUrl(5, reasonCode || 'screen_out');
-  }
-
-  // (Optional) true disqualify path: DISQUALIFIED = 4
-  function getDisqualifyUrl(reasonCode) {
-    return buildTRUrl(4, reasonCode || 'disqualified');
+    return buildTRUrl(4, reasonCode || 'screen_out');
   }
 
   // =========================
@@ -285,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
       'Please click the button below to exit this survey. Thank you for your time.'
     );
 
-    // For this flow, pre-screener fails are treated as SCREENOUT (result=5)
     const screenoutUrl = getScreenoutUrl(reasonCode || 'pre_screener_fail');
 
     renderOptions([
@@ -680,12 +674,59 @@ document.addEventListener('DOMContentLoaded', function() {
     ]);
   }
 
+  // ✅ NEW: 60s waiting screen BEFORE sending to Worker
+  function stepWaitAndFinish() {
+    let seconds = 60;
+
+    addBotMessage(
+      'Please wait a moment while we confirm your submission with our partner system. ' +
+      'This usually takes under a minute.'
+    );
+
+    const countdownBubble = document.createElement('div');
+    countdownBubble.className = 'chat-bubble chat-bot';
+    countdownBubble.id = 'countdownBubble';
+    countdownBubble.textContent = 'Checking your submission... 60 seconds remaining';
+    chatWindow.appendChild(countdownBubble);
+    scrollToBottom();
+
+    // Optional: let them cancel while waiting (will screenout)
+    renderOptions([
+      {
+        label: 'Cancel and exit',
+        onClick: () => {
+          window.location.href = getScreenoutUrl('user_cancel_wait');
+        }
+      }
+    ]);
+
+    const interval = setInterval(() => {
+      seconds--;
+      if (seconds <= 0) {
+        clearInterval(interval);
+        countdownBubble.textContent = 'Done! Redirecting now...';
+        scrollToBottom();
+        setTimeout(() => {
+          // Now hit your Worker /finish endpoint
+          window.location.href = workerFinishUrl;
+        }, 800);
+      } else {
+        countdownBubble.textContent =
+          'Checking your submission... ' + seconds + ' seconds remaining';
+      }
+    }, 1000);
+  }
+
   function finalStep() {
     addBotMessage(
       'Thank you. After the company contacts you and you have your call, please send a short email about your experience to apkconnex@gmail.com.'
     );
     addBotMessage(
       'We will now verify with our system whether your form was successfully submitted. Only participants with a verified submission will be approved for the study.'
+    );
+    addBotMessage(
+      '⚠️ Please only click "Finish Survey" if you have submitted the full form and completed your call. ' +
+      'If our system does not detect a valid submission, this study cannot approve your participation.'
     );
     addBotMessage('You can now finish or abandon the survey below.');
 
@@ -694,17 +735,15 @@ document.addEventListener('DOMContentLoaded', function() {
         label: 'Finish Survey',
         onClick: () => {
           addUserMessage('Finish Survey');
-          // Worker will check MarketCall status and then redirect to:
-          // - TheoremReach COMPLETE (result=10, using same SHA3 logic)
-          // - OR TheoremReach SCREENOUT (result=5)
-          window.location.href = workerFinishUrl;
+          // 👉 Instead of going directly to Worker, show 60s waiting screen
+          fadeOutAllAndThen(stepWaitAndFinish);
         }
       },
       {
         label: 'Abandon Survey',
         onClick: () => {
           addUserMessage('Abandon Survey');
-          // Direct screenout with SHA3 enc (result=5)
+          // Direct screenout with SHA3 enc
           window.location.href = getScreenoutUrl('user_abandon');
         }
       }
@@ -718,3 +757,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+

@@ -96,14 +96,49 @@ document.addEventListener('DOMContentLoaded', function() {
   const chatWindow = document.getElementById('chatWindow');
   const chatControls = document.getElementById('chatControls');
 
-  // URLs
-  // 👉 Replace this later with your TheoremReach screenout link (or Worker "screenout" route) if needed
-  const abandonUrl =
-    `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${transactionId}`;
+  // =========================
+  //  THEOREMREACH CONSTANTS
+  // =========================
 
-  // ✅ Your MarketCall + TheoremReach worker (checks HOLD + redirects)
+  const TR_BASE = 'https://surveys.theoremreach.com/respondent_result';
+
+  // 🔴 IMPORTANT: replace these two with the SHA3 enc values
+  // that you already tested and TheoremReach said "SUCCESS".
+  // - COMPLETE: result=10
+  // - SCREENOUT / DISQUALIFY: result=4
+  const TR_COMPLETE_ENC  = 'YOUR_COMPLETE_ENC_HERE';
+  const TR_SCREENOUT_ENC = 'YOUR_SCREENOUT_ENC_HERE';
+
+  function buildTheoremreachUrl(result, enc, reason) {
+    const params = new URLSearchParams();
+    params.set('result', String(result));
+    params.set('transaction_id', transactionId);
+    if (reason) {
+      params.set('reason', reason);
+    }
+    params.set('enc', enc);
+    return `${TR_BASE}?${params.toString()}`;
+  }
+
+  // Used for all screenout / disqualify exits from the screener
+  function getScreenoutUrl(reason) {
+    // example reasons: 'debt_too_low', 'non_us', 'state_not_allowed', etc.
+    return buildTheoremreachUrl(4, TR_SCREENOUT_ENC, reason || 'screenout');
+  }
+
+  // If you ever want to call complete directly from front-end (not via worker), use:
+  // buildTheoremreachUrl(10, TR_COMPLETE_ENC, 'survey_complete')
+
+  // =========================
+  //  OTHER URLS
+  // =========================
+
+  // 👉 All DQ paths now go to TheoremReach screenout
+  const abandonUrl = getScreenoutUrl('pre_screener_fail');
+
+  // ✅ Your MarketCall + TheoremReach worker (checks HOLD + redirects COMPLETE/SCREENOUT)
   const workerFinishUrl =
-    `https://marketcall.kayembakasongo.workers.dev/finish?transaction_id=${transactionId}`;
+    `https://marketcall.kayembakasongo.workers.dev/finish?transaction_id=${encodeURIComponent(transactionId)}`;
 
   // 👉 MarketCall offer link with subid = transaction_id
   const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
@@ -234,20 +269,23 @@ document.addEventListener('DOMContentLoaded', function() {
     scrollToBottom();
   }
 
-  function disqualify(reasonText) {
+  function disqualify(reasonText, reasonCode) {
     disqualified = true;
-    addBotMessage(
-      reasonText ||
-      'Based on your answers, you do not match the profile for this particular research study.'
-    );
+    const finalReason = reasonText ||
+      'Based on your answers, you do not match the profile for this particular research study.';
+
+    addBotMessage(finalReason);
     addBotMessage(
       'Please click the button below to exit this survey. Thank you for your time.'
     );
+
+    const screenoutUrl = getScreenoutUrl(reasonCode || 'pre_screener_fail');
+
     renderOptions([
       {
         label: 'Exit survey',
         onClick: () => {
-          window.open(abandonUrl, '_blank');
+          window.location.href = screenoutUrl;
         }
       }
     ]);
@@ -271,7 +309,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('Less than $5,000');
           fadeOutAllAndThen(() => {
-            disqualify('For this specific project, we are focusing on people with more than $15,000 in unsecured balances.');
+            disqualify(
+              'For this specific project, we are focusing on people with more than $15,000 in unsecured balances.',
+              'debt_too_low'
+            );
           });
         }
       },
@@ -280,7 +321,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('$5,000 - $9,999');
           fadeOutAllAndThen(() => {
-            disqualify('For this specific project, we are focusing on people with more than $15,000 in unsecured balances.');
+            disqualify(
+              'For this specific project, we are focusing on people with more than $15,000 in unsecured balances.',
+              'debt_too_low'
+            );
           });
         }
       },
@@ -289,7 +333,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('$10,000 - $14,999');
           fadeOutAllAndThen(() => {
-            disqualify('For this specific project, we are focusing on people with more than $15,000 in unsecured balances.');
+            disqualify(
+              'For this specific project, we are focusing on people with more than $15,000 in unsecured balances.',
+              'debt_too_low'
+            );
           });
         }
       },
@@ -335,7 +382,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('No, I live outside the U.S.');
           fadeOutAllAndThen(() => {
-            disqualify('Right now this particular project is limited to U.S. residents only.');
+            disqualify(
+              'Right now this particular project is limited to U.S. residents only.',
+              'non_us'
+            );
           });
         }
       }
@@ -360,7 +410,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('No, my state does not allow this');
           fadeOutAllAndThen(() => {
-            disqualify('This project is limited to states where our partners are allowed to operate.');
+            disqualify(
+              'This project is limited to states where our partners are allowed to operate.',
+              'state_not_allowed'
+            );
           });
         }
       },
@@ -369,7 +422,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage("I'm not sure");
           fadeOutAllAndThen(() => {
-            disqualify('For compliance reasons, this project requires participants who are confident that their state allows these programs.');
+            disqualify(
+              'For compliance reasons, this project requires participants who are confident that their state allows these programs.',
+              'state_unknown'
+            );
           });
         }
       }
@@ -394,7 +450,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('No, I really cannot');
           fadeOutAllAndThen(() => {
-            disqualify('This project focuses on people who are able to commit at least around $300/month to a structured plan.');
+            disqualify(
+              'This project focuses on people who are able to commit at least around $300/month to a structured plan.',
+              'cannot_afford'
+            );
           });
         }
       }
@@ -419,7 +478,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('No, I do not want any calls');
           fadeOutAllAndThen(() => {
-            disqualify('This project is only for people who are open to being contacted by phone.');
+            disqualify(
+              'This project is only for people who are open to being contacted by phone.',
+              'no_call_consent'
+            );
           });
         }
       }
@@ -444,7 +506,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('No, I do not agree');
           fadeOutAllAndThen(() => {
-            disqualify('For legal reasons, we can only include people who consent to being contacted about this program.');
+            disqualify(
+              'For legal reasons, we can only include people who consent to being contacted about this program.',
+              'no_tcp_consent'
+            );
           });
         }
       }
@@ -469,7 +534,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('No, it might be a fake / other number');
           fadeOutAllAndThen(() => {
-            disqualify('This project requires valid contact information so the specialist can actually reach you.');
+            disqualify(
+              'This project requires valid contact information so the specialist can actually reach you.',
+              'invalid_contact'
+            );
           });
         }
       }
@@ -487,7 +555,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('Yes, I already applied recently');
           fadeOutAllAndThen(() => {
-            disqualify('This project is not accepting recent duplicate applications.');
+            disqualify(
+              'This project is not accepting recent duplicate applications.',
+              'duplicate'
+            );
           });
         }
       },
@@ -519,7 +590,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('No, I only speak Spanish or another language');
           fadeOutAllAndThen(() => {
-            disqualify('Right now this particular project is only set up for English-language calls.');
+            disqualify(
+              'Right now this particular project is only set up for English-language calls.',
+              'language'
+            );
           });
         }
       }
@@ -544,7 +618,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage('No, I’m just testing / curious');
           fadeOutAllAndThen(() => {
-            disqualify('This project is only for people who are actively looking for real help with their debt.');
+            disqualify(
+              'This project is only for people who are actively looking for real help with their debt.',
+              'incentivized_or_test'
+            );
           });
         }
       }
@@ -589,7 +666,7 @@ document.addEventListener('DOMContentLoaded', function() {
         onClick: () => {
           addUserMessage("I don't want to continue");
           fadeOutAllAndThen(() => {
-            disqualify('No problem at all. We will not count this as a full participation.');
+            disqualify('No problem at all. We will not count this as a full participation.', 'user_quit');
           });
         }
       }
@@ -610,14 +687,17 @@ document.addEventListener('DOMContentLoaded', function() {
         label: 'Finish Survey',
         onClick: () => {
           addUserMessage('Finish Survey');
-          window.open(workerFinishUrl, '_blank');
+          // Worker will check MarketCall status and then redirect to:
+          // - TheoremReach COMPLETE (result=10, TR_COMPLETE_ENC)
+          // - OR TheoremReach SCREENOUT (result=4, TR_SCREENOUT_ENC)
+          window.location.href = workerFinishUrl;
         }
       },
       {
         label: 'Abandon Survey',
         onClick: () => {
           addUserMessage('Abandon Survey');
-          window.open(abandonUrl, '_blank');
+          window.location.href = getScreenoutUrl('user_abandon');
         }
       }
     ]);

@@ -10,9 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- TheoremReach SHA3 library -->
-  <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.2/build/sha3.min.js"></script>
-
   <!-- Brevo base styles (from Simple HTML embed) -->
   <style>
     @font-face {
@@ -102,8 +99,6 @@
       0%   { opacity: 1; transform: translateY(0); }
       100% { opacity: 0; transform: translateY(-6px); }
     }
-
-    .internal-hidden { display: none !important; }
   </style>
 
   <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
@@ -131,8 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const urlParams = new URLSearchParams(window.location.search);
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
 
-  // src=ps (PureSpectrum) or src=tr (TheoremReach)
-  const src = urlParams.get('src') || 'ps';
+  // Force PureSpectrum only
+  const src = 'ps';
 
   if (!transactionId) {
     transactionId = 'tx_' + Date.now().toString(36) +
@@ -143,35 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const chatControls = document.getElementById('chatControls');
 
   // =========================
-  // TheoremReach constants
-  // =========================
-  const TR_BASE    = 'https://surveys.theoremreach.com/respondent_result';
-  const SECRET_KEY = 'b747a0bc7e7e618c2df9abdd0ab6e2fa89736c86';
-
-  function buildTRUrl(result, reason) {
-    if (typeof sha3_256 === 'undefined') {
-      console.error("SHA3 library not loaded.");
-      return TR_BASE;
-    }
-
-    const baseUrl =
-      TR_BASE +
-      '?result=' + encodeURIComponent(result) +
-      '&transaction_id=' + encodeURIComponent(transactionId) +
-      '&reason=' + encodeURIComponent(reason || 'screen_out');
-
-    const hashInput = baseUrl + SECRET_KEY;
-    const enc = sha3_256(hashInput);
-
-    return baseUrl + '&enc=' + enc;
-  }
-
-  // TheoremReach COMPLETE + SCREENOUT URLs (only used if src=tr)
-  const trCompleteUrl  = buildTRUrl(10, 'survey_complete');
-  const trScreenoutUrl = buildTRUrl(4,  'screen_out');
-
-  // =========================
-  // Other URLs
+  // PureSpectrum URLs
   // =========================
 
   // PureSpectrum screenout URL (st=18)
@@ -179,24 +146,19 @@ document.addEventListener('DOMContentLoaded', function() {
     `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
 
   function getScreenoutUrl(reasonCode) {
-    if (src === 'tr') {
-      return buildTRUrl(4, reasonCode || 'screen_out');
-    } else {
-      return psScreenoutUrl;
-    }
+    // We ignore reasonCode for PS; PS only needs st + transaction_id
+    return psScreenoutUrl;
   }
 
   // MarketCall offer link with subid=transaction_id
-  const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
+  const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
   const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
 
-  // Worker finish URL (auto-routes PS/TR based on src)
+  // Worker finish URL (PureSpectrum only)
   const workerFinishUrl =
     'https://marketcall.kayembakasongo.workers.dev/finish' +
     '?transaction_id=' + encodeURIComponent(transactionId) +
-    '&src=' + encodeURIComponent(src) +
-    '&tr_complete=' + encodeURIComponent(trCompleteUrl) +
-    '&tr_screenout=' + encodeURIComponent(trScreenoutUrl);
+    '&src=ps';
 
   // ----- Helpers -----
   function scrollToBottom() {
@@ -353,7 +315,9 @@ document.addEventListener('DOMContentLoaded', function() {
     ]);
   }
 
-  // ----- Chat Steps -----
+  // -----------------------------------
+  // CHAT STEPS – 8-QUESTION PRESCREENER
+  // -----------------------------------
 
   function startChat() {
     addBotMessage(
@@ -362,10 +326,11 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(stepDebtAmount, 700);
   }
 
+  // 1) Debt amount (your preferred ranges)
   function stepDebtAmount() {
     addBotMessage(
-      'First, roughly how much unsecured debt do you currently have? ' +
-      '(Credit cards, personal loans, etc. — not including mortgage or auto loans.)'
+      'First, about how much unsecured debt do you currently have? ' +
+      '(Credit cards, personal loans — not including mortgage or auto loans.)'
     );
     renderOptions([
       {
@@ -408,113 +373,46 @@ document.addEventListener('DOMContentLoaded', function() {
         label: '$15,000 - $24,999',
         onClick: () => {
           addUserMessage('$15,000 - $24,999');
-          fadeOutAllAndThen(stepUSResidency);
+          fadeOutAllAndThen(stepAbilityToPay);
         }
       },
       {
         label: '$25,000 - $39,999',
         onClick: () => {
           addUserMessage('$25,000 - $39,999');
-          fadeOutAllAndThen(stepUSResidency);
+          fadeOutAllAndThen(stepAbilityToPay);
         }
       },
       {
         label: '$40,000 or more',
         onClick: () => {
           addUserMessage('$40,000 or more');
-          fadeOutAllAndThen(stepUSResidency);
+          fadeOutAllAndThen(stepAbilityToPay);
         }
       }
     ]);
   }
 
-  function stepUSResidency() {
-    addBotMessage('Do you currently live in the United States?');
-    renderOptions([
-      {
-        label: 'Yes, I live in the U.S.',
-        onClick: () => {
-          addUserMessage('Yes, I live in the U.S.');
-          fadeOutAllAndThen(stepStateAvailability);
-        }
-      },
-      {
-        label: 'No, I live outside the U.S.',
-        onClick: () => {
-          addUserMessage('No, I live outside the U.S.');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'Right now this particular project is limited to U.S. residents only.',
-              'non_us'
-            );
-          });
-        }
-      }
-    ]);
-  }
-
-  function stepStateAvailability() {
+  // 2) Ability to pay
+  function stepAbilityToPay() {
     addBotMessage(
-      'Our partners only operate in certain U.S. states. To the best of your knowledge, ' +
-      'do you live in a state where debt relief programs like this are allowed? ' +
-      '(Most states are included, but not all.)'
+      'Could you realistically afford at least about $250–$350 per month toward a structured plan if it helped reduce your debt?'
     );
     renderOptions([
       {
-        label: 'Yes, I believe my state is eligible',
-        onClick: () => {
-          addUserMessage('Yes, my state is eligible');
-          fadeOutAllAndThen(stepPaymentAbility);
-        }
-      },
-      {
-        label: 'No, I know my state does not allow this',
-        onClick: () => {
-          addUserMessage('No, my state does not allow this');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'This project is limited to states where our partners are allowed to operate.',
-              'state_not_allowed'
-            );
-          });
-        }
-      },
-      {
-        label: "I'm not sure",
-        onClick: () => {
-          addUserMessage("I'm not sure");
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'For compliance reasons, this project requires participants who are confident ' +
-              'that their state allows these programs.',
-              'state_unknown'
-            );
-          });
-        }
-      }
-    ]);
-  }
-
-  function stepPaymentAbility() {
-    addBotMessage(
-      'Could you realistically afford to put at least about $300 per month toward a structured plan ' +
-      'if it helped you resolve your high balances faster?'
-    );
-    renderOptions([
-      {
-        label: 'Yes, I could afford that',
+        label: 'Yes',
         onClick: () => {
           addUserMessage('Yes, I could afford that');
-          fadeOutAllAndThen(stepTCPA1);
+          fadeOutAllAndThen(stepBehindPayments);
         }
       },
       {
-        label: 'No, I really cannot',
+        label: 'No',
         onClick: () => {
           addUserMessage('No, I really cannot');
           fadeOutAllAndThen(() => {
             disqualify(
-              'This project focuses on people who are able to commit at least around $300/month to a structured plan.',
+              'This project focuses on people who are able to commit at least around $250–$350 per month to a structured plan.',
               'cannot_afford'
             );
           });
@@ -523,97 +421,118 @@ document.addEventListener('DOMContentLoaded', function() {
     ]);
   }
 
-  function stepTCPA1() {
+  // 3) Behind on payments
+  function stepBehindPayments() {
     addBotMessage(
-      'Are you willing to receive a phone call from a financial specialist to discuss your situation ' +
-      'and possible options?'
+      'Are you currently behind on your credit card or loan payments?'
     );
     renderOptions([
       {
-        label: 'Yes, I’m willing to receive a call',
+        label: 'Yes, 30+ days behind',
         onClick: () => {
-          addUserMessage('Yes, I’m willing to receive a call');
-          fadeOutAllAndThen(stepTCPA2);
+          addUserMessage('Yes, 30+ days behind');
+          fadeOutAllAndThen(stepHardshipReason);
         }
       },
       {
-        label: 'No, I do not want any calls',
+        label: 'Not yet, but struggling',
         onClick: () => {
-          addUserMessage('No, I do not want any calls');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'This project is only for people who are open to being contacted by phone.',
-              'no_call_consent'
-            );
-          });
+          addUserMessage('Not yet, but struggling');
+          fadeOutAllAndThen(stepHardshipReason);
+        }
+      },
+      {
+        label: 'No, fully current',
+        onClick: () => {
+          addUserMessage('No, fully current');
+          fadeOutAllAndThen(stepHardshipReason);
         }
       }
     ]);
   }
 
-  function stepTCPA2() {
+  // 4) Hardship reason
+  function stepHardshipReason() {
     addBotMessage(
-      'Do you agree that you may be contacted by phone or text, including automated or prerecorded messages, ' +
-      'regarding financial services related to this program?'
+      'What has caused your debt to increase the most?'
     );
     renderOptions([
       {
-        label: 'Yes, I agree',
+        label: 'Job loss',
         onClick: () => {
-          addUserMessage('Yes, I agree');
-          fadeOutAllAndThen(stepPhoneValidity);
+          addUserMessage('Job loss');
+          fadeOutAllAndThen(stepNumCreditLines);
         }
       },
       {
-        label: 'No, I do not agree',
+        label: 'Medical expenses',
         onClick: () => {
-          addUserMessage('No, I do not agree');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'For legal reasons, we can only include people who consent to being contacted about this program.',
-              'no_tcp_consent'
-            );
-          });
+          addUserMessage('Medical expenses');
+          fadeOutAllAndThen(stepNumCreditLines);
+        }
+      },
+      {
+        label: 'Cost of living',
+        onClick: () => {
+          addUserMessage('Cost of living');
+          fadeOutAllAndThen(stepNumCreditLines);
+        }
+      },
+      {
+        label: 'Divorce / family situation',
+        onClick: () => {
+          addUserMessage('Divorce / family situation');
+          fadeOutAllAndThen(stepNumCreditLines);
+        }
+      },
+      {
+        label: 'Other',
+        onClick: () => {
+          addUserMessage('Other');
+          fadeOutAllAndThen(stepNumCreditLines);
         }
       }
     ]);
   }
 
-  function stepPhoneValidity() {
+  // 5) Number of credit lines
+  function stepNumCreditLines() {
     addBotMessage(
-      'Will you be providing your real personal mobile phone number that you can actually answer?'
+      'How many credit cards or unsecured accounts are you juggling right now?'
     );
     renderOptions([
       {
-        label: 'Yes, it will be my real mobile',
+        label: '1',
         onClick: () => {
-          addUserMessage('Yes, it will be my real mobile');
+          addUserMessage('1 account');
           fadeOutAllAndThen(stepDuplicate);
         }
       },
       {
-        label: 'No, it might be a fake / other number',
+        label: '2–3',
         onClick: () => {
-          addUserMessage('No, it might be a fake / other number');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'This project requires valid contact information so the specialist can actually reach you.',
-              'invalid_contact'
-            );
-          });
+          addUserMessage('2–3 accounts');
+          fadeOutAllAndThen(stepDuplicate);
+        }
+      },
+      {
+        label: '4 or more',
+        onClick: () => {
+          addUserMessage('4 or more accounts');
+          fadeOutAllAndThen(stepDuplicate);
         }
       }
     ]);
   }
 
+  // 6) Duplicate filter
   function stepDuplicate() {
     addBotMessage(
-      'Have you already applied for a debt relief or consolidation program in the last 30 days ' +
-      'with your current phone number?'
+      'Have you already spoken with or applied to any debt-relief company in the last 30 days?'
     );
     renderOptions([
       {
-        label: 'Yes, I already applied recently',
+        label: 'Yes, I already applied',
         onClick: () => {
           addUserMessage('Yes, I already applied recently');
           fadeOutAllAndThen(() => {
@@ -625,33 +544,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       },
       {
-        label: 'No, this is my first time applying',
+        label: 'No, this is my first time',
         onClick: () => {
           addUserMessage('No, this is my first time applying');
-          fadeOutAllAndThen(stepLanguage);
+          fadeOutAllAndThen(stepTCPAConsent);
         }
       }
     ]);
   }
 
-  function stepLanguage() {
-    addBotMessage('Are you able to comfortably complete the call and discussion in English?');
+  // 7) TCPA consent (willingness to receive a call)
+  function stepTCPAConsent() {
+    addBotMessage(
+      'Are you okay with receiving a phone call from a financial specialist to discuss your options?'
+    );
     renderOptions([
       {
-        label: 'Yes, I can speak English',
+        label: 'Yes',
         onClick: () => {
-          addUserMessage('Yes, I can speak English');
+          addUserMessage('Yes, I’m okay with a call');
           fadeOutAllAndThen(stepIntent);
         }
       },
       {
-        label: 'No, I only speak Spanish or another language',
+        label: 'No',
         onClick: () => {
-          addUserMessage('No, I only speak Spanish or another language');
+          addUserMessage('No, I do not want any calls');
           fadeOutAllAndThen(() => {
             disqualify(
-              'Right now this particular project is only set up for English-language calls.',
-              'language'
+              'This project is only for people who agree to receive a call from a specialist.',
+              'no_tcp_consent'
             );
           });
         }
@@ -659,9 +581,10 @@ document.addEventListener('DOMContentLoaded', function() {
     ]);
   }
 
+  // 8) Intent confirmation
   function stepIntent() {
     addBotMessage(
-      'Are you actively looking for real help with your debt right now (not just testing or clicking for a reward)?'
+      'Are you genuinely looking for help resolving your debt (not just testing or browsing)?'
     );
     renderOptions([
       {
@@ -672,9 +595,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       },
       {
-        label: 'No, I’m just testing / curious',
+        label: 'No, I’m just testing',
         onClick: () => {
-          addUserMessage('No, I’m just testing / curious');
+          addUserMessage('No, I’m just testing / browsing');
           fadeOutAllAndThen(() => {
             disqualify(
               'This project is only for people who are actively looking for real help with their debt.',
@@ -686,6 +609,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ]);
   }
 
+  // If they pass all 8 questions
   function finishQual() {
     addBotMessage('Great, you look like a strong match for this study. 🎉');
     addBotMessage(
@@ -705,6 +629,9 @@ document.addEventListener('DOMContentLoaded', function() {
     ]);
   }
 
+  // ---------------------------------------------------------
+  // WEBSITE STEP → CLIQSLIVER / MARKETCALL FORM (OFFER LINK)
+  // ---------------------------------------------------------
   function stepWebsiteLinkStep() {
     addBotMessage(
       'Next, you\'ll open a secure website in a new tab to complete the full financial form. ' +
@@ -842,7 +769,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   </div>
                 </div>
 
-                <div style="padding: 8px 0;">
+                <div style="padding: 8px 0%;">
                   <div class="sib-form-block" style="text-align: left">
                     <button id="brevoSubmitBtn"
                             class="sib-form-block__button sib-form-block__button-with-loader"
@@ -923,7 +850,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Front-end validation passed — let the browser POST to Brevo via hidden iframe
-        // and then treat as success after a short delay.
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting...';
         addBotMessage('Saving your email securely, please wait...');
@@ -994,3 +920,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+

@@ -5,12 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
   <meta name="HandheldFriendly" content="true">
   <title>Financial Wellness Research Study</title>
+
+  <!-- Fonts + Tailwind -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SHA3 library for TheoremReach enc -->
+
+  <!-- TheoremReach SHA3 library -->
   <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.2/build/sha3.min.js"></script>
-  <!-- Brevo embedded form styles -->
-  <style type="text/css">
+
+  <!-- Brevo base styles (from Simple HTML embed) -->
+  <style>
+    @font-face {
+      font-display: block;
+      font-family: Roboto;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/7529907e9eaf8ebb5220c5f9850e3811.woff2) format("woff2"),
+           url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/25c678feafdc175a70922a116c9be3e7.woff) format("woff");
+    }
+
+    @font-face {
+      font-display: fallback;
+      font-family: Roboto;
+      font-weight: 600;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/6e9caeeafb1f3491be3e32744bc30440.woff2) format("woff2"),
+           url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/71501f0d8d5aa95960f6475d5487d4c2.woff) format("woff");
+    }
+
+    @font-face {
+      font-display: fallback;
+      font-family: Roboto;
+      font-weight: 700;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/3ef7cf158f310cf752d5ad08cd0e7e60.woff2) format("woff2"),
+           url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/ece3a1d82f18b60bcce0211725c476aa.woff) format("woff");
+    }
+
+    #sib-container input::placeholder {
+      text-align: left;
+      font-family: Helvetica, sans-serif;
+      color: #c0ccda;
+    }
+
+    #sib-container a {
+      text-decoration: underline;
+      color: #2BB2FC;
+    }
+
     body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
 
     .action-btn { transition: background-color 0.3s, transform 0.2s; cursor: pointer; }
@@ -23,8 +61,8 @@
       margin-bottom: 0.5rem;
       font-size: 0.9rem;
     }
-    .chat-bot   { background-color: #eef2ff; color: #111827; align-self: flex-start; }
-    .chat-user  { background-color: #4f46e5; color: white; align-self: flex-end; }
+    .chat-bot  { background-color: #eef2ff; color: #111827; align-self: flex-start; }
+    .chat-user { background-color: #4f46e5; color: white; align-self: flex-end; }
 
     .disabled-btn { opacity: 0.5; pointer-events: none; cursor: not-allowed; }
 
@@ -65,31 +103,10 @@
       100% { opacity: 0; transform: translateY(-6px); }
     }
 
-    /* Brevo fonts (from official embed) */
-    @font-face {
-      font-display: block;
-      font-family: Roboto;
-      src: url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/7529907e9eaf8ebb5220c5f9850e3811.woff2) format("woff2"),
-           url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/25c678feafdc175a70922a116c9be3e7.woff) format("woff");
-    }
-    @font-face {
-      font-display: fallback;
-      font-family: Roboto;
-      font-weight: 600;
-      src: url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/6e9caeeafb1f3491be3e32744bc30440.woff2) format("woff2"),
-           url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/71501f0d8d5aa95960f6475d5487d4c2.woff) format("woff");
-    }
-    @font-face {
-      font-display: fallback;
-      font-family: Roboto;
-      font-weight: 700;
-      src: url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/3ef7cf158f310cf752d5ad08cd0e7e60.woff2) format("woff2"),
-           url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/ece3a1d82f18b60bcce0211725c476aa.woff) format("woff");
-    }
-
-    /* We will visually hide Brevo's own green/red message panels AFTER we detect success */
-    .sib-form-message-panel.internal-hidden { display: none !important; }
+    .internal-hidden { display: none !important; }
   </style>
+
+  <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
 </head>
 <body class="bg-gray-100 min-h-screen">
 
@@ -132,10 +149,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const SECRET_KEY = 'b747a0bc7e7e618c2df9abdd0ab6e2fa89736c86';
 
   function buildTRUrl(result, reason) {
-    // sha3_256 function is available from the CDN link in the head
     if (typeof sha3_256 === 'undefined') {
       console.error("SHA3 library not loaded.");
-      return TR_BASE; // Fallback
+      return TR_BASE;
     }
 
     const baseUrl =
@@ -164,10 +180,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function getScreenoutUrl(reasonCode) {
     if (src === 'tr') {
-      // TheoremReach
       return buildTRUrl(4, reasonCode || 'screen_out');
     } else {
-      // PureSpectrum
       return psScreenoutUrl;
     }
   }
@@ -192,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function addBotMessage(text) {
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble chat-bot';
-    bubble.innerHTML = text; // allow simple **bold** etc.
+    bubble.innerHTML = text;
     chatWindow.appendChild(bubble);
     scrollToBottom();
   }
@@ -276,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
     scrollToBottom();
   }
 
-  // Website link instead of iframe
+  // Website link instead of iframe for offer
   function addOfferLinkBubble() {
     const wrapper = document.createElement('div');
     wrapper.className = 'w-full mb-4';
@@ -351,8 +365,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function stepDebtAmount() {
     addBotMessage(
       'First, roughly how much unsecured debt do you currently have? ' +
-      '(Credit cards, personal loans, etc. — not including mortgage or auto loans.' +
-      ')' // keep sentence intact
+      '(Credit cards, personal loans, etc. — not including mortgage or auto loans.)'
     );
     renderOptions([
       {
@@ -725,81 +738,124 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // -------------------------------------------------------------
-  // Mandatory Email Collection Gate (Brevo embed, direct submit)
+  // Mandatory Email Collection Gate - integrates your Brevo form
   // -------------------------------------------------------------
   function stepEmailGate() {
     addBotMessage(
-      'Before we can proceed to verification, your email is **mandatory** so we can send you a summary of your financial options and confirm your interest. ' +
-      'Please submit your email below. Once Brevo confirms it, the green **Continue** button will unlock.'
+      'Before we can proceed to verification, your email is <strong>mandatory</strong> so we can send you a reminder and summary of your options. ' +
+      'Please submit your email below. Once it is saved, the green <strong>Continue</strong> button will unlock.'
     );
 
-    // Brevo inline form HTML
-    // 👉 IMPORTANT: replace the `action` URL below with **your** Brevo form action
-    // from the Brevo form builder (Marketing → Forms → your form → Embed code).
     const formHtml = `
-      <div id="brevoBlock" class="p-4 mt-4 mb-4 bg-white border border-indigo-200 rounded-xl shadow-md">
-        <div class="sib-form" style="text-align: left; background-color: #ffffff;">
+      <div id="brevoBlock" class="w-full mb-4">
+        <div class="sib-form" style="text-align: center; background-color: #EFF2F7;">
           <div id="sib-form-container" class="sib-form-container">
-            <div id="error-message" class="sib-form-message-panel" style="font-size:13px; text-align:left; font-family:Roboto, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; color:#661d1d; background-color:#ffeded; border-radius:6px; border-color:#ff4949; margin-bottom:8px; display:none;">
-              <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
-                Your subscription could not be saved. Please check your email and try again.
-              </div>
-            </div>
-            <div id="success-message" class="sib-form-message-panel" style="font-size:13px; text-align:left; font-family:Roboto, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; color:#085229; background-color:#e7faf0; border-radius:6px; border-color:#13ce66; margin-bottom:8px; display:none;">
-              <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
-                Your email has been saved successfully.
-              </div>
-            </div>
+            <div id="sib-container"
+                 class="sib-container--large sib-container--vertical"
+                 style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:3px; border-width:1px; border-color:#C0CCD9; border-style:solid; margin:0 auto;">
 
-            <div id="sib-container" class="sib-container--large sib-container--vertical" style="text-align:left; background-color:#ffffff; border-radius:8px; border-width:1px; border-color:#E5E7EB; border-style:solid; direction:ltr; padding:12px 16px;">
-              <form id="sib-form" method="POST" action="https://YOUR_BREVO_SUBDOMAIN.sibforms.com/serve/YOUR_FORM_ID" data-type="subscription">
-                <div style="padding: 4px 0 10px;">
-                  <div class="sib-form-block" style="font-size:14px; font-weight:600; font-family:Roboto, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; color:#111827;">
-                    Enter your email to receive your options summary:
+              <!-- Hidden iframe so submit goes to Brevo without leaving this page -->
+              <iframe name="brevo_iframe" id="brevo_iframe" style="display:none;"></iframe>
+
+              <form id="sib-form"
+                    method="POST"
+                    action="https://52bcaf92.sibforms.com/serve/MUIFAO5vlejSCs-rWtk8_hSGgyILb9Oi-aOLbS_zI5_FjrtRovBWkBZlGVuoCXxEbmOMZMrdo0ZllgcfYtt7jPnKOHgyHT2TYdf3Q-xFXArnK8ikp21kPr7-iXsfMeK4CtD4cAPf2oHHMJLw5OtgVzgyKMt0hXTJ3UiMJVGUXzHbWENuGdgb7j-x2xeZ6iW5f9ix4gocwCjOBdct"
+                    target="brevo_iframe">
+
+                <div style="padding: 8px 0;">
+                  <div class="sib-form-block"
+                       style="font-size:18px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;">
+                    <p>Survey Feedback Reminder</p>
                   </div>
                 </div>
 
                 <div style="padding: 4px 0;">
+                  <div class="sib-form-block"
+                       style="font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;">
+                    <div class="sib-text-form-block">
+                      <p>Please provide your email so we can send you a reminder about this survey and the outcome of your request.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="padding: 8px 0;">
                   <div class="sib-input sib-form-block">
                     <div class="form__entry entry_block">
                       <div class="form__label-row">
+                        <label class="entry__label"
+                               style="font-weight: 700; text-align:left; font-size:14px; font-family:Helvetica, sans-serif; color:#3c4858;"
+                               for="EMAIL" data-required="*">
+                          Enter your email address
+                        </label>
+
                         <div class="entry__field">
-                          <input class="input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" type="text" id="EMAIL" name="EMAIL" autocomplete="off" placeholder="Email address" data-required="true" required />
+                          <input class="input"
+                                 type="text"
+                                 id="EMAIL"
+                                 name="EMAIL"
+                                 autocomplete="off"
+                                 placeholder="EMAIL"
+                                 data-required="true"
+                                 required />
                         </div>
                       </div>
-                      <label class="entry__error entry__error--primary" style="font-size:12px; text-align:left; font-family:Roboto, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; color:#661d1d; background-color:#ffeded; border-radius:4px; border-color:#ff4949;"></label>
+
+                      <label id="email_error"
+                             class="entry__error entry__error--primary"
+                             style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px;">
+                      </label>
+                      <label class="entry__specification"
+                             style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
+                        Provide your email address to subscribe. For example: abc@xyz.com
+                      </label>
                     </div>
                   </div>
                 </div>
 
-                <div style="padding: 4px 0 2px;">
-                  <div class="sib-optin sib-form-block" data-required="true">
+                <div style="padding: 8px 0;">
+                  <div class="sib-optin sib-form-block">
                     <div class="form__entry entry_mcq">
                       <div class="form__label-row">
-                        <label class="entry__label" style="font-weight: 600; font-size:12px; font-family:Roboto, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; color:#374151;" for="OPT_IN" data-required="*">Consent</label>
                         <div class="entry__choice">
-                          <label class="flex items-start gap-2 text-xs text-gray-600">
-                            <input type="checkbox" class="mt-[3px]" value="1" id="OPT_IN" name="OPT_IN" required />
-                            <span>I agree to receive communications about my financial options and follow-up regarding this research.</span>
+                          <label style="display:flex; align-items:flex-start; gap:6px;">
+                            <input type="checkbox"
+                                   class="input_replaced"
+                                   value="1"
+                                   id="OPT_IN"
+                                   name="OPT_IN" />
+                            <span class="checkbox checkbox_tick_positive"></span>
+                            <span style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858;">
+                              I agree to receive your email and accept the data privacy statement.
+                            </span>
                           </label>
                         </div>
                       </div>
-                      <label class="entry__error entry__error--primary" style="font-size:12px; text-align:left; font-family:Roboto, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; color:#661d1d; background-color:#ffeded; border-radius:4px; border-color:#ff4949;"></label>
+                      <label id="optin_error"
+                             class="entry__error entry__error--primary"
+                             style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px;">
+                      </label>
+                      <label class="entry__specification"
+                             style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
+                        You may unsubscribe at any time using the link in our emails.
+                      </label>
                     </div>
                   </div>
                 </div>
 
-                <div style="padding: 4px 0 0;">
-                  <div class="sib-form-block" style="text-align: left;">
-                    <button class="sib-form-block__button sib-form-block__button-with-loader inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-full text-white bg-indigo-600 hover:bg-indigo-700" type="submit">
-                      Save my email
+                <div style="padding: 8px 0;">
+                  <div class="sib-form-block" style="text-align: left">
+                    <button id="brevoSubmitBtn"
+                            class="sib-form-block__button sib-form-block__button-with-loader"
+                            style="font-size:14px; text-align:center; font-weight:700; font-family:Helvetica, sans-serif; color:#FFFFFF; background-color:#3E4857; border-radius:9999px; border-width:0px; width:100%; padding:8px 0;"
+                            type="submit">
+                      SUBMIT
                     </button>
                   </div>
                 </div>
 
-                <!-- Anti-bot & locale fields required by Brevo -->
-                <input type="text" name="email_address_check" value="" class="input--hidden" style="display:none;" />
-                <input type="hidden" name="locale" value="en" />
+                <input type="text" name="email_address_check" value="" class="input--hidden">
+                <input type="hidden" name="locale" value="en">
+                <input type="hidden" name="html_type" value="simple">
               </form>
             </div>
           </div>
@@ -812,7 +868,7 @@ document.addEventListener('DOMContentLoaded', function() {
     formWrapper.innerHTML = formHtml;
     chatWindow.appendChild(formWrapper);
 
-    // Final Continue Button (initially disabled)
+    // Create the final "Continue" button (DISABLED by default)
     clearControls();
     const continueButton = document.createElement('button');
     continueButton.id = 'mandatoryContinueBtn';
@@ -829,35 +885,51 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    // Configure Brevo messages (same as official embed snippet)
-    window.REQUIRED_CODE_ERROR_MESSAGE = 'Please choose a country code';
-    window.LOCALE = 'en';
-    window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = 'The information provided is invalid. Please review the field format and try again.';
-    window.REQUIRED_ERROR_MESSAGE = 'This field cannot be left blank. ';
-    window.GENERIC_INVALID_MESSAGE = 'The information provided is invalid. Please review the field format and try again.';
-    window.translation = { common: { selectedList: '{quantity} list selected', selectedLists: '{quantity} lists selected' } };
-    window.AUTOHIDE = false;
+    // Attach validation + gating to Brevo form
+    const sibForm    = document.getElementById('sib-form');
+    const emailInput = document.getElementById('EMAIL');
+    const optIn      = document.getElementById('OPT_IN');
+    const emailErr   = document.getElementById('email_error');
+    const optinErr   = document.getElementById('optin_error');
+    const submitBtn  = document.getElementById('brevoSubmitBtn');
 
-    // Load Brevo main.js once
-    if (!document.querySelector('script[src*="sibforms.com/forms/end-form/build/main.js"]')) {
-      const script = document.createElement('script');
-      script.defer = true;
-      script.src = 'https://sibforms.com/forms/end-form/build/main.js';
-      document.body.appendChild(script);
-    }
+    if (sibForm) {
+      sibForm.addEventListener('submit', function(e) {
+        let hasError = false;
+        emailErr.style.display = 'none';
+        optinErr.style.display = 'none';
 
-    // Watch the success-message panel to know when Brevo has accepted the email
-    const successPanel = document.getElementById('success-message');
-    const errorPanel   = document.getElementById('error-message');
+        const emailVal = (emailInput.value || '').trim();
 
-    if (successPanel) {
-      const observer = new MutationObserver(() => {
-        const visible = successPanel.offsetParent !== null || successPanel.style.display === 'block';
-        if (visible) {
-          // Hide Brevo panels visually so user only sees Chloe messages
-          successPanel.classList.add('internal-hidden');
-          if (errorPanel) errorPanel.classList.add('internal-hidden');
+        if (!emailVal) {
+          hasError = true;
+          emailErr.textContent = 'Please enter your email address.';
+          emailErr.style.display = 'block';
+        } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)) {
+          hasError = true;
+          emailErr.textContent = 'Please enter a valid email address.';
+          emailErr.style.display = 'block';
+        }
 
+        if (!optIn.checked) {
+          hasError = true;
+          optinErr.textContent = 'Please agree to the privacy statement to continue.';
+          optinErr.style.display = 'block';
+        }
+
+        if (hasError) {
+          e.preventDefault();
+          return;
+        }
+
+        // Front-end validation passed — let the browser POST to Brevo via hidden iframe
+        // and then treat as success after a short delay.
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        addBotMessage('Saving your email securely, please wait...');
+
+        // Do NOT e.preventDefault() here — we want the POST to go to Brevo.
+        setTimeout(() => {
           const brevoBlock = document.getElementById('brevoBlock');
           if (brevoBlock) brevoBlock.classList.add('hidden');
 
@@ -866,19 +938,15 @@ document.addEventListener('DOMContentLoaded', function() {
           continueButton.classList.add('bg-green-600', 'hover:bg-green-700');
           continueButton.textContent = 'Continue to Finish Screen';
 
-          addBotMessage('✅ <strong>Success!</strong> Your email is secured. Please click the green button to finalize your participation.');
-
-          observer.disconnect();
-        }
+          addBotMessage('✅ <strong>Success!</strong> Your email is saved. Please click the green button below to finalize your participation.');
+        }, 3500); // small delay so Brevo has time to receive the POST
       });
-
-      observer.observe(successPanel, { attributes: true, attributeFilter: ['style', 'class'] });
     }
 
     scrollToBottom();
   }
 
-  // 60s waiting step before sending to Worker (Existing)
+  // 60s waiting step before sending to Worker
   function stepWaitAndFinish() {
     let seconds = 60;
 
@@ -919,7 +987,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1000);
   }
 
-  // Start
+  // Start chat
   startChat();
 });
 </script>

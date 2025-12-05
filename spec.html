@@ -99,8 +99,6 @@
       0%   { opacity: 1; transform: translateY(0); }
       100% { opacity: 0; transform: translateY(-6px); }
     }
-
-    .internal-hidden { display: none !important; }
   </style>
 
   <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
@@ -143,26 +141,21 @@ document.addEventListener('DOMContentLoaded', function() {
   // PureSpectrum URLs
   // =========================
 
-  // PureSpectrum screenout URL (st=18)
   const psScreenoutUrl =
     `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
 
   function getScreenoutUrl(reasonCode) {
-    // We ignore reasonCode for PS; PS only needs st + transaction_id
     return psScreenoutUrl;
   }
 
-  // MarketCall offer link with subid=transaction_id
-  const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
+  const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
 
-  // Worker finish URL (PureSpectrum only)
   const workerFinishUrl =
     'https://marketcall.kayembakasongo.workers.dev/finish' +
     '?transaction_id=' + encodeURIComponent(transactionId) +
     '&src=ps';
 
-  // ----- Helpers -----
   function scrollToBottom() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   }
@@ -247,14 +240,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const hint = document.createElement('p');
     hint.className = 'text-[11px] text-slate-600 mt-2';
     hint.textContent =
-      'When you finish watching, scroll down and click “I\'ve watched the video” to keep going.';
+      'When you finish watching, scroll down and click “I\\'ve watched the video” to keep going.';
     wrapper.appendChild(hint);
 
     chatWindow.appendChild(wrapper);
     scrollToBottom();
   }
 
-  // Website link instead of iframe for offer
   function addOfferLinkBubble() {
     const wrapper = document.createElement('div');
     wrapper.className = 'w-full mb-4';
@@ -262,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const title = document.createElement('p');
     title.className = 'text-[11px] font-semibold text-slate-700 mb-2';
     title.textContent =
-      'Next, open the secure website in a new tab and complete the full form:';
+      'Next, open the secure website in a new tab to complete the full financial form:';
     wrapper.appendChild(title);
 
     const card = document.createElement('div');
@@ -272,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const desc = document.createElement('p');
     desc.className = 'text-xs text-slate-700 text-center';
     desc.textContent =
-      'Click the button below to open the form. Fill everything out honestly, then return here.';
+      'Click the button below to open the form. Fill everything out honestly, then return to this page.';
     card.appendChild(desc);
 
     const linkBtn = document.createElement('a');
@@ -317,7 +309,9 @@ document.addEventListener('DOMContentLoaded', function() {
     ]);
   }
 
-  // ----- Chat Steps -----
+  // -----------------------------------
+  // CHAT STEPS – 8-Question Prescreener
+  // -----------------------------------
 
   function startChat() {
     addBotMessage(
@@ -328,8 +322,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function stepDebtAmount() {
     addBotMessage(
-      'First, roughly how much unsecured debt do you currently have? ' +
-      '(Credit cards, personal loans, etc. — not including mortgage or auto loans.)'
+      'First, about how much unsecured debt do you currently have? ' +
+      '(Credit cards, personal loans — not including mortgage or auto loans.)'
     );
     renderOptions([
       {
@@ -372,113 +366,45 @@ document.addEventListener('DOMContentLoaded', function() {
         label: '$15,000 - $24,999',
         onClick: () => {
           addUserMessage('$15,000 - $24,999');
-          fadeOutAllAndThen(stepUSResidency);
+          fadeOutAllAndThen(stepAbilityToPay);
         }
       },
       {
         label: '$25,000 - $39,999',
         onClick: () => {
           addUserMessage('$25,000 - $39,999');
-          fadeOutAllAndThen(stepUSResidency);
+          fadeOutAllAndThen(stepAbilityToPay);
         }
       },
       {
         label: '$40,000 or more',
         onClick: () => {
           addUserMessage('$40,000 or more');
-          fadeOutAllAndThen(stepUSResidency);
+          fadeOutAllAndThen(stepAbilityToPay);
         }
       }
     ]);
   }
 
-  function stepUSResidency() {
-    addBotMessage('Do you currently live in the United States?');
-    renderOptions([
-      {
-        label: 'Yes, I live in the U.S.',
-        onClick: () => {
-          addUserMessage('Yes, I live in the U.S.');
-          fadeOutAllAndThen(stepStateAvailability);
-        }
-      },
-      {
-        label: 'No, I live outside the U.S.',
-        onClick: () => {
-          addUserMessage('No, I live outside the U.S.');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'Right now this particular project is limited to U.S. residents only.',
-              'non_us'
-            );
-          });
-        }
-      }
-    ]);
-  }
-
-  function stepStateAvailability() {
+  function stepAbilityToPay() {
     addBotMessage(
-      'Our partners only operate in certain U.S. states. To the best of your knowledge, ' +
-      'do you live in a state where debt relief programs like this are allowed? ' +
-      '(Most states are included, but not all.)'
+      'Could you realistically afford at least about $250–$350 per month toward a structured plan if it helped reduce your debt?'
     );
     renderOptions([
       {
-        label: 'Yes, I believe my state is eligible',
-        onClick: () => {
-          addUserMessage('Yes, my state is eligible');
-          fadeOutAllAndThen(stepPaymentAbility);
-        }
-      },
-      {
-        label: 'No, I know my state does not allow this',
-        onClick: () => {
-          addUserMessage('No, my state does not allow this');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'This project is limited to states where our partners are allowed to operate.',
-              'state_not_allowed'
-            );
-          });
-        }
-      },
-      {
-        label: "I'm not sure",
-        onClick: () => {
-          addUserMessage("I'm not sure");
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'For compliance reasons, this project requires participants who are confident ' +
-              'that their state allows these programs.',
-              'state_unknown'
-            );
-          });
-        }
-      }
-    ]);
-  }
-
-  function stepPaymentAbility() {
-    addBotMessage(
-      'Could you realistically afford to put at least about $300 per month toward a structured plan ' +
-      'if it helped you resolve your high balances faster?'
-    );
-    renderOptions([
-      {
-        label: 'Yes, I could afford that',
+        label: 'Yes',
         onClick: () => {
           addUserMessage('Yes, I could afford that');
-          fadeOutAllAndThen(stepTCPA1);
+          fadeOutAllAndThen(stepBehindPayments);
         }
       },
       {
-        label: 'No, I really cannot',
+        label: 'No',
         onClick: () => {
           addUserMessage('No, I really cannot');
           fadeOutAllAndThen(() => {
             disqualify(
-              'This project focuses on people who are able to commit at least around $300/month to a structured plan.',
+              'This project focuses on people who are able to commit at least around $250–$350 per month to a structured plan.',
               'cannot_afford'
             );
           });
@@ -487,84 +413,102 @@ document.addEventListener('DOMContentLoaded', function() {
     ]);
   }
 
-  function stepTCPA1() {
+  function stepBehindPayments() {
     addBotMessage(
-      'Are you willing to receive a phone call from a financial specialist to discuss your situation ' +
-      'and possible options?'
+      'Are you currently behind on your credit card or loan payments?'
     );
     renderOptions([
       {
-        label: 'Yes, I’m willing to receive a call',
+        label: 'Yes, 30+ days behind',
         onClick: () => {
-          addUserMessage('Yes, I’m willing to receive a call');
-          fadeOutAllAndThen(stepTCPA2);
+          addUserMessage('Yes, 30+ days behind');
+          fadeOutAllAndThen(stepHardshipReason);
         }
       },
       {
-        label: 'No, I do not want any calls',
+        label: 'Not yet, but struggling',
         onClick: () => {
-          addUserMessage('No, I do not want any calls');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'This project is only for people who are open to being contacted by phone.',
-              'no_call_consent'
-            );
-          });
+          addUserMessage('Not yet, but struggling');
+          fadeOutAllAndThen(stepHardshipReason);
+        }
+      },
+      {
+        label: 'No, fully current',
+        onClick: () => {
+          addUserMessage('No, fully current');
+          fadeOutAllAndThen(stepHardshipReason);
         }
       }
     ]);
   }
 
-  function stepTCPA2() {
+  function stepHardshipReason() {
     addBotMessage(
-      'Do you agree that you may be contacted by phone or text, including automated or prerecorded messages, ' +
-      'regarding financial services related to this program?'
+      'What has caused your debt to increase the most?'
     );
     renderOptions([
       {
-        label: 'Yes, I agree',
+        label: 'Job loss',
         onClick: () => {
-          addUserMessage('Yes, I agree');
-          fadeOutAllAndThen(stepPhoneValidity);
+          addUserMessage('Job loss');
+          fadeOutAllAndThen(stepNumCreditLines);
         }
       },
       {
-        label: 'No, I do not agree',
+        label: 'Medical expenses',
         onClick: () => {
-          addUserMessage('No, I do not agree');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'For legal reasons, we can only include people who consent to being contacted about this program.',
-              'no_tcp_consent'
-            );
-          });
+          addUserMessage('Medical expenses');
+          fadeOutAllAndThen(stepNumCreditLines);
+        }
+      },
+      {
+        label: 'Cost of living',
+        onClick: () => {
+          addUserMessage('Cost of living');
+          fadeOutAllAndThen(stepNumCreditLines);
+        }
+      },
+      {
+        label: 'Divorce / family situation',
+        onClick: () => {
+          addUserMessage('Divorce / family situation');
+          fadeOutAllAndThen(stepNumCreditLines);
+        }
+      },
+      {
+        label: 'Other',
+        onClick: () => {
+          addUserMessage('Other');
+          fadeOutAllAndThen(stepNumCreditLines);
         }
       }
     ]);
   }
 
-  function stepPhoneValidity() {
+  function stepNumCreditLines() {
     addBotMessage(
-      'Will you be providing your real personal mobile phone number that you can actually answer?'
+      'How many credit cards or unsecured accounts are you juggling right now?'
     );
     renderOptions([
       {
-        label: 'Yes, it will be my real mobile',
+        label: '1',
         onClick: () => {
-          addUserMessage('Yes, it will be my real mobile');
+          addUserMessage('1 account');
           fadeOutAllAndThen(stepDuplicate);
         }
       },
       {
-        label: 'No, it might be a fake / other number',
+        label: '2–3',
         onClick: () => {
-          addUserMessage('No, it might be a fake / other number');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'This project requires valid contact information so the specialist can actually reach you.',
-              'invalid_contact'
-            );
-          });
+          addUserMessage('2–3 accounts');
+          fadeOutAllAndThen(stepDuplicate);
+        }
+      },
+      {
+        label: '4 or more',
+        onClick: () => {
+          addUserMessage('4 or more accounts');
+          fadeOutAllAndThen(stepDuplicate);
         }
       }
     ]);
@@ -572,12 +516,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function stepDuplicate() {
     addBotMessage(
-      'Have you already applied for a debt relief or consolidation program in the last 30 days ' +
-      'with your current phone number?'
+      'Have you already spoken with or applied to any debt-relief company in the last 30 days?'
     );
     renderOptions([
       {
-        label: 'Yes, I already applied recently',
+        label: 'Yes, I already applied',
         onClick: () => {
           addUserMessage('Yes, I already applied recently');
           fadeOutAllAndThen(() => {
@@ -589,33 +532,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       },
       {
-        label: 'No, this is my first time applying',
+        label: 'No, this is my first time',
         onClick: () => {
           addUserMessage('No, this is my first time applying');
-          fadeOutAllAndThen(stepLanguage);
+          fadeOutAllAndThen(stepTCPAConsent);
         }
       }
     ]);
   }
 
-  function stepLanguage() {
-    addBotMessage('Are you able to comfortably complete the call and discussion in English?');
+  function stepTCPAConsent() {
+    addBotMessage(
+      'Are you okay with receiving a phone call from a financial specialist to discuss your options?'
+    );
     renderOptions([
       {
-        label: 'Yes, I can speak English',
+        label: 'Yes',
         onClick: () => {
-          addUserMessage('Yes, I can speak English');
+          addUserMessage('Yes, I’m okay with a call');
           fadeOutAllAndThen(stepIntent);
         }
       },
       {
-        label: 'No, I only speak Spanish or another language',
+        label: 'No',
         onClick: () => {
-          addUserMessage('No, I only speak Spanish or another language');
+          addUserMessage('No, I do not want any calls');
           fadeOutAllAndThen(() => {
             disqualify(
-              'Right now this particular project is only set up for English-language calls.',
-              'language'
+              'This project is only for people who agree to receive a call from a specialist.',
+              'no_tcp_consent'
             );
           });
         }
@@ -625,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function stepIntent() {
     addBotMessage(
-      'Are you actively looking for real help with your debt right now (not just testing or clicking for a reward)?'
+      'Are you genuinely looking for help resolving your debt (not just testing or browsing)?'
     );
     renderOptions([
       {
@@ -636,9 +581,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       },
       {
-        label: 'No, I’m just testing / curious',
+        label: 'No, I’m just testing',
         onClick: () => {
-          addUserMessage('No, I’m just testing / curious');
+          addUserMessage('No, I’m just testing / browsing');
           fadeOutAllAndThen(() => {
             disqualify(
               'This project is only for people who are actively looking for real help with their debt.',
@@ -654,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function() {
     addBotMessage('Great, you look like a strong match for this study. 🎉');
     addBotMessage(
       'Before we move forward, please watch this short video about the program. ' +
-      'When you\'re done, scroll down and click “I\'ve watched the video” to continue.'
+      'When you\'re done, please scroll down and click “I\'ve watched the video” to continue.'
     );
     addVideoBubble();
 
@@ -701,9 +646,6 @@ document.addEventListener('DOMContentLoaded', function() {
     ]);
   }
 
-  // -------------------------------------------------------------
-  // Mandatory Email Collection Gate - integrates your Brevo form
-  // -------------------------------------------------------------
   function stepEmailGate() {
     addBotMessage(
       'Before we can proceed to verification, your email is <strong>mandatory</strong> so we can send you a reminder and summary of your options. ' +
@@ -718,7 +660,6 @@ document.addEventListener('DOMContentLoaded', function() {
                  class="sib-container--large sib-container--vertical"
                  style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:3px; border-width:1px; border-color:#C0CCD9; border-style:solid; margin:0 auto;">
 
-              <!-- Hidden iframe so submit goes to Brevo without leaving this page -->
               <iframe name="brevo_iframe" id="brevo_iframe" style="display:none;"></iframe>
 
               <form id="sib-form"
@@ -742,220 +683,4 @@ document.addEventListener('DOMContentLoaded', function() {
                   </div>
                 </div>
 
-                <div style="padding: 8px 0;">
-                  <div class="sib-input sib-form-block">
-                    <div class="form__entry entry_block">
-                      <div class="form__label-row">
-                        <label class="entry__label"
-                               style="font-weight: 700; text-align:left; font-size:14px; font-family:Helvetica, sans-serif; color:#3c4858;"
-                               for="EMAIL" data-required="*">
-                          Enter your email address
-                        </label>
-
-                        <div class="entry__field">
-                          <input class="input"
-                                 type="text"
-                                 id="EMAIL"
-                                 name="EMAIL"
-                                 autocomplete="off"
-                                 placeholder="EMAIL"
-                                 data-required="true"
-                                 required />
-                        </div>
-                      </div>
-
-                      <label id="email_error"
-                             class="entry__error entry__error--primary"
-                             style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px;">
-                      </label>
-                      <label class="entry__specification"
-                             style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
-                        Provide your email address to subscribe. For example: abc@xyz.com
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div style="padding: 8px 0;">
-                  <div class="sib-optin sib-form-block">
-                    <div class="form__entry entry_mcq">
-                      <div class="form__label-row">
-                        <div class="entry__choice">
-                          <label style="display:flex; align-items:flex-start; gap:6px;">
-                            <input type="checkbox"
-                                   class="input_replaced"
-                                   value="1"
-                                   id="OPT_IN"
-                                   name="OPT_IN" />
-                            <span class="checkbox checkbox_tick_positive"></span>
-                            <span style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858;">
-                              I agree to receive your email and accept the data privacy statement.
-                            </span>
-                          </label>
-                        </div>
-                      </div>
-                      <label id="optin_error"
-                             class="entry__error entry__error--primary"
-                             style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px;">
-                      </label>
-                      <label class="entry__specification"
-                             style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
-                        You may unsubscribe at any time using the link in our emails.
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div style="padding: 8px 0;">
-                  <div class="sib-form-block" style="text-align: left">
-                    <button id="brevoSubmitBtn"
-                            class="sib-form-block__button sib-form-block__button-with-loader"
-                            style="font-size:14px; text-align:center; font-weight:700; font-family:Helvetica, sans-serif; color:#FFFFFF; background-color:#3E4857; border-radius:9999px; border-width:0px; width:100%; padding:8px 0;"
-                            type="submit">
-                      SUBMIT
-                    </button>
-                  </div>
-                </div>
-
-                <input type="text" name="email_address_check" value="" class="input--hidden">
-                <input type="hidden" name="locale" value="en">
-                <input type="hidden" name="html_type" value="simple">
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    const formWrapper = document.createElement('div');
-    formWrapper.className = 'w-full mb-4';
-    formWrapper.innerHTML = formHtml;
-    chatWindow.appendChild(formWrapper);
-
-    // Create the final "Continue" button (DISABLED by default)
-    clearControls();
-    const continueButton = document.createElement('button');
-    continueButton.id = 'mandatoryContinueBtn';
-    continueButton.className =
-      'action-btn w-full px-5 py-3 rounded-full bg-slate-400 text-white font-bold disabled-btn cursor-not-allowed';
-    continueButton.textContent = 'Continue to Finish Screen (Email Required)';
-    continueButton.disabled = true;
-    chatControls.appendChild(continueButton);
-
-    continueButton.addEventListener('click', () => {
-      if (!continueButton.disabled) {
-        addUserMessage('Continue to Finish Screen');
-        fadeOutAllAndThen(stepWaitAndFinish);
-      }
-    });
-
-    // Attach validation + gating to Brevo form
-    const sibForm    = document.getElementById('sib-form');
-    const emailInput = document.getElementById('EMAIL');
-    const optIn      = document.getElementById('OPT_IN');
-    const emailErr   = document.getElementById('email_error');
-    const optinErr   = document.getElementById('optin_error');
-    const submitBtn  = document.getElementById('brevoSubmitBtn');
-
-    if (sibForm) {
-      sibForm.addEventListener('submit', function(e) {
-        let hasError = false;
-        emailErr.style.display = 'none';
-        optinErr.style.display = 'none';
-
-        const emailVal = (emailInput.value || '').trim();
-
-        if (!emailVal) {
-          hasError = true;
-          emailErr.textContent = 'Please enter your email address.';
-          emailErr.style.display = 'block';
-        } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)) {
-          hasError = true;
-          emailErr.textContent = 'Please enter a valid email address.';
-          emailErr.style.display = 'block';
-        }
-
-        if (!optIn.checked) {
-          hasError = true;
-          optinErr.textContent = 'Please agree to the privacy statement to continue.';
-          optinErr.style.display = 'block';
-        }
-
-        if (hasError) {
-          e.preventDefault();
-          return;
-        }
-
-        // Front-end validation passed — let the browser POST to Brevo via hidden iframe
-        // and then treat as success after a short delay.
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting...';
-        addBotMessage('Saving your email securely, please wait...');
-
-        // Do NOT e.preventDefault() here — we want the POST to go to Brevo.
-        setTimeout(() => {
-          const brevoBlock = document.getElementById('brevoBlock');
-          if (brevoBlock) brevoBlock.classList.add('hidden');
-
-          continueButton.disabled = false;
-          continueButton.classList.remove('disabled-btn', 'bg-slate-400', 'cursor-not-allowed');
-          continueButton.classList.add('bg-green-600', 'hover:bg-green-700');
-          continueButton.textContent = 'Continue to Finish Screen';
-
-          addBotMessage('✅ <strong>Success!</strong> Your email is saved. Please click the green button below to finalize your participation.');
-        }, 3500); // small delay so Brevo has time to receive the POST
-      });
-    }
-
-    scrollToBottom();
-  }
-
-  // 60s waiting step before sending to Worker
-  function stepWaitAndFinish() {
-    let seconds = 60;
-
-    addBotMessage(
-      'Thank you. We will now verify your form and email submission with our partner system. ' +
-      'This usually takes under a minute.'
-    );
-
-    const countdownBubble = document.createElement('div');
-    countdownBubble.className = 'chat-bubble chat-bot';
-    countdownBubble.id = 'countdownBubble';
-    countdownBubble.textContent = 'Checking your submission... 60 seconds remaining';
-    chatWindow.appendChild(countdownBubble);
-    scrollToBottom();
-
-    renderOptions([
-      {
-        label: 'Cancel and exit',
-        onClick: () => {
-          window.location.href = getScreenoutUrl('user_cancel_wait');
-        }
-      }
-    ]);
-
-    const interval = setInterval(() => {
-      seconds--;
-      if (seconds <= 0) {
-        clearInterval(interval);
-        countdownBubble.textContent = 'Done! Redirecting now...';
-        scrollToBottom();
-        setTimeout(() => {
-          window.location.href = workerFinishUrl;
-        }, 800);
-      } else {
-        countdownBubble.textContent =
-          'Checking your submission... ' + seconds + ' seconds remaining';
-      }
-    }, 1000);
-  }
-
-  // Start chat
-  startChat();
-});
-</script>
-
-</body>
-</html>
-
+                ...

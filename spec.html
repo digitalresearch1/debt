@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // MarketCall offer link with subid=transaction_id
-  const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83'; // NEW LINK
+  const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
   const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
 
   // Worker finish URL (auto-routes PS/TR based on src)
@@ -778,7 +778,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   </div>
                 </div>
 
-                <div style="padding: 8px 0%;">
+                <div style="padding: 8px 0;">
                   <div class="sib-input sib-form-block">
                     <div class="form__entry entry_block">
                       <div class="form__label-row">
@@ -923,6 +923,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Front-end validation passed — let the browser POST to Brevo via hidden iframe
+        // and then treat as success after a short delay.
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting...';
         addBotMessage('Saving your email securely, please wait...');
@@ -938,7 +939,7 @@ document.addEventListener('DOMContentLoaded', function() {
           continueButton.textContent = 'Continue to Finish Screen';
 
           addBotMessage('✅ <strong>Success!</strong> Your email is saved. Please click the green button below to finalize your participation.');
-        }, 3500);
+        }, 3500); // small delay so Brevo has time to receive the POST
       });
     }
 
@@ -993,4 +994,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-

@@ -10,9 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- TheoremReach SHA3 library -->
-  <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.2/build/sha3.min.js"></script>
-
   <!-- Brevo base styles (from Simple HTML embed) -->
   <style>
     @font-face {
@@ -131,8 +128,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const urlParams = new URLSearchParams(window.location.search);
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
 
-  // src=ps (PureSpectrum) or src=tr (TheoremReach)
-  const src = urlParams.get('src') || 'ps';
+  // Force PureSpectrum only
+  const src = 'ps';
 
   if (!transactionId) {
     transactionId = 'tx_' + Date.now().toString(36) +
@@ -143,35 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const chatControls = document.getElementById('chatControls');
 
   // =========================
-  // TheoremReach constants
-  // =========================
-  const TR_BASE    = 'https://surveys.theoremreach.com/respondent_result';
-  const SECRET_KEY = 'b747a0bc7e7e618c2df9abdd0ab6e2fa89736c86';
-
-  function buildTRUrl(result, reason) {
-    if (typeof sha3_256 === 'undefined') {
-      console.error("SHA3 library not loaded.");
-      return TR_BASE;
-    }
-
-    const baseUrl =
-      TR_BASE +
-      '?result=' + encodeURIComponent(result) +
-      '&transaction_id=' + encodeURIComponent(transactionId) +
-      '&reason=' + encodeURIComponent(reason || 'screen_out');
-
-    const hashInput = baseUrl + SECRET_KEY;
-    const enc = sha3_256(hashInput);
-
-    return baseUrl + '&enc=' + enc;
-  }
-
-  // TheoremReach COMPLETE + SCREENOUT URLs (only used if src=tr)
-  const trCompleteUrl  = buildTRUrl(10, 'survey_complete');
-  const trScreenoutUrl = buildTRUrl(4,  'screen_out');
-
-  // =========================
-  // Other URLs
+  // PureSpectrum URLs
   // =========================
 
   // PureSpectrum screenout URL (st=18)
@@ -179,24 +148,19 @@ document.addEventListener('DOMContentLoaded', function() {
     `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
 
   function getScreenoutUrl(reasonCode) {
-    if (src === 'tr') {
-      return buildTRUrl(4, reasonCode || 'screen_out');
-    } else {
-      return psScreenoutUrl;
-    }
+    // We ignore reasonCode for PS; PS only needs st + transaction_id
+    return psScreenoutUrl;
   }
 
   // MarketCall offer link with subid=transaction_id
   const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
   const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
 
-  // Worker finish URL (auto-routes PS/TR based on src)
+  // Worker finish URL (PureSpectrum only)
   const workerFinishUrl =
     'https://marketcall.kayembakasongo.workers.dev/finish' +
     '?transaction_id=' + encodeURIComponent(transactionId) +
-    '&src=' + encodeURIComponent(src) +
-    '&tr_complete=' + encodeURIComponent(trCompleteUrl) +
-    '&tr_screenout=' + encodeURIComponent(trScreenoutUrl);
+    '&src=ps';
 
   // ----- Helpers -----
   function scrollToBottom() {

@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return psScreenoutUrl;
   }
 
+  // OFFER LINK (THIS VERSION USES p98vjj0e83)
   const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
 
@@ -214,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const title = document.createElement('p');
     title.className = 'text-[11px] font-semibold text-slate-700 mb-2';
     title.textContent =
-      'Here is a short video explaining the program for people with high balances:';
+      'Here is a short Facebook video explaining the program for people with high balances:';
     wrapper.appendChild(title);
 
     const videoContainer = document.createElement('div');
@@ -241,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const hint = document.createElement('p');
     hint.className = 'text-[11px] text-slate-600 mt-2';
     hint.textContent =
-      'When you finish watching, scroll down and click “I\'ve watched the video” to keep going.';
+      'Please watch the Facebook video. The Next button will unlock after a short moment.';
     wrapper.appendChild(hint);
 
     chatWindow.appendChild(wrapper);
@@ -264,8 +265,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const desc = document.createElement('p');
     desc.className = 'text-xs text-slate-700 text-center';
-    desc.textContent =
-      'Click the button below to open the form. Fill everything out honestly, then return to this page.';
+    desc.innerHTML =
+      'Click the button below to open the form. Fill everything out honestly, then return to this page.<br><br>' +
+      '<strong>If you see a question like “Where did you hear about this program?”, please select <span style="text-decoration:underline;">Facebook</span> so your answers match this study.</strong>';
     card.appendChild(desc);
 
     const linkBtn = document.createElement('a');
@@ -443,17 +445,99 @@ document.addEventListener('DOMContentLoaded', function() {
   function finishQual() {
     addBotMessage('Great, you look like a strong match for this study. 🎉');
     addBotMessage(
-      'Before we move forward, please watch this short video about the program. ' +
-      'When you\'re done, scroll down and click “I\'ve watched the video” to continue.'
+      'Before we move forward, please watch this short Facebook video about the program. ' +
+      'The Next button will unlock after a short moment.'
     );
     addVideoBubble();
 
+    // Render the "I've watched the video" button but lock it for 40 seconds
     renderOptions([
       {
         label: "I've watched the video",
         onClick: () => {
           addUserMessage("I've watched the video");
+          fadeOutAllAndThen(stepSourceQuestion);
+        }
+      }
+    ]);
+
+    // Lock the button immediately
+    const btn = chatControls.querySelector('button');
+    if (btn) {
+      btn.disabled = true;
+      btn.classList.add('disabled-btn', 'bg-slate-300', 'cursor-not-allowed');
+      btn.classList.remove('hover:bg-slate-100');
+
+      let waitSeconds = 40;
+      const originalLabel = "I've watched the video";
+
+      btn.textContent = originalLabel + ` (${waitSeconds}s)`;
+
+      const countdown = setInterval(() => {
+        waitSeconds--;
+        if (waitSeconds <= 0) {
+          clearInterval(countdown);
+          btn.disabled = false;
+          btn.classList.remove('disabled-btn', 'bg-slate-300', 'cursor-not-allowed');
+          btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'text-white');
+          btn.textContent = originalLabel;
+          addBotMessage(
+            '✅ You can now continue. If you haven\'t already, please make sure you watched the Facebook video so the call makes sense.'
+          );
+        } else {
+          btn.textContent = originalLabel + ` (${waitSeconds}s)`;
+        }
+      }, 1000);
+    }
+  }
+
+  // New step: force “Facebook” as source
+  function stepSourceQuestion() {
+    addBotMessage(
+      'Quick check: where did you first hear about this debt relief program?'
+    );
+    addBotMessage(
+      '<span style="font-size:11px; color:#4b5563;">For this particular study, we are only including people who saw it on Facebook.</span>'
+    );
+    renderOptions([
+      {
+        label: 'Facebook',
+        onClick: () => {
+          addUserMessage('Facebook');
           fadeOutAllAndThen(stepWebsiteLinkStep);
+        }
+      },
+      {
+        label: 'Google / Search',
+        onClick: () => {
+          addUserMessage('Google / Search');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'For this project, we are only including people who first saw this program on Facebook.'
+            );
+          });
+        }
+      },
+      {
+        label: 'A friend or family member',
+        onClick: () => {
+          addUserMessage('A friend or family member');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'For this project, we are only including people who first saw this program on Facebook.'
+            );
+          });
+        }
+      },
+      {
+        label: 'Another website / Other',
+        onClick: () => {
+          addUserMessage('Another website / Other');
+          fadeOutAllAndThen(() => {
+            disqualify(
+              'For this project, we are only including people who first saw this program on Facebook.'
+            );
+          });
         }
       }
     ]);
@@ -463,6 +547,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // OFFER STEP
   // ------------------------
   function stepWebsiteLinkStep() {
+    addBotMessage(
+      'Perfect, thanks! We\'ll mark that you discovered this program on <strong>Facebook</strong> for this study.'
+    );
     addBotMessage(
       'Next, you\'ll open a secure website in a new tab to complete the full financial form. ' +
       'Please fill it out with accurate information, then return to this page. ' +

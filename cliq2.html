@@ -1,0 +1,727 @@
+<!DOCTYPE HTML>
+<html lang="en" class="supernova">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
+  <meta name="HandheldFriendly" content="true">
+  <title>Financial Wellness Research Study</title>
+
+  <!-- Fonts + Tailwind -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Brevo base styles -->
+  <style>
+    @font-face {
+      font-display: block;
+      font-family: Roboto;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/7529907e9eaf8ebb5220c5f9850e3811.woff2) format("woff2"),
+           url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/25c678feafdc175a70922a116c9be3e7.woff) format("woff");
+    }
+
+    @font-face {
+      font-display: fallback;
+      font-family: Roboto;
+      font-weight: 600;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/6e9caeeafb1f3491be3e32744bc30440.woff2) format("woff2"),
+           url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/71501f0d8d5aa95960f6475d5487d4c2.woff) format("woff");
+    }
+
+    @font-face {
+      font-display: fallback;
+      font-family: Roboto;
+      font-weight: 700;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/3ef7cf158f310cf752d5ad08cd0e7e60.woff2) format("woff2"),
+           url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/ece3a1d82f18b60bcce0211725c476aa.woff) format("woff");
+    }
+
+    #sib-container input::placeholder {
+      text-align: left;
+      font-family: Helvetica, sans-serif;
+      color: #c0ccda;
+    }
+
+    #sib-container a {
+      text-decoration: underline;
+      color: #2BB2FC;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+    }
+
+    .form-all {
+      box-shadow: 0 4px 20px rgba(15,23,42,0.1);
+    }
+
+    .form-header-group {
+      background: linear-gradient(120deg, #4f46e5 0%, #6366f1 50%, #9333ea 100%);
+    }
+
+    .action-btn {
+      transition: background-color 0.3s, transform 0.2s;
+      cursor: pointer;
+    }
+    .action-btn:hover:not(.disabled-btn) {
+      transform: translateY(-2px);
+    }
+
+    .disabled-btn {
+      opacity: 0.5;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    .video-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      background: #000;
+    }
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+    }
+
+    @media (max-width: 768px) {
+      .video-wrapper { height: 220px; }
+    }
+    @media (min-width: 769px) {
+      .video-wrapper { height: 380px; }
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border-radius: 9999px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<div class="form-all w-full max-w-5xl mx-auto bg-white rounded-2xl p-4 md:p-8 my-6">
+  <!-- HEADER -->
+  <div class="form-header-group header-large mb-6 p-6 rounded-xl text-white text-center">
+    <p class="badge bg-white/10 backdrop-blur text-xs md:text-sm justify-center mb-2">
+      🔒 Private financial wellness research study
+    </p>
+    <h1 class="text-2xl md:text-3xl font-bold">Financial Wellness Research Study</h1>
+    <p class="mt-2 text-sm md:text-base text-indigo-100">
+      Please follow each step carefully. Only complete and verified participants are approved.
+    </p>
+  </div>
+
+  <!-- WHO CAN PARTICIPATE -->
+  <section class="mb-6 bg-indigo-50 border border-indigo-100 rounded-xl p-4 md:p-5">
+    <h2 class="text-lg md:text-xl font-semibold text-indigo-900 mb-2">
+      Who is this for?
+    </h2>
+    <p class="text-sm md:text-base text-indigo-900 mb-3">
+      We are speaking with people who:
+    </p>
+    <ul class="list-disc list-inside text-sm md:text-base text-indigo-900 space-y-1">
+      <li>Have significant unsecured debt (credit cards, personal loans, medical bills).</li>
+      <li>Are actively looking for real help, not just testing a link.</li>
+      <li>Are open to a call with a financial specialist about options.</li>
+    </ul>
+  </section>
+
+  <!-- STEP 1: PRESCREENER -->
+  <section id="step1" class="mb-6 bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5">
+    <h2 class="text-lg md:text-xl font-semibold text-slate-900 mb-1">
+      Step 1 — Quick eligibility check
+    </h2>
+    <p class="text-sm text-slate-600 mb-4">
+      Answer these 3 short questions. If you don’t match this project, you’ll be redirected back to PureSpectrum.
+    </p>
+
+    <!-- Q1 -->
+    <div class="mb-4">
+      <p class="font-semibold text-slate-800 text-sm md:text-base mb-1">
+        1. About how much unsecured debt do you currently have?<br>
+        <span class="text-xs text-slate-500">
+          (Credit cards, personal loans &amp; similar — do not include mortgage or auto loans.)
+        </span>
+      </p>
+      <div class="mt-2 space-y-1 text-sm text-slate-800">
+        <label class="flex items-center gap-2">
+          <input type="radio" name="q1_debt" value="lt5k" class="h-4 w-4">
+          <span>Less than $5,000</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="radio" name="q1_debt" value="5k_9999" class="h-4 w-4">
+          <span>$5,000 - $9,999</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="radio" name="q1_debt" value="10k_14999" class="h-4 w-4">
+          <span>$10,000 - $14,999</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="radio" name="q1_debt" value="15k_24999" class="h-4 w-4">
+          <span>$15,000 - $24,999</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="radio" name="q1_debt" value="25k_39999" class="h-4 w-4">
+          <span>$25,000 - $39,999</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="radio" name="q1_debt" value="40k_plus" class="h-4 w-4">
+          <span>$40,000 or more</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="mb-4">
+      <p class="font-semibold text-slate-800 text-sm md:text-base mb-1">
+        2. Could you realistically afford at least about $250–$350 per month toward a structured plan
+        if it helped reduce your debt?
+      </p>
+      <div class="mt-2 space-y-1 text-sm text-slate-800">
+        <label class="flex items-center gap-2">
+          <input type="radio" name="q2_pay" value="yes" class="h-4 w-4">
+          <span>Yes, I could afford that</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="radio" name="q2_pay" value="no" class="h-4 w-4">
+          <span>No, I really cannot</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="mb-4">
+      <p class="font-semibold text-slate-800 text-sm md:text-base mb-1">
+        3. Are you seriously looking for real help with your debt and okay with receiving a phone call
+        from a financial specialist about your options?
+      </p>
+      <div class="mt-2 space-y-1 text-sm text-slate-800">
+        <label class="flex items-center gap-2">
+          <input type="radio" name="q3_intent" value="yes" class="h-4 w-4">
+          <span>Yes, I’m seriously looking for help and okay with a call</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="radio" name="q3_intent" value="no" class="h-4 w-4">
+          <span>No, I’m just testing / not okay with a call</span>
+        </label>
+      </div>
+    </div>
+
+    <p id="eligibilityMessage" class="text-sm mt-2 hidden"></p>
+
+    <div class="mt-4 flex flex-wrap gap-3">
+      <button id="btnCheckEligibility"
+              class="action-btn bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full">
+        Check my eligibility
+      </button>
+      <button id="btnExitEarly"
+              class="action-btn bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium text-xs px-4 py-2 rounded-full">
+        Exit and return to PureSpectrum
+      </button>
+    </div>
+  </section>
+
+  <!-- STEP 2: VIDEO -->
+  <section id="step2" class="mb-6 bg-white border border-slate-200 rounded-xl p-4 md:p-5 opacity-40">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-lg md:text-xl font-semibold text-slate-900">
+        Step 2 — Watch the short explainer video
+      </h2>
+      <span class="text-xs text-slate-500">Unlocked after eligibility</span>
+    </div>
+
+    <p class="text-sm text-slate-600 mb-3">
+      Please watch this short Facebook video that explains how the program works for people with higher balances.
+      The “Continue” button will unlock after a short delay.
+    </p>
+
+    <div class="video-wrapper mb-3">
+      <iframe
+        src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1205740158030889%2F&show_text=true&width=860&t=0"
+        style="border:none; overflow:hidden;" scrolling="no" frameborder="0"
+        allowfullscreen="true"
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+      </iframe>
+    </div>
+
+    <p id="videoHint" class="text-[11px] text-slate-600 mb-3">
+      Please watch the Facebook video. The button below will unlock after a moment.
+    </p>
+
+    <button id="btnVideoNext"
+            class="action-btn disabled-btn bg-slate-300 text-white font-semibold text-sm px-5 py-2.5 rounded-full"
+            disabled>
+      I watched the video
+    </button>
+  </section>
+
+  <!-- STEP 3: OPEN OFFER FORM -->
+  <section id="step3" class="mb-6 bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5 opacity-40">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-lg md:text-xl font-semibold text-slate-900">
+        Step 3 — Open the secure financial form
+      </h2>
+      <span class="text-xs text-slate-500">Unlocked after the video</span>
+    </div>
+
+    <p class="text-sm text-slate-600 mb-3">
+      The link below opens a secure website in a new tab where you will complete your full financial form.  
+      Please fill it out honestly and completely.
+    </p>
+
+    <div class="w-full max-w-xl bg-white border border-slate-200 rounded-xl shadow-sm p-4 mx-auto mb-3">
+      <p class="text-xs text-slate-700 mb-3 text-center">
+        <strong>Important:</strong> If you see a question like
+        “Where did you hear about this program?” on the external form,
+        please select <span class="font-semibold underline">Facebook</span>
+        so your answers match this research.
+      </p>
+      <div class="flex flex-col items-center gap-2">
+        <a id="offerLink"
+           href="#"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="action-btn inline-flex items-center justify-center px-5 py-3 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled-btn pointer-events-none">
+          Open secure financial form
+        </a>
+        <p class="text-[11px] text-slate-500 text-center">
+          After submitting the form in the new tab, come back here and click
+          <strong>“I completed the form”</strong> below.
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <button id="btnFormDone"
+              class="action-btn bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full disabled-btn"
+              disabled>
+        I completed the form
+      </button>
+      <button id="btnFormQuit"
+              class="action-btn bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium text-xs px-4 py-2 rounded-full">
+        I don't want to continue
+      </button>
+    </div>
+  </section>
+
+  <!-- STEP 4: BREVO EMAIL GATE -->
+  <section id="step4" class="mb-6 bg-white border border-slate-200 rounded-xl p-4 md:p-5 opacity-40">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-lg md:text-xl font-semibold text-slate-900">
+        Step 4 — Mandatory email reminder
+      </h2>
+      <span class="text-xs text-slate-500">Unlocked after form completion</span>
+    </div>
+
+    <p class="text-sm text-slate-600 mb-3">
+      Before we can verify your participation, your email is
+      <strong>required</strong> so we can send a reminder and summary of your options.
+      Submit your email below. Once it is saved, the green button to finish will unlock.
+    </p>
+
+    <!-- Brevo embed -->
+    <div id="brevoBlock" class="w-full mb-4">
+      <div class="sib-form" style="text-align: center; background-color: #EFF2F7;">
+        <div id="sib-form-container" class="sib-form-container">
+          <div id="sib-container"
+               class="sib-container--large sib-container--vertical"
+               style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:3px; border-width:1px; border-color:#C0CCD9; border-style:solid; margin:0 auto;">
+
+            <!-- Hidden iframe so the form posts to Brevo without leaving this page -->
+            <iframe name="brevo_iframe" id="brevo_iframe" style="display:none;"></iframe>
+
+            <form id="sib-form"
+                  method="POST"
+                  action="https://52bcaf92.sibforms.com/serve/MUIFAO5vlejSCs-rWtk8_hSGgyILb9Oi-aOLbS_zI5_FjrtRovBWkBZlGVuoCXxEbmOMZMrdo0ZllgcfYtt7jPnKOHgyHT2TYdf3Q-xFXArnK8ikp21kPr7-iXsfMeK4CtD4cAPf2oHHMJLw5OtgVzgyKMt0hXTJ3UiMJVGUXzHbWENuGdgb7j-x2xeZ6iW5f9ix4gocwCjOBdct"
+                  target="brevo_iframe">
+
+              <div style="padding: 8px 0;">
+                <div class="sib-form-block"
+                     style="font-size:18px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;">
+                  <p>Survey feedback reminder</p>
+                </div>
+              </div>
+
+              <div style="padding: 4px 0;">
+                <div class="sib-form-block"
+                     style="font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;">
+                  <div class="sib-text-form-block">
+                    <p>Please provide your email so we can send you a reminder about this survey and the outcome of your request.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding: 8px 0;">
+                <div class="sib-input sib-form-block">
+                  <div class="form__entry entry_block">
+                    <div class="form__label-row">
+                      <label class="entry__label"
+                             style="font-weight: 700; text-align:left; font-size:14px; font-family:Helvetica, sans-serif; color:#3c4858;"
+                             for="EMAIL" data-required="*">
+                        Enter your email address
+                      </label>
+
+                      <div class="entry__field">
+                        <input class="input"
+                               type="text"
+                               id="EMAIL"
+                               name="EMAIL"
+                               autocomplete="off"
+                               placeholder="EMAIL"
+                               data-required="true"
+                               required />
+                      </div>
+                    </div>
+
+                    <label id="email_error"
+                           class="entry__error entry__error--primary"
+                           style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px;">
+                    </label>
+                    <label class="entry__specification"
+                           style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
+                      Provide your email address to subscribe. For example: abc@xyz.com
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding: 8px 0;">
+                <div class="sib-optin sib-form-block">
+                  <div class="form__entry entry_mcq">
+                    <div class="form__label-row">
+                      <div class="entry__choice">
+                        <label style="display:flex; align-items:flex-start; gap:6px;">
+                          <input type="checkbox"
+                                 class="input_replaced"
+                                 value="1"
+                                 id="OPT_IN"
+                                 name="OPT_IN" />
+                          <span class="checkbox checkbox_tick_positive"></span>
+                          <span style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858;">
+                            I agree to receive your email and accept the data privacy statement.
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+                    <label id="optin_error"
+                           class="entry__error entry__error--primary"
+                           style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px;">
+                    </label>
+                    <label class="entry__specification"
+                           style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
+                      You may unsubscribe at any time using the link in our emails.
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding: 8px 0%;">
+                <div class="sib-form-block" style="text-align: left">
+                  <button id="brevoSubmitBtn"
+                          class="sib-form-block__button sib-form-block__button-with-loader"
+                          style="font-size:14px; text-align:center; font-weight:700; font-family:Helvetica, sans-serif; color:#FFFFFF; background-color:#3E4857; border-radius:9999px; border-width:0px; width:100%; padding:8px 0;"
+                          type="submit">
+                    SUBMIT
+                  </button>
+                </div>
+              </div>
+
+              <input type="text" name="email_address_check" value="" class="input--hidden">
+              <input type="hidden" name="locale" value="en">
+              <input type="hidden" name="html_type" value="simple">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="btnContinueFinish"
+            class="action-btn w-full md:w-auto px-6 py-2.5 rounded-full bg-slate-400 text-white font-semibold text-sm disabled-btn cursor-not-allowed"
+            disabled>
+      Continue to final verification
+    </button>
+  </section>
+
+  <!-- STEP 5: FINAL WAIT + REDIRECT -->
+  <section id="step5" class="bg-amber-50 border border-amber-200 rounded-xl p-4 md:p-5 opacity-40">
+    <h2 class="text-lg md:text-xl font-semibold text-amber-900 mb-2">
+      Step 5 — Final verification and return to panel
+    </h2>
+    <p class="text-sm text-amber-800 mb-3">
+      After you click the button above, we will verify your form and email submission with our partner system.
+      This usually takes under a minute.  
+      Please do not refresh or close the page until you are redirected.
+    </p>
+
+    <p id="waitText" class="text-sm text-amber-900 font-semibold hidden"></p>
+  </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
+
+  // PureSpectrum source
+  const src = 'ps';
+
+  if (!transactionId) {
+    transactionId = 'tx_' + Date.now().toString(36) +
+      Math.random().toString(36).substring(2);
+  }
+
+  // --- URLs ---
+  const psScreenoutUrl =
+    'https://spectrumsurveys.com/surveydone?st=18&transaction_id=' +
+    encodeURIComponent(transactionId);
+
+  // Offer (strict panel)
+  const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
+  const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
+
+  // Cloudflare worker finish URL (PureSpectrum mode)
+  const workerFinishUrl =
+    'https://marketcall1.kayembakasongo.workers.dev/finish' +
+    '?transaction_id=' + encodeURIComponent(transactionId) +
+    '&src=' + encodeURIComponent(src);
+
+  // --- DOM elements ---
+  const btnCheckEligibility = document.getElementById('btnCheckEligibility');
+  const btnExitEarly        = document.getElementById('btnExitEarly');
+  const eligibilityMessage  = document.getElementById('eligibilityMessage');
+
+  const step2 = document.getElementById('step2');
+  const btnVideoNext = document.getElementById('btnVideoNext');
+  const videoHint = document.getElementById('videoHint');
+
+  const step3 = document.getElementById('step3');
+  const offerLink = document.getElementById('offerLink');
+  const btnFormDone = document.getElementById('btnFormDone');
+  const btnFormQuit = document.getElementById('btnFormQuit');
+
+  const step4 = document.getElementById('step4');
+  const brevoBlock = document.getElementById('brevoBlock');
+  const btnContinueFinish = document.getElementById('btnContinueFinish');
+
+  const step5 = document.getElementById('step5');
+  const waitText = document.getElementById('waitText');
+
+  const sibForm    = document.getElementById('sib-form');
+  const emailInput = document.getElementById('EMAIL');
+  const optIn      = document.getElementById('OPT_IN');
+  const emailErr   = document.getElementById('email_error');
+  const optinErr   = document.getElementById('optin_error');
+  const brevoSubmitBtn  = document.getElementById('brevoSubmitBtn');
+
+  // Set offer link href
+  offerLink.href = offerTrackedUrl;
+
+  function getRadioValue(name) {
+    const els = document.querySelectorAll('input[name="' + name + '"]');
+    for (const el of els) {
+      if (el.checked) return el.value;
+    }
+    return null;
+  }
+
+  function disqualifyAndExit(message) {
+    alert(message + '\n\nYou will now be returned to PureSpectrum.');
+    window.location.href = psScreenoutUrl;
+  }
+
+  function smoothScrollTo(el) {
+    const rect = el.getBoundingClientRect();
+    const absoluteY = rect.top + window.scrollY - 80;
+    window.scrollTo({ top: absoluteY, behavior: 'smooth' });
+  }
+
+  // --- Button: Exit early from Step 1 ---
+  btnExitEarly.addEventListener('click', function() {
+    window.location.href = psScreenoutUrl;
+  });
+
+  // --- Step 1: Check eligibility ---
+  btnCheckEligibility.addEventListener('click', function() {
+    const q1 = getRadioValue('q1_debt');
+    const q2 = getRadioValue('q2_pay');
+    const q3 = getRadioValue('q3_intent');
+
+    eligibilityMessage.classList.remove('hidden');
+    eligibilityMessage.textContent = '';
+    eligibilityMessage.className = 'text-sm mt-2';
+
+    if (!q1 || !q2 || !q3) {
+      eligibilityMessage.textContent = '⚠️ Please answer all 3 questions before continuing.';
+      eligibilityMessage.classList.add('text-amber-700');
+      return;
+    }
+
+    // Strict logic: only 15k+ and "yes" answers pass
+    if (q1 === 'lt5k' || q1 === '5k_9999' || q1 === '10k_14999') {
+      disqualifyAndExit(
+        'For this specific project, we are focusing on people with more than $15,000 in unsecured balances.'
+      );
+      return;
+    }
+
+    if (q2 !== 'yes') {
+      disqualifyAndExit(
+        'This project focuses on people who are able to commit at least around $250–$350 per month to a structured plan.'
+      );
+      return;
+    }
+
+    if (q3 !== 'yes') {
+      disqualifyAndExit(
+        'This project is only for people who genuinely want help and agree to receive a call from a specialist.'
+      );
+      return;
+    }
+
+    // Passed
+    eligibilityMessage.textContent =
+      '✅ Great, you look like a strong match for this study. Please continue with the next steps below.';
+    eligibilityMessage.classList.add('text-emerald-700');
+
+    // Unlock Step 2 (video)
+    step2.style.opacity = '1';
+    smoothScrollTo(step2);
+
+    // Start 40s lock timer for video button
+    let waitSeconds = 40;
+    const originalLabel = 'I watched the video';
+    btnVideoNext.disabled = true;
+    btnVideoNext.classList.add('disabled-btn');
+    btnVideoNext.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+    btnVideoNext.classList.add('bg-slate-300');
+    btnVideoNext.textContent = originalLabel + ' (' + waitSeconds + 's)';
+
+    const interval = setInterval(() => {
+      waitSeconds--;
+      if (waitSeconds <= 0) {
+        clearInterval(interval);
+        btnVideoNext.disabled = false;
+        btnVideoNext.classList.remove('disabled-btn', 'bg-slate-300');
+        btnVideoNext.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+        btnVideoNext.textContent = originalLabel;
+        videoHint.textContent =
+          '✅ You can now continue. If you haven’t already, please make sure you watched the Facebook video so the call makes sense.';
+      } else {
+        btnVideoNext.textContent = originalLabel + ' (' + waitSeconds + 's)';
+      }
+    }, 1000);
+  });
+
+  // --- Step 2: after video ---
+  btnVideoNext.addEventListener('click', function() {
+    // Unlock step 3
+    step3.style.opacity = '1';
+    offerLink.classList.remove('disabled-btn', 'pointer-events-none');
+    smoothScrollTo(step3);
+  });
+
+  // --- Step 3: user completed or quit form ---
+  btnFormQuit.addEventListener('click', function() {
+    window.location.href = psScreenoutUrl;
+  });
+
+  btnFormDone.addEventListener('click', function() {
+    if (btnFormDone.classList.contains('disabled-btn')) return;
+    // Unlock step 4
+    step4.style.opacity = '1';
+    smoothScrollTo(step4);
+  });
+
+  // enable "I completed form" only after they open offer link at least once
+  offerLink.addEventListener('click', function() {
+    btnFormDone.classList.remove('disabled-btn');
+    btnFormDone.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+  });
+
+  // --- Step 4: Brevo email submit ---
+  if (sibForm) {
+    sibForm.addEventListener('submit', function(e) {
+      let hasError = false;
+      emailErr.style.display = 'none';
+      optinErr.style.display = 'none';
+
+      const emailVal = (emailInput.value || '').trim();
+
+      if (!emailVal) {
+        hasError = true;
+        emailErr.textContent = 'Please enter your email address.';
+        emailErr.style.display = 'block';
+      } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)) {
+        hasError = true;
+        emailErr.textContent = 'Please enter a valid email address.';
+        emailErr.style.display = 'block';
+      }
+
+      if (!optIn.checked) {
+        hasError = true;
+        optinErr.textContent = 'Please agree to the privacy statement to continue.';
+        optinErr.style.display = 'block';
+      }
+
+      if (hasError) {
+        e.preventDefault();
+        return;
+      }
+
+      // Let Brevo submit via hidden iframe
+      brevoSubmitBtn.disabled = true;
+      brevoSubmitBtn.textContent = 'Submitting...';
+
+      // After short delay, hide Brevo and unlock final button
+      setTimeout(() => {
+        if (brevoBlock) brevoBlock.classList.add('hidden');
+        btnContinueFinish.disabled = false;
+        btnContinueFinish.classList.remove('disabled-btn', 'bg-slate-400', 'cursor-not-allowed');
+        btnContinueFinish.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+        btnContinueFinish.textContent = 'Continue to final verification';
+      }, 3500);
+    });
+  }
+
+  // --- Step 5: wait + redirect via worker ---
+  btnContinueFinish.addEventListener('click', function() {
+    if (btnContinueFinish.disabled) return;
+
+    step5.style.opacity = '1';
+    waitText.classList.remove('hidden');
+    let seconds = 60;
+    waitText.textContent = 'Checking your submission with our partner system... 60 seconds remaining.';
+
+    smoothScrollTo(step5);
+
+    const interval = setInterval(() => {
+      seconds--;
+      if (seconds <= 0) {
+        clearInterval(interval);
+        waitText.textContent = 'Done! Redirecting you back to the panel...';
+        setTimeout(() => {
+          window.location.href = workerFinishUrl;
+        }, 800);
+      } else {
+        waitText.textContent =
+          'Checking your submission with our partner system... ' + seconds + ' seconds remaining.';
+      }
+    }, 1000);
+  });
+});
+</script>
+
+</body>
+</html>

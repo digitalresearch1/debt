@@ -1,1 +1,15 @@
-<iframe src="https://trkmcl.com/wy8odpg43k/xwndpp7qne" width="800" height="600"></iframe>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Embedded Page</title>
+  <style>
+    body { margin: 0; padding: 0; }
+    iframe { width: 100vw; height: 100vh; border: none; }
+  </style>
+</head>
+<body>
+  <iframe src="https://trkmcl.com/wy8odpg43k/xwndpp7qne"></iframe>
+</body>
+</html>

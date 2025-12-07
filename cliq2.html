@@ -233,7 +233,7 @@
     </div>
   </section>
 
-  <!-- STEP 2: VIDEO -->
+  <!-- STEP 2: VIDEO (now without embedded Facebook iframe) -->
   <section id="step2" class="mb-6 bg-white border border-slate-200 rounded-xl p-4 md:p-5 opacity-40">
     <div class="flex items-center justify-between mb-2">
       <h2 class="text-lg md:text-xl font-semibold text-slate-900">
@@ -243,21 +243,14 @@
     </div>
 
     <p class="text-sm text-slate-600 mb-3">
-      Please watch this short Facebook video that explains how the program works for people with higher balances.
+      Please watch the explainer content about how the program works for people with higher balances.
       The “Continue” button will unlock after a short delay.
     </p>
 
-    <div class="video-wrapper mb-3">
-      <iframe
-        src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1205740158030889%2F&show_text=true&width=860&t=0"
-        style="border:none; overflow:hidden;" scrolling="no" frameborder="0"
-        allowfullscreen="true"
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-      </iframe>
-    </div>
+    <!-- Facebook iframe removed -->
 
     <p id="videoHint" class="text-[11px] text-slate-600 mb-3">
-      Please watch the Facebook video. The button below will unlock after a moment.
+      After reviewing the information, you can continue by clicking the button below once it unlocks.
     </p>
 
     <button id="btnVideoNext"
@@ -617,14 +610,14 @@ document.addEventListener('DOMContentLoaded', function() {
         btnVideoNext.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
         btnVideoNext.textContent = originalLabel;
         videoHint.textContent =
-          '✅ You can now continue. If you haven’t already, please make sure you watched the Facebook video so the call makes sense.';
+          '✅ You can now continue. Please make sure you understood how the program works before moving on.';
       } else {
         btnVideoNext.textContent = originalLabel + ' (' + waitSeconds + 's)';
       }
     }, 1000);
   });
 
-  // --- Step 2: after video ---
+  // --- Step 2: after "video" step ---
   btnVideoNext.addEventListener('click', function() {
     // Unlock step 3
     step3.style.opacity = '1';
@@ -725,3 +718,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+

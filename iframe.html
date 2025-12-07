@@ -1,15 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Embedded Page</title>
+  <meta charset="UTF-8">
+  <title>Offer Step</title>
   <style>
-    body { margin: 0; padding: 0; }
-    iframe { width: 100vw; height: 100vh; border: none; }
+    body { font-family: system-ui; padding: 20px; }
+    .hidden { display: none; }
+    button { padding: 10px 16px; border-radius: 999px; border: none; cursor: pointer; }
   </style>
 </head>
 <body>
-  <iframe src="https://quote.cliqsilver.com/enrollment/4"></iframe>
+
+  <div id="step1">
+    <h2>Step 1: Open the offer</h2>
+    <p>Click the button below to open the secure offer in a new tab, complete the form there, then return to this page.</p>
+    <button onclick="openOffer()">Open Offer</button>
+  </div>
+
+  <div id="step2" class="hidden">
+    <h2>Step 2: Confirm</h2>
+    <p>Once you have finished and closed the offer tab, click the button below to continue.</p>
+    <button onclick="finishStep()">I’m done, continue</button>
+  </div>
+
+  <div id="finished" class="hidden">
+    <h2>Thank you!</h2>
+    <p>You can now see the next step / survey / confirmation.</p>
+  </div>
+
+  <script>
+    function openOffer() {
+      window.open('https://trkmcl.com/wy8odpg43k/xwndpp7qne', '_blank');
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('step2').classList.remove('hidden');
+    }
+
+    function finishStep() {
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('finished').classList.remove('hidden');
+      // here you can also show your own form, unlock next section, etc.
+    }
+  </script>
+
 </body>
 </html>

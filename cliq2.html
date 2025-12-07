@@ -233,7 +233,7 @@
     </div>
   </section>
 
-  <!-- STEP 2: VIDEO (now without embedded Facebook iframe) -->
+  <!-- STEP 2: VIDEO -->
   <section id="step2" class="mb-6 bg-white border border-slate-200 rounded-xl p-4 md:p-5 opacity-40">
     <div class="flex items-center justify-between mb-2">
       <h2 class="text-lg md:text-xl font-semibold text-slate-900">
@@ -243,14 +243,21 @@
     </div>
 
     <p class="text-sm text-slate-600 mb-3">
-      Please watch the explainer content about how the program works for people with higher balances.
+      Please watch this short Facebook video that explains how the program works for people with higher balances.
       The “Continue” button will unlock after a short delay.
     </p>
 
-    <!-- Facebook iframe removed -->
+    <div class="video-wrapper mb-3">
+      <iframe
+        src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1205740158030889%2F&show_text=true&width=860&t=0"
+        style="border:none; overflow:hidden;" scrolling="no" frameborder="0"
+        allowfullscreen="true"
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+      </iframe>
+    </div>
 
     <p id="videoHint" class="text-[11px] text-slate-600 mb-3">
-      After reviewing the information, you can continue by clicking the button below once it unlocks.
+      Please watch the Facebook video. The button below will unlock after a moment.
     </p>
 
     <button id="btnVideoNext"
@@ -260,7 +267,7 @@
     </button>
   </section>
 
-  <!-- STEP 3: OPEN OFFER FORM -->
+  <!-- STEP 3: OPEN OFFER FORM + EXPLANATION -->
   <section id="step3" class="mb-6 bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5 opacity-40">
     <div class="flex items-center justify-between mb-2">
       <h2 class="text-lg md:text-xl font-semibold text-slate-900">
@@ -269,9 +276,45 @@
       <span class="text-xs text-slate-500">Unlocked after the video</span>
     </div>
 
-    <p class="text-sm text-slate-600 mb-3">
-     Next, you'll open a secure website in a new tab to complete the full financial form. Please fill it out with accurate information, then return to this page. ⚠️ We automatically verify if the form was successfully submitted. If it is not submitted, your participation will NOT be approved.
-    </p>
+    <!-- Explanation block updated: no “send us an email later” -->
+    <div class="mb-4 text-sm text-slate-700 space-y-3">
+      <div>
+        <h3 class="font-semibold text-slate-900 mb-1">Who Can Participate?</h3>
+        <p class="mb-1">
+          In this part of the study, we are collecting feedback from people who are actively looking for real options
+          to reduce or restructure their unsecured debt. Please continue only if:
+        </p>
+        <ul class="list-disc list-inside space-y-1">
+          <li>You have significant unsecured debt (credit cards, personal loans, medical bills, etc.).</li>
+          <li>Your total unsecured balances are typically above $15,000.</li>
+          <li>You are genuinely interested in speaking with a specialist about reducing your debt.</li>
+          <li>You are willing to receive a phone call at the number you provide on the next page.</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-semibold text-slate-900 mb-1">How To Participate</h3>
+        <ol class="list-decimal list-inside space-y-1">
+          <li>
+            Click <span class="font-semibold">“Open secure financial form”</span> below. A new tab will open on our
+            partner’s secure website.
+          </li>
+          <li>
+            Complete the full form on that website. You will be asked for details such as your approximate debt amount,
+            types of debt, name, email, phone number, and other basic information needed to review your situation.
+          </li>
+          <li>
+            After submitting the form, you should see a confirmation or “thank you” page on the partner site, and a
+            financial specialist may contact you by phone to discuss your options.
+          </li>
+          <li>
+            Once you have submitted the form, return to this tab, click
+            <span class="font-semibold">“I completed the form”</span>, and then complete the email reminder step
+            below so we can confirm your participation in the study.
+          </li>
+        </ol>
+      </div>
+    </div>
 
     <div class="w-full max-w-xl bg-white border border-slate-200 rounded-xl shadow-sm p-4 mx-auto mb-3">
       <p class="text-xs text-slate-700 mb-3 text-center">
@@ -320,7 +363,7 @@
 
     <p class="text-sm text-slate-600 mb-3">
       Before we can verify your participation, your email is
-      <strong>required</strong> so we can send a reminder and summary of your options.
+      <strong>required</strong> so we can send a reminder and a summary of your options.
       Submit your email below. Once it is saved, the green button to finish will unlock.
     </p>
 
@@ -521,6 +564,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set offer link href
   offerLink.href = offerTrackedUrl;
 
+  // 🔒 Initially block Brevo fields until they did Step 3 properly
+  if (emailInput) emailInput.disabled = true;
+  if (optIn) optIn.disabled = true;
+  if (brevoSubmitBtn) brevoSubmitBtn.disabled = true;
+
   function getRadioValue(name) {
     const els = document.querySelectorAll('input[name="' + name + '"]');
     for (const el of els) {
@@ -610,14 +658,14 @@ document.addEventListener('DOMContentLoaded', function() {
         btnVideoNext.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
         btnVideoNext.textContent = originalLabel;
         videoHint.textContent =
-          '✅ You can now continue. Please make sure you understood how the program works before moving on.';
+          '✅ You can now continue. If you haven’t already, please make sure you watched the Facebook video so the call makes sense.';
       } else {
         btnVideoNext.textContent = originalLabel + ' (' + waitSeconds + 's)';
       }
     }, 1000);
   });
 
-  // --- Step 2: after "video" step ---
+  // --- Step 2: after video ---
   btnVideoNext.addEventListener('click', function() {
     // Unlock step 3
     step3.style.opacity = '1';
@@ -625,22 +673,28 @@ document.addEventListener('DOMContentLoaded', function() {
     smoothScrollTo(step3);
   });
 
-  // --- Step 3: user completed or quit form ---
+  // --- Step 3: open form / quit ---
   btnFormQuit.addEventListener('click', function() {
     window.location.href = psScreenoutUrl;
-  });
-
-  btnFormDone.addEventListener('click', function() {
-    if (btnFormDone.classList.contains('disabled-btn')) return;
-    // Unlock step 4
-    step4.style.opacity = '1';
-    smoothScrollTo(step4);
   });
 
   // enable "I completed form" only after they open offer link at least once
   offerLink.addEventListener('click', function() {
     btnFormDone.classList.remove('disabled-btn');
     btnFormDone.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+  });
+
+  btnFormDone.addEventListener('click', function() {
+    // If they never clicked the affiliate link, button stays disabled
+    if (btnFormDone.classList.contains('disabled-btn')) return;
+
+    // Unlock step 4 (Brevo)
+    step4.style.opacity = '1';
+    if (emailInput) emailInput.disabled = false;
+    if (optIn) optIn.disabled = false;
+    if (brevoSubmitBtn) brevoSubmitBtn.disabled = false;
+
+    smoothScrollTo(step4);
   });
 
   // --- Step 4: Brevo email submit ---

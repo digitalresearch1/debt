@@ -115,15 +115,15 @@
   <!-- HEADER -->
   <div class="form-header-group header-large mb-6 p-6 rounded-xl text-white text-center">
     <p class="badge bg-white/10 backdrop-blur text-xs md:text-sm justify-center mb-2">
-      🔒 Private financial wellness study
+      🔒 Private financial wellness research study
     </p>
     <h1 class="text-2xl md:text-3xl font-bold">Financial Wellness Research Study</h1>
     <p class="mt-2 text-sm md:text-base text-indigo-100">
-      3 quick steps. Only complete and verified participants are approved.
+      Please follow each step carefully. Only complete and verified participants are approved.
     </p>
   </div>
 
-  <!-- STEP 1: OPEN OFFER FORM + SHORT EXPLANATION -->
+  <!-- STEP 1: MULTI-PAGE FLOW -->
   <section id="step1" class="mb-6 bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5">
     <div class="flex items-center justify-between mb-2">
       <h2 class="text-lg md:text-xl font-semibold text-slate-900">
@@ -132,73 +132,116 @@
       <span class="text-xs text-slate-500">Start here</span>
     </div>
 
-    <div class="mb-4 text-sm text-slate-700 space-y-3">
+    <!-- PAGE 1: WHO CAN PARTICIPATE -->
+    <div id="step1-page1" class="mb-4 text-sm text-slate-700 space-y-3">
       <div>
-        <h3 class="font-semibold text-slate-900 mb-1">Who should continue?</h3>
+        <h3 class="font-semibold text-slate-900 mb-1">Who Can Participate?</h3>
+        <p class="mb-1">
+          In this part of the study, we are collecting feedback from people who are actively looking for real options
+          to reduce or restructure their unsecured debt. Please continue only if:
+        </p>
         <ul class="list-disc list-inside space-y-1">
-          <li>You have around <strong>$15,000+</strong> in unsecured debt (cards, loans, medical, etc.).</li>
-          <li>You want real help and are okay with a specialist calling you.</li>
+          <li>You have significant unsecured debt (credit cards, personal loans, medical bills, etc.).</li>
+          <li>Your total unsecured balances are typically above $15,000.</li>
+          <li>You are genuinely interested in speaking with a specialist about reducing your debt.</li>
+          <li>You are willing to receive a phone call at the number you provide on the next page.</li>
         </ul>
       </div>
 
+      <div class="mt-4 flex justify-end">
+        <button id="step1Next1"
+                class="action-btn bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full">
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- PAGE 2: HOW TO PARTICIPATE -->
+    <div id="step1-page2" class="mb-4 text-sm text-slate-700 space-y-3 hidden">
       <div>
-        <h3 class="font-semibold text-slate-900 mb-1">What you need to do</h3>
+        <h3 class="font-semibold text-slate-900 mb-1">How To Participate</h3>
         <ol class="list-decimal list-inside space-y-1">
-          <li>Click <strong>“Open secure financial form”</strong> below (new tab).</li>
-          <li>Complete and submit the full form with accurate details.</li>
-          <li>Return here and click <strong>“I completed the form”</strong>.</li>
+          <li>
+            Click <span class="font-semibold">“Open secure financial form”</span> below. A new tab will open on our
+            partner’s secure website.
+          </li>
+          <li>
+            Complete the full form on that website. You will be asked for details such as your approximate debt amount,
+            types of debt, name, email, phone number, and other basic information needed to review your situation.
+          </li>
+          <li>
+            After submitting the form, you should see a confirmation or “thank you” page on the partner site, and a
+            financial specialist may contact you by phone to discuss your options.
+          </li>
+          <li>
+            Once you have submitted the form, return to this tab, click
+            <span class="font-semibold">“I completed the form”</span>, and then continue with the remaining steps.
+          </li>
         </ol>
       </div>
-    </div>
 
-    <div class="w-full max-w-xl bg-white border border-slate-200 rounded-xl shadow-sm p-4 mx-auto mb-3">
-      <p class="text-xs text-slate-700 mb-3 text-center">
-        Click below to open the secure form in a new tab. Fill it honestly, then come back here.<br>
-        <strong>Important:</strong> If you see “Where did you hear about this program?” please select
-        <span class="font-semibold underline">Facebook</span> so your answers match this study.<br>
-        <span class="font-semibold text-red-600">
-          ⚠️ We automatically check if the form was submitted. If not, your participation will NOT be approved.
-        </span>
-      </p>
-      <div class="flex flex-col items-center gap-2">
-        <a id="offerLink"
-           href="#"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="action-btn inline-flex items-center justify-center px-5 py-3 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700">
-          Open secure financial form
-        </a>
-        <p class="text-[11px] text-slate-500 text-center">
-          After you submit the form, come back and click
-          <strong>“I completed the form”</strong>.
-        </p>
+      <div class="mt-4 flex justify-end">
+        <button id="step1Next2"
+                class="action-btn bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full">
+          Next
+        </button>
       </div>
     </div>
 
-    <div class="flex flex-wrap gap-3">
-      <button id="btnFormDone"
-              class="action-btn bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full disabled-btn"
-              disabled>
-        I completed the form
-      </button>
-      <button id="btnFormQuit"
-              class="action-btn bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium text-xs px-4 py-2 rounded-full">
-        I don't want to continue
-      </button>
+    <!-- PAGE 3: OPEN FORM + BUTTONS -->
+    <div id="step1-page3" class="hidden">
+      <div class="w-full max-w-xl bg-white border border-slate-200 rounded-xl shadow-sm p-4 mx-auto mb-3">
+        <p class="text-xs text-slate-700 mb-3 text-center">
+          Click the button below to open the form. Fill everything out honestly, then return to this page.<br>
+          <strong>Important:</strong> If you see a question like
+          “Where did you hear about this program?” on the external form,
+          please select <span class="font-semibold underline">Facebook</span>
+          so your answers match this research.<br>
+          <span class="font-semibold text-red-600">
+            ⚠️ We automatically verify if the form was successfully submitted. If it is not submitted, your participation will NOT be approved.
+          </span>
+        </p>
+        <div class="flex flex-col items-center gap-2">
+          <a id="offerLink"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="action-btn inline-flex items-center justify-center px-5 py-3 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700">
+            Open secure financial form
+          </a>
+          <p class="text-[11px] text-slate-500 text-center">
+            After submitting the form in the new tab, come back here and click
+            <strong>“I completed the form”</strong> below.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button id="btnFormDone"
+                class="action-btn bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full disabled-btn"
+                disabled>
+          I completed the form
+        </button>
+        <button id="btnFormQuit"
+                class="action-btn bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium text-xs px-4 py-2 rounded-full">
+          I don't want to continue
+        </button>
+      </div>
     </div>
   </section>
 
-  <!-- STEP 2: VIDEO -->
+  <!-- STEP 2: VIDEO (Facebook iframe in between) -->
   <section id="step2" class="mb-6 bg-white border border-slate-200 rounded-xl p-4 md:p-5 opacity-40">
     <div class="flex items-center justify-between mb-2">
       <h2 class="text-lg md:text-xl font-semibold text-slate-900">
-        Step 2 — Watch a short explainer video
+        Step 2 — Watch the short explainer video
       </h2>
       <span class="text-xs text-slate-500">Unlocked after Step 1</span>
     </div>
 
     <p class="text-sm text-slate-600 mb-3">
-      Please watch this short Facebook video about how the program works. The button below will unlock after a brief delay.
+      Please watch this short Facebook video that explains how the program works for people with higher balances.
+      The “Continue” button will unlock after a short delay once this step is available.
     </p>
 
     <div class="video-wrapper mb-3">
@@ -211,7 +254,7 @@
     </div>
 
     <p id="videoHint" class="text-[11px] text-slate-600 mb-3">
-      This step will unlock after you click “I completed the form” in Step 1.
+      This step will unlock after you have completed Step 1 and clicked “I completed the form”.
     </p>
 
     <button id="btnVideoNext"
@@ -225,14 +268,15 @@
   <section id="step3" class="mb-6 bg-white border border-slate-200 rounded-xl p-4 md:p-5 opacity-40">
     <div class="flex items-center justify-between mb-2">
       <h2 class="text-lg md:text-xl font-semibold text-slate-900">
-        Step 3 — Email for follow-up
+        Step 3 — Mandatory email reminder
       </h2>
       <span class="text-xs text-slate-500">Unlocked after video</span>
     </div>
 
     <p class="text-sm text-slate-600 mb-3">
-      Your email is <strong>required</strong> so we can send you a reminder and summary of your options.
-      Once it is saved, the green button to finish will unlock.
+      Before we can verify your participation, your email is
+      <strong>required</strong> so we can send a reminder and a summary of your options.
+      Submit your email below. Once it is saved, the green button to finish will unlock.
     </p>
 
     <!-- Brevo embed -->
@@ -262,7 +306,7 @@
                 <div class="sib-form-block"
                      style="font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;">
                   <div class="sib-text-form-block">
-                    <p>Please provide your email so we can send you a reminder and the outcome of your request.</p>
+                    <p>Please provide your email so we can send you a reminder about this survey and the outcome of your request.</p>
                   </div>
                 </div>
               </div>
@@ -295,7 +339,7 @@
                     </label>
                     <label class="entry__specification"
                            style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
-                      Example: abc@xyz.com
+                      Provide your email address to subscribe. For example: abc@xyz.com
                     </label>
                   </div>
                 </div>
@@ -325,7 +369,7 @@
                     </label>
                     <label class="entry__specification"
                            style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
-                      You can unsubscribe at any time using the link in our emails.
+                      You may unsubscribe at any time using the link in our emails.
                     </label>
                   </div>
                 </div>
@@ -361,11 +405,12 @@
   <!-- STEP 4: FINAL WAIT + REDIRECT -->
   <section id="step4" class="bg-amber-50 border border-amber-200 rounded-xl p-4 md:p-5 opacity-40">
     <h2 class="text-lg md:text-xl font-semibold text-amber-900 mb-2">
-      Step 4 — Final verification
+      Step 4 — Final verification and return to panel
     </h2>
     <p class="text-sm text-amber-800 mb-3">
-      After you click the button above, we will verify your form and email with our partner system.
-      This usually takes under a minute. Please do not refresh or close the page until you are redirected.
+      After you click the button above, we will verify your form and email submission with our partner system.
+      This usually takes under a minute.  
+      Please do not refresh or close the page until you are redirected.
     </p>
 
     <p id="waitText" class="text-sm text-amber-900 font-semibold hidden"></p>
@@ -412,6 +457,13 @@
     encodeURIComponent(src);
 
   // DOM elements
+  const step1 = document.getElementById('step1');
+  const step1Page1 = document.getElementById('step1-page1');
+  const step1Page2 = document.getElementById('step1-page2');
+  const step1Page3 = document.getElementById('step1-page3');
+  const step1Next1 = document.getElementById('step1Next1');
+  const step1Next2 = document.getElementById('step1Next2');
+
   const offerLink = document.getElementById('offerLink');
   const btnFormDone = document.getElementById('btnFormDone');
   const btnFormQuit = document.getElementById('btnFormQuit');
@@ -433,6 +485,23 @@
   const emailErr = document.getElementById('email_error');
   const optinErr = document.getElementById('optin_error');
   const brevoSubmitBtn = document.getElementById('brevoSubmitBtn');
+
+  // Step 1 internal navigation
+  if (step1Next1 && step1Page1 && step1Page2) {
+    step1Next1.addEventListener('click', function () {
+      step1Page1.classList.add('hidden');
+      step1Page2.classList.remove('hidden');
+      smoothScrollTo(step1);
+    });
+  }
+
+  if (step1Next2 && step1Page2 && step1Page3) {
+    step1Next2.addEventListener('click', function () {
+      step1Page2.classList.add('hidden');
+      step1Page3.classList.remove('hidden');
+      smoothScrollTo(step1);
+    });
+  }
 
   // Set offer link href safely
   if (offerLink) {
@@ -597,3 +666,4 @@
 
 </body>
 </html>
+

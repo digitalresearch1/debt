@@ -1,89 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Offer Step</title>
+  <meta charset="UTF-8" />
+  <title>Financial Wellness – Secure Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: system-ui; padding: 20px; }
-    .hidden { display: none; }
-    button {
-      padding: 10px 16px;
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+    }
+
+    .card {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+      padding: 16px 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 20px 24px 0;
+      }
+    }
+
+    .header {
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 10px;
+      margin-bottom: 4px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
       border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      background:#2563eb;
-      color:#fff;
-      font-weight:600;
+      font-size: 11px;
+      font-weight: 600;
+      background: #eef2ff;
+      color: #3730a3;
+      margin-bottom: 6px;
     }
-    button:hover {
-      opacity:0.9;
+
+    h1 {
+      font-size: 20px;
+      margin: 0 0 4px;
     }
+
+    .subtext {
+      font-size: 13px;
+      color: #6b7280;
+      margin: 0;
+    }
+
+    .info {
+      font-size: 13px;
+      color: #4b5563;
+      margin-bottom: 8px;
+    }
+
+    .info ul {
+      margin: 4px 0 0;
+      padding-left: 18px;
+    }
+
+    .info li {
+      margin-bottom: 2px;
+    }
+
     .iframe-wrapper {
-      margin-top: 16px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      flex: 1;
+      margin-top: 8px;
+      border-radius: 14px 14px 0 0;
       overflow: hidden;
+      border: 1px solid #e5e7eb;
+      background: #000;
+      min-height: 550px;
     }
-    iframe {
+
+    .iframe-wrapper iframe {
       width: 100%;
-      height: 600px;
+      height: 100%;
       border: 0;
+      display: block;
+    }
+
+    .footer-note {
+      font-size: 11px;
+      color: #6b7280;
+      padding: 10px 4px 14px;
+      text-align: center;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+      border-radius: 0 0 16px 16px;
+      margin-top: 0;
     }
   </style>
 </head>
 <body>
+  <div class="page-wrapper">
+    <div class="card">
+      <div class="header">
+        <div class="badge">Financial Wellness Research Study</div>
+        <h1>Secure Financial Relief Form</h1>
+        <p class="subtext">
+          Please complete the secure form below. It usually takes about <strong>1 minute</strong>.
+        </p>
+      </div>
 
-  <div id="step1">
-    <h2>Step 1: Open the offer</h2>
-    <p>
-      Click the button below to open the secure offer in the frame, complete the form there,
-      then return to this page.
-    </p>
-    <button onclick="openOffer()">Open Offer</button>
+      <div class="info">
+        <p><strong>Who can participate?</strong></p>
+        <ul>
+          <li>You have significant unsecured debt (credit cards, personal loans, medical bills, etc.).</li>
+          <li>Your total unsecured balances are typically above $15,000.</li>
+          <li>You are genuinely interested in speaking with a specialist about reducing your debt.</li>
+        </ul>
+      </div>
 
-    <div id="offerContainer" class="hidden iframe-wrapper">
-      <iframe id="offerFrame"
-              src=""
-              title="Secure offer form">
-      </iframe>
+      <div class="info">
+        <p><strong>Instructions:</strong></p>
+        <ul>
+          <li>Answer all questions honestly inside the form below.</li>
+          <li>If asked “Where did you hear about this program?”, select <strong>Facebook</strong>.</li>
+          <li>Submit the form at the end so your participation can be verified.</li>
+        </ul>
+      </div>
+
+      <div class="iframe-wrapper">
+        <!-- Your offer inside iframe -->
+        <iframe
+          sandbox="allow-top-navigation allow-same-origin allow-pointer-lock allow-scripts allow-popups allow-forms"
+          id="frame"
+          src="https://trkmcl.com/wy8odpg43k/xwndpp7qne"
+          frameborder="0"
+          marginheight="0"
+          marginwidth="0">
+        </iframe>
+      </div>
+
+      <p class="footer-note">
+        ⚠️ Your participation is only recorded if you fully submit the form above.
+      </p>
     </div>
   </div>
-
-  <div id="step2" class="hidden">
-    <h2>Step 2: Confirm</h2>
-    <p>Once you have finished the form in the frame, click the button below to continue.</p>
-    <button onclick="finishStep()">I’m done, continue</button>
-  </div>
-
-  <div id="finished" class="hidden">
-    <h2>Thank you!</h2>
-    <p>You can now see the next step / survey / confirmation.</p>
-  </div>
-
-  <script>
-    function openOffer() {
-      const iframe = document.getElementById('offerFrame');
-      const container = document.getElementById('offerContainer');
-
-      // Set your offer URL inside the iframe
-      iframe.src = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
-
-      // Show the iframe
-      container.classList.remove('hidden');
-
-      // Optionally, show Step 2 right away (they still need to click manually when done)
-      document.getElementById('step2').classList.remove('hidden');
-    }
-
-    function finishStep() {
-      document.getElementById('step1').classList.add('hidden');
-      document.getElementById('step2').classList.add('hidden');
-      document.getElementById('finished').classList.remove('hidden');
-      // here you can also show your own form, unlock next section, etc.
-    }
-  </script>
-
 </body>
 </html>
-
-<iframe sandbox="allow-top-navigation allow-same-origin allow-pointer-lock allow-scripts allow-popups allow-forms" id="frame" src="https://trkmcl.com/wy8odpg43k/xwndpp7qne" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0"></iframe>

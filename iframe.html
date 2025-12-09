@@ -3,63 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Wellness Application | Complete Now</title>
+    <title>Financial Form | Complete Application</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
+            margin: 0;
             padding: 20px;
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
         }
-        
         .container {
             max-width: 1200px;
             margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
             overflow: hidden;
         }
-        
         .header {
-            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
             padding: 30px;
             text-align: center;
         }
-        
-        .header h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-        
-        .content {
-            padding: 30px;
-        }
-        
-        .frame-container {
+        .frame-wrapper {
             position: relative;
             width: 100%;
-            height: 1000px;
-            border: 2px solid #e0e0e0;
-            border-radius: 15px;
-            overflow: hidden;
-            background: #f5f5f5;
+            height: 1200px;
+            background: white;
         }
-        
-        #mainFrame {
+        #formContainer {
             width: 100%;
             height: 100%;
             border: none;
         }
-        
         .loading {
             position: absolute;
             top: 0;
@@ -68,42 +44,9 @@
             height: 100%;
             background: white;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 100;
-        }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #007bff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .info-box {
-            background: #e8f4fd;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 5px;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
+            font-size: 18px;
         }
     </style>
 </head>
@@ -111,79 +54,153 @@
     <div class="container">
         <div class="header">
             <h1>Financial Relief Application</h1>
-            <p>Complete this form to see if you qualify for debt assistance</p>
+            <p>Complete the form below to qualify for assistance</p>
         </div>
         
-        <div class="content">
-            <div class="info-box">
-                <h3>✅ Instructions:</h3>
-                <p>1. Fill out all fields completely</p>
-                <p>2. When asked "How did you hear about us?" select <strong>Facebook</strong></p>
-                <p>3. Submit the form to receive your personalized options</p>
+        <div class="frame-wrapper">
+            <div class="loading" id="loading">
+                Loading secure form...
             </div>
-            
-            <div class="frame-container">
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p style="margin-top: 20px;">Loading secure form...</p>
-                </div>
-                <!-- This will be populated by JavaScript -->
-                <div id="proxyContainer"></div>
-            </div>
+            <div id="formContainer"></div>
         </div>
     </div>
 
-    <!-- JavaScript Proxy Implementation for GitHub Pages -->
     <script>
-        // Your target URL
-        const TARGET_URL = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
+        // ============================================
+        // WORKING SOLUTION: Fetch, Clean, Inject
+        // ============================================
         
-        // ============================================
-        // METHOD 1: Iframe with JavaScript Proxy
-        // ============================================
-        async function loadForm() {
-            try {
-                // Create iframe
-                const iframe = document.createElement('iframe');
-                iframe.id = 'mainFrame';
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
-                iframe.style.border = 'none';
-                iframe.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups';
-                
-                // First, try to fetch via proxy
-                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(TARGET_URL);
-                
-                const response = await fetch(proxyUrl);
-                if (response.ok) {
-                    const html = await response.text();
-                    
-                    // Clean the HTML
-                    let cleaned = html
-                        .replace(/<script\b[^>]*>(.*?)<\/script>/gi, '')
-                        .replace(/onload=["'][^"']*["']/gi, '')
-                        .replace(/onclick=["'][^"']*["']/gi, '');
-                    
-                    // Create data URL
-                    const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(cleaned)}`;
-                    iframe.src = dataUrl;
-                    
-                    // Add to container
-                    document.getElementById('proxyContainer').appendChild(iframe);
-                    
-                    // Hide loading
-                    document.getElementById('loading').style.display = 'none';
-                    
-                    return true;
-                }
-            } catch (error) {
-                console.log('Method 1 failed:', error);
-                return false;
+        const TARGET_URL = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
+        const loading = document.getElementById('loading');
+        const container = document.getElementById('formContainer');
+        
+        // List of working proxies (rotate if one fails)
+        const proxies = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://thingproxy.freeboard.io/fetch/',
+            'https://crossorigin.me/',
+            'https://api.codetabs.com/v1/proxy?quest='
+        ];
+        
+        // Function to clean HTML of frame-busting code
+        function cleanHTML(html) {
+            let cleaned = html;
+            
+            // Remove common frame-busting scripts
+            cleaned = cleaned.replace(
+                /<script\b[^>]*>[\s\S]*?(top\.|parent\.|self\.|window\.top|window\.parent)[\s\S]*?<\/script>/gi,
+                ''
+            );
+            
+            // Remove onload/onclick handlers that break frames
+            cleaned = cleaned.replace(
+                /(onload|onclick|onunload)\s*=\s*["'][^"']*["']/gi,
+                ''
+            );
+            
+            // Remove meta tags that prevent framing
+            cleaned = cleaned.replace(
+                /<meta[^>]*(http-equiv=["']X-Frame-Options["']|content=["']DENY["']|content=["']SAMEORIGIN["'])[^>]*>/gi,
+                ''
+            );
+            
+            // Add base tag for relative URLs
+            if (!cleaned.includes('<base')) {
+                cleaned = cleaned.replace(
+                    /<head>/i,
+                    '<head><base href="https://trkmcl.com/">'
+                );
             }
+            
+            return cleaned;
         }
         
-        // Start loading
-        loadForm();
+        // Function to create a sandboxed iframe with clean content
+        function createSandboxedIframe(html) {
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups allow-modals';
+            
+            // Create blob URL from cleaned HTML
+            const blob = new Blob([html], { type: 'text/html' });
+            const blobUrl = URL.createObjectURL(blob);
+            iframe.src = blobUrl;
+            
+            return iframe;
+        }
+        
+        // Main function to load form
+        async function loadForm() {
+            loading.textContent = 'Connecting to secure server...';
+            
+            // Try each proxy in sequence
+            for (let i = 0; i < proxies.length; i++) {
+                try {
+                    const proxyUrl = proxies[i] + encodeURIComponent(TARGET_URL);
+                    console.log(`Trying proxy ${i + 1}: ${proxies[i]}`);
+                    
+                    loading.textContent = `Trying connection method ${i + 1}...`;
+                    
+                    const response = await fetch(proxyUrl, {
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const html = await response.text();
+                        const cleaned = cleanHTML(html);
+                        
+                        // Remove loading screen
+                        loading.style.display = 'none';
+                        
+                        // Create and append iframe
+                        const iframe = createSandboxedIframe(cleaned);
+                        container.appendChild(iframe);
+                        
+                        console.log(`Successfully loaded with proxy ${i + 1}`);
+                        return;
+                    }
+                } catch (error) {
+                    console.log(`Proxy ${i + 1} failed:`, error);
+                    continue;
+                }
+            }
+            
+            // If all proxies fail, show fallback
+            showFallback();
+        }
+        
+        // Fallback method
+        function showFallback() {
+            loading.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <h2 style="color: #dc3545;">Unable to Load Form</h2>
+                    <p>The form cannot be embedded due to security restrictions.</p>
+                    <p>Click the button below to open it in a new tab:</p>
+                    <button onclick="window.open('${TARGET_URL}', '_blank')" 
+                            style="background: #007bff; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 20px;">
+                        Open Form in New Tab
+                    </button>
+                    <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                        This is the most reliable way to access the application.
+                    </p>
+                </div>
+            `;
+        }
+        
+        // Start loading when page loads
+        window.addEventListener('DOMContentLoaded', loadForm);
+        
+        // Auto-retry after 5 seconds if still loading
+        setTimeout(() => {
+            if (loading.style.display !== 'none') {
+                loading.innerHTML += '<br><br><em>Still trying to connect...</em>';
+            }
+        }, 5000);
     </script>
 </body>
 </html>

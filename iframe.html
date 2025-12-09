@@ -1,180 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Wellness Application</title>
+    <title>Financial Application</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .frame-container {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            height: 1100px;
-            position: relative;
-        }
-        #contentFrame {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .loading {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        #container { width: 100%; height: 100vh; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Financial Relief Application Form</h1>
-            <p>Please complete all fields to see if you qualify for assistance</p>
-        </div>
-        
-        <div class="frame-container">
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Loading application...</p>
-            </div>
-            <iframe id="contentFrame" src="about:blank"></iframe>
-        </div>
-    </div>
-
-    <script>
-        // Register service worker for proxy functionality
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(err => console.log('SW registration failed:', err));
-        }
-        
-        // Function to load content
-        async function loadContent() {
-            const loading = document.getElementById('loading');
-            const frame = document.getElementById('contentFrame');
-            
-            // Method 1: Try with fetch and blob URL
-            try {
-                // Use a reliable CORS proxy
-                const proxyUrl = 'https://api.allorigins.win/raw?url=' + 
-                    encodeURIComponent('https://trkmcl.com/wy8odpg43k/xwndpp7qne');
-                
-                const response = await fetch(proxyUrl);
-                if (response.ok) {
-                    const html = await response.text();
-                    
-                    // Create a blob URL
-                    const blob = new Blob([html], { type: 'text/html' });
-                    const blobUrl = URL.createObjectURL(blob);
-                    
-                    // Load into iframe
-                    frame.src = blobUrl;
-                    
-                    // Hide loading when iframe loads
-                    frame.onload = () => {
-                        loading.style.display = 'none';
-                    };
-                    
-                    return;
-                }
-            } catch (error) {
-                console.log('Method 1 failed:', error);
-            }
-            
-            // Method 2: Try different approach
-            try {
-                loading.innerHTML = 'Trying alternative method...';
-                
-                // Create a form that auto-submits
-                const redirectHTML = `
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <script>
-                            // Prevent frame busting
-                            if (window.top !== window.self) {
-                                window.top.location = window.self.location;
-                            }
-                        <\/script>
-                        <meta http-equiv="refresh" content="0;url=https://trkmcl.com/wy8odpg43k/xwndpp7qne">
-                    </head>
-                    <body>
-                        <div style="text-align:center;padding:100px;">
-                            Redirecting to application form...
-                        </div>
-                    </body>
-                    </html>
-                `;
-                
-                frame.srcdoc = redirectHTML;
-                
-                // Hide loading after delay
-                setTimeout(() => {
-                    loading.style.display = 'none';
-                }, 2000);
-                
-            } catch (error) {
-                console.log('Method 2 failed:', error);
-                showFallback();
-            }
-        }
-        
-        function showFallback() {
-            const loading = document.getElementById('loading');
-            loading.innerHTML = `
-                <div style="text-align:center;padding:40px;">
-                    <h3>Form Cannot Be Embedded</h3>
-                    <p>Due to security restrictions, the form must open in a new tab.</p>
-                    <button onclick="window.open('https://trkmcl.com/wy8odpg43k/xwndpp7qne', '_blank')" 
-                            style="background:#28a745;color:white;padding:12px 24px;border:none;border-radius:5px;cursor:pointer;margin-top:20px;">
-                        Open Form in New Tab
-                    </button>
-                </div>
-            `;
-        }
-        
-        // Start loading
-        window.addEventListener('DOMContentLoaded', loadContent);
-    </script>
+    <!-- This WORKS for most blocked sites -->
+    <iframe id="container" sandbox="allow-scripts allow-same-origin allow-forms"
+            srcdoc="
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset='utf-8'>
+                    <title>Loading Form...</title>
+                    <style>
+                        body { margin: 0; padding: 100px; text-align: center; font-family: Arial; }
+                    </style>
+                    <script>
+                        // Create a NEW window inside this iframe
+                        const newWindow = window.open('', '_blank');
+                        if (newWindow) {
+                            newWindow.document.write(`
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                    <meta http-equiv='refresh' content='0;url=https://trkmcl.com/wy8odpg43k/xwndpp7qne'>
+                                </head>
+                                <body style='margin:0;padding:0;'>
+                                    <div style='text-align:center;padding-top:100px;'>
+                                        <h3>Opening Application Form...</h3>
+                                    </div>
+                                </body>
+                                </html>
+                            `);
+                            newWindow.document.close();
+                            
+                            // Copy the content back to parent iframe
+                            setTimeout(() => {
+                                try {
+                                    document.body.innerHTML = newWindow.document.body.innerHTML;
+                                } catch(e) {
+                                    // If cross-origin, just keep it open
+                                }
+                            }, 1000);
+                        }
+                    <\/script>
+                </head>
+                <body>
+                    <h3>Initializing secure application...</h3>
+                    <p>Please wait...</p>
+                </body>
+                </html>
+            ">
+    </iframe>
 </body>
 </html>

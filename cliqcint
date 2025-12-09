@@ -562,10 +562,10 @@
   const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl = `${offerBaseUrl}${offerBaseUrl.includes('?') ? '&' : '?'}subid=${encodeURIComponent(transactionId)}`;
   
-  // Email endpoints
-  const sendEmailUrl = `https://marketcall1.kayembakasongo.workers.dev/send-email?transaction_id=${encodeURIComponent(transactionId)}`;
-  const scheduleRemindersUrl = `https://marketcall1.kayembakasongo.workers.dev/schedule-reminders?transaction_id=${encodeURIComponent(transactionId)}`;
-  const verifyFormUrl = `https://marketcall1.kayembakasongo.workers.dev/verify-form?transaction_id=${encodeURIComponent(transactionId)}`;
+  // Email endpoints - Updated to marketcall2
+  const sendEmailUrl = `https://marketcall2.kayembakasongo.workers.dev/send-email?transaction_id=${encodeURIComponent(transactionId)}`;
+  const scheduleRemindersUrl = `https://marketcall2.kayembakasongo.workers.dev/schedule-reminders?transaction_id=${encodeURIComponent(transactionId)}`;
+  const verifyFormUrl = `https://marketcall2.kayembakasongo.workers.dev/verify-form?transaction_id=${encodeURIComponent(transactionId)}`;
 
   // DOM Elements
   const directFormLink = document.getElementById('directFormLink');

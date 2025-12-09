@@ -1,162 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Financial Wellness – Secure Form</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f3f4f6;
-      color: #111827;
-    }
-
-    .page-wrapper {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 12px;
-    }
-
-    .card {
-      max-width: 1100px;
-      margin: 0 auto;
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-      padding: 16px 16px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    @media (min-width: 768px) {
-      .card {
-        padding: 20px 24px 0;
-      }
-    }
-
-    .header {
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 10px;
-      margin-bottom: 4px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      background: #eef2ff;
-      color: #3730a3;
-      margin-bottom: 6px;
-    }
-
-    h1 {
-      font-size: 20px;
-      margin: 0 0 4px;
-    }
-
-    .subtext {
-      font-size: 13px;
-      color: #6b7280;
-      margin: 0;
-    }
-
-    .info {
-      font-size: 13px;
-      color: #4b5563;
-      margin-bottom: 8px;
-    }
-
-    .info ul {
-      margin: 4px 0 0;
-      padding-left: 18px;
-    }
-
-    .info li {
-      margin-bottom: 2px;
-    }
-
-    .iframe-wrapper {
-      flex: 1;
-      margin-top: 8px;
-      border-radius: 14px 14px 0 0;
-      overflow: hidden;
-      border: 1px solid #e5e7eb;
-      background: #000;
-      min-height: 550px;
-    }
-
-    .iframe-wrapper iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-    }
-
-    .footer-note {
-      font-size: 11px;
-      color: #6b7280;
-      padding: 10px 4px 14px;
-      text-align: center;
-      border-top: 1px solid #e5e7eb;
-      background: #f9fafb;
-      border-radius: 0 0 16px 16px;
-      margin-top: 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Wellness Application | Complete Now</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .frame-container {
+            position: relative;
+            width: 100%;
+            height: 1000px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #f5f5f5;
+        }
+        
+        #mainFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info-box {
+            background: #e8f4fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-  <div class="page-wrapper">
-    <div class="card">
-      <div class="header">
-        <div class="badge">Financial Wellness Research Study</div>
-        <h1>Secure Financial Relief Form</h1>
-        <p class="subtext">
-          Please complete the secure form below. It usually takes about <strong>1 minute</strong>.
-        </p>
-      </div>
-
-      <div class="info">
-        <p><strong>Who can participate?</strong></p>
-        <ul>
-          <li>You have significant unsecured debt (credit cards, personal loans, medical bills, etc.).</li>
-          <li>Your total unsecured balances are typically above $15,000.</li>
-          <li>You are genuinely interested in speaking with a specialist about reducing your debt.</li>
-        </ul>
-      </div>
-
-      <div class="info">
-        <p><strong>Instructions:</strong></p>
-        <ul>
-          <li>Answer all questions honestly inside the form below.</li>
-          <li>If asked “Where did you hear about this program?”, select <strong>Facebook</strong>.</li>
-          <li>Submit the form at the end so your participation can be verified.</li>
-        </ul>
-      </div>
-
-      <div class="iframe-wrapper">
-        <!-- Your offer inside iframe -->
-       <iframe 
-  src="https://api.allorigins.win/raw?url=https://trkmcl.com/wy8odpg43k/xwndpp7qne"
-  width="100%"
-  height="1200"
-  frameborder="0">
-</iframe>
-      </div>
-
-      <p class="footer-note">
-        ⚠️ Your participation is only recorded if you fully submit the form above.
-      </p>
+    <div class="container">
+        <div class="header">
+            <h1>Financial Relief Application</h1>
+            <p>Complete this form to see if you qualify for debt assistance</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                <h3>✅ Instructions:</h3>
+                <p>1. Fill out all fields completely</p>
+                <p>2. When asked "How did you hear about us?" select <strong>Facebook</strong></p>
+                <p>3. Submit the form to receive your personalized options</p>
+            </div>
+            
+            <div class="frame-container">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 20px;">Loading secure form...</p>
+                </div>
+                <!-- This will be populated by JavaScript -->
+                <div id="proxyContainer"></div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- JavaScript Proxy Implementation for GitHub Pages -->
+    <script>
+        // Your target URL
+        const TARGET_URL = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
+        
+        // ============================================
+        // METHOD 1: Iframe with JavaScript Proxy
+        // ============================================
+        async function loadForm() {
+            try {
+                // Create iframe
+                const iframe = document.createElement('iframe');
+                iframe.id = 'mainFrame';
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups';
+                
+                // First, try to fetch via proxy
+                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(TARGET_URL);
+                
+                const response = await fetch(proxyUrl);
+                if (response.ok) {
+                    const html = await response.text();
+                    
+                    // Clean the HTML
+                    let cleaned = html
+                        .replace(/<script\b[^>]*>(.*?)<\/script>/gi, '')
+                        .replace(/onload=["'][^"']*["']/gi, '')
+                        .replace(/onclick=["'][^"']*["']/gi, '');
+                    
+                    // Create data URL
+                    const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(cleaned)}`;
+                    iframe.src = dataUrl;
+                    
+                    // Add to container
+                    document.getElementById('proxyContainer').appendChild(iframe);
+                    
+                    // Hide loading
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    return true;
+                }
+            } catch (error) {
+                console.log('Method 1 failed:', error);
+                return false;
+            }
+        }
+        
+        // Start loading
+        loadForm();
+    </script>
 </body>
 </html>

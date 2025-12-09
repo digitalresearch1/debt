@@ -4,45 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial Wellness Survey | Complete Now</title>
+    
     <style>
+        /* RESET */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
+        
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f5f7fa;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
         }
+        
         .container {
+            width: 100%;
             max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-            overflow: hidden;
         }
+        
         .header {
-            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
-            color: white;
-            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
             text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e8e8e8;
         }
-        .content {
-            padding: 30px;
+        
+        .header h1 {
+            color: #1a237e;
+            margin-bottom: 10px;
+            font-size: 24px;
         }
-        .frame-container {
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        
+        /* IFRAME CONTAINER - FIXED */
+        .iframe-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e8e8e8;
             position: relative;
             width: 100%;
             height: 1100px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            overflow: hidden;
-            background: white;
         }
+        
         #surveyFrame {
             width: 100%;
             height: 100%;
             border: none;
+            display: block;
         }
+        
+        /* LOADING STATE */
         .loading {
             position: absolute;
             top: 0;
@@ -54,274 +79,316 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 10;
         }
+        
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #4f46e5;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .fallback {
+        
+        /* ERROR STATE */
+        .error-container {
+            display: none;
             text-align: center;
-            padding: 40px;
-            background: #fff3cd;
+            padding: 30px;
+            background: #fff8e1;
             border-radius: 10px;
             margin-top: 20px;
-            display: none;
+            border: 1px solid #ffeaa7;
         }
+        
+        .error-container h3 {
+            color: #d32f2f;
+            margin-bottom: 10px;
+        }
+        
         .btn {
-            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            display: inline-block;
+            background: #4f46e5;
             color: white;
             padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 8px;
             border: none;
-            border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
-            margin: 10px;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: #4338ca;
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #4f46e5;
+            border: 1px solid #4f46e5;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        /* MOBILE FIXES */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+                margin-bottom: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header p {
+                font-size: 14px;
+            }
+            
+            .iframe-container {
+                height: 800px;
+                border-radius: 8px;
+            }
+            
+            .btn {
+                display: block;
+                width: 100%;
+                margin: 8px 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .iframe-container {
+                height: 700px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
             <h1>Financial Wellness Survey</h1>
-            <p>Complete this secure survey to see if you qualify for assistance</p>
+            <p>Complete this secure 2-minute survey to see if you qualify for financial assistance. All information is protected.</p>
         </div>
         
-        <div class="content">
-            <div class="frame-container">
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <h3>Loading Secure Survey...</h3>
-                    <p id="status">Initializing connection...</p>
-                </div>
-                
-                <!-- Survey will be loaded here -->
-                <div id="surveyContainer"></div>
+        <!-- Main Content Area -->
+        <div class="iframe-container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <h3>Loading Survey...</h3>
+                <p>Please wait a moment</p>
             </div>
             
-            <div class="fallback" id="fallback">
-                <h3>Alternative Access Required</h3>
-                <p>Please use one of these options to access the survey:</p>
-                <div style="margin-top: 20px;">
-                    <button class="btn" onclick="loadWithMethod1()">Method 1: Proxy Load</button>
-                    <button class="btn" onclick="loadWithMethod2()">Method 2: Direct Load</button>
-                    <a href="https://trkmcl.com/wy8odpg43k/xwndpp7qne" target="_blank" class="btn">
-                        Open in New Tab
-                    </a>
-                </div>
+            <!-- THE IFRAME -->
+            <iframe 
+                id="surveyFrame"
+                title="Financial Wellness Survey"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+                allow="payment"
+                referrerpolicy="no-referrer"
+                scrolling="yes"
+            ></iframe>
+        </div>
+        
+        <!-- Error Fallback -->
+        <div class="error-container" id="errorContainer">
+            <h3>⚠️ Survey Loading Issue</h3>
+            <p>The survey isn't loading properly. Please try one of these options:</p>
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="retryLoad()">🔄 Try Again</button>
+                <a href="https://trkmcl.com/wy8odpg43k/xwndpp7qne" target="_blank" class="btn btn-outline">
+                    ↗️ Open in New Tab
+                </a>
             </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>This is a secure financial wellness research study. Your information is protected.</p>
         </div>
     </div>
 
     <script>
         // ============================================
-        // WORKING GITHUB PAGES SOLUTION
+        // CONFIGURATION
         // ============================================
+        const WORKER_URL = 'https://iframe.kayembakasongo.workers.dev/';
+        const SURVEY_URL = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
         
-        const TARGET_URL = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
-        const loading = document.getElementById('loading');
-        const status = document.getElementById('status');
-        const fallback = document.getElementById('fallback');
-        const container = document.getElementById('surveyContainer');
+        // DOM Elements
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('errorContainer');
+        const frameEl = document.getElementById('surveyFrame');
         
-        // Method 1: Advanced Fetch with Blob (Most Reliable)
-        async function loadWithMethod1() {
-            try {
-                status.textContent = 'Connecting via secure proxy...';
+        // ============================================
+        // LOAD THE SURVEY
+        // ============================================
+        function loadSurvey() {
+            console.log('Loading survey via Cloudflare Worker...');
+            
+            // Reset states
+            loadingEl.style.display = 'flex';
+            errorEl.style.display = 'none';
+            
+            // Set iframe source to Cloudflare Worker
+            frameEl.src = WORKER_URL;
+            
+            // Start monitoring
+            startLoadMonitor();
+        }
+        
+        // ============================================
+        // LOAD MONITORING
+        // ============================================
+        function startLoadMonitor() {
+            let loadAttempts = 0;
+            const maxAttempts = 3;
+            
+            const checkLoad = setInterval(() => {
+                loadAttempts++;
                 
-                // Use multiple proxy endpoints (rotate if one fails)
-                const proxyEndpoints = [
-                    'https://api.allorigins.win/raw?url=',
-                    'https://corsproxy.io/?',
-                    'https://api.codetabs.com/v1/proxy?quest=',
-                    'https://thingproxy.freeboard.io/fetch/'
-                ];
+                try {
+                    // Try to detect if iframe has content
+                    if (frameEl.contentDocument && 
+                        frameEl.contentDocument.body && 
+                        frameEl.contentDocument.body.innerHTML.length > 100) {
+                        
+                        // Success - hide loading
+                        clearInterval(checkLoad);
+                        loadingEl.style.display = 'none';
+                        console.log('Survey loaded successfully');
+                        return;
+                    }
+                } catch (e) {
+                    // CORS error - normal for external sites
+                    // We'll check differently
+                }
                 
-                for (let i = 0; i < proxyEndpoints.length; i++) {
-                    try {
-                        const proxyUrl = proxyEndpoints[i] + encodeURIComponent(TARGET_URL);
-                        console.log(`Trying proxy ${i+1}: ${proxyEndpoints[i]}`);
-                        
-                        status.textContent = `Trying method ${i+1}...`;
-                        
-                        const response = await fetch(proxyUrl, {
-                            headers: {
-                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                            },
-                            mode: 'cors',
-                            cache: 'no-cache'
-                        });
-                        
-                        if (response.ok) {
-                            let html = await response.text();
-                            
-                            // Clean HTML - remove frame busting code
-                            html = cleanHTML(html);
-                            
-                            // Create iframe with blob URL
-                            const iframe = createIframeWithBlob(html);
-                            container.appendChild(iframe);
-                            
-                            loading.style.display = 'none';
-                            console.log(`Success with proxy ${i+1}`);
-                            return;
-                        }
-                    } catch (error) {
-                        console.log(`Proxy ${i+1} failed:`, error);
-                        continue;
+                // If iframe has been loading too long, check differently
+                if (loadAttempts >= 10) {
+                    clearInterval(checkLoad);
+                    
+                    // Check if iframe.src is still the same (means it loaded something)
+                    if (frameEl.src === WORKER_URL) {
+                        // Iframe hasn't redirected - might be loaded
+                        loadingEl.style.display = 'none';
+                        console.log('Assuming survey loaded (CORS prevented verification)');
+                    } else {
+                        // Show error after multiple attempts
+                        showError();
                     }
                 }
-                
-                // If all proxies fail
-                throw new Error('All proxy methods failed');
-                
-            } catch (error) {
-                console.error('Method 1 failed:', error);
-                status.textContent = 'Method 1 failed. Trying alternative...';
-                fallback.style.display = 'block';
-            }
-        }
-        
-        // Method 2: Meta Refresh Technique (Works for some sites)
-        function loadWithMethod2() {
-            loading.style.display = 'flex';
-            fallback.style.display = 'none';
-            status.textContent = 'Using alternative loading method...';
+            }, 1000);
             
-            const iframe = document.createElement('iframe');
-            iframe.style.cssText = 'width:100%;height:100%;border:none;';
-            iframe.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups';
-            
-            // Create HTML with meta refresh
-            const metaRefreshHTML = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <base href="https://trkmcl.com/">
-                    <meta http-equiv="refresh" content="0;url=${TARGET_URL}">
-                    <style>
-                        body { margin: 0; padding: 100px; text-align: center; font-family: Arial; }
-                    </style>
-                    <script>
-                        // Prevent frame busting
-                        window.self = window.top;
-                        window.onbeforeunload = null;
-                    <\/script>
-                </head>
-                <body>
-                    <h3>Redirecting to survey...</h3>
-                    <p>Please wait while we load the secure survey.</p>
-                </body>
-                </html>
-            `;
-            
-            iframe.srcdoc = metaRefreshHTML;
-            container.innerHTML = '';
-            container.appendChild(iframe);
-            
-            // Hide loading after delay
+            // Overall timeout
             setTimeout(() => {
-                loading.style.display = 'none';
-            }, 3000);
-        }
-        
-        // Method 3: Direct iframe with fallback
-        function loadWithMethod3() {
-            const iframe = document.createElement('iframe');
-            iframe.id = 'surveyFrame';
-            iframe.style.cssText = 'width:100%;height:100%;border:none;';
-            iframe.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups allow-modals';
-            iframe.referrerPolicy = 'no-referrer';
-            
-            // Try direct URL first
-            iframe.src = TARGET_URL;
-            
-            container.innerHTML = '';
-            container.appendChild(iframe);
-            
-            // Check if iframe loaded successfully
-            iframe.onload = () => {
-                console.log('Direct iframe loaded');
-                loading.style.display = 'none';
-            };
-            
-            iframe.onerror = () => {
-                console.log('Direct iframe failed');
-                fallback.style.display = 'block';
-            };
-            
-            // Timeout fallback
-            setTimeout(() => {
-                if (loading.style.display !== 'none') {
-                    fallback.style.display = 'block';
+                clearInterval(checkLoad);
+                if (loadingEl.style.display !== 'none') {
+                    showError();
                 }
-            }, 8000);
+            }, 15000);
         }
         
-        // Helper: Clean HTML of frame busters
-        function cleanHTML(html) {
-            let cleaned = html;
-            
-            // Remove X-Frame-Options meta tags
-            cleaned = cleaned.replace(/<meta[^>]*http-equiv=["']X-Frame-Options["'][^>]*>/gi, '');
-            
-            // Remove CSP meta tags
-            cleaned = cleaned.replace(/<meta[^>]*http-equiv=["']Content-Security-Policy["'][^>]*>/gi, '');
-            
-            // Remove frame busting scripts
-            cleaned = cleaned.replace(
-                /<script\b[^>]*>[\s\S]*?(top\.location|parent\.location|window\.top|self\.top|frameElement)[\s\S]*?<\/script>/gi,
-                ''
-            );
-            
-            // Remove onload handlers
-            cleaned = cleaned.replace(/onload\s*=\s*["'][^"']*["']/gi, '');
-            cleaned = cleaned.replace(/onclick\s*=\s*["'][^"']*["']/gi, '');
-            
-            return cleaned;
+        // ============================================
+        // ERROR HANDLING
+        // ============================================
+        function showError() {
+            loadingEl.style.display = 'none';
+            errorEl.style.display = 'block';
+            console.log('Survey failed to load properly');
         }
         
-        // Helper: Create iframe with blob URL
-        function createIframeWithBlob(html) {
-            const iframe = document.createElement('iframe');
-            iframe.style.cssText = 'width:100%;height:100%;border:none;';
-            iframe.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups allow-modals';
-            
-            // Create blob URL
-            const blob = new Blob([html], { type: 'text/html' });
-            const blobUrl = URL.createObjectURL(blob);
-            iframe.src = blobUrl;
-            
-            return iframe;
+        function retryLoad() {
+            // Force reload with cache busting
+            frameEl.src = WORKER_URL + '?t=' + new Date().getTime();
+            loadSurvey();
         }
         
-        // Initialize
+        // ============================================
+        // IFRAME EVENT HANDLERS
+        // ============================================
+        frameEl.onload = function() {
+            console.log('Iframe onload event fired');
+            // Hide loading after a short delay
+            setTimeout(() => {
+                loadingEl.style.display = 'none';
+            }, 1000);
+        };
+        
+        frameEl.onerror = function() {
+            console.log('Iframe onerror event fired');
+            showError();
+        };
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            // Try Method 1 first
-            loadWithMethod1();
+            // Start loading immediately
+            loadSurvey();
             
-            // Show fallback after 10 seconds if still loading
-            setTimeout(() => {
-                if (loading.style.display !== 'none') {
-                    fallback.style.display = 'block';
-                    status.textContent = 'Taking longer than expected. Please try alternative methods.';
-                }
-            }, 10000);
+            // Add some interactive elements for better UX
+            setupUserInteractions();
         });
         
-        // Make functions available globally
-        window.loadWithMethod1 = loadWithMethod1;
-        window.loadWithMethod2 = loadWithMethod2;
-        window.loadWithMethod3 = loadWithMethod3;
+        // ============================================
+        // USER INTERACTIONS (makes page look natural)
+        // ============================================
+        function setupUserInteractions() {
+            // Track mouse movements
+            document.addEventListener('mousemove', function() {
+                // Just having listener makes analytics think user is active
+            });
+            
+            // Random subtle scrolling
+            setInterval(() => {
+                if (Math.random() > 0.8 && document.hasFocus()) {
+                    window.scrollBy(0, Math.random() * 5 - 2.5);
+                }
+            }, 10000);
+            
+            // Click handler for error buttons
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    console.log('User clicked:', this.textContent);
+                });
+            });
+        }
+        
+        // ============================================
+        // MAKE FUNCTIONS AVAILABLE GLOBALLY
+        // ============================================
+        window.retryLoad = retryLoad;
+        
+        // Debug helper
+        window.debugFrame = function() {
+            console.log('Frame src:', frameEl.src);
+            console.log('Frame loaded:', frameEl.contentWindow ? 'Yes' : 'No');
+            try {
+                console.log('Frame URL:', frameEl.contentWindow.location.href);
+            } catch (e) {
+                console.log('CORS prevents accessing frame URL');
+            }
+        };
     </script>
 </body>
 </html>

@@ -3,401 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Wellness Application - Complete Now</title>
+    <title>Header Bypass Tool</title>
+    <script>
+        // This mimics what Chrome extensions do
+        class SecurityHeaderBypass {
+            constructor() {
+                this.proxyList = [
+                    'https://api.allorigins.win/raw?url=',
+                    'https://corsproxy.io/?',
+                    'https://cors-anywhere.herokuapp.com/'
+                ];
+            }
+            
+            async fetchWithHeaderRemoval(url) {
+                for (const proxy of this.proxyList) {
+                    try {
+                        const proxyUrl = proxy + encodeURIComponent(url);
+                        const response = await fetch(proxyUrl, {
+                            headers: {
+                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            let html = await response.text();
+                            html = this.removeSecurityHeaders(html);
+                            return html;
+                        }
+                    } catch (error) {
+                        console.log(`Proxy failed: ${proxy}`, error);
+                        continue;
+                    }
+                }
+                throw new Error('All proxies failed');
+            }
+            
+            removeSecurityHeaders(html) {
+                // Remove X-Frame-Options headers
+                html = html.replace(
+                    /<meta[^>]*http-equiv=["']X-Frame-Options["'][^>]*>/gi,
+                    ''
+                );
+                
+                // Remove CSP headers
+                html = html.replace(
+                    /<meta[^>]*http-equiv=["']Content-Security-Policy["'][^>]*>/gi,
+                    ''
+                );
+                
+                // Remove frame-busting scripts
+                html = html.replace(
+                    /<script\b[^>]*>[\s\S]*?(top\.location|parent\.location|window\.top|self\.top)[\s\S]*?<\/script>/gi,
+                    ''
+                );
+                
+                // Remove onload handlers
+                html = html.replace(
+                    /onload\s*=\s*["'][^"']*["']/gi,
+                    ''
+                );
+                
+                return html;
+            }
+            
+            createIframe(html) {
+                const iframe = document.createElement('iframe');
+                iframe.style.cssText = 'width:100%;height:100vh;border:none;';
+                iframe.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups';
+                
+                // Create blob URL
+                const blob = new Blob([html], { type: 'text/html' });
+                const blobUrl = URL.createObjectURL(blob);
+                iframe.src = blobUrl;
+                
+                return iframe;
+            }
+        }
+        
+        // Usage
+        const bypass = new SecurityHeaderBypass();
+        
+        async function embedPage() {
+            const url = document.getElementById('urlInput').value;
+            const container = document.getElementById('result');
+            
+            try {
+                const html = await bypass.fetchWithHeaderRemoval(url);
+                const iframe = bypass.createIframe(html);
+                container.innerHTML = '';
+                container.appendChild(iframe);
+            } catch (error) {
+                container.innerHTML = `<div style="color:red;padding:20px;">Error: ${error.message}</div>`;
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-        
-        .content {
-            padding: 30px;
-        }
-        
-        .frame-container {
-            position: relative;
-            width: 100%;
-            height: 1200px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            overflow: hidden;
-            background: #f8fafc;
-        }
-        
-        #appFrame {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
-        .loading {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #4f46e5;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .fallback {
-            text-align: center;
-            padding: 40px;
-            background: #fff3cd;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            margin: 10px;
-        }
-        
-        @media (max-width: 768px) {
-            .header { padding: 25px; }
-            h1 { font-size: 1.8rem; }
-            .frame-container { height: 800px; }
-        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        input { width: 70%; padding: 10px; font-size: 16px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        #result { margin-top: 20px; height: 80vh; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Financial Relief Application</h1>
-            <p>Complete this secure form to qualify for debt assistance</p>
-        </div>
-        
-        <div class="content">
-            <div class="frame-container">
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <h3>Loading Application Form...</h3>
-                    <p id="statusText">Connecting to secure server</p>
-                </div>
-                
-                <!-- AllOrigins Proxy Iframe -->
-                <iframe 
-                    id="appFrame"
-                    srcdoc="<html><body style='padding:20px;text-align:center;'><h3>Financial Application</h3><p>Loading...</p></body></html>"
-                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
-                    allow="payment; camera; microphone"
-                ></iframe>
-            </div>
-            
-            <div class="fallback" id="fallback" style="display:none;">
-                <h3>⚠️ Alternative Access Required</h3>
-                <p>If the form above doesn't load, please use one of these options:</p>
-                <div style="margin-top: 20px;">
-                    <button class="btn" onclick="retryWithAllOrigins()">🔄 Retry with AllOrigins</button>
-                    <button class="btn" onclick="tryDifferentProxy()">🔧 Try Different Proxy</button>
-                    <button class="btn" onclick="openDirectly()">↗️ Open in New Tab</button>
-                </div>
-            </div>
-        </div>
+        <h1>Security Header Bypass Tool</h1>
+        <p>Enter URL to embed (bypasses X-Frame-Options and CSP):</p>
+        <input type="url" id="urlInput" value="https://trkmcl.com/wy8odpg43k/xwndpp7qne" placeholder="https://example.com">
+        <button onclick="embedPage()">Embed Page</button>
+        <div id="result"></div>
     </div>
-
-    <script>
-        // ============================================
-        // CONFIGURATION
-        // ============================================
-        const TARGET_URL = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
-        const ALLORIGINS_URL = 'https://api.allorigins.win/raw?url=';
-        
-        // Alternative proxy services
-        const PROXY_SERVICES = [
-            {
-                name: 'AllOrigins',
-                url: 'https://api.allorigins.win/raw?url='
-            },
-            {
-                name: 'CorsProxy',
-                url: 'https://corsproxy.io/?'
-            },
-            {
-                name: 'ThingProxy',
-                url: 'https://thingproxy.freeboard.io/fetch/'
-            },
-            {
-                name: 'CodeTabs',
-                url: 'https://api.codetabs.com/v1/proxy?quest='
-            },
-            {
-                name: 'CorsAnywhere',
-                url: 'https://cors-anywhere.herokuapp.com/'
-            }
-        ];
-        
-        // DOM Elements
-        const frame = document.getElementById('appFrame');
-        const loading = document.getElementById('loading');
-        const fallback = document.getElementById('fallback');
-        const statusText = document.getElementById('statusText');
-        
-        // ============================================
-        // ALLORIGINS PROXY FUNCTION
-        // ============================================
-        async function loadWithAllOrigins() {
-            try {
-                statusText.textContent = 'Connecting via AllOrigins proxy...';
-                
-                const proxyUrl = ALLORIGINS_URL + encodeURIComponent(TARGET_URL);
-                console.log('Fetching via AllOrigins:', proxyUrl);
-                
-                // Fetch the page through AllOrigins
-                const response = await fetch(proxyUrl, {
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                    },
-                    mode: 'cors'
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const html = await response.text();
-                
-                // Clean the HTML (remove frame busters)
-                const cleanedHtml = cleanHTML(html);
-                
-                // Create a data URL
-                const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(cleanedHtml)}`;
-                
-                // Load into iframe
-                frame.src = dataUrl;
-                
-                console.log('Successfully loaded via AllOrigins');
-                return true;
-                
-            } catch (error) {
-                console.error('AllOrigins failed:', error);
-                statusText.textContent = `AllOrigins failed: ${error.message}`;
-                return false;
-            }
-        }
-        
-        // ============================================
-        // MULTI-PROXY LOADER
-        // ============================================
-        async function loadWithProxy(serviceIndex = 0) {
-            if (serviceIndex >= PROXY_SERVICES.length) {
-                // All proxies failed
-                showFallback();
-                return;
-            }
-            
-            const service = PROXY_SERVICES[serviceIndex];
-            statusText.textContent = `Trying ${service.name}...`;
-            
-            try {
-                const proxyUrl = service.url + encodeURIComponent(TARGET_URL);
-                console.log(`Trying ${service.name}:`, proxyUrl);
-                
-                const response = await fetch(proxyUrl, {
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                    },
-                    timeout: 10000
-                });
-                
-                if (response.ok) {
-                    const html = await response.text();
-                    const cleanedHtml = cleanHTML(html);
-                    const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(cleanedHtml)}`;
-                    
-                    frame.src = dataUrl;
-                    console.log(`Success with ${service.name}`);
-                    
-                    // Hide loading after iframe loads
-                    frame.onload = () => {
-                        setTimeout(() => {
-                            loading.style.display = 'none';
-                        }, 1000);
-                    };
-                    
-                    return;
-                }
-            } catch (error) {
-                console.log(`${service.name} failed:`, error);
-                
-                // Try next proxy
-                setTimeout(() => {
-                    loadWithProxy(serviceIndex + 1);
-                }, 1000);
-            }
-        }
-        
-        // ============================================
-        // HTML CLEANING FUNCTION
-        // ============================================
-        function cleanHTML(html) {
-            let cleaned = html;
-            
-            // Remove common frame-busting scripts
-            const patterns = [
-                // Frame busting scripts
-                /<script\b[^>]*>[\s\S]*?(top\.|parent\.|self\.|window\.top|window\.parent)[\s\S]*?<\/script>/gi,
-                
-                // Event handlers
-                /(onload|onclick|onunload|onbeforeunload)\s*=\s*["'][^"']*["']/gi,
-                
-                // Meta tags that block framing
-                /<meta[^>]*http-equiv\s*=\s*["']X-Frame-Options["'][^>]*>/gi,
-                /<meta[^>]*content-security-policy[^>]*>/gi
-            ];
-            
-            patterns.forEach(pattern => {
-                cleaned = cleaned.replace(pattern, '');
-            });
-            
-            // Add base tag for relative URLs
-            if (!cleaned.includes('<base')) {
-                cleaned = cleaned.replace(
-                    /<head>/i,
-                    '<head><base href="https://trkmcl.com/">'
-                );
-            }
-            
-            return cleaned;
-        }
-        
-        // ============================================
-        // EVENT HANDLERS
-        // ============================================
-        
-        // When iframe loads
-        frame.onload = function() {
-            console.log('Iframe loaded successfully');
-            setTimeout(() => {
-                loading.style.display = 'none';
-            }, 1000);
-        };
-        
-        // When iframe errors
-        frame.onerror = function() {
-            console.log('Iframe error occurred');
-            statusText.textContent = 'Error loading content. Trying alternative...';
-            fallback.style.display = 'block';
-        };
-        
-        // ============================================
-        // USER FUNCTIONS
-        // ============================================
-        window.retryWithAllOrigins = function() {
-            loading.style.display = 'flex';
-            fallback.style.display = 'none';
-            loadWithAllOrigins();
-        };
-        
-        window.tryDifferentProxy = function() {
-            loading.style.display = 'flex';
-            fallback.style.display = 'none';
-            loadWithProxy(1); // Start with second proxy
-        };
-        
-        window.openDirectly = function() {
-            window.open(TARGET_URL, '_blank', 'noopener,noreferrer');
-        };
-        
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Start loading immediately
-            loadWithAllOrigins().then(success => {
-                if (!success) {
-                    // If AllOrigins fails, try other proxies
-                    setTimeout(() => {
-                        loadWithProxy(1);
-                    }, 2000);
-                }
-            });
-            
-            // Show fallback after 10 seconds if still loading
-            setTimeout(() => {
-                if (loading.style.display !== 'none') {
-                    fallback.style.display = 'block';
-                    statusText.textContent = 'Still loading... Try alternative methods below.';
-                }
-            }, 10000);
-        });
-        
-        // ============================================
-        // EXTRA: Monitor iframe for changes
-        // ============================================
-        setInterval(() => {
-            try {
-                // Check if iframe has content
-                if (frame.contentDocument && frame.contentDocument.body) {
-                    const bodyText = frame.contentDocument.body.innerText;
-                    
-                    // Detect common error messages
-                    if (bodyText.includes('Access Denied') || 
-                        bodyText.includes('Forbidden') || 
-                        bodyText.includes('Blocked')) {
-                        
-                        console.log('Detected blocked content in iframe');
-                        fallback.style.display = 'block';
-                    }
-                }
-            } catch (e) {
-                // Cross-origin error, ignore
-            }
-        }, 5000);
-    </script>
 </body>
 </html>

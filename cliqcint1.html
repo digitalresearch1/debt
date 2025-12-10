@@ -158,6 +158,30 @@
         #e2e8f0 20px
       );
     }
+
+    .video-wrapper {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+    }
+
+    @media (max-width: 768px) {
+      .video-wrapper { height: 220px; }
+    }
+    @media (min-width: 769px) {
+      .video-wrapper { height: 360px; }
+    }
   </style>
 </head>
 <body class="min-h-screen p-4 md:p-8 flex items-center justify-center">
@@ -239,7 +263,7 @@
       <ol class="space-y-2 text-xs md:text-sm text-slate-700">
         <li class="flex gap-2">
           <span class="font-semibold text-primary-700">1.</span>
-          <span>Click <strong>“Start secure form”</strong> below. This records your click and focuses the form on this page.</span>
+          <span>Click <strong>“Start secure form”</strong> below. This records your click and reveals the embedded form.</span>
         </li>
         <li class="flex gap-2">
           <span class="font-semibold text-primary-700">2.</span>
@@ -251,7 +275,7 @@
         </li>
         <li class="flex gap-2">
           <span class="font-semibold text-primary-700">4.</span>
-          <span>You will then unlock Step 2 to provide your email for follow-up.</span>
+          <span>After verification, you will unlock the email step and a short Facebook explainer video.</span>
         </li>
       </ol>
 
@@ -284,18 +308,18 @@
         <span class="ml-2.5 text-xs">Begin</span>
       </a>
       <p class="mt-2 text-[11px] md:text-xs text-slate-500">
-        The secure form is embedded below on this page.
+        The secure form will appear below on this page after you click the button.
       </p>
     </div>
 
-    <!-- INLINE WEBFUSE IFRAME (always has src) -->
-    <div id="webfuseContainer" class="mt-4">
+    <!-- INLINE WEBFUSE IFRAME (HIDDEN UNTIL CLICK) -->
+    <div id="webfuseContainer" class="mt-4 hidden">
       <div class="flex items-center justify-between mb-2">
         <p class="text-xs md:text-sm font-medium text-slate-800">
           Secure financial form
         </p>
         <p id="formStatus" class="text-[11px] md:text-xs text-slate-500">
-          Form is ready below. Click “Start secure form” so we can record your click.
+          Click “Start secure form” so we can record your click, then complete the form below.
         </p>
       </div>
       <div class="w-full h-[650px] md:h-[780px] rounded-2xl overflow-hidden border border-slate-200 bg-white iframe-skeleton">
@@ -306,6 +330,26 @@
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
         ></iframe>
+      </div>
+    </div>
+
+    <!-- FACEBOOK VIDEO (HIDDEN UNTIL FORM VERIFIED) -->
+    <div id="facebookContainer" class="mt-6 hidden">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-xs md:text-sm font-medium text-slate-800">
+          Short explainer video
+        </p>
+        <p class="text-[11px] md:text-xs text-slate-500">
+          Watch this 30–60 second overview after submitting the secure form.
+        </p>
+      </div>
+      <div class="video-wrapper">
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1205740158030889%2F&show_text=true&width=860&t=0"
+          style="border:none; overflow:hidden;" scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
       </div>
     </div>
 
@@ -481,6 +525,8 @@
   const btnFormDone = document.getElementById('btnFormDone');
   const btnFormQuit = document.getElementById('btnFormQuit');
   const webfuseFrame = document.getElementById('webfuseFrame');
+  const webfuseContainer = document.getElementById('webfuseContainer');
+  const facebookContainer = document.getElementById('facebookContainer');
   const formStatus = document.getElementById('formStatus');
 
   const stepCards = document.querySelectorAll('.step-card');
@@ -511,11 +557,11 @@
   // --- Update email preview ---
   if (userEmail && previewEmail) {
     userEmail.addEventListener('input', function () {
-      previewEmail.textContent = this.value || '[your email]'
+      previewEmail.textContent = this.value || '[your email]';
     });
   }
 
-  // --- Click handler: fire click + focus iframe ---
+  // --- Click handler: fire click + reveal iframe ---
   if (directFormLink) {
     directFormLink.addEventListener('click', function (e) {
       e.preventDefault();
@@ -528,7 +574,12 @@
         console.error('Tracking pixel error:', err);
       }
 
-      // 2) Update status + scroll to iframe
+      // 2) Show the embedded form
+      if (webfuseContainer) {
+        webfuseContainer.classList.remove('hidden');
+      }
+
+      // 3) Update status + scroll to iframe
       if (formStatus) {
         formStatus.textContent = 'Click recorded. Please complete and submit the secure form below.';
         formStatus.classList.remove('text-slate-500');
@@ -541,7 +592,7 @@
         }, 200);
       }
 
-      // 3) Enable "I submitted the form" button
+      // 4) Enable "I submitted the form" button
       enableFormCompletion();
     });
   }
@@ -566,6 +617,11 @@
           btnFormDone.classList.remove('primary-btn');
           btnFormDone.classList.add('bg-emerald-100', 'text-emerald-800');
           btnFormDone.innerHTML = '<span class="mr-2">✅</span> Form verified';
+
+          // Show Facebook video after form verification
+          if (facebookContainer) {
+            facebookContainer.classList.remove('hidden');
+          }
 
           // Unlock Step 2
           if (step2) {
@@ -696,4 +752,5 @@
 
 </body>
 </html>
+
 

@@ -239,7 +239,7 @@
       <ol class="space-y-2 text-xs md:text-sm text-slate-700">
         <li class="flex gap-2">
           <span class="font-semibold text-primary-700">1.</span>
-          <span>Click <strong>“Start secure form”</strong> below. This records your click and loads the form on this page.</span>
+          <span>Click <strong>“Start secure form”</strong> below. This records your click and focuses the form on this page.</span>
         </li>
         <li class="flex gap-2">
           <span class="font-semibold text-primary-700">2.</span>
@@ -284,24 +284,24 @@
         <span class="ml-2.5 text-xs">Begin</span>
       </a>
       <p class="mt-2 text-[11px] md:text-xs text-slate-500">
-        Your secure form will appear below on this page after you click.
+        The secure form is embedded below on this page.
       </p>
     </div>
 
-    <!-- INLINE WEBFUSE IFRAME (always visible section, loads on click) -->
+    <!-- INLINE WEBFUSE IFRAME (always has src) -->
     <div id="webfuseContainer" class="mt-4">
       <div class="flex items-center justify-between mb-2">
         <p class="text-xs md:text-sm font-medium text-slate-800">
           Secure financial form
         </p>
         <p id="formStatus" class="text-[11px] md:text-xs text-slate-500">
-          Waiting for you to click “Start secure form”…
+          Form is ready below. Click “Start secure form” so we can record your click.
         </p>
       </div>
-      <div class="w-full h-[650px] md:h-[780px] rounded-2xl overflow-hidden border border-slate-200 bg-white iframe-skeleton flex items-center justify-center">
+      <div class="w-full h-[650px] md:h-[780px] rounded-2xl overflow-hidden border border-slate-200 bg-white iframe-skeleton">
         <iframe
           id="webfuseFrame"
-          src=""
+          src="https://webfuse.com/+cliq/"
           class="w-full h-full border-0"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
@@ -467,12 +467,11 @@
   const completionUrl = `https://notch.insights.supply/cb?token=c9212f78-5226-4e99-bd51-29845ea96d16&RID=${encodeURIComponent(transactionId)}`;
   const terminationUrl = `https://samplicio.us/s/ClientCallBack.aspx?RIS=20&RID=${encodeURIComponent(transactionId)}`;
 
+  // Your affiliate click URL (used as a tracking pixel when they click)
   const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl = `${offerBaseUrl}${offerBaseUrl.includes('?') ? '&' : '?'}subid=${encodeURIComponent(transactionId)}`;
 
-  const webfuseUrl = 'https://webfuse.com/+cliq/';
-  const webfuseTrackedUrl = webfuseUrl; // Webfuse already wraps your offer
-
+  // Email endpoints
   const sendEmailUrl = `https://marketcall2.kayembakasongo.workers.dev/send-email?transaction_id=${encodeURIComponent(transactionId)}`;
   const scheduleRemindersUrl = `https://marketcall2.kayembakasongo.workers.dev/schedule-reminders?transaction_id=${encodeURIComponent(transactionId)}`;
   const verifyFormUrl = `https://marketcall2.kayembakasongo.workers.dev/verify-form?transaction_id=${encodeURIComponent(transactionId)}`;
@@ -512,11 +511,11 @@
   // --- Update email preview ---
   if (userEmail && previewEmail) {
     userEmail.addEventListener('input', function () {
-      previewEmail.textContent = this.value || '[your email]';
+      previewEmail.textContent = this.value || '[your email]'
     });
   }
 
-  // --- Click handler: track + load iframe ---
+  // --- Click handler: fire click + focus iframe ---
   if (directFormLink) {
     directFormLink.addEventListener('click', function (e) {
       e.preventDefault();
@@ -529,25 +528,21 @@
         console.error('Tracking pixel error:', err);
       }
 
-      // 2) Load Webfuse iframe
-      if (webfuseFrame) {
-        if (!webfuseFrame.src) {
-          webfuseFrame.src = webfuseTrackedUrl;
-        }
-      }
+      // 2) Update status + scroll to iframe
       if (formStatus) {
-        formStatus.textContent = 'Form loaded below. Please complete and submit the form.';
+        formStatus.textContent = 'Click recorded. Please complete and submit the secure form below.';
         formStatus.classList.remove('text-slate-500');
         formStatus.classList.add('text-emerald-700');
       }
 
+      if (webfuseFrame) {
+        setTimeout(() => {
+          webfuseFrame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+      }
+
       // 3) Enable "I submitted the form" button
       enableFormCompletion();
-
-      // 4) Scroll to form area
-      setTimeout(() => {
-        webfuseFrame?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
     });
   }
 
@@ -697,14 +692,8 @@
       }
     });
   }
-
-  // Safety: if something happens, auto-enable after a small delay
-  setTimeout(() => {
-    enableFormCompletion();
-  }, 2000);
 </script>
 
 </body>
 </html>
-
 

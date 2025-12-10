@@ -240,7 +240,6 @@
         </li>
       </ol>
       
-      <!-- About the Follow-up Emails Section -->
       <div class="mt-6 info-box rounded-lg p-4">
         <div class="flex items-start">
           <span class="text-blue-600 mr-3">📧</span>
@@ -297,8 +296,8 @@
 
         <!-- BUTTON THAT TRIGGERS IFRAME LOAD -->
         <button id="directFormLink"
-           type="button"
-           class="primary-btn inline-flex items-center justify-center px-8 py-4 rounded-xl text-lg font-bold mb-4 w-full md:w-auto">
+                type="button"
+                class="primary-btn inline-flex items-center justify-center px-8 py-4 rounded-xl text-lg font-bold mb-4 w-full md:w-auto">
           <span class="mr-3">🚀</span>
           Open secure financial form
         </button>
@@ -310,13 +309,13 @@
     </div>
 
     <!-- INLINE IFRAME (WEBFUSE) -->
-    <div id="webfuseContainer" class="mt-6 hidden">
+    <div id="webfuseContainer" class="mt-6 hidden" style="display:none;">
       <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-4 text-left">
         <p class="text-sm text-gray-700 font-medium">
-          The secure financial form is now loaded below. Please complete and submit it, then return here and click "I submitted the form".
+          The secure financial form is now loaded below. Please complete and submit it, then click "I submitted the form" to continue.
         </p>
       </div>
-      <div class="w-full h-[900px] rounded-xl overflow-hidden border border-gray-200">
+      <div class="w-full rounded-xl overflow-hidden border border-gray-200" style="height:900px;">
         <iframe
           id="webfuseFrame"
           src=""
@@ -532,23 +531,21 @@
 </div>
 
 <script>
-  // Initialize
+  // ==== BASIC INIT ====
   const urlParams = new URLSearchParams(window.location.search);
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
-  const src = 'ps';
-
   if (!transactionId) {
     transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 
-  // Survey platform URLs (completion / termination)
+  // Survey platform URLs
   const completionUrl = `https://notch.insights.supply/cb?token=c9212f78-5226-4e99-bd51-29845ea96d16&RID=${encodeURIComponent(transactionId)}`;
   const terminationUrl = `https://samplicio.us/s/ClientCallBack.aspx?RIS=20&RID=${encodeURIComponent(transactionId)}`;
   
-  // WEBFUSE LINK (your iframe URL)
+  // WEBFUSE URL (iframe host)
   const webfuseBaseUrl = 'https://webfuse.com/+cliq/';
   const webfuseTrackedUrl = `${webfuseBaseUrl}${webfuseBaseUrl.includes('?') ? '&' : '?'}subid=${encodeURIComponent(transactionId)}`;
-  
+
   // Email endpoints
   const sendEmailUrl = `https://marketcall2.kayembakasongo.workers.dev/send-email?transaction_id=${encodeURIComponent(transactionId)}`;
   const scheduleRemindersUrl = `https://marketcall2.kayembakasongo.workers.dev/schedule-reminders?transaction_id=${encodeURIComponent(transactionId)}`;
@@ -558,8 +555,8 @@
   const directFormLink = document.getElementById('directFormLink');
   const btnFormDone = document.getElementById('btnFormDone');
   const btnFormQuit = document.getElementById('btnFormQuit');
-  const step2 = document.querySelector('.step-card:nth-child(2)');
-  const step3 = document.querySelector('.step-card:nth-child(3)');
+  const step2 = document.querySelectorAll('.step-card')[1];
+  const step3 = document.querySelectorAll('.step-card')[2];
   const emailSection = document.getElementById('emailSection');
   const emailScheduled = document.getElementById('emailScheduled');
   const btnSendEmail = document.getElementById('btnSendEmail');
@@ -571,26 +568,27 @@
   const webfuseFrame = document.getElementById('webfuseFrame');
 
   // Update email preview
-  if (userEmail) {
+  if (userEmail && previewEmail) {
     userEmail.addEventListener('input', function() {
       previewEmail.textContent = this.value || '[Your Email]';
     });
   }
 
-  // When user clicks "Open secure financial form"
+  // ==== CLICK -> SHOW IFRAME + LOAD WEBFUSE ====
   if (directFormLink) {
     directFormLink.addEventListener('click', function() {
-      // Show iframe container
+      // Make container visible (extra safe)
       if (webfuseContainer) {
         webfuseContainer.classList.remove('hidden');
+        webfuseContainer.style.display = 'block';
       }
 
-      // Load Webfuse URL into iframe (with subid for tracking)
+      // Set iframe src (only once)
       if (webfuseFrame && !webfuseFrame.src) {
         webfuseFrame.src = webfuseTrackedUrl;
       }
 
-      // Enable the "I submitted the form" button
+      // Enable "I submitted the form" button
       enableFormCompletion();
     });
   }
@@ -604,60 +602,48 @@
     }
   }
 
-  // Form completion button
+  // ==== VERIFY FORM SUBMISSION ====
   if (btnFormDone) {
     btnFormDone.addEventListener('click', async function() {
       if (btnFormDone.disabled) return;
 
-      // Show loading state
       btnFormDone.disabled = true;
       btnFormDone.innerHTML = '<span class="mr-2">⏳</span> Verifying submission...';
 
       try {
-        // Verify form submission
         const verifyResponse = await fetch(verifyFormUrl, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          }
+          headers: { 'Content-Type': 'application/json' }
         });
 
         const verification = await verifyResponse.json();
 
         if (verification.submitted) {
-          // Success - form submitted
           btnFormDone.classList.remove('primary-btn');
           btnFormDone.classList.add('bg-green-100', 'text-green-800');
           btnFormDone.innerHTML = '<span class="mr-2">✅</span> Form Verified ✓';
 
-          // Unlock step 2
           if (step2) {
             step2.style.opacity = '1';
             step2.classList.add('active');
-            
-            // Show email section
             if (emailSection) {
               setTimeout(() => {
                 emailSection.classList.remove('hidden');
                 emailSection.classList.add('animate-slideUp');
               }, 300);
             }
-            
-            // Scroll to step 2
             setTimeout(() => {
               step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 500);
           }
         } else {
-          // Form not submitted
           btnFormDone.disabled = false;
           btnFormDone.classList.remove('primary-btn');
           btnFormDone.classList.add('bg-red-100', 'text-red-800');
           btnFormDone.innerHTML = '<span class="mr-2">❌</span> Form not submitted';
-          
+
           alert('We could not verify your form submission. Please make sure you completed and submitted the form below, then try again.');
-          
-          // Reset button after 3 seconds
+
           setTimeout(() => {
             btnFormDone.disabled = false;
             btnFormDone.classList.remove('bg-red-100', 'text-red-800');
@@ -665,15 +651,13 @@
             btnFormDone.innerHTML = '<span class="mr-2">📋</span> I submitted the form';
           }, 3000);
         }
-        
       } catch (error) {
         console.error('Error verifying form:', error);
         btnFormDone.disabled = false;
         btnFormDone.classList.remove('primary-btn');
         btnFormDone.classList.add('bg-yellow-100', 'text-yellow-800');
         btnFormDone.innerHTML = '<span class="mr-2">⚠️</span> Check connection';
-        
-        // Reset button after 3 seconds
+
         setTimeout(() => {
           btnFormDone.disabled = false;
           btnFormDone.classList.remove('bg-yellow-100', 'text-yellow-800');
@@ -684,7 +668,7 @@
     });
   }
 
-  // Send email and schedule reminders
+  // ==== EMAIL + REMINDERS ====
   if (btnSendEmail) {
     btnSendEmail.addEventListener('click', async function() {
       const email = userEmail.value.trim();
@@ -705,12 +689,9 @@
       btnSendEmail.innerHTML = 'Scheduling emails...';
       
       try {
-        // Send immediate email
         await fetch(sendEmailUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             email: email,
             type: 'immediate',
@@ -718,12 +699,9 @@
           })
         });
         
-        // Schedule reminders for next 3 days
         await fetch(scheduleRemindersUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             email: email,
             transaction_id: transactionId,
@@ -731,17 +709,12 @@
           })
         });
         
-        // Show email scheduled section
         setTimeout(() => {
           if (emailScheduled) {
             emailScheduled.classList.remove('hidden');
             emailScheduled.classList.add('animate-slideUp');
-            
-            // Scroll to scheduled section
             setTimeout(() => {
               emailScheduled.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              
-              // Unlock step 3
               if (step3) {
                 step3.style.opacity = '1';
                 step3.classList.add('active');
@@ -762,7 +735,6 @@
     });
   }
 
-  // Complete study button
   if (btnCompleteStudy) {
     btnCompleteStudy.addEventListener('click', function() {
       if (confirm('Thank you for participating! Your follow-up emails have been scheduled for the next 3 days. You may now complete the study.')) {
@@ -771,13 +743,11 @@
     });
   }
 
-  // Email validation
   function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   }
 
-  // Quit button
   if (btnFormQuit) {
     btnFormQuit.addEventListener('click', function() {
       if (confirm('If you don\'t have $15,000+ in unsecured debt or cannot receive a specialist call, you may exit the study. Are you sure?')) {
@@ -789,3 +759,4 @@
 
 </body>
 </html>
+

@@ -27,44 +27,45 @@
               900: '#312e81',
             }
           },
-          animation: {
-            'pulse-slow': 'pulse 3s ease-in-out infinite',
-            'float': 'float 3s ease-in-out infinite',
-            'fadeIn': 'fadeIn 0.5s ease-in-out',
-            'slideUp': 'slideUp 0.3s ease-out',
+          boxShadow: {
+            soft: '0 24px 60px rgba(15, 23, 42, 0.18)',
           }
         }
       }
     }
   </script>
 
+  <!-- Brevo base styles -->
+  <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: radial-gradient(circle at top, #4f46e5 0, #020617 55%);
       min-height: 100vh;
     }
 
     .form-container {
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+      border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+      border: 1px solid rgba(148, 163, 184, 0.4);
     }
 
     .header-gradient {
-      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #9333ea 100%);
+      background: radial-gradient(circle at top left, #6366f1, #4f46e5 40%, #a855f7 100%);
     }
 
     .step-card {
       background: white;
+      border-radius: 18px;
       border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
     }
 
     .step-card.active {
       border-color: #4f46e5;
-      box-shadow: 0 10px 30px rgba(79, 70, 229, 0.1);
+      box-shadow: 0 16px 40px rgba(79, 70, 229, 0.12);
     }
 
     .step-number {
@@ -73,204 +74,199 @@
       justify-content: center;
       width: 32px;
       height: 32px;
-      border-radius: 50%;
+      border-radius: 999px;
       background: linear-gradient(135deg, #4f46e5, #6366f1);
       color: white;
       font-weight: 600;
+      font-size: 0.875rem;
     }
 
     .primary-btn {
       background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
       color: white;
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
     }
 
     .primary-btn:hover {
       background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
-    }
-
-    .success-btn {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 16px 35px rgba(79, 70, 229, 0.45);
     }
 
     .warning-box {
-      background: #fff3cd;
-      border: 1px solid #ffeaa7;
-      border-left: 4px solid #f59e0b;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 14px;
     }
 
     .info-box {
-      background: #f0f9ff;
-      border: 1px solid #e0f2fe;
-      border-left: 4px solid #0ea5e9;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 14px;
     }
 
     .eligibility-box {
-      background: #fef3c7;
-      border: 1px solid #fbbf24;
-      border-left: 4px solid #f59e0b;
-    }
-
-    .loading-dots span {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #4f46e5;
-      margin: 0 4px;
-      animation: bounce 1.5s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from { 
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateY(0);
-      }
+      background: #fefce8;
+      border: 1px solid #facc15;
+      border-radius: 14px;
     }
 
     .feature-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.5rem 1rem;
+      padding: 0.45rem 0.9rem;
       background: #eef2ff;
-      border-radius: 50px;
-      font-size: 0.875rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
       font-weight: 500;
-      color: #4f46e5;
+      color: #4338ca;
     }
 
     .reminder-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: #f0f9ff;
-      border-radius: 50px;
-      font-size: 0.875rem;
+      padding: 0.45rem 0.9rem;
+      background: #ecfeff;
+      border-radius: 999px;
+      font-size: 0.8rem;
       font-weight: 500;
-      color: #0ea5e9;
+      color: #0369a1;
     }
 
-    .email-preview {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 1.5rem;
-      font-family: 'Courier New', monospace;
-      font-size: 0.875rem;
-      line-height: 1.5;
-      white-space: pre-wrap;
+    .video-wrapper {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      background: #000;
     }
 
-    .completion-card {
-      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-      border: 2px solid #10b981;
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+    }
+
+    @media (max-width: 768px) {
+      .video-wrapper { height: 220px; }
+    }
+    @media (min-width: 769px) {
+      .video-wrapper { height: 360px; }
+    }
+
+    /* Brevo small tweaks */
+    #sib-container input::placeholder {
+      text-align: left;
+      font-family: Helvetica, sans-serif;
+      color: #c0ccda;
+    }
+
+    #sib-container a {
+      text-decoration: underline;
+      color: #2BB2FC;
     }
   </style>
 </head>
-<body class="min-h-screen p-4 md:p-6 flex items-center justify-center">
+<body class="min-h-screen p-4 md:p-8 flex items-center justify-center">
 
-<div class="form-container w-full max-w-4xl p-4 md:p-8">
+<div class="form-container w-full max-w-5xl p-4 md:p-8 lg:p-10">
   
   <!-- HEADER -->
-  <div class="header-gradient rounded-2xl p-6 md:p-8 text-white text-center mb-8">
-    <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold mb-4">
-      <span>🔒</span> Private Financial Wellness Research
+  <div class="header-gradient rounded-2xl p-6 md:p-8 text-white mb-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+      <div>
+        <div class="inline-flex items-center gap-2 bg-black/20 backdrop-blur px-4 py-1.5 rounded-full text-xs md:text-sm font-medium">
+          <span>🔒</span>
+          <span>Confidential Financial Wellness Research</span>
+        </div>
+        <h1 class="mt-3 text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight">
+          Financial Wellness Research Study
+        </h1>
+      </div>
+      <div class="text-right text-xs md:text-sm text-indigo-100 space-y-1">
+        <p>Study Type: <span class="font-semibold">Debt Relief Experience</span></p>
+        <p>Estimated Time: <span class="font-semibold">3–5 minutes</span></p>
+      </div>
     </div>
-    <h1 class="text-3xl md:text-4xl font-bold mb-3">Financial Wellness Research Study</h1>
-    <p class="text-lg text-indigo-100">
+    <p class="text-sm md:text-base text-indigo-100/90 max-w-3xl">
+      You’ll be asked to complete a secure debt-relief form, watch a short explainer video, then confirm your email.
       Please follow each step carefully. Only complete and verified participants are approved.
     </p>
   </div>
 
-  <!-- STEP 1: OPEN FINANCIAL FORM -->
-  <div class="step-card active p-6 mb-6">
-    <div class="flex items-start gap-4 mb-6">
+  <!-- STEP 1: WEBFUSE FORM -->
+  <div class="step-card active p-5 md:p-6 lg:p-7 mb-6">
+    <div class="flex items-start gap-3 md:gap-4 mb-5">
       <div class="step-number">1</div>
       <div class="flex-1">
-        <div class="flex items-center justify-between mb-2">
-          <h2 class="text-xl md:text-2xl font-bold text-gray-900">
-            Step 1 — Open the secure financial form
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-1.5">
+          <h2 class="text-lg md:text-xl lg:text-2xl font-semibold text-slate-900">
+            Open & Complete the Secure Financial Form
           </h2>
-          <span class="text-sm font-medium text-primary-600 bg-primary-50 px-3 py-1 rounded-full">
+          <span class="text-xs md:text-sm font-medium text-primary-700 bg-primary-50 px-3 py-1 rounded-full">
             Start here
           </span>
         </div>
-      </div>
-    </div>
-
-    <!-- Who Can Participate Section -->
-    <div class="eligibility-box rounded-lg p-5 mb-6">
-      <h3 class="font-semibold text-gray-900 mb-3 text-lg">Who Can Participate?</h3>
-      <p class="text-gray-700 mb-3">
-        In this part of the study, we are collecting feedback from people who are actively looking for real options to reduce or restructure their unsecured debt. Please continue only if:
-      </p>
-      <ul class="space-y-2 text-gray-700">
-        <li class="flex items-start">
-          <span class="text-orange-600 mr-2">•</span>
-          <span><strong>You have significant unsecured debt</strong> (credit cards, personal loans, medical bills, etc.).</span>
-        </li>
-        <li class="flex items-start">
-          <span class="text-orange-600 mr-2">•</span>
-          <span><strong>Your total unsecured balances are typically above $15,000.</strong></span>
-        </li>
-        <li class="flex items-start">
-          <span class="text-orange-600 mr-2">•</span>
-          <span><strong>You are genuinely interested</strong> in speaking with a specialist about reducing your debt.</span>
-        </li>
-        <li class="flex items-start">
-          <span class="text-orange-600 mr-2">•</span>
-          <span><strong>You are willing to receive a phone call</strong> at the number you provide on the next page.</span>
-        </li>
-      </ul>
-      <div class="mt-4 p-3 bg-white/50 rounded-lg">
-        <p class="text-sm font-semibold text-orange-800 flex items-center">
-          <span class="mr-2">📞</span>
-          Important: A financial specialist will call you within 24-48 hours after form submission
+        <p class="text-sm md:text-base text-slate-600">
+        We are collecting feedback from people who are actively looking for real options to reduce or restructure their unsecured debt.   This step connects you with a real debt specialist for balances of <span class="font-semibold">$15,000+</span> in unsecured debt.
         </p>
       </div>
     </div>
 
-    <!-- How To Participate Section -->
-    <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-6">
-      <h3 class="font-semibold text-gray-900 mb-3 text-lg">How To Participate</h3>
-      <ol class="space-y-3 text-gray-700">
-        <li class="flex items-start">
-          <span class="font-bold text-primary-600 mr-3">1.</span>
-          <span>Click <span class="font-semibold text-primary-700">"Open secure financial form"</span> below. The form will open in a new tab.</span>
+    <!-- Who Can Participate -->
+    <div class="eligibility-box p-4 md:p-5 mb-5">
+      <h3 class="font-semibold text-slate-900 mb-2 text-sm md:text-base">Who should continue?</h3>
+      <ul class="space-y-1.5 text-xs md:text-sm text-slate-700">
+        <li class="flex gap-2">
+          <span class="mt-0.5 text-amber-500">•</span>
+          <span>You have <strong>unsecured debt</strong> (credit cards, personal loans, medical bills, etc.).</span>
         </li>
-        <li class="flex items-start">
-          <span class="font-bold text-primary-600 mr-3">2.</span>
-          <span><strong>Complete the full form</strong> with your accurate contact information and debt details.</span>
+        <li class="flex gap-2">
+          <span class="mt-0.5 text-amber-500">•</span>
+          <span>Your <strong>total unsecured balances are typically above $15,000</strong>.</span>
         </li>
-        <li class="flex items-start">
-          <span class="font-bold text-primary-600 mr-3">3.</span>
-          <span><strong>Return to this page</strong> after submitting the external form.</span>
+        <li class="flex gap-2">
+          <span class="mt-0.5 text-amber-500">•</span>
+          <span>You are <strong>seriously interested</strong> in exploring debt reduction options.</span>
         </li>
-        <li class="flex items-start">
-          <span class="font-bold text-primary-600 mr-3">4.</span>
-          <span><strong>Enter your email</strong> to receive immediate follow-up emails tracking your call experience.</span>
+        <li class="flex gap-2">
+          <span class="mt-0.5 text-amber-500">•</span>
+          <span>You are willing to <strong>receive a phone call</strong> at the number you provide.</span>
+        </li>
+      </ul>
+      <p class="mt-3 text-xs md:text-sm text-amber-800 flex items-center gap-2">
+        <span>📞</span>
+        <span>A financial specialist will typically call within <strong>24–48 hours</strong> after you submit the form.</span>
+      </p>
+    </div>
+
+    <!-- How To Participate -->
+    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-5 mb-5">
+      <h3 class="font-semibold text-slate-900 mb-3 text-sm md:text-base">How this step works</h3>
+      <ol class="space-y-2 text-xs md:text-sm text-slate-700">
+        <li class="flex gap-2">
+          <span class="font-semibold text-primary-700">1.</span>
+          <span>Click <strong>“Start secure form”</strong> below. This records your click and reveals the embedded form.</span>
+        </li>
+        <li class="flex gap-2">
+          <span class="font-semibold text-primary-700">2.</span>
+          <span>Complete the secure form in the frame with accurate contact and debt details.</span>
+        </li>
+        <li class="flex gap-2">
+          <span class="font-semibold text-primary-700">3.</span>
+          <span>After submitting, click <strong>“I submitted the form”</strong> so we can verify and unlock the next step.</span>
+        </li>
+        <li class="flex gap-2">
+          <span class="font-semibold text-primary-700">4.</span>
+          <span>Enter your email to receive immediate follow-up emails tracking your call experience.</span>
         </li>
       </ol>
       
-      <!-- Added Back: About the Follow-up Emails Section -->
       <div class="mt-6 info-box rounded-lg p-4">
         <div class="flex items-start">
           <span class="text-blue-600 mr-3">📧</span>
@@ -283,270 +279,279 @@
         </div>
       </div>
       
-      <div class="mt-4 warning-box rounded-lg p-4">
-        <div class="flex items-start">
-          <span class="text-orange-600 mr-3">⚠️</span>
-          <div>
-            <p class="font-semibold text-gray-900 mb-1">Important Verification</p>
-            <p class="text-gray-700 text-sm">
-              We automatically verify if the form was successfully submitted. If it is not submitted, your participation will NOT be approved.
-            </p>
-          </div>
+      <div class="mt-3 warning-box p-3.5 md:p-4">
+        <div class="flex items-start gap-2.5">
+          <span class="mt-0.5 text-amber-600">⚠️</span>
+          <p class="text-xs md:text-sm text-slate-800">
+            We automatically verify whether the secure form was submitted. If it is not found as submitted, your participation cannot be approved.
+          </p>
         </div>
       </div>
     </div>
 
-    <!-- FORM OPENING SECTION -->
-    <div class="mb-6">
-      <div class="text-center p-6 border-2 border-gray-200 rounded-xl bg-gray-50">
-        <div class="mb-4">
-          <div class="text-4xl mb-3">📋</div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Click to Open Financial Form</h3>
-          <p class="text-gray-600">The form will open in a new tab</p>
-        </div>
+    <!-- FORM OPENING BUTTON -->
+    <div class="mb-5 text-center">
+      <a id="directFormLink"
+         href="#"
+         class="primary-btn inline-flex items-center justify-center px-8 py-3.5 rounded-xl text-sm md:text-base font-semibold w-full md:w-auto">
+        <span class="mr-2.5">🚀</span>
+        Start secure form
+        <span class="ml-2.5 text-xs">Begin</span>
+      </a>
+      <p class="mt-2 text-[11px] md:text-xs text-slate-500">
+        The secure form is embedded below on this page. Your click is also used for tracking.
+      </p>
+    </div>
 
-        <div class="mb-6">
-          <div class="info-box rounded-lg p-4 mb-4">
-            <div class="flex items-center">
-              <span class="text-xl mr-2">📝</span>
-              <p class="text-sm font-semibold text-gray-900">
-                On the external form, please provide accurate information about your $15,000+ unsecured debt
-              </p>
-            </div>
-          </div>
-
-          <div class="warning-box rounded-lg p-4 mb-4">
-            <div class="flex items-center">
-              <span class="text-xl mr-2">ℹ️</span>
-              <p class="text-sm font-semibold text-gray-900">
-                If you see "Where did you hear about this program?" please select <span class="underline">Facebook</span>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <a id="directFormLink"
-           href="#"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="primary-btn inline-flex items-center justify-center px-8 py-4 rounded-xl text-lg font-bold mb-4 w-full md:w-auto">
-          <span class="mr-3">🚀</span>
-          Open secure financial form (New Tab)
-          <span class="ml-3">↗️</span>
-        </a>
-        
-        <p class="text-xs text-gray-500 mt-2">
-          After submitting the form in the new tab, return to this page and click "I submitted the form" below.
+    <!-- INLINE WEBFUSE IFRAME (cropped header/footer) -->
+    <div id="webfuseContainer" class="mt-4 hidden">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-xs md:text-sm font-medium text-slate-800">
+          Secure financial form
         </p>
+        <p id="formStatus" class="text-[11px] md:text-xs text-slate-500">
+          Click “Start secure form” to open and complete the form below.
+        </p>
+      </div>
+      <div class="w-full h-[650px] md:h-[780px] rounded-2xl overflow-hidden border border-slate-200 bg-white">
+        <iframe
+          id="webfuseFrame"
+          src="https://webfuse.com/+cliqcint2/"
+          class="w-full border-0"
+          loading="lazy"
+          style="margin-top:-60px; height:calc(100% + 60px);"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
       </div>
     </div>
 
     <!-- ACTION BUTTONS -->
-    <div class="flex flex-wrap gap-3">
+    <div class="flex flex-wrap gap-3 mt-5">
       <button id="btnFormDone"
-              class="px-6 py-3 bg-gray-100 text-gray-500 font-semibold rounded-xl cursor-not-allowed"
+              class="px-6 py-3 bg-slate-100 text-slate-400 text-sm md:text-base font-semibold rounded-xl cursor-not-allowed"
               disabled>
         <span class="mr-2">⏳</span>
         I submitted the form
       </button>
       <button id="btnFormQuit"
-              class="px-5 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">
+              class="px-5 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm md:text-base font-medium rounded-xl border border-slate-200 transition">
         I don't meet the requirements
       </button>
     </div>
 
     <!-- FEATURE BADGES -->
-    <div class="flex flex-wrap gap-2 mt-6">
+    <div class="flex flex-wrap gap-2 mt-5">
       <span class="feature-badge">
-        <span>📞</span> Specialist Call
+        <span>📞</span> Live specialist call
       </span>
       <span class="feature-badge">
-        <span>💰</span> $15,000+ Debt Focus
+        <span>💰</span> $15,000+ unsecured debt
       </span>
       <span class="reminder-badge">
-        <span>📧</span> 3-Day Follow-up
+        <span>📧</span> 3-day follow-up
       </span>
       <span class="feature-badge">
-        <span>⏱️</span> 24-48h Response
+        <span>⏱️</span> 24–48h response
       </span>
     </div>
   </div>
 
-  <!-- STEP 2: EMAIL FOR FOLLOW-UP REMINDERS -->
-  <div class="step-card p-6 mb-6 opacity-60">
-    <div class="flex items-start gap-4">
+  <!-- STEP 2: FACEBOOK VIDEO -->
+  <div class="step-card p-5 md:p-6 lg:p-7 mb-6 opacity-60">
+    <div class="flex items-start gap-3 md:gap-4 mb-4">
       <div class="step-number">2</div>
       <div class="flex-1">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl md:text-2xl font-bold text-gray-900">
-            Step 2 — Provide Email for Follow-up
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-1.5">
+          <h2 class="text-lg md:text-xl lg:text-2xl font-semibold text-slate-900">
+            Watch the Short Explainer Video
           </h2>
-          <span class="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-            Unlocked after Step 1
+          <span class="text-xs md:text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+            Unlocks after Step 1 verification
           </span>
         </div>
-        <p class="text-gray-600 mb-6">
-          We'll send you immediate feedback requests and reminders for the next 3 days.
+        <p class="text-xs md:text-sm text-slate-600">
+          This quick video explains how the program works for people with higher unsecured debt balances.
         </p>
-        
-        <!-- Email Section (Hidden initially) -->
-        <div id="emailSection" class="hidden animate-slideUp">
-          <div class="info-box rounded-lg p-5 mb-6">
-            <h3 class="font-semibold text-gray-900 mb-3 text-lg">Your Follow-up Email Series</h3>
-            <p class="text-gray-700 mb-4">
-              Once you provide your email, we'll immediately start sending you feedback requests. You'll receive:
-            </p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div class="bg-white border border-gray-200 rounded-xl p-4">
-                <div class="text-3xl mb-3 text-blue-500">📧</div>
-                <h4 class="font-semibold text-gray-900 mb-2">Immediate Email</h4>
-                <p class="text-sm text-gray-600">
-                  Sent right after you submit your email below
-                </p>
+      </div>
+    </div>
+
+    <div id="videoContainer" class="hidden">
+      <div class="video-wrapper mb-3">
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1205740158030889%2F&show_text=true&width=860&t=0"
+          style="border:none; overflow:hidden;" scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
+      </div>
+      <p class="text-[11px] md:text-xs text-slate-500">
+        You only need to watch this once. When you are done, click the button below to continue.
+      </p>
+    </div>
+
+    <button id="btnVideoDone"
+            class="mt-4 px-6 py-3 bg-slate-300 text-slate-500 text-sm md:text-base font-semibold rounded-xl cursor-not-allowed">
+      I watched the video
+    </button>
+  </div>
+
+  <!-- STEP 3: BREVO EMAIL + FINAL VERIFICATION -->
+  <div class="step-card p-5 md:p-6 lg:p-7 opacity-60">
+    <div class="flex items-start gap-3 md:gap-4 mb-4">
+      <div class="step-number">3</div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-1.5">
+          <h2 class="text-lg md:text-xl lg:text-2xl font-semibold text-slate-900">
+            Email Confirmation & Finish Study
+          </h2>
+          <span class="text-xs md:text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+            Last required step
+          </span>
+        </div>
+        <p class="text-xs md:text-sm text-slate-600">
+          Your email is required to confirm your participation and send a short follow-up about your experience.
+          After submitting your email, click “Verify & finish study” to complete the survey.
+        </p>
+      </div>
+    </div>
+
+    <!-- BREVO FORM BLOCK -->
+    <div id="brevoBlock" class="w-full mb-4 hidden">
+      <div class="sib-form" style="text-align: center; background-color: #EFF2F7;">
+        <div id="sib-form-container" class="sib-form-container">
+          <div id="sib-container"
+               class="sib-container--large sib-container--vertical"
+               style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:10px; border-width:1px; border-color:#C0CCD9; border-style:solid; margin:0 auto; box-shadow:0 10px 30px rgba(15,23,42,0.15);">
+
+            <!-- Hidden iframe so the form posts to Brevo without leaving this page -->
+            <iframe name="brevo_iframe" id="brevo_iframe" style="display:none;"></iframe>
+
+            <form id="sib-form"
+                  method="POST"
+                  action="https://52bcaf92.sibforms.com/serve/MUIFAO5vlejSCs-rWtk8_hSGgyILb9Oi-aOLbS_zI5_FjrtRovBWkBZlGVuoCXxEbmOMZMrdo0ZllgcfYtt7jPnKOHgyHT2TYdf3Q-xFXArnK8ikp21kPr7-iXsfMeK4CtD4cAPf2oHHMJLw5OtgVzgyKMt0hXTJ3UiMJVGUXzHbWENuGdgb7j-x2xeZ6iW5f9ix4gocwCjOBdct"
+                  target="brevo_iframe">
+
+              <div style="padding: 10px 18px 0 18px;">
+                <div class="sib-form-block"
+                     style="font-size:18px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#111827; background-color:transparent;">
+                  <p>Survey feedback reminder</p>
+                </div>
               </div>
-              
-              <div class="bg-white border border-gray-200 rounded-xl p-4">
-                <div class="text-3xl mb-3 text-green-500">⏰</div>
-                <h4 class="font-semibold text-gray-900 mb-2">Day 1 Reminder</h4>
-                <p class="text-sm text-gray-600">
-                  Sent 24 hours after your form submission
-                </p>
-              </div>
-              
-              <div class="bg-white border border-gray-200 rounded-xl p-4">
-                <div class="text-3xl mb-3 text-purple-500">🔄</div>
-                <h4 class="font-semibold text-gray-900 mb-2">Day 2 & 3 Reminders</h4>
-                <p class="text-sm text-gray-600">
-                  Follow-up emails on subsequent days
-                </p>
-              </div>
-            </div>
-            
-            <div class="email-preview mb-6">
-              <strong>From:</strong> Financial Wellness Research Team<br>
-              <strong>To:</strong> <span id="previewEmail">[Your Email]</span><br>
-              <strong>Subject:</strong> Feedback Request: Did the financial specialist call you?<br><br>
-              
-              Hi [Name],<br><br>
-              
-              Thank you for submitting your information for our debt reduction research study.<br><br>
-              
-              A financial specialist should call you within 24-48 hours to discuss options for your $15,000+ debt.<br><br>
-              
-              <strong>We'd like to know:</strong><br>
-              1. Have you received a call from the specialist yet?<br>
-              2. If yes, did you get the help you were looking for regarding your debt?<br><br>
-              
-              Please reply to this email with your feedback. You'll receive reminders for the next 3 days to update us on your experience.<br><br>
-              
-              Thank you for participating in this important research!<br><br>
-              
-              Best regards,<br>
-              Financial Wellness Research Team
-            </div>
-            
-            <div class="flex flex-col md:flex-row items-start gap-4 mb-6">
-              <div class="flex-1">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Your email address (for follow-up reminders)</label>
-                <input type="email" id="userEmail" placeholder="you@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                <p class="text-xs text-gray-500 mt-2">
-                  We'll send immediate feedback requests and reminders for the next 3 days.
-                </p>
-              </div>
-              <div class="mt-6">
-                <button id="btnSendEmail" class="primary-btn px-6 py-3 rounded-xl font-semibold">
-                  Start Follow-up Emails
-                </button>
-              </div>
-            </div>
-            
-            <!-- Email Scheduled Section -->
-            <div id="emailScheduled" class="hidden">
-              <div class="completion-card rounded-2xl p-6 text-center">
-                <div class="text-5xl mb-4">📧</div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Follow-up Emails Scheduled!</h3>
-                <p class="text-gray-700 mb-4">
-                  We've sent your first feedback request email and scheduled reminders for the next 3 days.
-                </p>
-                
-                <div class="bg-white rounded-xl p-4 mb-6">
-                  <h4 class="font-semibold text-gray-900 mb-3">Your Email Schedule:</h4>
-                  <div class="space-y-3">
-                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                      <div class="flex items-center">
-                        <span class="text-blue-600 mr-3">✅</span>
-                        <span class="font-medium">Immediate email sent</span>
-                      </div>
-                      <span class="text-sm text-gray-600">Now</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div class="flex items-center">
-                        <span class="text-gray-400 mr-3">⏰</span>
-                        <span class="font-medium text-gray-600">Day 1 reminder</span>
-                      </div>
-                      <span class="text-sm text-gray-600">Tomorrow</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div class="flex items-center">
-                        <span class="text-gray-400 mr-3">⏰</span>
-                        <span class="font-medium text-gray-600">Day 2 reminder</span>
-                      </div>
-                      <span class="text-sm text-gray-600">In 2 days</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div class="flex items-center">
-                        <span class="text-gray-400 mr-3">⏰</span>
-                        <span class="font-medium text-gray-600">Day 3 reminder</span>
-                      </div>
-                      <span class="text-sm text-gray-600">In 3 days</span>
-                    </div>
+
+              <div style="padding: 4px 18px;">
+                <div class="sib-form-block"
+                     style="font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#4b5563; background-color:transparent;">
+                  <div class="sib-text-form-block">
+                    <p>Please provide your email so we can send a reminder about this research and the outcome of your request.</p>
                   </div>
                 </div>
-                
-                <div class="info-box rounded-lg p-4 mb-4">
-                  <p class="text-sm text-gray-700">
-                    <span class="font-semibold">Note:</span> Please check your email (and spam folder) for our messages. Reply to any email with updates about whether you received the specialist's call and if you got the help you needed.
-                  </p>
-                </div>
-                
-                <button id="btnCompleteStudy" class="primary-btn px-6 py-3 rounded-xl font-semibold">
-                  Complete Study
-                </button>
               </div>
-            </div>
+
+              <div style="padding: 8px 18px 0 18px;">
+                <div class="sib-input sib-form-block">
+                  <div class="form__entry entry_block">
+                    <div class="form__label-row">
+                      <label class="entry__label"
+                             style="font-weight:700; text-align:left; font-size:14px; font-family:Helvetica, sans-serif; color:#111827;"
+                             for="EMAIL" data-required="*">
+                        Enter your email address
+                      </label>
+
+                      <div class="entry__field">
+                        <input class="input"
+                               type="text"
+                               id="EMAIL"
+                               name="EMAIL"
+                               autocomplete="off"
+                               placeholder="you@example.com"
+                               data-required="true"
+                               required />
+                      </div>
+                    </div>
+
+                    <label id="email_error"
+                           class="entry__error entry__error--primary"
+                           style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px; margin-top:6px;">
+                    </label>
+                    <label class="entry__specification"
+                           style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#6b7280;">
+                      We only use this to send survey-related reminders.
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding: 8px 18px 0 18px;">
+                <div class="sib-optin sib-form-block">
+                  <div class="form__entry entry_mcq">
+                    <div class="form__label-row">
+                      <div class="entry__choice">
+                        <label style="display:flex; align-items:flex-start; gap:6px;">
+                          <input type="checkbox"
+                                 class="input_replaced"
+                                 value="1"
+                                 id="OPT_IN"
+                                 name="OPT_IN" />
+                          <span class="checkbox checkbox_tick_positive"></span>
+                          <span style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#374151;">
+                            I agree to receive your email and accept the data privacy statement.
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+                    <label id="optin_error"
+                           class="entry__error entry__error--primary"
+                           style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px; margin-top:6px;">
+                    </label>
+                    <label class="entry__specification"
+                           style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#6b7280;">
+                      You may unsubscribe at any time using the link in our emails.
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding: 10px 18px 16px 18px;">
+                <div class="sib-form-block" style="text-align: left">
+                  <button id="brevoSubmitBtn"
+                          class="sib-form-block__button sib-form-block__button-with-loader"
+                          style="font-size:14px; text-align:center; font-weight:700; font-family:Helvetica, sans-serif; color:#FFFFFF; background-color:#4f46e5; border-radius:9999px; border-width:0px; width:100%; padding:10px 0; cursor:pointer;"
+                          type="submit">
+                    SUBMIT EMAIL
+                  </button>
+                </div>
+              </div>
+
+              <input type="text" name="email_address_check" value="" class="input--hidden">
+              <input type="hidden" name="locale" value="en">
+              <input type="hidden" name="html_type" value="simple">
+            </form>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- STEP 3: COMPLETION -->
-  <div class="step-card p-6 opacity-60">
-    <div class="flex items-start gap-4">
-      <div class="step-number">3</div>
-      <div class="flex-1">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl md:text-2xl font-bold text-gray-900">
-            Step 3 — Study Completion
-          </h2>
-          <span class="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-            Unlocked after email setup
-          </span>
-        </div>
-        <p class="text-gray-600">
-          Complete the study after setting up your follow-up email reminders.
-        </p>
-      </div>
-    </div>
+    <button id="btnFinalVerify"
+            class="mt-2 px-6 py-3 bg-slate-300 text-slate-500 text-sm md:text-base font-semibold rounded-xl cursor-not-allowed w-full md:w-auto"
+            disabled>
+      Verify & finish study
+    </button>
+    <p class="mt-2 text-[11px] md:text-xs text-slate-500">
+      If our system cannot verify your secure form submission, you will be redirected to a disqualification page instead of completion.
+    </p>
   </div>
 </div>
 
 <script>
-  // Initialize
+  // --- Smooth scroll helper ---
+  function smoothScrollTo(el) {
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const absoluteY = rect.top + window.scrollY - 80;
+    window.scrollTo({ top: absoluteY, behavior: 'smooth' });
+  }
+
+  // --- Transaction ID ---
   const urlParams = new URLSearchParams(window.location.search);
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
   const src = 'ps';
@@ -555,253 +560,251 @@
     transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 
-  // URLs
-  const psScreenoutUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
-  const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
-  const offerTrackedUrl = `${offerBaseUrl}${offerBaseUrl.includes('?') ? '&' : '?'}subid=${encodeURIComponent(transactionId)}`;
-  const workerFinishUrl = `https://marketcall1.kayembakasongo.workers.dev/finish?transaction_id=${encodeURIComponent(transactionId)}&src=${encodeURIComponent(src)}`;
-  
-  // Email endpoints
-  const sendEmailUrl = `https://marketcall1.kayembakasongo.workers.dev/send-email?transaction_id=${encodeURIComponent(transactionId)}`;
-  const scheduleRemindersUrl = `https://marketcall1.kayembakasongo.workers.dev/schedule-reminders?transaction_id=${encodeURIComponent(transactionId)}`;
-  const verifyFormUrl = `https://marketcall1.kayembakasongo.workers.dev/verify-form?transaction_id=${encodeURIComponent(transactionId)}`;
+  // --- PureSpectrum URLs ---
+  const completionUrl = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
+  const terminationUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
 
-  // DOM Elements
+  // Offer click URL (MarketCall)
+  const offerBaseUrl = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
+  const offerTrackedUrl = `${offerBaseUrl}${offerBaseUrl.includes('?') ? '&' : '?'}subid=${encodeURIComponent(transactionId)}`;
+
+  // Worker verify URL
+  const verifyFormUrl = `https://marketcall.kayembakasongo.workers.dev/verify-form?transaction_id=${encodeURIComponent(transactionId)}`;
+
+  // --- DOM Elements ---
+  const stepCards = document.querySelectorAll('.step-card');
+  const step2Card = stepCards[1];
+  const step3Card = stepCards[2];
+
   const directFormLink = document.getElementById('directFormLink');
+  const webfuseContainer = document.getElementById('webfuseContainer');
+  const webfuseFrame = document.getElementById('webfuseFrame');
+  const formStatus = document.getElementById('formStatus');
   const btnFormDone = document.getElementById('btnFormDone');
   const btnFormQuit = document.getElementById('btnFormQuit');
-  const step2 = document.querySelector('.step-card:nth-child(2)');
-  const step3 = document.querySelector('.step-card:nth-child(3)');
-  const emailSection = document.getElementById('emailSection');
-  const emailScheduled = document.getElementById('emailScheduled');
-  const btnSendEmail = document.getElementById('btnSendEmail');
-  const userEmail = document.getElementById('userEmail');
-  const previewEmail = document.getElementById('previewEmail');
-  const btnCompleteStudy = document.getElementById('btnCompleteStudy');
 
-  // Set URLs
+  const videoContainer = document.getElementById('videoContainer');
+  const btnVideoDone = document.getElementById('btnVideoDone');
+
+  const brevoBlock = document.getElementById('brevoBlock');
+  const sibForm = document.getElementById('sib-form');
+  const emailInput = document.getElementById('EMAIL');
+  const optIn = document.getElementById('OPT_IN');
+  const emailErr = document.getElementById('email_error');
+  const optinErr = document.getElementById('optin_error');
+  const brevoSubmitBtn = document.getElementById('brevoSubmitBtn');
+  const btnFinalVerify = document.getElementById('btnFinalVerify');
+
+  // --- Direct form click: fire affiliate click + show iframe ---
   if (directFormLink) {
-    directFormLink.href = offerTrackedUrl;
-  }
+    directFormLink.addEventListener('click', function (e) {
+      e.preventDefault();
 
-  // Update email preview
-  if (userEmail) {
-    userEmail.addEventListener('input', function() {
-      previewEmail.textContent = this.value || '[Your Email]';
+      // 1) Fire tracking pixel
+      try {
+        const tracker = new Image();
+        tracker.src = offerTrackedUrl + (offerTrackedUrl.includes('?') ? '&' : '?') + 'ts=' + Date.now();
+      } catch (err) {
+        console.error('Tracking pixel error:', err);
+      }
+
+      // 2) Show iframe, update status
+      if (webfuseContainer && webfuseContainer.classList.contains('hidden')) {
+        webfuseContainer.classList.remove('hidden');
+      }
+      if (formStatus) {
+        formStatus.textContent = 'Click recorded. Please complete and submit the secure form in the frame below.';
+        formStatus.classList.remove('text-slate-500');
+        formStatus.classList.add('text-emerald-700');
+      }
+      if (webfuseFrame) {
+        setTimeout(() => smoothScrollTo(webfuseContainer), 200);
+      }
+
+      // 3) Enable "I submitted the form"
+      if (btnFormDone) {
+        btnFormDone.disabled = false;
+        btnFormDone.classList.remove('cursor-not-allowed', 'bg-slate-100', 'text-slate-400');
+        btnFormDone.classList.add('primary-btn', 'text-white');
+        btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
+      }
     });
   }
 
-  // Enable form button when user clicks external link
-  if (directFormLink) {
-    directFormLink.addEventListener('click', function() {
-      // Enable the "I submitted the form" button
-      enableFormCompletion();
-      
-      // Show message that they should return after submission
-      setTimeout(() => {
-        if (confirm("Remember: After submitting the form in the new tab, return to this page and click 'I submitted the form' to continue.")) {
-          // Nothing to do, just informational
-        }
-      }, 1000);
+  // --- Quit / terminate ---
+  if (btnFormQuit) {
+    btnFormQuit.addEventListener('click', function () {
+      if (confirm("If you don't meet the requirements or cannot complete the form, you may exit the study. Continue?")) {
+        window.location.href = terminationUrl;
+      }
     });
   }
 
-  function enableFormCompletion() {
-    if (btnFormDone) {
-      btnFormDone.disabled = false;
-      btnFormDone.classList.remove('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
-      btnFormDone.classList.add('primary-btn', 'text-white');
-      btnFormDone.innerHTML = '<span class="mr-2">📋</span> I submitted the form';
-    }
-  }
-
-  // Form completion button
+  // --- Verify form after "I submitted the form" ---
   if (btnFormDone) {
-    btnFormDone.addEventListener('click', async function() {
+    btnFormDone.addEventListener('click', async function () {
       if (btnFormDone.disabled) return;
 
-      // Show loading state
       btnFormDone.disabled = true;
-      btnFormDone.innerHTML = '<span class="mr-2">⏳</span> Verifying submission...';
+      btnFormDone.innerHTML = '<span class="mr-2">⏳</span>Verifying your submission...';
 
       try {
-        // Verify form submission
-        const verifyResponse = await fetch(verifyFormUrl, {
+        const resp = await fetch(verifyFormUrl, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          }
+          headers: { 'Content-Type': 'application/json' }
         });
+        const data = await resp.json();
 
-        const verification = await verifyResponse.json();
-
-        if (verification.submitted) {
-          // Success - form submitted
+        if (data.submitted) {
+          // Success
           btnFormDone.classList.remove('primary-btn');
-          btnFormDone.classList.add('bg-green-100', 'text-green-800');
-          btnFormDone.innerHTML = '<span class="mr-2">✅</span> Form Verified ✓';
+          btnFormDone.classList.add('bg-emerald-100', 'text-emerald-800');
+          btnFormDone.innerHTML = '<span class="mr-2">✅</span>Form verified';
 
-          // Unlock step 2
-          if (step2) {
-            step2.style.opacity = '1';
-            step2.classList.add('active');
-            
-            // Show email section
-            if (emailSection) {
-              setTimeout(() => {
-                emailSection.classList.remove('hidden');
-                emailSection.classList.add('animate-slideUp');
-              }, 300);
-            }
-            
-            // Scroll to step 2
-            setTimeout(() => {
-              step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 500);
+          // Unlock Step 2 (video)
+          if (step2Card) {
+            step2Card.style.opacity = '1';
+            step2Card.classList.add('active');
           }
+          if (videoContainer) {
+            videoContainer.classList.remove('hidden');
+          }
+          if (btnVideoDone) {
+            btnVideoDone.disabled = false;
+            btnVideoDone.classList.remove('cursor-not-allowed', 'bg-slate-300', 'text-slate-500');
+            btnVideoDone.classList.add('primary-btn', 'text-white');
+          }
+
+          setTimeout(() => smoothScrollTo(step2Card), 400);
         } else {
-          // Form not submitted
+          // Not found
           btnFormDone.disabled = false;
           btnFormDone.classList.remove('primary-btn');
           btnFormDone.classList.add('bg-red-100', 'text-red-800');
-          btnFormDone.innerHTML = '<span class="mr-2">❌</span> Form not submitted';
-          
-          alert('We could not verify your form submission. Please make sure you completed and submitted the form in the new tab, then try again.');
-          
-          // Reset button after 3 seconds
+          btnFormDone.innerHTML = '<span class="mr-2">❌</span>Form not found';
+
+          alert('We could not verify your form submission. Please make sure you completed and submitted the secure form in the frame, then try again.');
+
           setTimeout(() => {
-            btnFormDone.disabled = false;
             btnFormDone.classList.remove('bg-red-100', 'text-red-800');
             btnFormDone.classList.add('primary-btn', 'text-white');
-            btnFormDone.innerHTML = '<span class="mr-2">📋</span> I submitted the form';
-          }, 3000);
+            btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
+          }, 3500);
         }
-        
-      } catch (error) {
-        console.error('Error verifying form:', error);
+      } catch (err) {
+        console.error('Error verifying form:', err);
         btnFormDone.disabled = false;
         btnFormDone.classList.remove('primary-btn');
-        btnFormDone.classList.add('bg-yellow-100', 'text-yellow-800');
-        btnFormDone.innerHTML = '<span class="mr-2">⚠️</span> Check connection';
-        
-        // Reset button after 3 seconds
+        btnFormDone.classList.add('bg-amber-100', 'text-amber-800');
+        btnFormDone.innerHTML = '<span class="mr-2">⚠️</span>Network error';
+
         setTimeout(() => {
-          btnFormDone.disabled = false;
-          btnFormDone.classList.remove('bg-yellow-100', 'text-yellow-800');
+          btnFormDone.classList.remove('bg-amber-100', 'text-amber-800');
           btnFormDone.classList.add('primary-btn', 'text-white');
-          btnFormDone.innerHTML = '<span class="mr-2">📋</span> I submitted the form';
-        }, 3000);
+          btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
+        }, 3500);
       }
     });
   }
 
-  // Send email and schedule reminders
-  if (btnSendEmail) {
-    btnSendEmail.addEventListener('click', async function() {
-      const email = userEmail.value.trim();
-      
-      if (!email) {
-        alert('Please enter your email address to receive follow-up reminders.');
-        userEmail.focus();
+  // --- After video, unlock Brevo step ---
+  if (btnVideoDone) {
+    btnVideoDone.addEventListener('click', function () {
+      if (btnVideoDone.disabled) return;
+
+      if (step3Card) {
+        step3Card.style.opacity = '1';
+        step3Card.classList.add('active');
+      }
+      if (brevoBlock) {
+        brevoBlock.classList.remove('hidden');
+      }
+
+      smoothScrollTo(step3Card);
+    });
+  }
+
+  // --- Brevo submit: validate and then unlock final verify button ---
+  if (sibForm) {
+    sibForm.addEventListener('submit', function (e) {
+      let hasError = false;
+      if (emailErr) emailErr.style.display = 'none';
+      if (optinErr) optinErr.style.display = 'none';
+
+      const emailVal = (emailInput && emailInput.value ? emailInput.value : '').trim();
+
+      if (!emailVal) {
+        hasError = true;
+        if (emailErr) {
+          emailErr.textContent = 'Please enter your email address.';
+          emailErr.style.display = 'block';
+        }
+      } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)) {
+        hasError = true;
+        if (emailErr) {
+          emailErr.textContent = 'Please enter a valid email address.';
+          emailErr.style.display = 'block';
+        }
+      }
+
+      if (!optIn || !optIn.checked) {
+        hasError = true;
+        if (optinErr) {
+          optinErr.textContent = 'Please agree to the privacy statement to continue.';
+          optinErr.style.display = 'block';
+        }
+      }
+
+      if (hasError) {
+        e.preventDefault();
         return;
       }
-      
-      if (!validateEmail(email)) {
-        alert('Please enter a valid email address.');
-        userEmail.focus();
-        return;
+
+      if (brevoSubmitBtn) {
+        brevoSubmitBtn.disabled = true;
+        brevoSubmitBtn.textContent = 'Submitting...';
       }
-      
-      btnSendEmail.disabled = true;
-      btnSendEmail.innerHTML = 'Scheduling emails...';
-      
+
+      // After a short delay (Brevo processing), unlock final verify button
+      setTimeout(function () {
+        if (btnFinalVerify) {
+          btnFinalVerify.disabled = false;
+          btnFinalVerify.classList.remove('cursor-not-allowed', 'bg-slate-300', 'text-slate-500');
+          btnFinalVerify.classList.add('primary-btn', 'text-white');
+        }
+      }, 3500);
+    });
+  }
+
+  // --- Final verification: completion or termination ---
+  if (btnFinalVerify) {
+    btnFinalVerify.addEventListener('click', async function () {
+      if (btnFinalVerify.disabled) return;
+
+      btnFinalVerify.disabled = true;
+      btnFinalVerify.innerHTML = '⏳ Verifying & finishing...';
+
       try {
-        // Send immediate email
-        const emailResponse = await fetch(sendEmailUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: email,
-            type: 'immediate',
-            transaction_id: transactionId
-          })
+        const resp = await fetch(verifyFormUrl, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
         });
-        
-        // Schedule reminders for next 3 days
-        const reminderResponse = await fetch(scheduleRemindersUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: email,
-            transaction_id: transactionId,
-            days: 3
-          })
-        });
-        
-        // Show email scheduled section
-        setTimeout(() => {
-          if (emailScheduled) {
-            emailScheduled.classList.remove('hidden');
-            emailScheduled.classList.add('animate-slideUp');
-            
-            // Scroll to scheduled section
-            setTimeout(() => {
-              emailScheduled.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              
-              // Unlock step 3
-              if (step3) {
-                step3.style.opacity = '1';
-                step3.classList.add('active');
-              }
-            }, 300);
-          }
-        }, 1000);
-        
-        btnSendEmail.innerHTML = '✅ Emails Scheduled';
-        btnSendEmail.classList.add('bg-green-100', 'text-green-800');
-        
-      } catch (error) {
-        console.error('Error scheduling emails:', error);
-        btnSendEmail.innerHTML = '❌ Error - Try Again';
-        btnSendEmail.disabled = false;
-        alert('There was an error scheduling your emails. Please try again.');
+        const data = await resp.json();
+
+        if (data.submitted) {
+          // Verified -> completion
+          window.location.href = completionUrl;
+        } else {
+          // Not verified -> termination / disqualify
+          window.location.href = terminationUrl;
+        }
+      } catch (err) {
+        console.error('Error during final verification:', err);
+        // Safer to send to termination if verification fails
+        window.location.href = terminationUrl;
       }
     });
   }
-
-  // Complete study button
-  if (btnCompleteStudy) {
-    btnCompleteStudy.addEventListener('click', function() {
-      // Show confirmation
-      if (confirm('Thank you for participating! Your follow-up emails have been scheduled for the next 3 days. You may now complete the study.')) {
-        window.location.href = workerFinishUrl;
-      }
-    });
-  }
-
-  // Email validation
-  function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  }
-
-  // Quit button
-  if (btnFormQuit) {
-    btnFormQuit.addEventListener('click', function() {
-      if (confirm('If you don\'t have $15,000+ in unsecured debt or cannot receive a specialist call, you may exit the study. Are you sure?')) {
-        window.location.href = psScreenoutUrl;
-      }
-    });
-  }
-
-  // Auto-enable form button after a delay (in case user already clicked link)
-  setTimeout(() => {
-    enableFormCompletion();
-  }, 2000);
 </script>
 
 </body>

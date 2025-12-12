@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Financial Wellness Research Study</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      background: radial-gradient(circle at top, #4f46e5 0, #020617 55%);
+      min-height: 100vh;
+    }
+  </style>
+</head>
+
+<body class="p-4 md:p-8 flex justify-center items-start">
+
+<div class="bg-white max-w-4xl w-full rounded-2xl shadow-2xl p-6 md:p-10">
+
+  <!-- HEADER -->
+  <div class="mb-8">
+    <span class="inline-block bg-indigo-100 text-indigo-700 text-xs px-3 py-1 rounded-full mb-3">
+      Confidential Research Study
+    </span>
+    <h1 class="text-3xl font-semibold text-slate-900 mb-3">
+      Financial Wellness Research
+    </h1>
+    <p class="text-slate-600">
+      This study collects feedback from individuals actively exploring debt relief options.
+      Participation requires completing a secure third-party form.
+    </p>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="border rounded-xl p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-2">
+      Step 1: Complete the Secure Financial Form
+    </h2>
+
+    <p class="text-slate-600 mb-4">
+      Click the button below to open the secure form in a new tab.
+      This action is required to proceed.
+    </p>
+
+    <ul class="list-disc ml-5 text-slate-600 text-sm mb-5">
+      <li>$15,000+ unsecured debt</li>
+      <li>Valid phone number required</li>
+      <li>Available to receive a call</li>
+    </ul>
+
+    <!-- START FORM BUTTON -->
+    <a
+      id="startFormBtn"
+      href="#"
+      class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-xl transition"
+    >
+      🚀 Start Secure Form
+    </a>
+
+    <p class="text-xs text-slate-500 mt-2">
+      Opens in a new tab. Please complete and submit the form before returning.
+    </p>
+
+    <!-- CONFIRM BUTTON -->
+    <button
+      id="confirmFormBtn"
+      disabled
+      class="mt-5 bg-slate-200 text-slate-400 px-6 py-3 rounded-xl font-semibold cursor-not-allowed"
+    >
+      I submitted the form
+    </button>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="border rounded-xl p-6 mb-6 opacity-50" id="step2">
+    <h2 class="text-xl font-semibold mb-2">
+      Step 2: Watch Short Explanation
+    </h2>
+
+    <p class="text-slate-600 mb-4">
+      This video explains how the program works.
+    </p>
+
+    <iframe
+      class="w-full rounded-lg"
+      height="315"
+      src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/reel/1205740158030889/"
+      allowfullscreen
+    ></iframe>
+
+    <button
+      id="videoDoneBtn"
+      disabled
+      class="mt-4 bg-slate-200 text-slate-400 px-6 py-3 rounded-xl font-semibold cursor-not-allowed"
+    >
+      I watched the video
+    </button>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="border rounded-xl p-6 opacity-50" id="step3">
+    <h2 class="text-xl font-semibold mb-2">
+      Step 3: Finish Study
+    </h2>
+
+    <p class="text-slate-600 mb-4">
+      You will now be routed based on completion status.
+    </p>
+
+    <button
+      id="finishBtn"
+      disabled
+      class="bg-slate-200 text-slate-400 px-6 py-3 rounded-xl font-semibold cursor-not-allowed"
+    >
+      Finish Study
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // Transaction ID
+  const params = new URLSearchParams(window.location.search);
+  let tx = params.get('transaction_id') || 'tx_' + Date.now();
+
+  // LINKS
+  const MARKETCALL_LINK =
+    `https://trkmcl.com/wy8odpg43k/p98vjj0e83?subid=${encodeURIComponent(tx)}`;
+
+  const COMPLETE_LINK =
+    `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(tx)}`;
+
+  const DISQUALIFY_LINK =
+    `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(tx)}`;
+
+  // ELEMENTS
+  const startBtn = document.getElementById('startFormBtn');
+  const confirmBtn = document.getElementById('confirmFormBtn');
+  const videoBtn = document.getElementById('videoDoneBtn');
+  const finishBtn = document.getElementById('finishBtn');
+  const step2 = document.getElementById('step2');
+  const step3 = document.getElementById('step3');
+
+  // CLICK → OPEN MARKETCALL
+  startBtn.addEventListener('click', e => {
+    e.preventDefault();
+    window.open(MARKETCALL_LINK, '_blank', 'noopener');
+    confirmBtn.disabled = false;
+    confirmBtn.className =
+      'mt-5 bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold';
+  });
+
+  // CONFIRM FORM
+  confirmBtn.addEventListener('click', () => {
+    step2.classList.remove('opacity-50');
+    videoBtn.disabled = false;
+    videoBtn.className =
+      'mt-4 bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold';
+  });
+
+  // VIDEO DONE
+  videoBtn.addEventListener('click', () => {
+    step3.classList.remove('opacity-50');
+    finishBtn.disabled = false;
+    finishBtn.className =
+      'bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold';
+  });
+
+  // FINISH
+  finishBtn.addEventListener('click', () => {
+    window.location.href = COMPLETE_LINK;
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,686 @@
+<!DOCTYPE HTML>
+<html lang="en" class="supernova">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
+  <meta name="HandheldFriendly" content="true">
+  <title>Financial Wellness Research Study</title>
+
+  <!-- Fonts + Tailwind -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          },
+          boxShadow: {
+            soft: '0 24px 60px rgba(15, 23, 42, 0.18)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Brevo base styles -->
+  <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top, #4f46e5 0, #020617 55%);
+      min-height: 100vh;
+    }
+
+    .form-container {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .header-gradient {
+      background: radial-gradient(circle at top left, #6366f1, #4f46e5 40%, #a855f7 100%);
+    }
+
+    .step-card {
+      background: white;
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+      transition: all 0.25s ease;
+    }
+
+    .step-card.active {
+      border-color: #4f46e5;
+      box-shadow: 0 16px 40px rgba(79, 70, 229, 0.12);
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      color: white;
+      transition: all 0.25s ease;
+    }
+
+    .primary-btn:hover {
+      background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 16px 35px rgba(79, 70, 229, 0.45);
+    }
+
+    .warning-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 14px;
+    }
+
+    .info-box {
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 14px;
+    }
+
+    .eligibility-box {
+      background: #fefce8;
+      border: 1px solid #facc15;
+      border-radius: 14px;
+    }
+
+    .feature-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.9rem;
+      background: #eef2ff;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #4338ca;
+    }
+
+    .reminder-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.9rem;
+      background: #ecfeff;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #0369a1;
+    }
+
+    .video-wrapper {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+    }
+
+    @media (max-width: 768px) {
+      .video-wrapper { height: 220px; }
+    }
+    @media (min-width: 769px) {
+      .video-wrapper { height: 360px; }
+    }
+
+    /* Brevo small tweaks */
+    #sib-container input::placeholder {
+      text-align: left;
+      font-family: Helvetica, sans-serif;
+      color: #c0ccda;
+    }
+
+    #sib-container a {
+      text-decoration: underline;
+      color: #2BB2FC;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex items-center justify-center">
+
+<div class="form-container w-full max-w-5xl p-4 md:p-8 lg:p-10">
+
+  <!-- HEADER -->
+  <div class="header-gradient rounded-2xl p-6 md:p-8 text-white mb-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+      <div>
+        <div class="inline-flex items-center gap-2 bg-black/20 backdrop-blur px-4 py-1.5 rounded-full text-xs md:text-sm font-medium">
+          <span>🔒</span>
+          <span>Confidential Financial Wellness Research</span>
+        </div>
+        <h1 class="mt-3 text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight">
+          Financial Wellness Research Study
+        </h1>
+      </div>
+      <div class="text-right text-xs md:text-sm text-indigo-100 space-y-1">
+        <p>Study Type: <span class="font-semibold">Debt Relief Experience</span></p>
+        <p>Estimated Time: <span class="font-semibold">3–5 minutes</span></p>
+      </div>
+    </div>
+    <p class="text-sm md:text-base text-indigo-100/90 max-w-3xl">
+      You’ll be asked to complete a secure debt-relief form in a new tab, watch a short explainer video, then confirm your email.
+      Please follow each step carefully.
+    </p>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-card active p-5 md:p-6 lg:p-7 mb-6">
+    <div class="flex items-start gap-3 md:gap-4 mb-5">
+      <div class="step-number">1</div>
+      <div class="flex-1">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-1.5">
+          <h2 class="text-lg md:text-xl lg:text-2xl font-semibold text-slate-900">
+            Open & Complete the Secure Financial Form
+          </h2>
+          <span class="text-xs md:text-sm font-medium text-primary-700 bg-primary-50 px-3 py-1 rounded-full">
+            Start here
+          </span>
+        </div>
+        <p class="text-sm md:text-base text-slate-600">
+          We are collecting feedback from people who are actively looking for real options to reduce or restructure their unsecured debt.
+          This step connects you with a financial specialist for balances of <span class="font-semibold">$15,000+</span> in unsecured debt.
+        </p>
+      </div>
+    </div>
+
+    <div class="eligibility-box p-4 md:p-5 mb-5">
+      <h3 class="font-semibold text-slate-900 mb-2 text-sm md:text-base">Who should continue?</h3>
+      <ul class="space-y-1.5 text-xs md:text-sm text-slate-700">
+        <li class="flex gap-2"><span class="mt-0.5 text-amber-500">•</span><span>You have <strong>unsecured debt</strong> (credit cards, personal loans, medical bills, etc.).</span></li>
+        <li class="flex gap-2"><span class="mt-0.5 text-amber-500">•</span><span>Your <strong>total unsecured balances are typically above $15,000</strong>.</span></li>
+        <li class="flex gap-2"><span class="mt-0.5 text-amber-500">•</span><span>You are <strong>seriously interested</strong> in exploring debt reduction options.</span></li>
+        <li class="flex gap-2"><span class="mt-0.5 text-amber-500">•</span><span>You are willing to <strong>receive a phone call</strong> at the number you provide.</span></li>
+      </ul>
+      <p class="mt-3 text-xs md:text-sm text-amber-800 flex items-center gap-2">
+        <span>📞</span>
+        <span>A financial specialist will typically call within <strong>24–48 hours</strong> after you submit the form.</span>
+      </p>
+    </div>
+
+    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-5 mb-5">
+      <h3 class="font-semibold text-slate-900 mb-3 text-sm md:text-base">How this step works</h3>
+      <ol class="space-y-2 text-xs md:text-sm text-slate-700">
+        <li class="flex gap-2"><span class="font-semibold text-primary-700">1.</span><span>Click <strong>“Start secure form”</strong> below. It opens the secure form in a new tab.</span></li>
+        <li class="flex gap-2"><span class="font-semibold text-primary-700">2.</span><span>Complete the secure form with accurate contact and debt details.</span></li>
+        <li class="flex gap-2"><span class="font-semibold text-primary-700">3.</span><span>Return to this tab and click <strong>“I submitted the form”</strong> to verify and unlock the next step.</span></li>
+        <li class="flex gap-2"><span class="font-semibold text-primary-700">4.</span><span>Enter your email to receive follow-up messages about your experience.</span></li>
+      </ol>
+
+      <div class="mt-6 info-box rounded-lg p-4">
+        <div class="flex items-start">
+          <span class="text-blue-600 mr-3">📧</span>
+          <div>
+            <p class="font-semibold text-gray-900 mb-1">About the Follow-up Emails</p>
+            <p class="text-gray-700 text-sm">
+              After you submit your email, we'll send a feedback request and reminders over the next 3 days to update us on your experience.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 warning-box p-3.5 md:p-4">
+        <div class="flex items-start gap-2.5">
+          <span class="mt-0.5 text-amber-600">⚠️</span>
+          <p class="text-xs md:text-sm text-slate-800">
+            To continue, you must complete the secure form and then verify your submission on this page.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUTTON -->
+    <div class="mb-3 text-center">
+      <a id="directFormLink"
+         href="#"
+         class="primary-btn inline-flex items-center justify-center px-8 py-3.5 rounded-xl text-sm md:text-base font-semibold w-full md:w-auto">
+        <span class="mr-2.5">🚀</span>
+        Start secure form
+        <span class="ml-2.5 text-xs">Opens new tab</span>
+      </a>
+
+      <p id="formStatus" class="mt-2 text-[11px] md:text-xs text-slate-500">
+        Click “Start secure form” to open and complete the secure form in a new tab.
+      </p>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="flex flex-wrap gap-3 mt-5">
+      <button id="btnFormDone"
+              class="px-6 py-3 bg-slate-100 text-slate-400 text-sm md:text-base font-semibold rounded-xl cursor-not-allowed"
+              disabled>
+        <span class="mr-2">⏳</span>
+        I submitted the form
+      </button>
+      <button id="btnFormQuit"
+              class="px-5 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm md:text-base font-medium rounded-xl border border-slate-200 transition">
+        I don't meet the requirements
+      </button>
+    </div>
+
+    <div class="flex flex-wrap gap-2 mt-5">
+      <span class="feature-badge"><span>📞</span> Live specialist call</span>
+      <span class="feature-badge"><span>💰</span> $15,000+ unsecured debt</span>
+      <span class="reminder-badge"><span>📧</span> 3-day follow-up</span>
+      <span class="feature-badge"><span>⏱️</span> 24–48h response</span>
+    </div>
+  </div>
+
+  <!-- STEP 2: FACEBOOK VIDEO -->
+  <div class="step-card p-5 md:p-6 lg:p-7 mb-6 opacity-60">
+    <div class="flex items-start gap-3 md:gap-4 mb-4">
+      <div class="step-number">2</div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-1.5">
+          <h2 class="text-lg md:text-xl lg:text-2xl font-semibold text-slate-900">
+            Watch the Short Explainer Video
+          </h2>
+          <span class="text-xs md:text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+            Unlocks after Step 1 verification
+          </span>
+        </div>
+        <p class="text-xs md:text-sm text-slate-600">
+          This quick video explains how the program works for people with higher unsecured debt balances.
+        </p>
+      </div>
+    </div>
+
+    <div id="videoContainer" class="hidden">
+      <div class="video-wrapper mb-3">
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1205740158030889%2F&show_text=true&width=860&t=0"
+          style="border:none; overflow:hidden;" scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
+      </div>
+      <p class="text-[11px] md:text-xs text-slate-500">
+        You only need to watch this once. When you are done, click the button below to continue.
+      </p>
+    </div>
+
+    <button id="btnVideoDone"
+            class="mt-4 px-6 py-3 bg-slate-300 text-slate-500 text-sm md:text-base font-semibold rounded-xl cursor-not-allowed"
+            disabled>
+      I watched the video
+    </button>
+  </div>
+
+  <!-- STEP 3: BREVO EMAIL + FINAL VERIFICATION -->
+  <div class="step-card p-5 md:p-6 lg:p-7 opacity-60">
+    <div class="flex items-start gap-3 md:gap-4 mb-4">
+      <div class="step-number">3</div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-1.5">
+          <h2 class="text-lg md:text-xl lg:text-2xl font-semibold text-slate-900">
+            Email Confirmation & Finish Study
+          </h2>
+          <span class="text-xs md:text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+            Last required step
+          </span>
+        </div>
+        <p class="text-xs md:text-sm text-slate-600">
+          Your email is required to confirm your participation and send a short follow-up about your experience.
+          After submitting your email, click “Verify & finish study” to complete the survey.
+        </p>
+      </div>
+    </div>
+
+    <!-- BREVO FORM BLOCK -->
+    <div id="brevoBlock" class="w-full mb-4 hidden">
+      <div class="sib-form" style="text-align: center; background-color: #EFF2F7;">
+        <div id="sib-form-container" class="sib-form-container">
+          <div id="sib-container"
+               class="sib-container--large sib-container--vertical"
+               style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:10px; border-width:1px; border-color:#C0CCD9; border-style:solid; margin:0 auto; box-shadow:0 10px 30px rgba(15,23,42,0.15);">
+
+            <iframe name="brevo_iframe" id="brevo_iframe" style="display:none;"></iframe>
+
+            <form id="sib-form"
+                  method="POST"
+                  action="https://52bcaf92.sibforms.com/serve/MUIFAO5vlejSCs-rWtk8_hSGgyILb9Oi-aOLbS_zI5_FjrtRovBWkBZlGVuoCXxEbmOMZMrdo0ZllgcfYtt7jPnKOHgyHT2TYdf3Q-xFXArnK8ikp21kPr7-iXsfMeK4CtD4cAPf2oHHMJLw5OtgVzgyKMt0hXTJ3UiMJVGUXzHbWENuGdgb7j-x2xeZ6iW5f9ix4gocwCjOBdct"
+                  target="brevo_iframe">
+
+              <div style="padding: 10px 18px 0 18px;">
+                <div class="sib-form-block"
+                     style="font-size:18px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#111827; background-color:transparent;">
+                  <p>Survey feedback reminder</p>
+                </div>
+              </div>
+
+              <div style="padding: 4px 18px;">
+                <div class="sib-form-block"
+                     style="font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#4b5563; background-color:transparent;">
+                  <div class="sib-text-form-block">
+                    <p>Please provide your email so we can send a reminder about this research and the outcome of your request.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding: 8px 18px 0 18px;">
+                <div class="sib-input sib-form-block">
+                  <div class="form__entry entry_block">
+                    <div class="form__label-row">
+                      <label class="entry__label"
+                             style="font-weight:700; text-align:left; font-size:14px; font-family:Helvetica, sans-serif; color:#111827;"
+                             for="EMAIL" data-required="*">
+                        Enter your email address
+                      </label>
+
+                      <div class="entry__field">
+                        <input class="input"
+                               type="text"
+                               id="EMAIL"
+                               name="EMAIL"
+                               autocomplete="off"
+                               placeholder="you@example.com"
+                               data-required="true"
+                               required />
+                      </div>
+                    </div>
+
+                    <label id="email_error"
+                           class="entry__error entry__error--primary"
+                           style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px; margin-top:6px;">
+                    </label>
+                    <label class="entry__specification"
+                           style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#6b7280;">
+                      We only use this to send survey-related reminders.
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding: 8px 18px 0 18px;">
+                <div class="sib-optin sib-form-block">
+                  <div class="form__entry entry_mcq">
+                    <div class="form__label-row">
+                      <div class="entry__choice">
+                        <label style="display:flex; align-items:flex-start; gap:6px;">
+                          <input type="checkbox"
+                                 class="input_replaced"
+                                 value="1"
+                                 id="OPT_IN"
+                                 name="OPT_IN" />
+                          <span class="checkbox checkbox_tick_positive"></span>
+                          <span style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#374151;">
+                            I agree to receive your email and accept the data privacy statement.
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+                    <label id="optin_error"
+                           class="entry__error entry__error--primary"
+                           style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px; margin-top:6px;">
+                    </label>
+                    <label class="entry__specification"
+                           style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#6b7280;">
+                      You may unsubscribe at any time using the link in our emails.
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding: 10px 18px 16px 18px;">
+                <div class="sib-form-block" style="text-align: left">
+                  <button id="brevoSubmitBtn"
+                          class="sib-form-block__button sib-form-block__button-with-loader"
+                          style="font-size:14px; text-align:center; font-weight:700; font-family:Helvetica, sans-serif; color:#FFFFFF; background-color:#4f46e5; border-radius:9999px; border-width:0px; width:100%; padding:10px 0; cursor:pointer;"
+                          type="submit">
+                    SUBMIT EMAIL
+                  </button>
+                </div>
+              </div>
+
+              <input type="text" name="email_address_check" value="" class="input--hidden">
+              <input type="hidden" name="locale" value="en">
+              <input type="hidden" name="html_type" value="simple">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="btnFinalVerify"
+            class="mt-2 px-6 py-3 bg-slate-300 text-slate-500 text-sm md:text-base font-semibold rounded-xl cursor-not-allowed w-full md:w-auto"
+            disabled>
+      Verify & finish study
+    </button>
+    <p class="mt-2 text-[11px] md:text-xs text-slate-500">
+      If our system cannot verify your secure form submission, you will be redirected accordingly.
+    </p>
+  </div>
+</div>
+
+<script>
+  function smoothScrollTo(el) {
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const absoluteY = rect.top + window.scrollY - 80;
+    window.scrollTo({ top: absoluteY, behavior: 'smooth' });
+  }
+
+  // Transaction ID
+  const urlParams = new URLSearchParams(window.location.search);
+  let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
+  if (!transactionId) transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
+
+  // PureSpectrum URLs
+  const completionUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
+  const terminationUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
+
+  // Marketcall offer (opens in NEW TAB)
+  const offerBaseUrl   = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
+  const offerTrackedUrl = `${offerBaseUrl}${offerBaseUrl.includes('?') ? '&' : '?'}subid=${encodeURIComponent(transactionId)}`;
+
+  // Worker verify URL
+  const verifyFormUrl = `https://marketcall.kayembakasongo.workers.dev/verify-form?transaction_id=${encodeURIComponent(transactionId)}`;
+
+  // DOM
+  const stepCards = document.querySelectorAll('.step-card');
+  const step2Card = stepCards[1];
+  const step3Card = stepCards[2];
+
+  const directFormLink = document.getElementById('directFormLink');
+  const formStatus = document.getElementById('formStatus');
+  const btnFormDone = document.getElementById('btnFormDone');
+  const btnFormQuit = document.getElementById('btnFormQuit');
+
+  const videoContainer = document.getElementById('videoContainer');
+  const btnVideoDone = document.getElementById('btnVideoDone');
+
+  const brevoBlock = document.getElementById('brevoBlock');
+  const sibForm = document.getElementById('sib-form');
+  const emailInput = document.getElementById('EMAIL');
+  const optIn = document.getElementById('OPT_IN');
+  const emailErr = document.getElementById('email_error');
+  const optinErr = document.getElementById('optin_error');
+  const brevoSubmitBtn = document.getElementById('brevoSubmitBtn');
+  const btnFinalVerify = document.getElementById('btnFinalVerify');
+
+  // Step 1: Open offer in NEW TAB (real click)
+  if (directFormLink) {
+    directFormLink.addEventListener('click', function (e) {
+      e.preventDefault();
+
+      // Open the tracked Marketcall URL in a new tab
+      window.open(offerTrackedUrl, '_blank', 'noopener,noreferrer');
+
+      // Status
+      if (formStatus) {
+        formStatus.textContent = 'New tab opened. Please complete and submit the secure form, then return here to verify.';
+        formStatus.classList.remove('text-slate-500');
+        formStatus.classList.add('text-emerald-700');
+      }
+
+      // Enable verify button
+      if (btnFormDone) {
+        btnFormDone.disabled = false;
+        btnFormDone.classList.remove('cursor-not-allowed', 'bg-slate-100', 'text-slate-400');
+        btnFormDone.classList.add('primary-btn', 'text-white');
+        btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
+      }
+    });
+  }
+
+  // Quit
+  if (btnFormQuit) {
+    btnFormQuit.addEventListener('click', function () {
+      if (confirm("If you don't meet the requirements or cannot complete the form, you may exit. Continue?")) {
+        window.location.href = terminationUrl;
+      }
+    });
+  }
+
+  // Verify after "I submitted the form"
+  if (btnFormDone) {
+    btnFormDone.addEventListener('click', async function () {
+      if (btnFormDone.disabled) return;
+
+      btnFormDone.disabled = true;
+      btnFormDone.innerHTML = '<span class="mr-2">⏳</span>Verifying your submission...';
+
+      try {
+        const resp = await fetch(verifyFormUrl, { method: 'GET' });
+        const data = await resp.json();
+
+        if (data.submitted) {
+          btnFormDone.classList.remove('primary-btn');
+          btnFormDone.classList.add('bg-emerald-100', 'text-emerald-800');
+          btnFormDone.innerHTML = '<span class="mr-2">✅</span>Form verified';
+
+          if (step2Card) { step2Card.style.opacity = '1'; step2Card.classList.add('active'); }
+          if (videoContainer) videoContainer.classList.remove('hidden');
+
+          if (btnVideoDone) {
+            btnVideoDone.disabled = false;
+            btnVideoDone.classList.remove('cursor-not-allowed', 'bg-slate-300', 'text-slate-500');
+            btnVideoDone.classList.add('primary-btn', 'text-white');
+          }
+
+          setTimeout(() => smoothScrollTo(step2Card), 400);
+        } else {
+          btnFormDone.disabled = false;
+          btnFormDone.classList.remove('primary-btn');
+          btnFormDone.classList.add('bg-red-100', 'text-red-800');
+          btnFormDone.innerHTML = '<span class="mr-2">❌</span>Submission not found';
+
+          alert('We could not verify your submission. Please complete and submit the form in the new tab, then try again.');
+
+          setTimeout(() => {
+            btnFormDone.classList.remove('bg-red-100', 'text-red-800');
+            btnFormDone.classList.add('primary-btn', 'text-white');
+            btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
+          }, 3500);
+        }
+      } catch (err) {
+        console.error(err);
+        window.location.href = terminationUrl;
+      }
+    });
+  }
+
+  // After video, unlock Brevo step
+  if (btnVideoDone) {
+    btnVideoDone.addEventListener('click', function () {
+      if (btnVideoDone.disabled) return;
+
+      if (step3Card) { step3Card.style.opacity = '1'; step3Card.classList.add('active'); }
+      if (brevoBlock) brevoBlock.classList.remove('hidden');
+
+      smoothScrollTo(step3Card);
+    });
+  }
+
+  // Brevo submit validation → unlock final verify
+  if (sibForm) {
+    sibForm.addEventListener('submit', function (e) {
+      let hasError = false;
+      if (emailErr) emailErr.style.display = 'none';
+      if (optinErr) optinErr.style.display = 'none';
+
+      const emailVal = (emailInput && emailInput.value ? emailInput.value : '').trim();
+
+      if (!emailVal) {
+        hasError = true;
+        if (emailErr) { emailErr.textContent = 'Please enter your email address.'; emailErr.style.display = 'block'; }
+      } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)) {
+        hasError = true;
+        if (emailErr) { emailErr.textContent = 'Please enter a valid email address.'; emailErr.style.display = 'block'; }
+      }
+
+      if (!optIn || !optIn.checked) {
+        hasError = true;
+        if (optinErr) { optinErr.textContent = 'Please agree to the privacy statement to continue.'; optinErr.style.display = 'block'; }
+      }
+
+      if (hasError) { e.preventDefault(); return; }
+
+      if (brevoSubmitBtn) { brevoSubmitBtn.disabled = true; brevoSubmitBtn.textContent = 'Submitting...'; }
+
+      setTimeout(function () {
+        if (btnFinalVerify) {
+          btnFinalVerify.disabled = false;
+          btnFinalVerify.classList.remove('cursor-not-allowed', 'bg-slate-300', 'text-slate-500');
+          btnFinalVerify.classList.add('primary-btn', 'text-white');
+        }
+      }, 3500);
+    });
+  }
+
+  // Final verification → completion/termination
+  if (btnFinalVerify) {
+    btnFinalVerify.addEventListener('click', async function () {
+      if (btnFinalVerify.disabled) return;
+
+      btnFinalVerify.disabled = true;
+      btnFinalVerify.innerHTML = '⏳ Verifying & finishing...';
+
+      try {
+        const resp = await fetch(verifyFormUrl, { method: 'GET' });
+        const data = await resp.json();
+        window.location.href = data.submitted ? completionUrl : terminationUrl;
+      } catch (err) {
+        window.location.href = terminationUrl;
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

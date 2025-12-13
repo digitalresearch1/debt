@@ -18,24 +18,20 @@
       background: radial-gradient(circle at top, #4f46e5 0, #020617 55%);
       min-height: 100vh;
     }
-
     .form-container {
       background: white;
       border-radius: 24px;
       box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
       border: 1px solid rgba(148, 163, 184, 0.4);
     }
-
     .header-gradient {
       background: radial-gradient(circle at top left, #6366f1, #4f46e5 40%, #a855f7 100%);
     }
-
     .step-card {
       background: white;
       border-radius: 18px;
       border: 1px solid #e5e7eb;
     }
-
     .step-number {
       display: inline-flex;
       align-items: center;
@@ -48,7 +44,6 @@
       font-weight: 600;
       font-size: 0.875rem;
     }
-
     .primary-btn {
       background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
       color: white;
@@ -59,7 +54,6 @@
       transform: translateY(-1px);
       box-shadow: 0 16px 35px rgba(79, 70, 229, 0.35);
     }
-
     .warning-box {
       background: #fff7ed;
       border: 1px solid #fed7aa;
@@ -75,7 +69,6 @@
       border: 1px solid #facc15;
       border-radius: 14px;
     }
-
     .feature-badge {
       display: inline-flex;
       align-items: center;
@@ -98,7 +91,6 @@
       font-weight: 500;
       color: #0369a1;
     }
-
     .video-wrapper {
       width: 100%;
       max-width: 100%;
@@ -117,7 +109,7 @@
     @media (max-width: 768px) { .video-wrapper { height: 220px; } }
     @media (min-width: 769px) { .video-wrapper { height: 360px; } }
 
-    /* "page" panels */
+    /* page panels */
     .page { display: none; }
     .page.active { display: block; }
 
@@ -182,18 +174,15 @@
       <div class="text-right text-xs md:text-sm text-indigo-100 space-y-1">
         <p>Study Type: <span class="font-semibold">Debt Relief Experience</span></p>
         <p>Estimated Time: <span class="font-semibold">3–5 minutes</span></p>
-       
       </div>
     </div>
 
     <p class="text-sm md:text-base text-indigo-100/90 max-w-3xl">
-    Please follow each step carefully.
+      Please follow each step carefully.
     </p>
   </div>
 
-  <!-- ======================
-       PAGE 1 (STEP 1)
-       ====================== -->
+  <!-- PAGE 1 -->
   <section id="page1" class="page active">
     <div class="step-card p-5 md:p-6 lg:p-7 mb-6">
       <div class="flex items-start gap-3 md:gap-4 mb-5">
@@ -224,7 +213,6 @@
           <li class="flex gap-2"><span class="mt-0.5 text-amber-500">•</span><span>You are willing to <strong>receive a phone call</strong> at the number you provide.</span></li>
         </ul>
 
-        <!-- STOP STEP 1 HERE -->
         <p class="mt-3 text-xs md:text-sm text-amber-800 flex items-center gap-2">
           <span>📞</span>
           <span>A financial specialist will typically call within <strong>24–48 hours</strong> after you submit the form.</span>
@@ -232,10 +220,7 @@
       </div>
 
       <div class="flex flex-wrap gap-3 mt-6">
-        <button id="btnStep1Next" class="primary-btn px-6 py-3 rounded-xl font-semibold">
-          Next →
-        </button>
-
+        <button id="btnStep1Next" class="primary-btn px-6 py-3 rounded-xl font-semibold">Next →</button>
         <button id="btnExit1" class="px-6 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium rounded-xl border border-slate-200 transition">
           I don't meet the requirements / Don't want to participate
         </button>
@@ -243,9 +228,7 @@
     </div>
   </section>
 
-  <!-- ======================
-       PAGE 2 (STEP 2)
-       ====================== -->
+  <!-- PAGE 2 -->
   <section id="page2" class="page">
     <div class="step-card p-5 md:p-6 lg:p-7 mb-6">
       <div class="flex items-start gap-3 md:gap-4 mb-5">
@@ -293,10 +276,8 @@
         </div>
       </div>
 
-      <!-- START SECURE FORM -->
       <div class="mb-4 text-center">
-        <a id="directFormLink"
-           href="#"
+        <a id="directFormLink" href="#"
            class="primary-btn inline-flex items-center justify-center px-8 py-3.5 rounded-xl text-sm md:text-base font-semibold w-full md:w-auto">
           <span class="mr-2.5">🚀</span>
           Start secure form
@@ -336,9 +317,7 @@
     </div>
   </section>
 
-  <!-- ======================
-       PAGE 3 (STEP 3)
-       ====================== -->
+  <!-- PAGE 3 -->
   <section id="page3" class="page">
     <div class="step-card p-5 md:p-6 lg:p-7 mb-6">
       <div class="flex items-start gap-3 md:gap-4 mb-4">
@@ -366,9 +345,7 @@
           allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
       </div>
 
-      <p class="text-[11px] md:text-xs text-slate-500">
-        When you are done, click the button below to continue.
-      </p>
+      <p class="text-[11px] md:text-xs text-slate-500">When you are done, click the button below to continue.</p>
 
       <div class="flex flex-wrap gap-3 mt-4">
         <button id="btnVideoDone" class="primary-btn px-6 py-3 rounded-xl font-semibold">
@@ -388,9 +365,7 @@
     </div>
   </section>
 
-  <!-- ======================
-       PAGE 4 (STEP 4)
-       ====================== -->
+  <!-- PAGE 4 -->
   <section id="page4" class="page">
     <div class="step-card p-5 md:p-6 lg:p-7 mb-6">
       <div class="flex items-start gap-3 md:gap-4 mb-4">
@@ -454,14 +429,9 @@
                         </label>
 
                         <div class="entry__field">
-                          <input class="input"
-                                 type="text"
-                                 id="EMAIL"
-                                 name="EMAIL"
-                                 autocomplete="off"
-                                 placeholder="you@example.com"
-                                 data-required="true"
-                                 required />
+                          <input class="input" type="text" id="EMAIL" name="EMAIL"
+                                 autocomplete="off" placeholder="you@example.com"
+                                 data-required="true" required />
                         </div>
                       </div>
 
@@ -484,11 +454,7 @@
                       <div class="form__label-row">
                         <div class="entry__choice">
                           <label style="display:flex; align-items:flex-start; gap:6px;">
-                            <input type="checkbox"
-                                   class="input_replaced"
-                                   value="1"
-                                   id="OPT_IN"
-                                   name="OPT_IN" />
+                            <input type="checkbox" class="input_replaced" value="1" id="OPT_IN" name="OPT_IN" />
                             <span class="checkbox checkbox_tick_positive"></span>
                             <span style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#374151;">
                               I agree to receive your email and accept the data privacy statement.
@@ -536,7 +502,7 @@
         Verify & finish study
       </button>
 
-      <p class="mt-2 text-[11px] md:text-xs text-slate-500">
+      <p id="finalStatus" class="mt-2 text-[11px] md:text-xs text-slate-500">
         If our system cannot verify your secure form submission, you will be redirected to a disqualification page instead of completion.
       </p>
 
@@ -553,7 +519,6 @@
       </div>
     </div>
   </section>
-
 </div>
 
 <!-- Sticky overlay -->
@@ -579,28 +544,28 @@
 </div>
 
 <script>
-  // Helper: show one "page" at a time (like separate pages)
+  // Show one "page" at a time
   function showPage(n) {
-    const pages = ['page1','page2','page3','page4'];
-    pages.forEach((id, idx) => {
+    const ids = ['page1','page2','page3','page4'];
+    ids.forEach((id, idx) => {
       const el = document.getElementById(id);
-      if (!el) return;
-      el.classList.toggle('active', idx === (n-1));
+      if (el) el.classList.toggle('active', idx === (n - 1));
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Transaction ID (supports transaction_id, RID, cint)
+  // Get transaction id (transaction_id, RID, cint) and persist for the session
   const urlParams = new URLSearchParams(window.location.search);
-  let transactionId = urlParams.get('transaction_id') || urlParams.get('RID') || urlParams.get('cint') || sessionStorage.getItem('transaction_id');
+  let transactionId =
+    urlParams.get('transaction_id') ||
+    urlParams.get('RID') ||
+    urlParams.get('cint') ||
+    sessionStorage.getItem('transaction_id');
 
   if (!transactionId) {
     transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
   sessionStorage.setItem('transaction_id', transactionId);
-
-  // Show id in header
-  document.getElementById('tidTop').textContent = transactionId;
 
   // PureSpectrum URLs
   const completionUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
@@ -610,23 +575,31 @@
   const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
   const offerTrackedUrl = `${offerBaseUrl}${offerBaseUrl.includes('?') ? '&' : '?'}subid=${encodeURIComponent(transactionId)}`;
 
-  // Worker verify URL (your endpoint)
+  // Worker verify URL
   const verifyFormUrl = `https://marketcall.kayembakasongo.workers.dev/verify-form?transaction_id=${encodeURIComponent(transactionId)}`;
 
-  // -------------------------
-  // PAGE 1 buttons
-  // -------------------------
-  document.getElementById('btnStep1Next').addEventListener('click', () => showPage(2));
-  document.getElementById('btnExit1').addEventListener('click', () => window.location.href = terminationUrl);
+  async function safeVerify() {
+    // Important: do NOT auto-disqualify on network/CORS/JSON issues
+    const resp = await fetch(verifyFormUrl, { method: 'GET', cache: 'no-store' });
 
-  // -------------------------
+    if (!resp.ok) {
+      // Example: 500/403/404
+      return { ok: false, submitted: false, error: `Worker HTTP ${resp.status}` };
+    }
+
+    // If worker returns non-JSON, this will throw; we catch above usage
+    const data = await resp.json();
+    return { ok: true, submitted: !!(data && data.submitted) };
+  }
+
+  // PAGE 1 buttons
+  document.getElementById('btnStep1Next')?.addEventListener('click', () => showPage(2));
+  document.getElementById('btnExit1')?.addEventListener('click', () => window.location.href = terminationUrl);
+
   // PAGE 2 buttons + overlay
-  // -------------------------
   const directFormLink = document.getElementById('directFormLink');
   const formStatus = document.getElementById('formStatus');
   const btnFormDone = document.getElementById('btnFormDone');
-  const btnExit2 = document.getElementById('btnExit2');
-  const btnBackTo1 = document.getElementById('btnBackTo1');
 
   const overlayWrap = document.getElementById('overlayWrap');
   const reopenBtn = document.getElementById('reopenBtn');
@@ -634,88 +607,92 @@
 
   let lastOpened = null;
 
-  directFormLink.addEventListener('click', (e) => {
+  directFormLink?.addEventListener('click', (e) => {
     e.preventDefault();
 
     lastOpened = offerTrackedUrl;
-
-    // Open in a real new-tab click
     window.open(offerTrackedUrl, '_blank', 'noopener,noreferrer');
 
-    // Show sticky overlay
-    overlayWrap.style.display = 'flex';
+    if (overlayWrap) overlayWrap.style.display = 'flex';
 
-    // Update status text
-    formStatus.textContent = 'New tab opened. Please complete and submit the secure form, then return here to verify.';
-    formStatus.classList.remove('text-slate-500');
-    formStatus.classList.add('text-emerald-700');
+    if (formStatus) {
+      formStatus.textContent = 'New tab opened. Please complete and submit the secure form, then return here to verify.';
+      formStatus.classList.remove('text-slate-500');
+      formStatus.classList.add('text-emerald-700');
+    }
 
-    // Enable verify
-    btnFormDone.disabled = false;
-    btnFormDone.classList.remove('cursor-not-allowed', 'bg-slate-100', 'text-slate-400');
-    btnFormDone.classList.add('primary-btn', 'text-white');
-    btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
+    if (btnFormDone) {
+      btnFormDone.disabled = false;
+      btnFormDone.classList.remove('cursor-not-allowed', 'bg-slate-100', 'text-slate-400');
+      btnFormDone.classList.add('primary-btn', 'text-white');
+      btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
+    }
   });
 
-  reopenBtn.addEventListener('click', () => {
+  reopenBtn?.addEventListener('click', () => {
     if (!lastOpened) return;
     window.open(lastOpened, '_blank', 'noopener,noreferrer');
   });
 
-  closeOverlayBtn.addEventListener('click', () => {
-    overlayWrap.style.display = 'none';
+  closeOverlayBtn?.addEventListener('click', () => {
+    if (overlayWrap) overlayWrap.style.display = 'none';
   });
 
-  btnExit2.addEventListener('click', () => window.location.href = terminationUrl);
-  btnBackTo1.addEventListener('click', () => showPage(1));
+  document.getElementById('btnExit2')?.addEventListener('click', () => window.location.href = terminationUrl);
+  document.getElementById('btnBackTo1')?.addEventListener('click', () => showPage(1));
 
   // Verify after "I submitted the form"
-  btnFormDone.addEventListener('click', async () => {
-    if (btnFormDone.disabled) return;
+  btnFormDone?.addEventListener('click', async () => {
+    if (!btnFormDone || btnFormDone.disabled) return;
 
     btnFormDone.disabled = true;
     btnFormDone.innerHTML = '<span class="mr-2">⏳</span>Verifying your submission...';
 
     try {
-      const resp = await fetch(verifyFormUrl, { method: 'GET' });
-      const data = await resp.json();
+      const result = await safeVerify();
 
-      if (data && data.submitted) {
+      if (result.ok && result.submitted) {
         btnFormDone.classList.remove('primary-btn');
         btnFormDone.classList.add('bg-emerald-100', 'text-emerald-800');
         btnFormDone.innerHTML = '<span class="mr-2">✅</span>Form verified';
-
-        // Move to page 3
         setTimeout(() => showPage(3), 600);
-      } else {
-        btnFormDone.disabled = false;
-        btnFormDone.classList.remove('primary-btn');
-        btnFormDone.classList.add('bg-red-100', 'text-red-800');
-        btnFormDone.innerHTML = '<span class="mr-2">❌</span>Submission not found';
-
-        alert('We could not verify your submission. Please complete and submit the secure form in the new tab, then try again.');
-
-        setTimeout(() => {
-          btnFormDone.classList.remove('bg-red-100', 'text-red-800');
-          btnFormDone.classList.add('primary-btn', 'text-white');
-          btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
-        }, 2000);
+        return;
       }
+
+      // Not submitted OR worker error -> do NOT disqualify automatically
+      btnFormDone.disabled = false;
+      btnFormDone.classList.remove('primary-btn');
+      btnFormDone.classList.add('bg-red-100', 'text-red-800');
+      btnFormDone.innerHTML = result.ok
+        ? '<span class="mr-2">❌</span>Submission not found'
+        : '<span class="mr-2">⚠️</span>Verification error';
+
+      alert(
+        result.ok
+          ? 'We could not verify your submission. Please make sure you submitted the secure form in the new tab, then try again.'
+          : 'We could not reach the verification server. Please try again in 10–20 seconds.'
+      );
+
+      setTimeout(() => {
+        btnFormDone.classList.remove('bg-red-100', 'text-red-800');
+        btnFormDone.classList.add('primary-btn', 'text-white');
+        btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
+      }, 2000);
     } catch (err) {
-      window.location.href = terminationUrl;
+      // JSON parse / CORS / network
+      btnFormDone.disabled = false;
+      btnFormDone.classList.remove('primary-btn');
+      btnFormDone.classList.add('bg-amber-100', 'text-amber-800');
+      btnFormDone.innerHTML = '<span class="mr-2">⚠️</span>Network error - try again';
     }
   });
 
-  // -------------------------
   // PAGE 3 buttons
-  // -------------------------
-  document.getElementById('btnVideoDone').addEventListener('click', () => showPage(4));
-  document.getElementById('btnBackTo2').addEventListener('click', () => showPage(2));
-  document.getElementById('btnExit3').addEventListener('click', () => window.location.href = terminationUrl);
+  document.getElementById('btnVideoDone')?.addEventListener('click', () => showPage(4));
+  document.getElementById('btnBackTo2')?.addEventListener('click', () => showPage(2));
+  document.getElementById('btnExit3')?.addEventListener('click', () => window.location.href = terminationUrl);
 
-  // -------------------------
   // PAGE 4 (Brevo + final verify)
-  // -------------------------
   const sibForm = document.getElementById('sib-form');
   const emailInput = document.getElementById('EMAIL');
   const optIn = document.getElementById('OPT_IN');
@@ -723,31 +700,31 @@
   const optinErr = document.getElementById('optin_error');
   const brevoSubmitBtn = document.getElementById('brevoSubmitBtn');
   const btnFinalVerify = document.getElementById('btnFinalVerify');
+  const finalStatus = document.getElementById('finalStatus');
 
-  document.getElementById('btnBackTo3').addEventListener('click', () => showPage(3));
-  document.getElementById('btnExit4').addEventListener('click', () => window.location.href = terminationUrl);
+  document.getElementById('btnBackTo3')?.addEventListener('click', () => showPage(3));
+  document.getElementById('btnExit4')?.addEventListener('click', () => window.location.href = terminationUrl);
 
   // Brevo submit validation -> unlock final verify
-  sibForm.addEventListener('submit', (e) => {
+  sibForm?.addEventListener('submit', (e) => {
     let hasError = false;
-    emailErr.style.display = 'none';
-    optinErr.style.display = 'none';
 
-    const emailVal = (emailInput.value || '').trim();
+    if (emailErr) emailErr.style.display = 'none';
+    if (optinErr) optinErr.style.display = 'none';
+
+    const emailVal = (emailInput?.value || '').trim();
+
     if (!emailVal) {
       hasError = true;
-      emailErr.textContent = 'Please enter your email address.';
-      emailErr.style.display = 'block';
+      if (emailErr) { emailErr.textContent = 'Please enter your email address.'; emailErr.style.display = 'block'; }
     } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)) {
       hasError = true;
-      emailErr.textContent = 'Please enter a valid email address.';
-      emailErr.style.display = 'block';
+      if (emailErr) { emailErr.textContent = 'Please enter a valid email address.'; emailErr.style.display = 'block'; }
     }
 
-    if (!optIn.checked) {
+    if (!optIn?.checked) {
       hasError = true;
-      optinErr.textContent = 'Please agree to the privacy statement to continue.';
-      optinErr.style.display = 'block';
+      if (optinErr) { optinErr.textContent = 'Please agree to the privacy statement to continue.'; optinErr.style.display = 'block'; }
     }
 
     if (hasError) {
@@ -755,30 +732,53 @@
       return;
     }
 
-    brevoSubmitBtn.disabled = true;
-    brevoSubmitBtn.textContent = 'Submitting...';
+    if (brevoSubmitBtn) {
+      brevoSubmitBtn.disabled = true;
+      brevoSubmitBtn.textContent = 'Submitting...';
+    }
 
-    // Allow Brevo to process, then unlock finish
+    // Unlock finish after Brevo has time to post to the iframe
     setTimeout(() => {
-      btnFinalVerify.disabled = false;
-      btnFinalVerify.classList.remove('cursor-not-allowed', 'bg-slate-300', 'text-slate-500');
-      btnFinalVerify.classList.add('primary-btn', 'text-white');
+      if (btnFinalVerify) {
+        btnFinalVerify.disabled = false;
+        btnFinalVerify.classList.remove('cursor-not-allowed', 'bg-slate-300', 'text-slate-500');
+        btnFinalVerify.classList.add('primary-btn', 'text-white');
+      }
+      if (finalStatus) {
+        finalStatus.textContent = 'Email received. Now click “Verify & finish study” to complete.';
+      }
     }, 2500);
   });
 
   // Final verification: completion or termination
-  btnFinalVerify.addEventListener('click', async () => {
-    if (btnFinalVerify.disabled) return;
+  btnFinalVerify?.addEventListener('click', async () => {
+    if (!btnFinalVerify || btnFinalVerify.disabled) return;
 
     btnFinalVerify.disabled = true;
     btnFinalVerify.textContent = '⏳ Verifying & finishing...';
 
     try {
-      const resp = await fetch(verifyFormUrl, { method: 'GET' });
-      const data = await resp.json();
-      window.location.href = (data && data.submitted) ? completionUrl : terminationUrl;
+      const result = await safeVerify();
+
+      if (result.ok && result.submitted) {
+        window.location.href = completionUrl;
+        return;
+      }
+
+      // If worker says NOT submitted, then terminate (disqualify)
+      if (result.ok && !result.submitted) {
+        window.location.href = terminationUrl;
+        return;
+      }
+
+      // Worker error: do NOT disqualify; allow retry
+      alert('Verification server error. Please wait 10–20 seconds and click “Verify & finish study” again.');
+      btnFinalVerify.disabled = false;
+      btnFinalVerify.textContent = 'Verify & finish study';
     } catch (err) {
-      window.location.href = terminationUrl;
+      alert('Network/CORS error while verifying. Please try again.');
+      btnFinalVerify.disabled = false;
+      btnFinalVerify.textContent = 'Verify & finish study';
     }
   });
 </script>

@@ -8,8 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Tesseract.js v5 -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <!-- Fast OCR (no worker management) -->
+  <script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
     body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
@@ -22,6 +22,7 @@
 <body class="bg-slate-50 text-slate-900">
 <main class="max-w-xl mx-auto px-4 py-10">
 
+  <!-- MAIN -->
   <section class="card bg-white shadow-sm p-6 space-y-5">
 
     <div class="space-y-2">
@@ -36,8 +37,8 @@
       </p>
 
       <p>
-        Click the button below to download the app. You will be taken to the App Store to install it.
-        After installing, open the app, complete the sign-up, and spend about one minute using it.
+        Click the button below. You will be taken to the App Store to install.
+        After installing, open it, complete sign-up, and spend about one minute using it.
         Then return to this page and continue.
       </p>
 
@@ -71,7 +72,7 @@
         <div>
           <p class="text-sm font-semibold text-slate-900">Upload screenshot (required)</p>
           <p class="text-xs text-slate-600">
-            Upload a screenshot of the email welcome message. We unlock “Continue” only if we detect:
+            Upload a screenshot of the welcome email. “Continue” unlocks only if we detect:
             <strong>“Welcome to TikTok”</strong>.
           </p>
         </div>
@@ -151,6 +152,16 @@
         </div>
         <p class="text-xs text-slate-500">1 = Not likely, 5 = Very likely</p>
       </div>
+
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+        <p class="font-semibold">What (if anything) felt confusing? <span class="text-xs text-slate-500">(optional)</span></p>
+        <textarea id="fb_confusing" class="w-full rounded-xl border border-slate-200 p-3 text-sm" rows="3"></textarea>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+        <p class="font-semibold">What did you like most? <span class="text-xs text-slate-500">(optional)</span></p>
+        <textarea id="fb_like" class="w-full rounded-xl border border-slate-200 p-3 text-sm" rows="3"></textarea>
+      </div>
     </div>
 
     <button id="btnSubmit"
@@ -166,21 +177,20 @@
 
 <script>
   // ====== CONFIG ======
-  const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1=";
+  const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1=";   // add RID to this
   const COMPLETE_URL   = "https://connect.cloudresearch.com/participant/project/31CCC7C024/complete";
-  const REQUIRED_PHRASE = "welcome to tiktok"; // ONLY check this
+  const REQUIRED_PHRASE = "welcome to tiktok"; // ONLY detect this (case-insensitive)
 
   // ====== STATE ======
   let openedOnce = false;
-  let ocrPassed = false;
-  let worker = null;
-  let workerCDN = "jsdelivr"; // fallback to unpkg if needed
+  let ocrPassed  = false;
 
   // ====== RID ======
   const qp = new URLSearchParams(location.search);
   let rid = qp.get("RID") || qp.get("transaction_id") || qp.get("s1") || sessionStorage.getItem("RID");
   if (!rid) rid = "tx_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
   sessionStorage.setItem("RID", rid);
+
   const offerUrl = OFFER_BASE_URL + encodeURIComponent(rid);
 
   // ====== DOM ======
@@ -205,6 +215,7 @@
   const btnSubmit = document.getElementById("btnSubmit");
   const hint2 = document.getElementById("hint2");
 
+  // ====== Helpers ======
   function setProgress(p, msg){
     const pct = Math.max(0, Math.min(100, Math.round(p)));
     ocrPct.textContent = pct + "%";
@@ -212,8 +223,12 @@
     if (msg) ocrMsg.textContent = msg;
   }
 
-  function normalize(text) {
-    return (text || "").toLowerCase().replace(/\s+/g, " ").trim();
+  function normalize(text){
+    return (text || "")
+      .toLowerCase()
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/\s+/g, " ")
+      .trim();
   }
 
   function updateGate(){
@@ -234,20 +249,23 @@
     statusChip.textContent = "Verified ✅";
   }
 
-  // ====== preprocess image (downscale + crop top) ======
+  // More reliable blob creation on iOS
   async function canvasToBlobSafe(canvas, type="image/jpeg", quality=0.9){
     const blob = await new Promise(res => canvas.toBlob(res, type, quality));
     if (blob) return blob;
-    // iOS fallback:
     const dataUrl = canvas.toDataURL(type, quality);
     const resp = await fetch(dataUrl);
     return await resp.blob();
   }
 
+  // Crop top portion (subject/header area)
   async function preprocessImageTop(file, maxW = 1400){
     const img = new Image();
     const url = URL.createObjectURL(file);
-    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+
+    await new Promise((res, rej) => {
+      img.onload = res; img.onerror = rej; img.src = url;
+    });
 
     const scale = Math.min(1, maxW / img.width);
     const w = Math.round(img.width * scale);
@@ -257,7 +275,7 @@
     canvas.width = w; canvas.height = h;
     canvas.getContext("2d").drawImage(img, 0, 0, w, h);
 
-    // Crop TOP 45% for email header/subject
+    // Crop TOP 45%
     const cropH = Math.round(h * 0.45);
     const crop = document.createElement("canvas");
     crop.width = w;
@@ -269,52 +287,7 @@
     return await canvasToBlobSafe(crop, "image/jpeg", 0.9);
   }
 
-  // ====== OCR worker init with CDN fallback ======
-  function cdnPaths(which){
-    if (which === "unpkg") {
-      return {
-        workerPath: "https://unpkg.com/tesseract.js@5/dist/worker.min.js",
-        corePath: "https://unpkg.com/tesseract.js-core@5/tesseract-core.wasm.js"
-      };
-    }
-    return {
-      workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js",
-      corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js"
-    };
-  }
-
-  async function makeWorker(which){
-    const paths = cdnPaths(which);
-    const w = await Tesseract.createWorker({
-      logger: m => {
-        if (m.status === "recognizing text") setProgress((m.progress||0)*100, "Reading screenshot…");
-      },
-      workerPath: paths.workerPath,
-      corePath: paths.corePath
-    });
-    await w.loadLanguage("eng");
-    await w.initialize("eng");
-    try { await w.setParameters({ tessedit_pageseg_mode: "6" }); } catch {}
-    return w;
-  }
-
-  async function getWorker(){
-    if (!window.Tesseract) throw new Error("Tesseract not loaded.");
-    if (worker) return worker;
-
-    // Try current CDN, then fallback
-    try {
-      worker = await makeWorker(workerCDN);
-      return worker;
-    } catch (e) {
-      // fallback
-      workerCDN = (workerCDN === "jsdelivr") ? "unpkg" : "jsdelivr";
-      worker = await makeWorker(workerCDN);
-      return worker;
-    }
-  }
-
-  // ====== Actions ======
+  // ====== Buttons ======
   btnOpen.addEventListener("click", () => {
     window.open(offerUrl, "_blank", "noopener,noreferrer");
     openedOnce = true;
@@ -341,6 +314,7 @@
     }
 
     if (!file.type.startsWith("image/")){
+      previewWrap.classList.add("hidden");
       btnOcr.disabled = true;
       ocrMsg.textContent = "Please upload an image.";
       updateGate();
@@ -357,29 +331,39 @@
     updateGate();
   });
 
+  // ====== OCR (FAST MODE) ======
   btnOcr.addEventListener("click", async () => {
     const file = shot.files && shot.files[0];
     if (!file) return;
 
     btnOcr.disabled = true;
-    setProgress(1, "Preparing image…");
+    btnGoFeedback.disabled = true;
     ocrPassed = false;
     statusChip.textContent = "";
     ocrResult.classList.add("hidden");
     ocrText.textContent = "";
 
+    setProgress(10, "Preparing image…");
+
     try {
       const blob = await preprocessImageTop(file, 1400);
+      setProgress(25, "Reading screenshot…");
 
-      setProgress(5, "Loading OCR engine…");
-      const w = await getWorker();
+      const result = await Tesseract.recognize(blob, "eng", {
+        logger: m => {
+          // only reliable progress is during recognition
+          if (typeof m.progress === "number") {
+            const p = 25 + Math.round(m.progress * 70); // 25 -> 95
+            setProgress(p, "Reading screenshot…");
+          }
+        }
+      });
 
-      const { data } = await w.recognize(blob);
-      const raw = data?.text || "";
+      const raw = result?.data?.text || "";
       const text = normalize(raw);
 
       ocrResult.classList.remove("hidden");
-      ocrText.textContent = raw.slice(0, 1500) + (raw.length > 1500 ? "\n…(truncated)" : "");
+      ocrText.textContent = raw.slice(0, 1400) + (raw.length > 1400 ? "\n…(truncated)" : "");
 
       setProgress(100, "Done.");
 
@@ -394,7 +378,7 @@
     } catch (e) {
       ocrPassed = false;
       setProgress(0, "Error.");
-      ocrMsg.textContent = "❌ OCR failed (CDN blocked or image too large). Try a clearer screenshot (top part) and retry.";
+      ocrMsg.textContent = "❌ OCR failed. Try a clearer screenshot (top of the email) and retry.";
     } finally {
       btnOcr.disabled = false;
       updateGate();
@@ -404,6 +388,7 @@
   btnGoFeedback.addEventListener("click", () => {
     if (!openedOnce) { hint.textContent = "Please click “Click To Download” first."; return; }
     if (!ocrPassed) { hint.textContent = "Please validate the screenshot first."; return; }
+
     feedback.classList.remove("hidden");
     feedback.scrollIntoView({ behavior: "smooth" });
     validateFeedback();
@@ -425,12 +410,9 @@
     window.location.href = COMPLETE_URL;
   });
 
-  window.addEventListener("beforeunload", async () => {
-    try { if (worker) await worker.terminate(); } catch {}
-  });
-
   updateGate();
 </script>
 
 </body>
 </html>
+

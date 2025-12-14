@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Survey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .card { border: 1px solid rgb(226 232 240); border-radius: 18px; }
+    input[type="radio"] { width: 16px; height: 16px; }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+<main class="max-w-xl mx-auto px-4 py-10">
+
+  <!-- PURPOSE + TASK -->
+  <section class="card bg-white shadow-sm p-6 space-y-5">
+
+    <div class="space-y-2">
+      <p class="text-sm text-slate-600">
+        App experience research study
+      </p>
+      <p class="text-lg font-semibold leading-snug">
+        Help us understand how new users experience this app for the first time
+      </p>
+    </div>
+
+    <div class="space-y-3 text-sm text-slate-700">
+      <p>
+        The purpose of this study is to understand how people who have <strong>not used TikTok before</strong>
+        experience the app when they try it for the first time.
+      </p>
+      <p>
+        Because you are new to this type of app, your feedback helps us evaluate things like
+        ease of sign-up, clarity of features, and overall first impressions.
+      </p>
+      <p>
+        There are no right or wrong answers — we are simply interested in your honest opinion
+        based on your first experience.
+      </p>
+    </div>
+
+    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4 space-y-2">
+      <p class="text-sm font-semibold text-slate-800">What you’ll do</p>
+      <ul class="text-sm text-slate-700 list-disc pl-5 space-y-1">
+        <li>Click <strong>Click to download</strong> (the App Store will open)</li>
+        <li>Install the app</li>
+        <li>Open the app and complete the sign-up</li>
+        <li>Spend a short moment exploring the app</li>
+        <li>Return here to answer a few feedback questions</li>
+      </ul>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <button id="btnOpen"
+        class="rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition">
+        Click to download
+      </button>
+
+      <button id="btnGoFeedback"
+        class="rounded-xl px-4 py-3 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+        disabled>
+        Continue to feedback
+      </button>
+    </div>
+
+    <p id="hint" class="text-xs text-slate-500"></p>
+  </section>
+
+  <!-- FEEDBACK -->
+  <section id="feedback" class="card bg-white shadow-sm p-6 mt-6 space-y-5 hidden">
+
+    <div class="space-y-1">
+      <p class="text-sm text-slate-600">Feedback</p>
+      <p class="text-lg font-semibold">Tell us about your first-time experience</p>
+    </div>
+
+    <div class="space-y-4">
+
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+        <p class="font-semibold">What was your overall first impression of the app?</p>
+        <label class="flex gap-2"><input type="radio" name="fb_impression"> Very positive</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression"> Somewhat positive</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression"> Neutral</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression"> Somewhat negative</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression"> Very negative</label>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+        <p class="font-semibold">How easy was the sign-up process for you?</p>
+        <label class="flex gap-2"><input type="radio" name="fb_signup"> Very easy</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup"> Easy</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup"> Okay</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup"> Difficult</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup"> Very difficult</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup"> I didn’t complete sign-up</label>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+        <p class="font-semibold">What did you like most about the app? <span class="text-xs text-slate-500">(optional)</span></p>
+        <textarea class="w-full rounded-xl border border-slate-200 p-3 text-sm" rows="3"></textarea>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+        <p class="font-semibold">Was anything confusing or unclear? <span class="text-xs text-slate-500">(optional)</span></p>
+        <textarea class="w-full rounded-xl border border-slate-200 p-3 text-sm" rows="3"></textarea>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+        <p class="font-semibold">Based on your first experience, how likely are you to use this app again?</p>
+        <div class="flex gap-2">
+          <label class="flex gap-1"><input type="radio" name="fb_likely">1</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely">2</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely">3</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely">4</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely">5</label>
+        </div>
+        <p class="text-xs text-slate-500">1 = Not likely, 5 = Very likely</p>
+      </div>
+
+    </div>
+
+    <button id="btnSubmit"
+      class="w-full rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition">
+      Submit & finish
+    </button>
+  </section>
+
+</main>
+
+<script>
+  const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1=";
+  const COMPLETE_URL = "https://connect.cloudresearch.com/participant/project/BA260A36E6/complete";
+
+  const btnOpen = document.getElementById("btnOpen");
+  const btnGoFeedback = document.getElementById("btnGoFeedback");
+  const btnSubmit = document.getElementById("btnSubmit");
+  const feedback = document.getElementById("feedback");
+  const hint = document.getElementById("hint");
+
+  let openedOnce = false;
+
+  btnOpen.addEventListener("click", () => {
+    window.open(OFFER_BASE_URL, "_blank", "noopener,noreferrer");
+    openedOnce = true;
+    btnGoFeedback.disabled = false;
+    hint.textContent = "After trying the app, please return here to continue.";
+  });
+
+  btnGoFeedback.addEventListener("click", () => {
+    if (!openedOnce) {
+      hint.textContent = "Please click “Click to download” first.";
+      return;
+    }
+    feedback.classList.remove("hidden");
+    feedback.scrollIntoView({ behavior: "smooth" });
+  });
+
+  btnSubmit.addEventListener("click", () => {
+    window.location.href = COMPLETE_URL;
+  });
+</script>
+
+</body>
+</html>

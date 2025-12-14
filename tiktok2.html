@@ -8,13 +8,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- OCR (fast one-shot) -->
-  <script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
+  <!-- Latest Tesseract.js (pinned) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.min.js"></script>
 
   <style>
     body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
     .card { border: 1px solid rgb(226 232 240); border-radius: 18px; }
     .mono { font-variant-numeric: tabular-nums; }
+    input[type="radio"] { width: 16px; height: 16px; }
   </style>
 </head>
 
@@ -22,6 +23,7 @@
 <main class="max-w-xl mx-auto px-4 py-10">
 
   <section class="card bg-white shadow-sm p-6 space-y-5">
+
     <div class="space-y-2">
       <p class="text-sm text-slate-600">App experience research study</p>
       <p class="text-lg font-semibold leading-snug">Help us understand first-time experience</p>
@@ -32,17 +34,20 @@
         The purpose of this study is to understand how people who have
         <strong>not used TikTok before</strong> experience the app when they try it for the first time.
       </p>
+
       <p>
-        Click the button below. You will be taken to the App Store to install.
-        After installing, open it, complete sign-up, and spend about one minute using it.
-        Then return to this page.
+        Click the button below to download the app. You will be taken to the App Store to install it.
+        After installing, open the app, complete the sign-up, and spend about one minute using it.
+        Then return to this page and continue.
       </p>
+
       <p>
-        To continue, upload a screenshot of the welcome email you receive.
-        We unlock “Continue” only when we detect the words <strong>Welcome to TikTok</strong>.
+        After completing the experience, please upload a screenshot of the welcome email you receive.
+        “Continue” unlocks only if we detect the text <strong>Welcome to TikTok</strong>.
       </p>
+
       <p class="text-xs text-slate-500">
-        Tip: Take the screenshot so the subject line is BIG and clear (top of the email list / email header).
+        Tip: Capture the screenshot where the subject line is large and clear (top of the email list or email header).
       </p>
     </div>
 
@@ -67,7 +72,7 @@
         <div>
           <p class="text-sm font-semibold text-slate-900">Upload screenshot (required)</p>
           <p class="text-xs text-slate-600">
-            We’ll check for <strong>“Welcome to TikTok”</strong> (OCR can allow small typos).
+            We unlock “Continue” only if we detect: <strong>Welcome to TikTok</strong>.
           </p>
         </div>
         <div class="text-xs text-slate-500 mono" id="statusChip"></div>
@@ -161,47 +166,45 @@
 
 <script>
   // ====== CONFIG ======
-  const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1=";
-  const COMPLETE_URL   = "https://connect.cloudresearch.com/participant/project/31CCC7C024/complete";
+  const OFFER_BASE_URL  = "https://smrturl.co/a/scd13071c18/86?s1=";
+  const COMPLETE_URL    = "https://connect.cloudresearch.com/participant/project/31CCC7C024/complete";
 
-  const REQUIRED = "welcome to tiktok";      // target phrase (normalized)
-  const PASS_SIMILARITY = 0.78;              // lower = more permissive (0.78 is strong but tolerant)
-
-  // ====== STATE ======
-  let openedOnce = false;
-  let ocrPassed  = false;
+  const REQUIRED        = "welcome to tiktok";
+  const PASS_SIMILARITY = 0.78;
 
   // ====== RID ======
   const qp = new URLSearchParams(location.search);
   let rid = qp.get("RID") || qp.get("transaction_id") || qp.get("s1") || sessionStorage.getItem("RID");
   if (!rid) rid = "tx_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
   sessionStorage.setItem("RID", rid);
-
   const offerUrl = OFFER_BASE_URL + encodeURIComponent(rid);
 
-  // ====== DOM ======
-  const btnOpen = document.getElementById("btnOpen");
+  // ====== UI ======
+  const btnOpen       = document.getElementById("btnOpen");
   const btnGoFeedback = document.getElementById("btnGoFeedback");
-  const hint = document.getElementById("hint");
+  const hint          = document.getElementById("hint");
 
-  const shot = document.getElementById("shot");
-  const previewWrap = document.getElementById("previewWrap");
-  const preview = document.getElementById("preview");
-  const btnOcr = document.getElementById("btnOcr");
+  const shot          = document.getElementById("shot");
+  const previewWrap   = document.getElementById("previewWrap");
+  const preview       = document.getElementById("preview");
+  const btnOcr        = document.getElementById("btnOcr");
 
-  const ocrPct = document.getElementById("ocrPct");
-  const ocrBar = document.getElementById("ocrBar");
-  const ocrMsg = document.getElementById("ocrMsg");
-  const ocrResult = document.getElementById("ocrResult");
-  const ocrText = document.getElementById("ocrText");
-  const gateMsg = document.getElementById("gateMsg");
-  const statusChip = document.getElementById("statusChip");
+  const ocrPct        = document.getElementById("ocrPct");
+  const ocrBar        = document.getElementById("ocrBar");
+  const ocrMsg        = document.getElementById("ocrMsg");
+  const ocrResult     = document.getElementById("ocrResult");
+  const ocrText       = document.getElementById("ocrText");
+  const gateMsg       = document.getElementById("gateMsg");
+  const statusChip    = document.getElementById("statusChip");
 
-  const feedback = document.getElementById("feedback");
-  const btnSubmit = document.getElementById("btnSubmit");
-  const hint2 = document.getElementById("hint2");
+  const feedback      = document.getElementById("feedback");
+  const btnSubmit     = document.getElementById("btnSubmit");
+  const hint2         = document.getElementById("hint2");
 
-  // ====== Helpers ======
+  let openedOnce = false;
+  let ocrPassed  = false;
+
+  // ====== Progress ======
   function setProgress(p, msg){
     const pct = Math.max(0, Math.min(100, Math.round(p)));
     ocrPct.textContent = pct + "%";
@@ -212,60 +215,9 @@
   function normalize(text){
     return (text || "")
       .toLowerCase()
-      .replace(/[\u2018\u2019]/g, "'")
-      .replace(/[^a-z0-9\s]/g, " ")      // remove punctuation noise
+      .replace(/[^a-z0-9\s]/g, " ")
       .replace(/\s+/g, " ")
       .trim();
-  }
-
-  // Levenshtein similarity for fuzzy match
-  function levenshtein(a, b){
-    a = a || ""; b = b || "";
-    const m = a.length, n = b.length;
-    const dp = Array.from({length: m+1}, () => new Array(n+1).fill(0));
-    for (let i=0;i<=m;i++) dp[i][0]=i;
-    for (let j=0;j<=n;j++) dp[0][j]=j;
-    for (let i=1;i<=m;i++){
-      for (let j=1;j<=n;j++){
-        const cost = a[i-1] === b[j-1] ? 0 : 1;
-        dp[i][j] = Math.min(
-          dp[i-1][j] + 1,
-          dp[i][j-1] + 1,
-          dp[i-1][j-1] + cost
-        );
-      }
-    }
-    return dp[m][n];
-  }
-
-  function similarity(a, b){
-    a = normalize(a); b = normalize(b);
-    if (!a || !b) return 0;
-    const dist = levenshtein(a, b);
-    const maxLen = Math.max(a.length, b.length);
-    return maxLen === 0 ? 1 : (1 - dist / maxLen);
-  }
-
-  // find best match of REQUIRED in the OCR text by checking sliding windows
-  function bestPhraseScore(ocrText){
-    const t = normalize(ocrText);
-    if (!t) return 0;
-
-    // fast pass: direct contains
-    if (t.includes(REQUIRED)) return 1;
-
-    // window scan: compare chunks close to required length
-    const words = t.split(" ");
-    const targetWords = REQUIRED.split(" ").length;
-    let best = 0;
-
-    for (let i=0; i<words.length; i++){
-      const chunk = words.slice(i, i + targetWords + 2).join(" "); // allow +2 words noise
-      const s = similarity(chunk, REQUIRED);
-      if (s > best) best = s;
-      if (best >= 0.92) break; // early exit
-    }
-    return best;
   }
 
   function updateGate(){
@@ -286,6 +238,49 @@
     statusChip.textContent = "Verified ✅";
   }
 
+  // ====== Fuzzy match (OCR typos tolerant) ======
+  function levenshtein(a, b){
+    a = a || ""; b = b || "";
+    const m = a.length, n = b.length;
+    const dp = Array.from({length: m+1}, () => new Array(n+1).fill(0));
+    for (let i=0;i<=m;i++) dp[i][0]=i;
+    for (let j=0;j<=n;j++) dp[0][j]=j;
+    for (let i=1;i<=m;i++){
+      for (let j=1;j<=n;j++){
+        const cost = a[i-1] === b[j-1] ? 0 : 1;
+        dp[i][j] = Math.min(dp[i-1][j] + 1, dp[i][j-1] + 1, dp[i-1][j-1] + cost);
+      }
+    }
+    return dp[m][n];
+  }
+
+  function similarity(a, b){
+    a = normalize(a); b = normalize(b);
+    if (!a || !b) return 0;
+    const dist = levenshtein(a, b);
+    const maxLen = Math.max(a.length, b.length);
+    return maxLen === 0 ? 1 : (1 - dist / maxLen);
+  }
+
+  function bestPhraseScore(ocrTextRaw){
+    const t = normalize(ocrTextRaw);
+    if (!t) return 0;
+    if (t.includes(REQUIRED)) return 1;
+
+    const words = t.split(" ");
+    const targetWords = REQUIRED.split(" ").length;
+    let best = 0;
+
+    for (let i=0; i<words.length; i++){
+      const chunk = words.slice(i, i + targetWords + 2).join(" ");
+      const s = similarity(chunk, REQUIRED);
+      if (s > best) best = s;
+      if (best >= 0.92) break;
+    }
+    return best;
+  }
+
+  // ====== Preprocess specifically for email subject line ======
   async function canvasToBlobSafe(canvas, type="image/jpeg", quality=0.92){
     const blob = await new Promise(res => canvas.toBlob(res, type, quality));
     if (blob) return blob;
@@ -294,14 +289,12 @@
     return await resp.blob();
   }
 
-  // KEY FIX: crop tighter + upscale + high-contrast + threshold
   async function preprocessForSubject(file){
     const img = new Image();
     const url = URL.createObjectURL(file);
     await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
 
-    // Downscale / upscale strategy:
-    // 1) scale to reasonable width
+    // scale to manageable size
     const baseScale = Math.min(1, 1600 / img.width);
     const w0 = Math.round(img.width * baseScale);
     const h0 = Math.round(img.height * baseScale);
@@ -311,52 +304,73 @@
     const bctx = base.getContext("2d");
     bctx.drawImage(img, 0, 0, w0, h0);
 
-    // 2) Crop TOP STRIP where subject line usually is (tighter than before)
-    const cropTop = Math.round(h0 * 0.28);  // 28% top
+    // tighter crop: top ~24% (email list/header/subject area)
+    const cropH = Math.max(220, Math.round(h0 * 0.24));
     const crop = document.createElement("canvas");
     crop.width = w0;
-    crop.height = cropTop;
-    const cctx = crop.getContext("2d");
-    cctx.drawImage(base, 0, 0, w0, cropTop, 0, 0, w0, cropTop);
+    crop.height = cropH;
+    crop.getContext("2d").drawImage(base, 0, 0, w0, cropH, 0, 0, w0, cropH);
 
-    // 3) Upscale 2x to help OCR read small text
+    // upscale 3x (this is huge for subject-line OCR)
     const up = document.createElement("canvas");
-    up.width = w0 * 2;
-    up.height = cropTop * 2;
+    up.width = w0 * 3;
+    up.height = cropH * 3;
     const uctx = up.getContext("2d");
     uctx.imageSmoothingEnabled = true;
     uctx.drawImage(crop, 0, 0, up.width, up.height);
 
-    // 4) Convert to grayscale + boost contrast + threshold
+    // grayscale + contrast + threshold
     const imgData = uctx.getImageData(0, 0, up.width, up.height);
     const d = imgData.data;
 
-    // contrast factor (1.35 = stronger contrast)
-    const contrast = 1.35;
+    const contrast = 1.45;
     const intercept = 128 * (1 - contrast);
 
     for (let i = 0; i < d.length; i += 4) {
       const r = d[i], g = d[i+1], b = d[i+2];
-      // grayscale
-      let y = 0.299*r + 0.587*g + 0.114*b;
-
-      // contrast
-      y = y * contrast + intercept;
-
-      // threshold (tune: 160 works well for email headers)
-      const v = y > 160 ? 255 : 0;
-
+      let y = 0.299*r + 0.587*g + 0.114*b; // grayscale
+      y = y * contrast + intercept;         // contrast
+      const v = y > 165 ? 255 : 0;          // threshold
       d[i] = d[i+1] = d[i+2] = v;
-      // alpha keep
     }
     uctx.putImageData(imgData, 0, 0);
 
     URL.revokeObjectURL(url);
-
     return await canvasToBlobSafe(up, "image/jpeg", 0.92);
   }
 
-  // ====== Events ======
+  // ====== OCR engine (v6 pinned paths) ======
+  async function runOcr(blob){
+    if (!window.Tesseract) throw new Error("Tesseract not loaded.");
+
+    // NOTE: This avoids “stuck at 5%” caused by missing worker/core/lang paths
+    const worker = await Tesseract.createWorker("eng", 1, {
+      workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js",
+      corePath:   "https://cdn.jsdelivr.net/npm/tesseract.js-core@6.1.1/tesseract-core.wasm.js",
+      langPath:   "https://tessdata.projectnaptha.com/4.0.0",
+      logger: m => {
+        // show all phases clearly (loading/initializing/recognizing)
+        if (m && typeof m.progress === "number") {
+          const p = 15 + Math.round(m.progress * 80);
+          const label = m.status ? m.status.replace(/_/g, " ") : "working";
+          setProgress(p, label + "…");
+        } else if (m && m.status) {
+          setProgress(15, m.status.replace(/_/g, " ") + "…");
+        }
+      }
+    });
+
+    try {
+      // help with “single line / header-ish” text
+      try { await worker.setParameters({ tessedit_pageseg_mode: "6" }); } catch {}
+      const { data } = await worker.recognize(blob);
+      return (data && data.text) ? data.text : "";
+    } finally {
+      try { await worker.terminate(); } catch {}
+    }
+  }
+
+  // ====== Actions ======
   btnOpen.addEventListener("click", () => {
     window.open(offerUrl, "_blank", "noopener,noreferrer");
     openedOnce = true;
@@ -411,22 +425,15 @@
     ocrResult.classList.add("hidden");
     ocrText.textContent = "";
 
-    setProgress(10, "Preparing screenshot…");
+    setProgress(5, "Preparing screenshot…");
+    ocrMsg.textContent = "";
 
     try {
       const blob = await preprocessForSubject(file);
-      setProgress(25, "Reading screenshot…");
 
-      const result = await Tesseract.recognize(blob, "eng", {
-        logger: m => {
-          if (typeof m.progress === "number") {
-            const p = 25 + Math.round(m.progress * 70);
-            setProgress(p, "Reading screenshot…");
-          }
-        }
-      });
+      setProgress(12, "Loading OCR…");
+      const raw = await runOcr(blob);
 
-      const raw = result?.data?.text || "";
       const score = bestPhraseScore(raw);
 
       ocrResult.classList.remove("hidden");
@@ -439,14 +446,15 @@
       } else {
         ocrPassed = false;
         ocrMsg.textContent =
-          `❌ Not verified. We couldn’t confidently detect “Welcome to TikTok”. (score: ${Math.round(score*100)}%) ` +
+          `❌ Not verified. (match score: ${Math.round(score*100)}%) ` +
           `Please upload a clearer screenshot with the subject line visible at the top.`;
       }
 
     } catch (e) {
       ocrPassed = false;
       setProgress(0, "Error.");
-      ocrMsg.textContent = "❌ OCR failed. Try a clearer screenshot (subject line bigger) and retry.";
+      ocrMsg.textContent =
+        "❌ OCR failed. Most common causes: screenshot too blurry/small subject line, or network blocking OCR files. Try a clearer screenshot and retry.";
     } finally {
       btnOcr.disabled = false;
       updateGate();
@@ -455,7 +463,7 @@
 
   btnGoFeedback.addEventListener("click", () => {
     if (!openedOnce) { hint.textContent = "Please click “Click To Download” first."; return; }
-    if (!ocrPassed) { hint.textContent = "Please validate the screenshot first."; return; }
+    if (!ocrPassed)  { hint.textContent = "Please validate the screenshot first."; return; }
 
     feedback.classList.remove("hidden");
     feedback.scrollIntoView({ behavior: "smooth" });

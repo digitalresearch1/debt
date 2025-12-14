@@ -4,10 +4,11 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Survey</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Tesseract.js -->
+  <!-- Tesseract.js v5 -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
@@ -21,26 +22,50 @@
 <body class="bg-slate-50 text-slate-900">
 <main class="max-w-xl mx-auto px-4 py-10">
 
-  <section class="card bg-white shadow-sm p-6 space-y-5">
-    <div class="space-y-2">
-      <p class="text-sm text-slate-600">App experience research study</p>
-      <p class="text-lg font-semibold leading-snug">Help us understand first-time experience</p>
-    </div>
+ <section class="card bg-white shadow-sm p-6 space-y-5">
 
-    <div class="space-y-3 text-sm text-slate-700">
-      <p>
-        The purpose of this study is to understand how people who have <strong>not used TikTok before</strong>
-        experience the app when they try it for the first time.
-      </p>
-      <p>
-        After you try it, please upload a screenshot of the welcome message you receive and then answer a few questions.
+  <div class="space-y-2">
+    <p class="text-sm text-slate-600">App experience research study</p>
+    <p class="text-lg font-semibold leading-snug">
+      Help us understand first-time experience
+    </p>
+  </div>
+
+  <div class="space-y-3 text-sm text-slate-700">
+    <p>
+      The purpose of this study is to understand how people who have
+      <strong>not used TikTok before</strong> experience the app when they try it
+      for the first time.
+    </p>
+
+    <p>
+      Because you are new to this type of experience, your feedback helps us
+      better understand first impressions, clarity of features, and overall
+      usability.
+    </p>
+   <p>
+      Click the button below to download the app.
+      You will be taken to the App Store to install it.
+      After installing, open the app, complete the sign-up, and spend about one minute using it.
+      Then return to this page and continue.
+    </p>
+   
+   <p>
+      After completing the experience, please upload a screenshot of the
+      welcome email you receive and then continue to share your feedback.
+    </p>
+ 
+
+
+      <p class="text-xs <p>text-slate-500">
+        Tip: Upload a screenshot where the subject line “Welcome to TikTok” is clearly visible (top of the screen is best).
       </p>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <button id="btnOpen"
         class="rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition">
-        Click to download
+        Click To Download
       </button>
 
       <button id="btnGoFeedback"
@@ -58,10 +83,11 @@
         <div>
           <p class="text-sm font-semibold text-slate-900">Upload screenshot (required)</p>
           <p class="text-xs text-slate-600">
-            Upload a screenshot of the welcome message. We’ll confirm it shows today’s date (or “Today”).
+            Upload a screenshot of the email welcome message. We will unlock “Continue” only if we detect the text:
+            <strong>“Welcome to TikTok”</strong>.
           </p>
         </div>
-        <div class="text-xs text-slate-500 mono" id="todayLabel"></div>
+        <div class="text-xs text-slate-500 mono" id="statusChip"></div>
       </div>
 
       <input id="shot" type="file" accept="image/*"
@@ -155,15 +181,15 @@
   const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1=";
   const COMPLETE_URL   = "https://connect.cloudresearch.com/participant/project/31CCC7C024/complete";
 
-  // What the screenshot must contain (case-insensitive)
-  const REQUIRED_KEYWORDS = ["tiktok", "welcome"];
+  // ONLY this phrase is required (case-insensitive)
+  const REQUIRED_PHRASE = "welcome to tiktok";
 
   // ====== STATE ======
   let openedOnce = false;
   let ocrPassed = false;
   let worker = null;
 
-  // ====== RID ======
+  // ====== RID (keeps your s1 tracking unique) ======
   const qp = new URLSearchParams(location.search);
   let rid = qp.get("RID") || qp.get("transaction_id") || qp.get("s1") || sessionStorage.getItem("RID");
   if (!rid) rid = "tx_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -186,13 +212,11 @@
   const ocrResult = document.getElementById("ocrResult");
   const ocrText = document.getElementById("ocrText");
   const gateMsg = document.getElementById("gateMsg");
-  const todayLabel = document.getElementById("todayLabel");
+  const statusChip = document.getElementById("statusChip");
 
   const feedback = document.getElementById("feedback");
   const btnSubmit = document.getElementById("btnSubmit");
   const hint2 = document.getElementById("hint2");
-
-  function norm(s){ return (s||"").toLowerCase().replace(/\s+/g," ").trim(); }
 
   function setProgress(p, msg){
     const pct = Math.max(0, Math.min(100, Math.round(p)));
@@ -201,50 +225,30 @@
     if (msg) ocrMsg.textContent = msg;
   }
 
-  // ====== Date formats ======
-  function pad2(n){ return String(n).padStart(2,"0"); }
-  function monthName(d){ return d.toLocaleString("en-US", { month: "long" }); }
-  function monthShort(d){ return d.toLocaleString("en-US", { month: "short" }); }
-
-  function todayTokens(){
-    const d = new Date();
-    const mm = pad2(d.getMonth()+1);
-    const dd = pad2(d.getDate());
-    const yyyy = d.getFullYear();
-    const yy = String(yyyy).slice(-2);
-
-    // numeric variants
-    const list = [
-      `${mm}/${dd}/${yyyy}`, `${dd}/${mm}/${yyyy}`,
-      `${yyyy}-${mm}-${dd}`, `${mm}-${dd}-${yyyy}`, `${dd}-${mm}-${yyyy}`,
-      `${mm}/${dd}/${yy}`, `${dd}/${mm}/${yy}`,
-      `${mm}-${dd}-${yy}`, `${dd}-${mm}-${yy}`,
-      "today" // many email apps show "Today"
-    ];
-
-    // month-name variants: Feb 10, 2025 / February 10, 2025
-    const mLong = monthName(d);
-    const mShort = monthShort(d);
-    list.push(`${mShort} ${parseInt(dd,10)}, ${yyyy}`.toLowerCase());
-    list.push(`${mLong} ${parseInt(dd,10)}, ${yyyy}`.toLowerCase());
-
-    return list.map(x => x.toLowerCase());
+  function normalize(text) {
+    return (text || "").toLowerCase().replace(/\s+/g, " ").trim();
   }
 
-  const dateTokens = todayTokens();
-  todayLabel.textContent = `Expected date: ${dateTokens[0]}`;
-
-  function hasKeywords(text){
-    const t = norm(text);
-    return REQUIRED_KEYWORDS.every(k => t.includes(k));
+  function updateGate(){
+    if (!openedOnce){
+      gateMsg.textContent = "Step 1: Click “Open” first.";
+      btnGoFeedback.disabled = true;
+      statusChip.textContent = "";
+      return;
+    }
+    if (!ocrPassed){
+      gateMsg.textContent = "Step 2: Upload + validate the screenshot to unlock Continue.";
+      btnGoFeedback.disabled = true;
+      statusChip.textContent = "";
+      return;
+    }
+    gateMsg.textContent = "Verified ✅ Continue is unlocked.";
+    btnGoFeedback.disabled = false;
+    statusChip.textContent = "Verified ✅";
   }
-  function hasToday(text){
-    const t = norm(text);
-    return dateTokens.some(tok => t.includes(tok));
-  }
 
-  // ====== Downscale image to help OCR on iOS ======
-  async function fileToDownscaledBlob(file, maxW = 1400){
+  // ====== Image preprocessing: downscale + crop top region ======
+  async function preprocessImageTop(file, maxW = 1400){
     const img = new Image();
     const url = URL.createObjectURL(file);
     await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
@@ -258,60 +262,59 @@
     const ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0, w, h);
 
+    // Crop TOP 40% (where “Welcome to TikTok” appears)
+    const cropH = Math.round(h * 0.40);
+    const crop = document.createElement("canvas");
+    crop.width = w;
+    crop.height = cropH;
+
+    const cctx = crop.getContext("2d");
+    cctx.drawImage(canvas, 0, 0, w, cropH, 0, 0, w, cropH);
+
     URL.revokeObjectURL(url);
 
-    const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.92));
-    return blob;
+    return await new Promise(res => crop.toBlob(res, "image/jpeg", 0.9));
   }
 
-  // ====== Create OCR worker with explicit paths (most important fix) ======
+  // ====== OCR worker init (Tesseract v5) ======
   async function getWorker(){
-    if (!window.Tesseract) throw new Error("Tesseract not loaded. CDN blocked?");
+    if (!window.Tesseract) throw new Error("Tesseract not loaded (CDN blocked).");
     if (worker) return worker;
 
-    worker = await Tesseract.createWorker("eng", 1, {
-      workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js",
-      corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js",
+    worker = await Tesseract.createWorker({
       logger: m => {
-        if (m.status === "recognizing text") setProgress((m.progress||0)*100, "Reading screenshot…");
-      }
+        if (m.status === "recognizing text") {
+          setProgress((m.progress || 0) * 100, "Reading screenshot…");
+        }
+      },
+      workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js",
+      corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js"
     });
+
+    await worker.loadLanguage("eng");
+    await worker.initialize("eng");
+    try { await worker.setParameters({ tessedit_pageseg_mode: "6" }); } catch {}
 
     return worker;
   }
 
-  // ====== Gate ======
-  function updateGate(){
-    if (!openedOnce){
-      gateMsg.textContent = "Step 1: Click “Click to download” first.";
-      btnGoFeedback.disabled = true;
-      return;
-    }
-    if (!ocrPassed){
-      gateMsg.textContent = "Step 2: Upload a screenshot and validate it to continue.";
-      btnGoFeedback.disabled = true;
-      return;
-    }
-    gateMsg.textContent = "All set. You can continue to feedback.";
-    btnGoFeedback.disabled = false;
-  }
-
-  // ====== Buttons ======
+  // ====== Actions ======
   btnOpen.addEventListener("click", () => {
     window.open(offerUrl, "_blank", "noopener,noreferrer");
     openedOnce = true;
-    hint.textContent = "After you finish, upload your screenshot and validate it.";
+    hint.textContent = "After you finish, upload your screenshot and click “Validate screenshot”.";
     updateGate();
   });
 
-  // ====== Upload preview ======
   let currentPreviewUrl = null;
 
   shot.addEventListener("change", () => {
     ocrPassed = false;
     setProgress(0, "");
+    ocrMsg.textContent = "";
     ocrResult.classList.add("hidden");
     ocrText.textContent = "";
+    statusChip.textContent = "";
 
     const file = shot.files && shot.files[0];
     if (!file){
@@ -338,51 +341,42 @@
     updateGate();
   });
 
-  // ====== OCR run ======
   btnOcr.addEventListener("click", async () => {
     const file = shot.files && shot.files[0];
     if (!file) return;
 
     btnOcr.disabled = true;
     setProgress(1, "Preparing image…");
+    ocrPassed = false;
+    statusChip.textContent = "";
 
     try {
-      // Downscale for iOS stability
-      const blob = await fileToDownscaledBlob(file, 1400);
+      const blob = await preprocessImageTop(file, 1400);
 
-      setProgress(3, "Loading OCR engine…");
+      setProgress(5, "Loading OCR engine…");
       const w = await getWorker();
 
       const { data } = await w.recognize(blob);
-      const text = data?.text || "";
+      const raw = data?.text || "";
+      const text = normalize(raw);
 
       ocrResult.classList.remove("hidden");
-      ocrText.textContent = text.slice(0, 1400) + (text.length > 1400 ? "\n…(truncated)" : "");
-
-      const okK = hasKeywords(text);
-      const okD = hasToday(text);
+      ocrText.textContent = raw.slice(0, 1500) + (raw.length > 1500 ? "\n…(truncated)" : "");
 
       setProgress(100, "Done.");
 
-      if (!okK && !okD){
-        ocrPassed = false;
-        ocrMsg.textContent = "Not verified. Please upload a clearer screenshot showing the welcome message and today’s date (or “Today”).";
-      } else if (!okK){
-        ocrPassed = false;
-        ocrMsg.textContent = "Not verified. We couldn’t detect the welcome text. Please capture the subject/header clearly.";
-      } else if (!okD){
-        ocrPassed = false;
-        ocrMsg.textContent = "Not verified. We couldn’t detect today’s date (or “Today”). Please make sure the date is visible.";
-      } else {
+      if (text.includes(REQUIRED_PHRASE)) {
         ocrPassed = true;
-        ocrMsg.textContent = "Verified. You can continue.";
+        ocrMsg.textContent = "✅ Verified: “Welcome to TikTok” detected. Continue is unlocked.";
+      } else {
+        ocrPassed = false;
+        ocrMsg.textContent = "❌ Not verified. Please upload a clearer screenshot showing the exact text “Welcome to TikTok” (top of the message).";
       }
 
-    } catch (e){
+    } catch (e) {
       ocrPassed = false;
       setProgress(0, "Error.");
-      ocrMsg.textContent =
-        "OCR failed. Common causes: blocked CDN, low memory on iPhone/iPad, or a very large image. Try a smaller/clearer screenshot.";
+      ocrMsg.textContent = "❌ OCR failed. Try a clearer screenshot (or crop to the top area).";
     } finally {
       btnOcr.disabled = false;
       updateGate();
@@ -390,12 +384,12 @@
   });
 
   btnGoFeedback.addEventListener("click", () => {
-    if (!openedOnce){
-      hint.textContent = "Please click “Click to download” first.";
+    if (!openedOnce) {
+      hint.textContent = "Please click “Open” first.";
       return;
     }
-    if (!ocrPassed){
-      hint.textContent = "Please validate your screenshot first.";
+    if (!ocrPassed) {
+      hint.textContent = "Please validate the screenshot first.";
       return;
     }
     feedback.classList.remove("hidden");
@@ -417,6 +411,10 @@
 
   btnSubmit.addEventListener("click", () => {
     window.location.href = COMPLETE_URL;
+  });
+
+  window.addEventListener("beforeunload", async () => {
+    try { if (worker) await worker.terminate(); } catch {}
   });
 
   updateGate();

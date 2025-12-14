@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mobile App Research Study</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#f5f7fb; padding:20px; }
+  .card { max-width:600px; margin:auto; background:#fff; padding:20px; border-radius:10px; }
+  h1 { font-size:22px; }
+  button { padding:12px 18px; border:none; border-radius:6px; background:#2563eb; color:#fff; cursor:pointer; }
+  button:disabled { opacity:.5; }
+  .hidden { display:none; }
+</style>
+</head>
+
+<body>
+<div class="card">
+  <h1>Mobile App Research Study</h1>
+  <p>This study is for iOS users only. Please answer honestly.</p>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <p><strong>1. Which device are you using?</strong></p>
+    <label><input type="radio" name="device" value="ios"> iPhone / iPad</label><br>
+    <label><input type="radio" name="device" value="other"> Android / Other</label><br><br>
+
+    <p><strong>2. Have you ever installed TikTok on this device?</strong></p>
+    <label><input type="radio" name="tiktok" value="no"> No, never</label><br>
+    <label><input type="radio" name="tiktok" value="yes"> Yes, before</label><br><br>
+
+    <button onclick="continueStep()">Continue</button>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" class="hidden">
+    <p>You qualify. Click below to install TikTok and open it for the first time.</p>
+
+    <button id="offerBtn">Install TikTok</button>
+
+    <p style="font-size:12px;margin-top:10px;">
+      After installing and opening the app, return to this page.
+    </p>
+
+    <button onclick="checkStatus()" style="margin-top:15px;">I installed & opened TikTok</button>
+  </div>
+
+  <div id="status" class="hidden"></div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const s1 = params.get('s1') || ('tx_' + Date.now());
+
+const OFFER_URL = `https://smrturl.co/a/scd13071c18/86?s1=${encodeURIComponent(s1)}`;
+const STATUS_URL = `https://YOUR_WORKER_DOMAIN/status?s1=${encodeURIComponent(s1)}`;
+
+function continueStep() {
+  const device = document.querySelector('input[name="device"]:checked')?.value;
+  const tiktok = document.querySelector('input[name="tiktok"]:checked')?.value;
+
+  if (device !== 'ios' || tiktok !== 'no') {
+    alert("You do not qualify for this study.");
+    return;
+  }
+
+  document.getElementById('step1').classList.add('hidden');
+  document.getElementById('step2').classList.remove('hidden');
+}
+
+document.getElementById('offerBtn').onclick = () => {
+  window.open(OFFER_URL, '_blank', 'noopener,noreferrer');
+};
+
+async function checkStatus() {
+  const res = await fetch(STATUS_URL);
+  const data = await res.json();
+
+  document.getElementById('status').classList.remove('hidden');
+  document.getElementById('status').innerHTML =
+    data.converted
+      ? "<strong>✅ Thank you! Your participation is confirmed.</strong>"
+      : "<strong>❌ We could not verify the install yet. Please try again later.</strong>";
+}
+</script>
+</body>
+</html>

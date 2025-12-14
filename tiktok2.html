@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>OCR Test</title>
+  <title>Survey</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -12,133 +13,258 @@
 
   <style>
     body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .card { border: 1px solid rgb(226 232 240); border-radius: 18px; }
+    input[type="radio"] { width: 16px; height: 16px; }
     .mono { font-variant-numeric: tabular-nums; }
   </style>
 </head>
 
 <body class="bg-slate-50 text-slate-900">
-<main class="max-w-xl mx-auto px-4 py-10 space-y-4">
+<main class="max-w-xl mx-auto px-4 py-10">
 
-  <div class="rounded-2xl border border-slate-200 bg-white p-5 space-y-3">
-    <div class="flex items-center justify-between">
-      <h1 class="font-semibold">OCR Debug</h1>
-      <span class="text-xs text-slate-500 mono" id="env"></span>
-    </div>
-
-    <div class="text-xs text-slate-600">
-      If OCR fails, the error message below will tell you exactly why.
-    </div>
-
-    <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-slate-600">Progress</span>
-        <span id="pct" class="text-xs text-slate-600 mono">0%</span>
-      </div>
-      <div class="mt-2 h-2 rounded-full bg-slate-200 overflow-hidden">
-        <div id="bar" class="h-full bg-indigo-600" style="width:0%"></div>
-      </div>
-      <p id="msg" class="text-xs text-slate-600 mt-2"></p>
-      <p id="err" class="text-xs text-red-600 mt-1"></p>
-    </div>
-
+  <!-- MAIN -->
+  <section class="card bg-white shadow-sm p-6 space-y-5">
     <div class="space-y-2">
-      <input id="file" type="file" accept="image/*"
-        class="block w-full text-sm text-slate-700 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold hover:file:bg-slate-200"/>
+      <p class="text-sm text-slate-600">App experience research study</p>
+      <p class="text-lg font-semibold leading-snug">Help us understand first-time experience</p>
+    </div>
 
-      <button id="run" class="w-full rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-40" disabled>
-        Run OCR
+    <div class="space-y-3 text-sm text-slate-700">
+      <p>
+        The purpose of this study is to understand how people who have
+        <strong>not used TikTok before</strong> experience the app when they try it for the first time.
+      </p>
+
+      <p>
+        Click the button below to download the app. You will be taken to the App Store to install it.
+        After installing, open the app, complete the sign-up, and spend about one minute using it.
+        Then return to this page and continue.
+      </p>
+
+      <p>
+        After completing the experience, please upload a screenshot of the welcome email you receive and then continue to share your feedback.
+      </p>
+
+      <p class="text-xs text-slate-500">
+        Tip: Upload a screenshot where the subject line “Welcome to TikTok” is clearly visible (top of the screen is best).
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <button id="btnOpen"
+        class="rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition">
+        Click To Download
+      </button>
+
+      <button id="btnGoFeedback"
+        class="rounded-xl px-4 py-3 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+        disabled>
+        Continue to feedback
       </button>
     </div>
 
-    <div class="rounded-xl border border-slate-200 bg-white p-3">
-      <p class="text-xs text-slate-600">Text output:</p>
-      <pre id="out" class="text-xs text-slate-800 whitespace-pre-wrap mt-2"></pre>
+    <p id="hint" class="text-xs text-slate-500"></p>
+
+    <!-- Upload + OCR -->
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold text-slate-900">Upload screenshot (required)</p>
+          <p class="text-xs text-slate-600">
+            Upload a screenshot of the email welcome message. We unlock “Continue” only if we detect the words:
+            <strong>Welcome</strong> and <strong>TikTok</strong>.
+          </p>
+        </div>
+        <div class="text-xs text-slate-500 mono" id="statusChip"></div>
+      </div>
+
+      <input id="shot" type="file" accept="image/*"
+        class="block w-full text-sm text-slate-700 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold hover:file:bg-slate-200"/>
+
+      <div id="previewWrap" class="hidden">
+        <img id="preview" class="w-full rounded-xl border border-slate-200" alt="Preview"/>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button id="btnOcr" type="button"
+          class="rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled>
+          Validate screenshot
+        </button>
+
+        <div class="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-600">OCR status</span>
+            <span id="ocrPct" class="text-xs text-slate-600 mono">0%</span>
+          </div>
+          <div class="mt-2 h-2 rounded-full bg-slate-200 overflow-hidden">
+            <div id="ocrBar" class="h-full bg-indigo-600" style="width:0%"></div>
+          </div>
+          <p id="ocrMsg" class="text-xs text-slate-600 mt-2"></p>
+          <p id="ocrErr" class="text-xs text-red-600 mt-1"></p>
+          <p id="envMsg" class="text-xs text-slate-500 mt-1 mono"></p>
+        </div>
+      </div>
+
+      <div id="ocrResult" class="hidden rounded-xl border border-slate-200 bg-white p-3">
+        <p class="text-xs text-slate-600">Detected text (preview):</p>
+        <pre id="ocrText" class="text-xs text-slate-700 whitespace-pre-wrap mt-2"></pre>
+      </div>
+
+      <p id="gateMsg" class="text-xs text-slate-500"></p>
     </div>
-  </div>
+  </section>
+
+  <!-- FEEDBACK -->
+  <section id="feedback" class="card bg-white shadow-sm p-6 mt-6 space-y-5 hidden">
+    <div class="space-y-1">
+      <p class="text-sm text-slate-600">Feedback</p>
+      <p class="text-lg font-semibold">Tell us about your experience</p>
+    </div>
+
+    <div class="space-y-4">
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+        <p class="font-semibold">What was your overall first impression?</p>
+        <label class="flex gap-2"><input type="radio" name="fb_impression" value="very_positive"> Very positive</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression" value="somewhat_positive"> Somewhat positive</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression" value="neutral"> Neutral</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression" value="somewhat_negative"> Somewhat negative</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression" value="very_negative"> Very negative</label>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+        <p class="font-semibold">How easy was sign-up?</p>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="very_easy"> Very easy</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="easy"> Easy</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="ok"> Okay</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="hard"> Difficult</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="very_hard"> Very difficult</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="did_not"> I didn’t complete sign-up</label>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+        <p class="font-semibold">How likely are you to use it again?</p>
+        <div class="flex gap-2">
+          <label class="flex gap-1"><input type="radio" name="fb_likely" value="1">1</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely" value="2">2</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely" value="3">3</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely" value="4">4</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely" value="5">5</label>
+        </div>
+        <p class="text-xs text-slate-500">1 = Not likely, 5 = Very likely</p>
+      </div>
+    </div>
+
+    <button id="btnSubmit" type="button"
+      class="w-full rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+      disabled>
+      Submit & finish
+    </button>
+
+    <p id="hint2" class="text-xs text-slate-500"></p>
+  </section>
 
 </main>
 
 <script>
-  const env = document.getElementById("env");
-  const pct = document.getElementById("pct");
-  const bar = document.getElementById("bar");
-  const msg = document.getElementById("msg");
-  const err = document.getElementById("err");
-  const out = document.getElementById("out");
-  const file = document.getElementById("file");
-  const run = document.getElementById("run");
+  // ====== CONFIG ======
+  const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1=";
+  const COMPLETE_URL   = "https://connect.cloudresearch.com/participant/project/31CCC7C024/complete";
 
-  env.textContent = location.protocol;
+  // ✅ most reliable traineddata host (fixes “OCR not working” for many users)
+  const LANG_PATH = "https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng/4.0.0_best/";
 
-  function setProgress(p, m) {
-    const v = Math.max(0, Math.min(100, Math.round(p)));
-    pct.textContent = v + "%";
-    bar.style.width = v + "%";
-    if (m) msg.textContent = m;
-  }
-
+  // ====== STATE ======
+  let openedOnce = false;
+  let ocrPassed = false;
   let worker = null;
 
-  async function getWorker() {
-    if (location.protocol === "file:") {
-      throw new Error("You are using file:// . Upload/host this page on HTTPS (https://) and try again.");
-    }
-    if (!window.Tesseract) throw new Error("Tesseract.js did not load (check adblock / network).");
-    if (worker) return worker;
+  // ====== RID ======
+  const qp = new URLSearchParams(location.search);
+  let rid = qp.get("RID") || qp.get("transaction_id") || qp.get("s1") || sessionStorage.getItem("RID");
+  if (!rid) rid = "tx_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
+  sessionStorage.setItem("RID", rid);
+  const offerUrl = OFFER_BASE_URL + encodeURIComponent(rid);
 
-    // ✅ Most reliable: language data from @tesseract.js-data package
-    // This provides: eng.traineddata.gz
-    const LANG_PATH = "https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng/4.0.0_best/";
+  // ====== DOM ======
+  const btnOpen = document.getElementById("btnOpen");
+  const btnGoFeedback = document.getElementById("btnGoFeedback");
+  const hint = document.getElementById("hint");
 
-    worker = await Tesseract.createWorker({
-      logger: m => {
-        if (m.status === "loading tesseract core") setProgress(5, "Loading OCR core…");
-        if (m.status === "loading language traineddata") setProgress(12, "Loading language data…");
-        if (m.status === "initializing tesseract") setProgress(18, "Initializing OCR…");
-        if (m.status === "recognizing text") setProgress(25 + (m.progress || 0) * 75, "Recognizing text…");
-      },
-      workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js",
-      corePath:   "https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js",
-      langPath:   LANG_PATH
-    });
+  const shot = document.getElementById("shot");
+  const previewWrap = document.getElementById("previewWrap");
+  const preview = document.getElementById("preview");
+  const btnOcr = document.getElementById("btnOcr");
 
-    await worker.loadLanguage("eng");
-    await worker.initialize("eng");
+  const ocrPct = document.getElementById("ocrPct");
+  const ocrBar = document.getElementById("ocrBar");
+  const ocrMsg = document.getElementById("ocrMsg");
+  const ocrErr = document.getElementById("ocrErr");
+  const envMsg = document.getElementById("envMsg");
 
-    // Better for subject lines
-    try { await worker.setParameters({ tessedit_pageseg_mode: "6" }); } catch {}
+  const ocrResult = document.getElementById("ocrResult");
+  const ocrText = document.getElementById("ocrText");
+  const gateMsg = document.getElementById("gateMsg");
+  const statusChip = document.getElementById("statusChip");
 
-    return worker;
+  const feedback = document.getElementById("feedback");
+  const btnSubmit = document.getElementById("btnSubmit");
+  const hint2 = document.getElementById("hint2");
+
+  envMsg.textContent = "Page: " + location.href;
+
+  // ====== Helpers ======
+  function normalize(text) {
+    return (text || "")
+      .toLowerCase()
+      .replace(/[^\w\s]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
   }
 
-  file.addEventListener("change", () => {
-    err.textContent = "";
-    out.textContent = "";
-    setProgress(0, "");
-    run.disabled = !(file.files && file.files[0]);
-  });
+  function setProgress(p, msg){
+    const pct = Math.max(0, Math.min(100, Math.round(p)));
+    ocrPct.textContent = pct + "%";
+    ocrBar.style.width = pct + "%";
+    if (msg) ocrMsg.textContent = msg;
+  }
 
-  run.addEventListener("click", async () => {
-    err.textContent = "";
-    out.textContent = "";
-    setProgress(1, "Starting…");
+  function keywordPass(textRaw){
+    const t = normalize(textRaw);
 
-    try {
-      const w = await getWorker();
-      const f = file.files[0];
-      const { data } = await w.recognize(f);
-      setProgress(100, "Done.");
-      out.textContent = (data && data.text) ? data.text : "";
-    } catch (e) {
-      setProgress(0, "Failed.");
-      err.textContent = String(e?.message || e || "Unknown error");
+    const hasWelcome = t.includes("welcome");
+    const hasTikTok =
+      t.includes("tiktok") ||
+      t.includes("tik tok") ||
+      t.includes("tikto") ||
+      (t.includes("tik") && t.includes("tok"));
+
+    return hasWelcome && hasTikTok;
+  }
+
+  function updateGate(){
+    if (!openedOnce){
+      gateMsg.textContent = "Step 1: Click “Click To Download” first.";
+      btnGoFeedback.disabled = true;
+      statusChip.textContent = "";
+      return;
     }
-  });
+    if (!ocrPassed){
+      gateMsg.textContent = "Step 2: Upload + validate the screenshot to unlock Continue.";
+      btnGoFeedback.disabled = true;
+      statusChip.textContent = "";
+      return;
+    }
+    gateMsg.textContent = "Verified ✅ Continue is unlocked.";
+    btnGoFeedback.disabled = false;
+    statusChip.textContent = "Verified ✅";
+  }
 
-  window.addEventListener("beforeunload", async () => {
-    try { if (worker) await worker.terminate(); } catch {}
-  });
-</script>
-</body>
-</html>
+  // ====== OCR worker ======
+  async function getWorker(){
+    if (!window.Tesseract) throw new Error("Tesseract.js not loaded (network/adblock).");
+
+    // This is a REAL reason it fails for many people:
+    if (location.protocol === "file:") {
+      throw new Error("You opened this page as file:// . Upload it to HTTPS (your site/
 

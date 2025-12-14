@@ -8,9 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Tesseract.js v5 (pinned + explicit paths) -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
   <style>
     body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
     .card { border: 1px solid rgb(226 232 240); border-radius: 18px; }
@@ -36,27 +33,22 @@
       </p>
 
       <p>
-        Click the button below to download the app. You will be taken to the App Store to install it.
-        After installing, open the app, complete the sign-up, and spend about one minute using it.
-        Then return to this page and continue.
-      </p>
-
-      <p>
-        After completing the experience, please upload a screenshot of the welcome email you receive and then continue to share your feedback.
+        Click the button below to open the download page in a new tab. After you finish,
+        return here and complete the feedback questions.
       </p>
 
       <p class="text-xs text-slate-500">
-        Tip: Upload a screenshot where the subject line “Welcome to TikTok” is clearly visible (top of the screen is best).
+        Tip: For the best OCR result, zoom in so the subject line is large, then take the screenshot.
       </p>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <button id="btnOpen"
+      <button id="btnOpen" type="button"
         class="rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition">
-        Click To Download
+        Open download page
       </button>
 
-      <button id="btnGoFeedback"
+      <button id="btnGoFeedback" type="button"
         class="rounded-xl px-4 py-3 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
         disabled>
         Continue to feedback
@@ -65,14 +57,14 @@
 
     <p id="hint" class="text-xs text-slate-500"></p>
 
-    <!-- Upload + OCR -->
+    <!-- Upload + OCR preview -->
     <div class="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
       <div class="flex items-start justify-between gap-3">
         <div>
           <p class="text-sm font-semibold text-slate-900">Upload screenshot (required)</p>
           <p class="text-xs text-slate-600">
-            Upload a screenshot of the email welcome message. We unlock “Continue” only if we detect the words:
-            <strong>Welcome</strong> and <strong>TikTok</strong>.
+            Upload a screenshot of the welcome email/message you received. You can use “Read screenshot text”
+            to confirm you selected the right image.
           </p>
         </div>
         <div class="text-xs text-slate-500 mono" id="statusChip"></div>
@@ -89,16 +81,13 @@
         <button id="btnOcr" type="button"
           class="rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
           disabled>
-          Validate screenshot
+          Read screenshot text
         </button>
 
         <div class="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
           <div class="flex items-center justify-between">
             <span class="text-xs text-slate-600">OCR status</span>
-            <span id="ocrPct" class="text-xs text-slate-600 mono">0%</span>
-          </div>
-          <div class="mt-2 h-2 rounded-full bg-slate-200 overflow-hidden">
-            <div id="ocrBar" class="h-full bg-indigo-600" style="width:0%"></div>
+            <span id="ocrPct" class="text-xs text-slate-600 mono">—</span>
           </div>
           <p id="ocrMsg" class="text-xs text-slate-600 mt-2"></p>
         </div>
@@ -108,8 +97,6 @@
         <p class="text-xs text-slate-600">Detected text (preview):</p>
         <pre id="ocrText" class="text-xs text-slate-700 whitespace-pre-wrap mt-2"></pre>
       </div>
-
-      <p id="gateMsg" class="text-xs text-slate-500"></p>
     </div>
   </section>
 
@@ -165,28 +152,31 @@
 </main>
 
 <script>
-  // ====== CONFIG ======
-  const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1=";
+  // =========================
+  // CONFIG
+  // =========================
+  const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1="; // will append RID
   const COMPLETE_URL   = "https://connect.cloudresearch.com/participant/project/31CCC7C024/complete";
 
-  // We validate by keyword presence (more reliable than exact phrase with highlights)
-  const REQUIRED_KEYWORDS = ["welcome", "tiktok"]; // tiktok may appear as "tik tok" or slightly broken
+  // OCR.Space: https://ocr.space/ocrapi  (get a free API key)
+  const OCR_SPACE_API_KEY = "PASTE_YOUR_OCRSPACE_KEY_HERE";
 
-  // ====== STATE ======
-  let openedOnce = false;
-  let ocrPassed = false;
+  // We will "detect" with fuzzy patterns for highlighted/ocr-messed text (display only)
+  const TARGET_DISPLAY = "welcome to tiktok";
 
-  // One worker per page
-  let worker = null;
-
-  // ====== RID ======
+  // =========================
+  // RID
+  // =========================
   const qp = new URLSearchParams(location.search);
   let rid = qp.get("RID") || qp.get("transaction_id") || qp.get("s1") || sessionStorage.getItem("RID");
   if (!rid) rid = "tx_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
   sessionStorage.setItem("RID", rid);
+
   const offerUrl = OFFER_BASE_URL + encodeURIComponent(rid);
 
-  // ====== DOM ======
+  // =========================
+  // DOM
+  // =========================
   const btnOpen = document.getElementById("btnOpen");
   const btnGoFeedback = document.getElementById("btnGoFeedback");
   const hint = document.getElementById("hint");
@@ -194,225 +184,189 @@
   const shot = document.getElementById("shot");
   const previewWrap = document.getElementById("previewWrap");
   const preview = document.getElementById("preview");
-  const btnOcr = document.getElementById("btnOcr");
+  const statusChip = document.getElementById("statusChip");
 
+  const btnOcr = document.getElementById("btnOcr");
   const ocrPct = document.getElementById("ocrPct");
-  const ocrBar = document.getElementById("ocrBar");
   const ocrMsg = document.getElementById("ocrMsg");
   const ocrResult = document.getElementById("ocrResult");
   const ocrText = document.getElementById("ocrText");
-  const gateMsg = document.getElementById("gateMsg");
-  const statusChip = document.getElementById("statusChip");
 
   const feedback = document.getElementById("feedback");
   const btnSubmit = document.getElementById("btnSubmit");
   const hint2 = document.getElementById("hint2");
 
-  // ====== Helpers ======
-  function normalize(text) {
-    return (text || "")
+  let openedOnce = false;
+  let currentPreviewUrl = null;
+
+  function hasFile(){
+    return !!(shot.files && shot.files[0]);
+  }
+
+  function normalizeOCR(s) {
+    return (s || "")
       .toLowerCase()
-      .replace(/[^\w\s]/g, " ")     // drop punctuation
+      .replace(/\s+/g, " ")
+      .replace(/[’‘]/g, "'")
+      .replace(/[“”]/g, '"')
+      .replace(/[^a-z0-9\s]/g, " ")
       .replace(/\s+/g, " ")
       .trim();
   }
 
-  function setProgress(p, msg){
-    const pct = Math.max(0, Math.min(100, Math.round(p)));
-    ocrPct.textContent = pct + "%";
-    ocrBar.style.width = pct + "%";
-    if (msg) ocrMsg.textContent = msg;
+  // Fuzzy patterns for common OCR errors on TikTok + highlights
+  function looksLikeWelcomeToTikTok(text) {
+    const t = normalizeOCR(text);
+
+    const patterns = [
+      /welcome\s+to\s+tiktok/,
+      /welcome\s+to\s+tik\s+tok/,
+      /welcome\s+to\s+tik\s*tok/,
+      /welcome\s+to\s+tikto[kx]/,
+      /welcome\s+to\s+tikt0k/,
+      /welcome\s+to\s+tikrok/,
+      /welcome\s+to\s+ti[kx]tok/,
+      /welco?me\s+to\s+tiktok/,
+    ];
+    return patterns.some(rx => rx.test(t));
   }
 
-  function updateGate(){
-    if (!openedOnce){
-      gateMsg.textContent = "Step 1: Click “Click To Download” first.";
-      btnGoFeedback.disabled = true;
-      statusChip.textContent = "";
-      return;
-    }
-    if (!ocrPassed){
-      gateMsg.textContent = "Step 2: Upload + validate the screenshot to unlock Continue.";
-      btnGoFeedback.disabled = true;
-      statusChip.textContent = "";
-      return;
-    }
-    gateMsg.textContent = "Verified ✅ Continue is unlocked.";
-    btnGoFeedback.disabled = false;
-    statusChip.textContent = "Verified ✅";
-  }
-
-  // ====== Fast OCR: do NOT hang at 5% ======
-  // We pin worker/core/langPath explicitly (this avoids “stuck at 5%” issues)
-  async function getWorker(){
-    if (!window.Tesseract) throw new Error("Tesseract not loaded.");
-
-    if (worker) return worker;
-
-    worker = await Tesseract.createWorker({
-      logger: m => {
-        if (m.status === "recognizing text") {
-          setProgress((m.progress || 0) * 100, "Reading screenshot…");
-        } else if (m.status === "loading tesseract core") {
-          setProgress(5, "Loading OCR core…");
-        } else if (m.status === "loading language traineddata") {
-          setProgress(10, "Loading language data…");
-        }
-      },
-      workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js",
-      corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js",
-      langPath: "https://tessdata.projectnaptha.com/4.0.0"
-    });
-
-    await worker.loadLanguage("eng");
-    await worker.initialize("eng");
-
-    // PSM 6: assume a block of text (good for subject lines)
-    try { await worker.setParameters({ tessedit_pageseg_mode: "6" }); } catch {}
-
-    return worker;
-  }
-
-  // ====== Image preprocessing tuned for YOUR screenshot ======
-  // - crop top area (subject line)
-  // - upscale
-  // - produce 3 variants:
-  //   1) highlight-removal (turn colored highlight to white)
-  //   2) normal threshold
-  //   3) inverted threshold
-  async function preprocessVariants(file){
+  // =========================
+  // Preprocess image for highlighted subject lines
+  // - downscale
+  // - crop top area (email header/subject)
+  // - run two versions: original crop + black/white
+  // =========================
+  async function makeCrops(file) {
     const img = new Image();
     const url = URL.createObjectURL(file);
     await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
 
-    const scale = Math.min(1, 1600 / img.width);
+    const maxW = 1200;
+    const scale = Math.min(1, maxW / img.width);
     const w = Math.round(img.width * scale);
     const h = Math.round(img.height * scale);
 
-    const base = document.createElement("canvas");
-    base.width = w; base.height = h;
-    base.getContext("2d").drawImage(img, 0, 0, w, h);
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0, w, h);
 
-    // Crop top ~28% where "Welcome to TikTok" subject sits in your screenshot
-    const cropH = Math.max(260, Math.round(h * 0.28));
+    // crop top ~38% (subject line area)
+    const cropH = Math.round(h * 0.38);
     const crop = document.createElement("canvas");
     crop.width = w; crop.height = cropH;
-    crop.getContext("2d").drawImage(base, 0, 0, w, cropH, 0, 0, w, cropH);
+    crop.getContext("2d", { willReadFrequently: true }).drawImage(canvas, 0, 0, w, cropH, 0, 0, w, cropH);
 
-    // Upscale 3x
-    const up = document.createElement("canvas");
-    up.width = crop.width * 3;
-    up.height = crop.height * 3;
-    const uctx = up.getContext("2d");
-    uctx.imageSmoothingEnabled = true;
-    uctx.drawImage(crop, 0, 0, up.width, up.height);
+    // high-contrast / binarized copy to fight highlight blocks
+    const bw = document.createElement("canvas");
+    bw.width = w; bw.height = cropH;
+    const bctx = bw.getContext("2d", { willReadFrequently: true });
+    bctx.drawImage(crop, 0, 0);
 
-    const imgData = uctx.getImageData(0, 0, up.width, up.height);
+    const imgData = bctx.getImageData(0, 0, w, cropH);
     const d = imgData.data;
 
-    const toGray = (r,g,b)=>0.299*r + 0.587*g + 0.114*b;
+    // contrast + threshold (tuned for email UI)
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i+1], b = d[i+2];
+      const gray = 0.299*r + 0.587*g + 0.114*b;
 
-    function buildCanvas(mode){
-      const out = new ImageData(up.width, up.height);
-      const o = out.data;
+      // boost contrast
+      const c = (gray - 128) * 1.8 + 128;
 
-      for (let i=0;i<d.length;i+=4){
-        const r=d[i], g=d[i+1], b=d[i+2], a=d[i+3];
+      // adaptive-ish threshold
+      const v = c > 165 ? 255 : 0;
 
-        const max = Math.max(r,g,b), min = Math.min(r,g,b);
-        const sat = max === 0 ? 0 : (max - min) / max; // 0..1
-        const gray = toGray(r,g,b);
-
-        let v;
-        if (mode === "dehighlight") {
-          // If pixel is “colored” (highlight) and not super-dark, wipe it to white.
-          // This is what fixes the yellow highlight on TikTok word.
-          if (sat > 0.18 && gray > 95) v = 255;
-          else v = (gray > 155) ? 255 : 0;
-        } else if (mode === "normal") {
-          v = (gray > 165) ? 255 : 0;
-        } else { // invert
-          const bw = (gray > 165) ? 255 : 0;
-          v = 255 - bw;
-        }
-
-        o[i]=o[i+1]=o[i+2]=v;
-        o[i+3]=a;
-      }
-
-      const c = document.createElement("canvas");
-      c.width = up.width; c.height = up.height;
-      c.getContext("2d").putImageData(out, 0, 0);
-      return c;
+      d[i] = d[i+1] = d[i+2] = v;
     }
+    bctx.putImageData(imgData, 0, 0);
 
     URL.revokeObjectURL(url);
 
-    const canvases = [buildCanvas("dehighlight"), buildCanvas("normal"), buildCanvas("invert")];
-
-    async function canvasToBlobSafe(canvas, type="image/jpeg", quality=0.92){
-      const blob = await new Promise(res => canvas.toBlob(res, type, quality));
+    async function toBlobSafe(c, type="image/jpeg", quality=0.92){
+      const blob = await new Promise(res => c.toBlob(res, type, quality));
       if (blob) return blob;
-      const dataUrl = canvas.toDataURL(type, quality);
+      const dataUrl = c.toDataURL(type, quality);
       const resp = await fetch(dataUrl);
       return await resp.blob();
     }
 
-    return Promise.all(canvases.map(c => canvasToBlobSafe(c)));
+    return {
+      cropBlob: await toBlobSafe(crop),
+      bwBlob: await toBlobSafe(bw),
+    };
   }
 
-  async function runOCR(blob){
-    const w = await getWorker();
-    const { data } = await w.recognize(blob);
-    return data?.text || "";
+  async function ocrSpace(blob) {
+    if (!OCR_SPACE_API_KEY || OCR_SPACE_API_KEY.includes("PASTE_YOUR")) {
+      throw new Error("Missing OCR.Space API key");
+    }
+
+    const form = new FormData();
+    form.append("apikey", OCR_SPACE_API_KEY);
+    form.append("language", "eng");
+    form.append("isOverlayRequired", "false");
+    form.append("scale", "true");
+    form.append("OCREngine", "2"); // better for UI text
+    form.append("file", blob, "crop.jpg");
+
+    const res = await fetch("https://api.ocr.space/parse/image", { method: "POST", body: form });
+    const data = await res.json();
+
+    if (data?.IsErroredOnProcessing) {
+      throw new Error((data?.ErrorMessage && data.ErrorMessage.join(", ")) || "OCR error");
+    }
+
+    return (data?.ParsedResults || []).map(x => x?.ParsedText || "").join("\n").trim();
   }
 
-  function keywordPass(textRaw){
-    const t = normalize(textRaw);
+  // =========================
+  // Feedback validation
+  // =========================
+  function updateSubmitState(){
+    const ok =
+      hasFile() &&
+      document.querySelector('input[name="fb_impression"]:checked') &&
+      document.querySelector('input[name="fb_signup"]:checked') &&
+      document.querySelector('input[name="fb_likely"]:checked');
 
-    // welcome must be present
-    const hasWelcome = t.includes("welcome");
-
-    // TikTok may be broken due to highlight: accept variations
-    const hasTikTok =
-      t.includes("tiktok") ||
-      t.includes("tik tok") ||
-      t.includes("tikto")  ||
-      (t.includes("tik") && t.includes("tok"));
-
-    return hasWelcome && hasTikTok;
+    btnSubmit.disabled = !ok;
+    hint2.textContent = ok ? "" : "Please upload a screenshot and answer the required questions.";
   }
 
-  // ====== Actions ======
+  // =========================
+  // Events
+  // =========================
   btnOpen.addEventListener("click", () => {
     window.open(offerUrl, "_blank", "noopener,noreferrer");
     openedOnce = true;
-    hint.textContent = "After you finish, upload your screenshot and click “Validate screenshot”.";
-    updateGate();
+    btnGoFeedback.disabled = false;
+    hint.textContent = "Return here after you finish and continue to feedback.";
   });
 
-  let currentPreviewUrl = null;
-
-  shot.addEventListener("change", () => {
-    ocrPassed = false;
-    setProgress(0, "");
-    ocrMsg.textContent = "";
-    ocrResult.classList.add("hidden");
-    ocrText.textContent = "";
-    statusChip.textContent = "";
-
-    const file = shot.files && shot.files[0];
-    if (!file){
-      previewWrap.classList.add("hidden");
-      btnOcr.disabled = true;
-      updateGate();
+  btnGoFeedback.addEventListener("click", () => {
+    if (!openedOnce) {
+      hint.textContent = "Please open the download page first.";
       return;
     }
+    feedback.classList.remove("hidden");
+    feedback.scrollIntoView({ behavior: "smooth" });
+    updateSubmitState();
+  });
 
-    if (!file.type.startsWith("image/")){
+  shot.addEventListener("change", () => {
+    statusChip.textContent = "";
+    ocrResult.classList.add("hidden");
+    ocrText.textContent = "";
+    ocrPct.textContent = "—";
+    ocrMsg.textContent = "";
+
+    const file = shot.files && shot.files[0];
+    if (!file) {
+      previewWrap.classList.add("hidden");
       btnOcr.disabled = true;
-      ocrMsg.textContent = "Please upload an image.";
-      updateGate();
+      updateSubmitState();
       return;
     }
 
@@ -422,8 +376,8 @@
     previewWrap.classList.remove("hidden");
 
     btnOcr.disabled = false;
-    ocrMsg.textContent = "Ready to validate.";
-    updateGate();
+    statusChip.textContent = "Uploaded ✅";
+    updateSubmitState();
   });
 
   btnOcr.addEventListener("click", async () => {
@@ -431,87 +385,48 @@
     if (!file) return;
 
     btnOcr.disabled = true;
-    btnGoFeedback.disabled = true;
-    ocrPassed = false;
-    statusChip.textContent = "";
+    ocrPct.textContent = "…";
+    ocrMsg.textContent = "Reading screenshot…";
     ocrResult.classList.add("hidden");
     ocrText.textContent = "";
 
     try {
-      setProgress(3, "Preparing screenshot…");
+      // two-pass OCR with preprocessing to handle highlights
+      const { cropBlob, bwBlob } = await makeCrops(file);
 
-      const variants = await preprocessVariants(file);
+      // pass 1: normal crop
+      const t1 = await ocrSpace(cropBlob);
 
-      let best = { raw: "", ok: false };
+      // pass 2: black/white crop (often fixes highlighted subject)
+      const t2 = await ocrSpace(bwBlob);
 
-      // Try variants (dehighlight first) – fast and reliable for your highlighted TikTok text
-      for (let i=0;i<variants.length;i++){
-        setProgress(10 + i*10, "Running OCR…");
-        const raw = await runOCR(variants[i]);
-        const ok = keywordPass(raw);
-
-        if (ok){
-          best = { raw, ok: true };
-          break;
-        }
-        if (raw.length > best.raw.length) best = { raw, ok: false };
-      }
+      const combined = [t1, "\n--- OCR PASS 2 (contrast) ---\n", t2].join("\n").trim();
 
       ocrResult.classList.remove("hidden");
-      ocrText.textContent = best.raw.slice(0, 1500) + (best.raw.length > 1500 ? "\n…(truncated)" : "");
+      ocrText.textContent = combined.slice(0, 3500);
+      ocrPct.textContent = "100%";
 
-      setProgress(100, "Done.");
+      // Display-only message
+      const match = looksLikeWelcomeToTikTok(combined);
+      ocrMsg.textContent = match
+        ? `Detected: text appears to include “${TARGET_DISPLAY}”.`
+        : `Not detected in OCR preview. Try a closer screenshot focused on the subject line.`;
 
-      if (best.ok){
-        ocrPassed = true;
-        ocrMsg.textContent = "✅ Verified: Welcome email detected. Continue is unlocked.";
-      } else {
-        ocrPassed = false;
-        ocrMsg.textContent =
-          "❌ Not verified. Please upload a clearer screenshot where the subject line “Welcome to TikTok” is visible (top area).";
-      }
-
-    } catch (e){
-      ocrPassed = false;
-      setProgress(0, "Error.");
-      ocrMsg.textContent =
-        "❌ OCR failed. Common causes: blocked CDN or very large screenshot. Try again with a clearer screenshot.";
+    } catch (e) {
+      ocrPct.textContent = "—";
+      ocrMsg.textContent = "OCR failed. Check API key, or try a clearer/zoomed screenshot of the subject line.";
     } finally {
       btnOcr.disabled = false;
-      updateGate();
     }
   });
 
-  btnGoFeedback.addEventListener("click", () => {
-    if (!openedOnce) { hint.textContent = "Please click “Click To Download” first."; return; }
-    if (!ocrPassed) { hint.textContent = "Please validate the screenshot first."; return; }
-
-    feedback.classList.remove("hidden");
-    feedback.scrollIntoView({ behavior: "smooth" });
-    validateFeedback();
-  });
-
-  function validateFeedback(){
-    const ok =
-      document.querySelector('input[name="fb_impression"]:checked') &&
-      document.querySelector('input[name="fb_signup"]:checked') &&
-      document.querySelector('input[name="fb_likely"]:checked');
-    btnSubmit.disabled = !ok;
-    hint2.textContent = ok ? "" : "Please answer the required questions.";
-  }
-
   document.querySelectorAll('input[name="fb_impression"], input[name="fb_signup"], input[name="fb_likely"]')
-    .forEach(r => r.addEventListener("change", validateFeedback));
+    .forEach(r => r.addEventListener("change", updateSubmitState));
 
   btnSubmit.addEventListener("click", () => {
+    if (btnSubmit.disabled) return;
     window.location.href = COMPLETE_URL;
   });
-
-  window.addEventListener("beforeunload", async () => {
-    try { if (worker) await worker.terminate(); } catch {}
-  });
-
-  updateGate();
 </script>
 
 </body>

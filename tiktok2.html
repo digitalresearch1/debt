@@ -8,13 +8,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Fast OCR (no worker management) -->
+  <!-- OCR (fast one-shot) -->
   <script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
     body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
     .card { border: 1px solid rgb(226 232 240); border-radius: 18px; }
-    input[type="radio"] { width: 16px; height: 16px; }
     .mono { font-variant-numeric: tabular-nums; }
   </style>
 </head>
@@ -22,9 +21,7 @@
 <body class="bg-slate-50 text-slate-900">
 <main class="max-w-xl mx-auto px-4 py-10">
 
-  <!-- MAIN -->
   <section class="card bg-white shadow-sm p-6 space-y-5">
-
     <div class="space-y-2">
       <p class="text-sm text-slate-600">App experience research study</p>
       <p class="text-lg font-semibold leading-snug">Help us understand first-time experience</p>
@@ -35,19 +32,17 @@
         The purpose of this study is to understand how people who have
         <strong>not used TikTok before</strong> experience the app when they try it for the first time.
       </p>
-
       <p>
         Click the button below. You will be taken to the App Store to install.
         After installing, open it, complete sign-up, and spend about one minute using it.
-        Then return to this page and continue.
+        Then return to this page.
       </p>
-
       <p>
-        After completing the experience, please upload a screenshot of the welcome email you receive and then continue to share your feedback.
+        To continue, upload a screenshot of the welcome email you receive.
+        We unlock “Continue” only when we detect the words <strong>Welcome to TikTok</strong>.
       </p>
-
       <p class="text-xs text-slate-500">
-        Tip: Upload a screenshot where the subject line “Welcome to TikTok” is clearly visible (top of the screen is best).
+        Tip: Take the screenshot so the subject line is BIG and clear (top of the email list / email header).
       </p>
     </div>
 
@@ -72,8 +67,7 @@
         <div>
           <p class="text-sm font-semibold text-slate-900">Upload screenshot (required)</p>
           <p class="text-xs text-slate-600">
-            Upload a screenshot of the welcome email. “Continue” unlocks only if we detect:
-            <strong>“Welcome to TikTok”</strong>.
+            We’ll check for <strong>“Welcome to TikTok”</strong> (OCR can allow small typos).
           </p>
         </div>
         <div class="text-xs text-slate-500 mono" id="statusChip"></div>
@@ -152,16 +146,6 @@
         </div>
         <p class="text-xs text-slate-500">1 = Not likely, 5 = Very likely</p>
       </div>
-
-      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
-        <p class="font-semibold">What (if anything) felt confusing? <span class="text-xs text-slate-500">(optional)</span></p>
-        <textarea id="fb_confusing" class="w-full rounded-xl border border-slate-200 p-3 text-sm" rows="3"></textarea>
-      </div>
-
-      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
-        <p class="font-semibold">What did you like most? <span class="text-xs text-slate-500">(optional)</span></p>
-        <textarea id="fb_like" class="w-full rounded-xl border border-slate-200 p-3 text-sm" rows="3"></textarea>
-      </div>
     </div>
 
     <button id="btnSubmit"
@@ -177,9 +161,11 @@
 
 <script>
   // ====== CONFIG ======
-  const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1=";   // add RID to this
+  const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1=";
   const COMPLETE_URL   = "https://connect.cloudresearch.com/participant/project/31CCC7C024/complete";
-  const REQUIRED_PHRASE = "welcome to tiktok"; // ONLY detect this (case-insensitive)
+
+  const REQUIRED = "welcome to tiktok";      // target phrase (normalized)
+  const PASS_SIMILARITY = 0.78;              // lower = more permissive (0.78 is strong but tolerant)
 
   // ====== STATE ======
   let openedOnce = false;
@@ -227,8 +213,59 @@
     return (text || "")
       .toLowerCase()
       .replace(/[\u2018\u2019]/g, "'")
+      .replace(/[^a-z0-9\s]/g, " ")      // remove punctuation noise
       .replace(/\s+/g, " ")
       .trim();
+  }
+
+  // Levenshtein similarity for fuzzy match
+  function levenshtein(a, b){
+    a = a || ""; b = b || "";
+    const m = a.length, n = b.length;
+    const dp = Array.from({length: m+1}, () => new Array(n+1).fill(0));
+    for (let i=0;i<=m;i++) dp[i][0]=i;
+    for (let j=0;j<=n;j++) dp[0][j]=j;
+    for (let i=1;i<=m;i++){
+      for (let j=1;j<=n;j++){
+        const cost = a[i-1] === b[j-1] ? 0 : 1;
+        dp[i][j] = Math.min(
+          dp[i-1][j] + 1,
+          dp[i][j-1] + 1,
+          dp[i-1][j-1] + cost
+        );
+      }
+    }
+    return dp[m][n];
+  }
+
+  function similarity(a, b){
+    a = normalize(a); b = normalize(b);
+    if (!a || !b) return 0;
+    const dist = levenshtein(a, b);
+    const maxLen = Math.max(a.length, b.length);
+    return maxLen === 0 ? 1 : (1 - dist / maxLen);
+  }
+
+  // find best match of REQUIRED in the OCR text by checking sliding windows
+  function bestPhraseScore(ocrText){
+    const t = normalize(ocrText);
+    if (!t) return 0;
+
+    // fast pass: direct contains
+    if (t.includes(REQUIRED)) return 1;
+
+    // window scan: compare chunks close to required length
+    const words = t.split(" ");
+    const targetWords = REQUIRED.split(" ").length;
+    let best = 0;
+
+    for (let i=0; i<words.length; i++){
+      const chunk = words.slice(i, i + targetWords + 2).join(" "); // allow +2 words noise
+      const s = similarity(chunk, REQUIRED);
+      if (s > best) best = s;
+      if (best >= 0.92) break; // early exit
+    }
+    return best;
   }
 
   function updateGate(){
@@ -249,8 +286,7 @@
     statusChip.textContent = "Verified ✅";
   }
 
-  // More reliable blob creation on iOS
-  async function canvasToBlobSafe(canvas, type="image/jpeg", quality=0.9){
+  async function canvasToBlobSafe(canvas, type="image/jpeg", quality=0.92){
     const blob = await new Promise(res => canvas.toBlob(res, type, quality));
     if (blob) return blob;
     const dataUrl = canvas.toDataURL(type, quality);
@@ -258,36 +294,69 @@
     return await resp.blob();
   }
 
-  // Crop top portion (subject/header area)
-  async function preprocessImageTop(file, maxW = 1400){
+  // KEY FIX: crop tighter + upscale + high-contrast + threshold
+  async function preprocessForSubject(file){
     const img = new Image();
     const url = URL.createObjectURL(file);
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
 
-    await new Promise((res, rej) => {
-      img.onload = res; img.onerror = rej; img.src = url;
-    });
+    // Downscale / upscale strategy:
+    // 1) scale to reasonable width
+    const baseScale = Math.min(1, 1600 / img.width);
+    const w0 = Math.round(img.width * baseScale);
+    const h0 = Math.round(img.height * baseScale);
 
-    const scale = Math.min(1, maxW / img.width);
-    const w = Math.round(img.width * scale);
-    const h = Math.round(img.height * scale);
+    const base = document.createElement("canvas");
+    base.width = w0; base.height = h0;
+    const bctx = base.getContext("2d");
+    bctx.drawImage(img, 0, 0, w0, h0);
 
-    const canvas = document.createElement("canvas");
-    canvas.width = w; canvas.height = h;
-    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-
-    // Crop TOP 45%
-    const cropH = Math.round(h * 0.45);
+    // 2) Crop TOP STRIP where subject line usually is (tighter than before)
+    const cropTop = Math.round(h0 * 0.28);  // 28% top
     const crop = document.createElement("canvas");
-    crop.width = w;
-    crop.height = cropH;
-    crop.getContext("2d").drawImage(canvas, 0, 0, w, cropH, 0, 0, w, cropH);
+    crop.width = w0;
+    crop.height = cropTop;
+    const cctx = crop.getContext("2d");
+    cctx.drawImage(base, 0, 0, w0, cropTop, 0, 0, w0, cropTop);
+
+    // 3) Upscale 2x to help OCR read small text
+    const up = document.createElement("canvas");
+    up.width = w0 * 2;
+    up.height = cropTop * 2;
+    const uctx = up.getContext("2d");
+    uctx.imageSmoothingEnabled = true;
+    uctx.drawImage(crop, 0, 0, up.width, up.height);
+
+    // 4) Convert to grayscale + boost contrast + threshold
+    const imgData = uctx.getImageData(0, 0, up.width, up.height);
+    const d = imgData.data;
+
+    // contrast factor (1.35 = stronger contrast)
+    const contrast = 1.35;
+    const intercept = 128 * (1 - contrast);
+
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i+1], b = d[i+2];
+      // grayscale
+      let y = 0.299*r + 0.587*g + 0.114*b;
+
+      // contrast
+      y = y * contrast + intercept;
+
+      // threshold (tune: 160 works well for email headers)
+      const v = y > 160 ? 255 : 0;
+
+      d[i] = d[i+1] = d[i+2] = v;
+      // alpha keep
+    }
+    uctx.putImageData(imgData, 0, 0);
 
     URL.revokeObjectURL(url);
 
-    return await canvasToBlobSafe(crop, "image/jpeg", 0.9);
+    return await canvasToBlobSafe(up, "image/jpeg", 0.92);
   }
 
-  // ====== Buttons ======
+  // ====== Events ======
   btnOpen.addEventListener("click", () => {
     window.open(offerUrl, "_blank", "noopener,noreferrer");
     openedOnce = true;
@@ -331,7 +400,6 @@
     updateGate();
   });
 
-  // ====== OCR (FAST MODE) ======
   btnOcr.addEventListener("click", async () => {
     const file = shot.files && shot.files[0];
     if (!file) return;
@@ -343,42 +411,42 @@
     ocrResult.classList.add("hidden");
     ocrText.textContent = "";
 
-    setProgress(10, "Preparing image…");
+    setProgress(10, "Preparing screenshot…");
 
     try {
-      const blob = await preprocessImageTop(file, 1400);
+      const blob = await preprocessForSubject(file);
       setProgress(25, "Reading screenshot…");
 
       const result = await Tesseract.recognize(blob, "eng", {
         logger: m => {
-          // only reliable progress is during recognition
           if (typeof m.progress === "number") {
-            const p = 25 + Math.round(m.progress * 70); // 25 -> 95
+            const p = 25 + Math.round(m.progress * 70);
             setProgress(p, "Reading screenshot…");
           }
         }
       });
 
       const raw = result?.data?.text || "";
-      const text = normalize(raw);
+      const score = bestPhraseScore(raw);
 
       ocrResult.classList.remove("hidden");
       ocrText.textContent = raw.slice(0, 1400) + (raw.length > 1400 ? "\n…(truncated)" : "");
-
       setProgress(100, "Done.");
 
-      if (text.includes(REQUIRED_PHRASE)) {
+      if (score >= PASS_SIMILARITY) {
         ocrPassed = true;
-        ocrMsg.textContent = "✅ Verified: “Welcome to TikTok” detected. Continue is unlocked.";
+        ocrMsg.textContent = `✅ Verified. (match score: ${Math.round(score*100)}%) Continue is unlocked.`;
       } else {
         ocrPassed = false;
-        ocrMsg.textContent = "❌ Not verified. Please upload a clearer screenshot where the words “Welcome to TikTok” are visible.";
+        ocrMsg.textContent =
+          `❌ Not verified. We couldn’t confidently detect “Welcome to TikTok”. (score: ${Math.round(score*100)}%) ` +
+          `Please upload a clearer screenshot with the subject line visible at the top.`;
       }
 
     } catch (e) {
       ocrPassed = false;
       setProgress(0, "Error.");
-      ocrMsg.textContent = "❌ OCR failed. Try a clearer screenshot (top of the email) and retry.";
+      ocrMsg.textContent = "❌ OCR failed. Try a clearer screenshot (subject line bigger) and retry.";
     } finally {
       btnOcr.disabled = false;
       updateGate();

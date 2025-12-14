@@ -6,26 +6,25 @@
   <title>Survey</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tesseract.js -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
   <style>
     body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
     .card { border: 1px solid rgb(226 232 240); border-radius: 18px; }
     input[type="radio"] { width: 16px; height: 16px; }
+    .mono { font-variant-numeric: tabular-nums; }
   </style>
 </head>
 
 <body class="bg-slate-50 text-slate-900">
 <main class="max-w-xl mx-auto px-4 py-10">
 
-  <!-- PURPOSE + TASK -->
   <section class="card bg-white shadow-sm p-6 space-y-5">
-
     <div class="space-y-2">
-      <p class="text-sm text-slate-600">
-        App experience research study
-      </p>
-      <p class="text-lg font-semibold leading-snug">
-        Help us understand how new users experience this app for the first time
-      </p>
+      <p class="text-sm text-slate-600">App experience research study</p>
+      <p class="text-lg font-semibold leading-snug">Help us understand first-time experience</p>
     </div>
 
     <div class="space-y-3 text-sm text-slate-700">
@@ -34,24 +33,8 @@
         experience the app when they try it for the first time.
       </p>
       <p>
-        Because you are new to this type of app, your feedback helps us evaluate things like
-        ease of sign-up, clarity of features, and overall first impressions.
+        After you try it, please upload a screenshot of the welcome message you receive and then answer a few questions.
       </p>
-      <p>
-        There are no right or wrong answers — we are simply interested in your honest opinion
-        based on your first experience.
-      </p>
-    </div>
-
-    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4 space-y-2">
-      <p class="text-sm font-semibold text-slate-800">What you’ll do</p>
-      <ul class="text-sm text-slate-700 list-disc pl-5 space-y-1">
-        <li>Click <strong>Click to download</strong> (the App Store will open)</li>
-        <li>Install the app</li>
-        <li>Open the app and complete the sign-up</li>
-        <li>Spend a short moment exploring the app</li>
-        <li>Return here to answer a few feedback questions</li>
-      </ul>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -68,100 +51,375 @@
     </div>
 
     <p id="hint" class="text-xs text-slate-500"></p>
+
+    <!-- Upload + OCR -->
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold text-slate-900">Upload screenshot (required)</p>
+          <p class="text-xs text-slate-600">
+            Upload a screenshot of the welcome message. We’ll confirm it shows today’s date (or “Today”).
+          </p>
+        </div>
+        <div class="text-xs text-slate-500 mono" id="todayLabel"></div>
+      </div>
+
+      <input id="shot" type="file" accept="image/*"
+        class="block w-full text-sm text-slate-700 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold hover:file:bg-slate-200"/>
+
+      <div id="previewWrap" class="hidden">
+        <img id="preview" class="w-full rounded-xl border border-slate-200" alt="Preview"/>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button id="btnOcr"
+          class="rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled>
+          Validate screenshot
+        </button>
+
+        <div class="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-600">OCR status</span>
+            <span id="ocrPct" class="text-xs text-slate-600 mono">0%</span>
+          </div>
+          <div class="mt-2 h-2 rounded-full bg-slate-200 overflow-hidden">
+            <div id="ocrBar" class="h-full bg-indigo-600" style="width:0%"></div>
+          </div>
+          <p id="ocrMsg" class="text-xs text-slate-600 mt-2"></p>
+        </div>
+      </div>
+
+      <div id="ocrResult" class="hidden rounded-xl border border-slate-200 bg-white p-3">
+        <p class="text-xs text-slate-600">Detected text (preview):</p>
+        <pre id="ocrText" class="text-xs text-slate-700 whitespace-pre-wrap mt-2"></pre>
+      </div>
+
+      <p id="gateMsg" class="text-xs text-slate-500"></p>
+    </div>
   </section>
 
   <!-- FEEDBACK -->
   <section id="feedback" class="card bg-white shadow-sm p-6 mt-6 space-y-5 hidden">
-
     <div class="space-y-1">
       <p class="text-sm text-slate-600">Feedback</p>
-      <p class="text-lg font-semibold">Tell us about your first-time experience</p>
+      <p class="text-lg font-semibold">Tell us about your experience</p>
     </div>
 
     <div class="space-y-4">
-
       <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
-        <p class="font-semibold">What was your overall first impression of the app?</p>
-        <label class="flex gap-2"><input type="radio" name="fb_impression"> Very positive</label>
-        <label class="flex gap-2"><input type="radio" name="fb_impression"> Somewhat positive</label>
-        <label class="flex gap-2"><input type="radio" name="fb_impression"> Neutral</label>
-        <label class="flex gap-2"><input type="radio" name="fb_impression"> Somewhat negative</label>
-        <label class="flex gap-2"><input type="radio" name="fb_impression"> Very negative</label>
+        <p class="font-semibold">What was your overall first impression?</p>
+        <label class="flex gap-2"><input type="radio" name="fb_impression" value="very_positive"> Very positive</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression" value="somewhat_positive"> Somewhat positive</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression" value="neutral"> Neutral</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression" value="somewhat_negative"> Somewhat negative</label>
+        <label class="flex gap-2"><input type="radio" name="fb_impression" value="very_negative"> Very negative</label>
       </div>
 
       <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
-        <p class="font-semibold">How easy was the sign-up process for you?</p>
-        <label class="flex gap-2"><input type="radio" name="fb_signup"> Very easy</label>
-        <label class="flex gap-2"><input type="radio" name="fb_signup"> Easy</label>
-        <label class="flex gap-2"><input type="radio" name="fb_signup"> Okay</label>
-        <label class="flex gap-2"><input type="radio" name="fb_signup"> Difficult</label>
-        <label class="flex gap-2"><input type="radio" name="fb_signup"> Very difficult</label>
-        <label class="flex gap-2"><input type="radio" name="fb_signup"> I didn’t complete sign-up</label>
+        <p class="font-semibold">How easy was sign-up?</p>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="very_easy"> Very easy</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="easy"> Easy</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="ok"> Okay</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="hard"> Difficult</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="very_hard"> Very difficult</label>
+        <label class="flex gap-2"><input type="radio" name="fb_signup" value="did_not"> I didn’t complete sign-up</label>
       </div>
 
       <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
-        <p class="font-semibold">What did you like most about the app? <span class="text-xs text-slate-500">(optional)</span></p>
-        <textarea class="w-full rounded-xl border border-slate-200 p-3 text-sm" rows="3"></textarea>
-      </div>
-
-      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
-        <p class="font-semibold">Was anything confusing or unclear? <span class="text-xs text-slate-500">(optional)</span></p>
-        <textarea class="w-full rounded-xl border border-slate-200 p-3 text-sm" rows="3"></textarea>
-      </div>
-
-      <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
-        <p class="font-semibold">Based on your first experience, how likely are you to use this app again?</p>
+        <p class="font-semibold">How likely are you to use it again?</p>
         <div class="flex gap-2">
-          <label class="flex gap-1"><input type="radio" name="fb_likely">1</label>
-          <label class="flex gap-1"><input type="radio" name="fb_likely">2</label>
-          <label class="flex gap-1"><input type="radio" name="fb_likely">3</label>
-          <label class="flex gap-1"><input type="radio" name="fb_likely">4</label>
-          <label class="flex gap-1"><input type="radio" name="fb_likely">5</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely" value="1">1</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely" value="2">2</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely" value="3">3</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely" value="4">4</label>
+          <label class="flex gap-1"><input type="radio" name="fb_likely" value="5">5</label>
         </div>
         <p class="text-xs text-slate-500">1 = Not likely, 5 = Very likely</p>
       </div>
-
     </div>
 
     <button id="btnSubmit"
-      class="w-full rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition">
+      class="w-full rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+      disabled>
       Submit & finish
     </button>
+
+    <p id="hint2" class="text-xs text-slate-500"></p>
   </section>
 
 </main>
 
 <script>
+  // ====== CONFIG ======
   const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1=";
-  const COMPLETE_URL = "https://connect.cloudresearch.com/participant/project/31CCC7C024/complete";
+  const COMPLETE_URL   = "https://connect.cloudresearch.com/participant/project/31CCC7C024/complete";
 
+  // What the screenshot must contain (case-insensitive)
+  const REQUIRED_KEYWORDS = ["tiktok", "welcome"];
+
+  // ====== STATE ======
+  let openedOnce = false;
+  let ocrPassed = false;
+  let worker = null;
+
+  // ====== RID ======
+  const qp = new URLSearchParams(location.search);
+  let rid = qp.get("RID") || qp.get("transaction_id") || qp.get("s1") || sessionStorage.getItem("RID");
+  if (!rid) rid = "tx_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
+  sessionStorage.setItem("RID", rid);
+
+  const offerUrl = OFFER_BASE_URL + encodeURIComponent(rid);
+
+  // ====== DOM ======
   const btnOpen = document.getElementById("btnOpen");
   const btnGoFeedback = document.getElementById("btnGoFeedback");
-  const btnSubmit = document.getElementById("btnSubmit");
-  const feedback = document.getElementById("feedback");
   const hint = document.getElementById("hint");
 
-  let openedOnce = false;
+  const shot = document.getElementById("shot");
+  const previewWrap = document.getElementById("previewWrap");
+  const preview = document.getElementById("preview");
+  const btnOcr = document.getElementById("btnOcr");
+  const ocrPct = document.getElementById("ocrPct");
+  const ocrBar = document.getElementById("ocrBar");
+  const ocrMsg = document.getElementById("ocrMsg");
+  const ocrResult = document.getElementById("ocrResult");
+  const ocrText = document.getElementById("ocrText");
+  const gateMsg = document.getElementById("gateMsg");
+  const todayLabel = document.getElementById("todayLabel");
 
-  btnOpen.addEventListener("click", () => {
-    window.open(OFFER_BASE_URL, "_blank", "noopener,noreferrer");
-    openedOnce = true;
+  const feedback = document.getElementById("feedback");
+  const btnSubmit = document.getElementById("btnSubmit");
+  const hint2 = document.getElementById("hint2");
+
+  function norm(s){ return (s||"").toLowerCase().replace(/\s+/g," ").trim(); }
+
+  function setProgress(p, msg){
+    const pct = Math.max(0, Math.min(100, Math.round(p)));
+    ocrPct.textContent = pct + "%";
+    ocrBar.style.width = pct + "%";
+    if (msg) ocrMsg.textContent = msg;
+  }
+
+  // ====== Date formats ======
+  function pad2(n){ return String(n).padStart(2,"0"); }
+  function monthName(d){ return d.toLocaleString("en-US", { month: "long" }); }
+  function monthShort(d){ return d.toLocaleString("en-US", { month: "short" }); }
+
+  function todayTokens(){
+    const d = new Date();
+    const mm = pad2(d.getMonth()+1);
+    const dd = pad2(d.getDate());
+    const yyyy = d.getFullYear();
+    const yy = String(yyyy).slice(-2);
+
+    // numeric variants
+    const list = [
+      `${mm}/${dd}/${yyyy}`, `${dd}/${mm}/${yyyy}`,
+      `${yyyy}-${mm}-${dd}`, `${mm}-${dd}-${yyyy}`, `${dd}-${mm}-${yyyy}`,
+      `${mm}/${dd}/${yy}`, `${dd}/${mm}/${yy}`,
+      `${mm}-${dd}-${yy}`, `${dd}-${mm}-${yy}`,
+      "today" // many email apps show "Today"
+    ];
+
+    // month-name variants: Feb 10, 2025 / February 10, 2025
+    const mLong = monthName(d);
+    const mShort = monthShort(d);
+    list.push(`${mShort} ${parseInt(dd,10)}, ${yyyy}`.toLowerCase());
+    list.push(`${mLong} ${parseInt(dd,10)}, ${yyyy}`.toLowerCase());
+
+    return list.map(x => x.toLowerCase());
+  }
+
+  const dateTokens = todayTokens();
+  todayLabel.textContent = `Expected date: ${dateTokens[0]}`;
+
+  function hasKeywords(text){
+    const t = norm(text);
+    return REQUIRED_KEYWORDS.every(k => t.includes(k));
+  }
+  function hasToday(text){
+    const t = norm(text);
+    return dateTokens.some(tok => t.includes(tok));
+  }
+
+  // ====== Downscale image to help OCR on iOS ======
+  async function fileToDownscaledBlob(file, maxW = 1400){
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+
+    const scale = Math.min(1, maxW / img.width);
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, w, h);
+
+    URL.revokeObjectURL(url);
+
+    const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.92));
+    return blob;
+  }
+
+  // ====== Create OCR worker with explicit paths (most important fix) ======
+  async function getWorker(){
+    if (!window.Tesseract) throw new Error("Tesseract not loaded. CDN blocked?");
+    if (worker) return worker;
+
+    worker = await Tesseract.createWorker("eng", 1, {
+      workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js",
+      corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js",
+      logger: m => {
+        if (m.status === "recognizing text") setProgress((m.progress||0)*100, "Reading screenshot…");
+      }
+    });
+
+    return worker;
+  }
+
+  // ====== Gate ======
+  function updateGate(){
+    if (!openedOnce){
+      gateMsg.textContent = "Step 1: Click “Click to download” first.";
+      btnGoFeedback.disabled = true;
+      return;
+    }
+    if (!ocrPassed){
+      gateMsg.textContent = "Step 2: Upload a screenshot and validate it to continue.";
+      btnGoFeedback.disabled = true;
+      return;
+    }
+    gateMsg.textContent = "All set. You can continue to feedback.";
     btnGoFeedback.disabled = false;
-    hint.textContent = "After trying the app, please return here to continue.";
+  }
+
+  // ====== Buttons ======
+  btnOpen.addEventListener("click", () => {
+    window.open(offerUrl, "_blank", "noopener,noreferrer");
+    openedOnce = true;
+    hint.textContent = "After you finish, upload your screenshot and validate it.";
+    updateGate();
+  });
+
+  // ====== Upload preview ======
+  let currentPreviewUrl = null;
+
+  shot.addEventListener("change", () => {
+    ocrPassed = false;
+    setProgress(0, "");
+    ocrResult.classList.add("hidden");
+    ocrText.textContent = "";
+
+    const file = shot.files && shot.files[0];
+    if (!file){
+      previewWrap.classList.add("hidden");
+      btnOcr.disabled = true;
+      updateGate();
+      return;
+    }
+
+    if (!file.type.startsWith("image/")){
+      btnOcr.disabled = true;
+      ocrMsg.textContent = "Please upload an image.";
+      updateGate();
+      return;
+    }
+
+    if (currentPreviewUrl) URL.revokeObjectURL(currentPreviewUrl);
+    currentPreviewUrl = URL.createObjectURL(file);
+    preview.src = currentPreviewUrl;
+    previewWrap.classList.remove("hidden");
+
+    btnOcr.disabled = false;
+    ocrMsg.textContent = "Ready to validate.";
+    updateGate();
+  });
+
+  // ====== OCR run ======
+  btnOcr.addEventListener("click", async () => {
+    const file = shot.files && shot.files[0];
+    if (!file) return;
+
+    btnOcr.disabled = true;
+    setProgress(1, "Preparing image…");
+
+    try {
+      // Downscale for iOS stability
+      const blob = await fileToDownscaledBlob(file, 1400);
+
+      setProgress(3, "Loading OCR engine…");
+      const w = await getWorker();
+
+      const { data } = await w.recognize(blob);
+      const text = data?.text || "";
+
+      ocrResult.classList.remove("hidden");
+      ocrText.textContent = text.slice(0, 1400) + (text.length > 1400 ? "\n…(truncated)" : "");
+
+      const okK = hasKeywords(text);
+      const okD = hasToday(text);
+
+      setProgress(100, "Done.");
+
+      if (!okK && !okD){
+        ocrPassed = false;
+        ocrMsg.textContent = "Not verified. Please upload a clearer screenshot showing the welcome message and today’s date (or “Today”).";
+      } else if (!okK){
+        ocrPassed = false;
+        ocrMsg.textContent = "Not verified. We couldn’t detect the welcome text. Please capture the subject/header clearly.";
+      } else if (!okD){
+        ocrPassed = false;
+        ocrMsg.textContent = "Not verified. We couldn’t detect today’s date (or “Today”). Please make sure the date is visible.";
+      } else {
+        ocrPassed = true;
+        ocrMsg.textContent = "Verified. You can continue.";
+      }
+
+    } catch (e){
+      ocrPassed = false;
+      setProgress(0, "Error.");
+      ocrMsg.textContent =
+        "OCR failed. Common causes: blocked CDN, low memory on iPhone/iPad, or a very large image. Try a smaller/clearer screenshot.";
+    } finally {
+      btnOcr.disabled = false;
+      updateGate();
+    }
   });
 
   btnGoFeedback.addEventListener("click", () => {
-    if (!openedOnce) {
+    if (!openedOnce){
       hint.textContent = "Please click “Click to download” first.";
+      return;
+    }
+    if (!ocrPassed){
+      hint.textContent = "Please validate your screenshot first.";
       return;
     }
     feedback.classList.remove("hidden");
     feedback.scrollIntoView({ behavior: "smooth" });
+    validateFeedback();
   });
+
+  function validateFeedback(){
+    const ok =
+      document.querySelector('input[name="fb_impression"]:checked') &&
+      document.querySelector('input[name="fb_signup"]:checked') &&
+      document.querySelector('input[name="fb_likely"]:checked');
+    btnSubmit.disabled = !ok;
+    hint2.textContent = ok ? "" : "Please answer the required questions.";
+  }
+
+  document.querySelectorAll('input[name="fb_impression"], input[name="fb_signup"], input[name="fb_likely"]')
+    .forEach(r => r.addEventListener("change", validateFeedback));
 
   btnSubmit.addEventListener("click", () => {
     window.location.href = COMPLETE_URL;
   });
+
+  updateGate();
 </script>
 
 </body>

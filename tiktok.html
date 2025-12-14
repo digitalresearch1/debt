@@ -1,37 +1,320 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Offer Preview</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Survey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #f3f4f6;
-    }
-    .iframe-wrap {
-      width: 100%;
-      height: 100vh;
-      border: none;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    input[type="radio"] { width: 16px; height: 16px; }
   </style>
 </head>
-<body>
 
-  <iframe
-    src="https://smrturl.co/a/scd13071c18/86?s1=TEST_SUBID"
-    class="iframe-wrap"
-    loading="lazy"
-    referrerpolicy="no-referrer"
-    sandbox="allow-forms allow-scripts allow-popups allow-top-navigation-by-user-activation"
-  ></iframe>
+<body class="bg-white text-slate-900">
+<main class="max-w-md mx-auto px-4 py-10">
 
+  <!-- PAGE 1 -->
+  <section class="page space-y-4">
+    <p class="text-base font-semibold">Which device are you using right now?</p>
+    <div class="space-y-2 text-sm">
+      <label class="flex items-center gap-2">
+        <input type="radio" name="q_device" value="iphone">
+        <span>iPhone</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="radio" name="q_device" value="ipad">
+        <span>iPad</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="radio" name="q_device" value="other">
+        <span>Other / Not sure</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- PAGE 2 -->
+  <section class="page hidden space-y-4">
+    <p class="text-base font-semibold">Have you ever used TikTok before on this device or Apple ID?</p>
+    <div class="space-y-2 text-sm">
+      <label class="flex items-center gap-2">
+        <input type="radio" name="q_new" value="never">
+        <span>No — I have never used it before</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="radio" name="q_new" value="used">
+        <span>Yes — I have used it before</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- PAGE 3 (UPDATED COPY: run app 1 min + signup + verification notice) -->
+  <section class="page hidden space-y-4">
+    <p class="text-sm text-slate-700">
+      This study is for participants who pay close attention to instructions.
+      We automatically verify whether the required in-app activity was completed
+      before allowing the survey to continue.
+    </p>
+
+    <p class="text-base font-semibold">
+      Please install the app now, open it, use it for about 1 minute, and complete the sign-up.
+      When finished, return to this page and continue.
+    </p>
+
+    <div class="space-y-2 text-sm">
+      <label class="flex items-center gap-2">
+        <input type="radio" name="q_ready" value="yes">
+        <span>OK — I will do it now</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="radio" name="q_ready" value="no">
+        <span>No</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- PAGE 4 (ACTION) -->
+  <section class="page hidden space-y-5 border-t pt-6">
+    <p class="text-sm text-slate-700">
+      If you qualify, a download page will open in a new tab. Please complete the task there,
+      then return here to continue.
+    </p>
+
+    <div class="space-y-3">
+      <button id="btnOpen"
+        class="w-full rounded-lg px-4 py-2.5 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+        disabled>
+        Open download page
+      </button>
+
+      <button id="btnContinue"
+        class="w-full rounded-lg px-4 py-2.5 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+        disabled>
+        Continue
+      </button>
+    </div>
+
+    <p id="hint" class="text-xs text-slate-500"></p>
+  </section>
+
+</main>
+
+<!-- Small sticky reminder (not flashy) -->
+<div id="toast" class="fixed bottom-4 left-0 right-0 px-4 hidden">
+  <div class="max-w-md mx-auto rounded-lg border border-slate-200 bg-white shadow-lg p-3 flex items-start justify-between gap-3">
+    <div class="text-sm text-slate-700">
+      <div class="font-semibold text-slate-900">New tab opened</div>
+      <div>Complete the install + sign-up, use it for ~1 minute, then return and press <strong>Continue</strong>.</div>
+    </div>
+    <div class="flex gap-2">
+      <button id="btnReopen" class="text-sm font-semibold px-3 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200">Re-open</button>
+      <button id="btnCloseToast" class="text-sm font-semibold px-3 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // =========================
+  // CONFIG (EDIT THESE)
+  // =========================
+  const OFFER_BASE_URL = "https://smrturl.co/a/scd13071c18/86?s1="; // offer link (no iframe)
+  const WORKER_BASE    = "https://adblue.kayembakasongo.workers.dev"; // your worker base
+
+  // Panel endpoints
+  const COMPLETE_URL  = (rid) => `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(rid)}`;
+  const SCREENOUT_URL = (rid) => `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(rid)}`;
+
+  // Enforce minimum wait time after opening offer tab (client-side)
+  const MIN_WAIT_MS = 60 * 1000; // 60 seconds
+
+  // =========================
+  // RID
+  // =========================
+  const qp = new URLSearchParams(location.search);
+  let rid = qp.get("RID") || qp.get("transaction_id") || qp.get("s1") || sessionStorage.getItem("RID");
+  if (!rid) rid = "tx_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
+  sessionStorage.setItem("RID", rid);
+
+  const offerUrl = OFFER_BASE_URL + encodeURIComponent(rid);
+
+  // =========================
+  // PAGES (1 question per page)
+  // =========================
+  const pages = Array.from(document.querySelectorAll(".page"));
+  let current = 0;
+
+  function showPage(i) {
+    pages.forEach((p, idx) => p.classList.toggle("hidden", idx !== i));
+    current = i;
+  }
+  showPage(0);
+
+  // =========================
+  // HELPERS
+  // =========================
+  function getRadio(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : null;
+  }
+
+  function eligibleNow() {
+    const device = getRadio("q_device");
+    const isNew  = getRadio("q_new");
+    const ready  = getRadio("q_ready");
+
+    const okDevice = (device === "iphone" || device === "ipad");
+    const okNew    = (isNew === "never");
+    const okReady  = (ready === "yes"); // "OK — I will do it now"
+
+    return okDevice && okNew && okReady;
+  }
+
+  // Auto-advance on each answer
+  document.querySelectorAll('input[type="radio"]').forEach(r => {
+    r.addEventListener("change", () => {
+      const next = Math.min(current + 1, pages.length - 1);
+      showPage(next);
+      qualifyCheck();
+    });
+  });
+
+  // =========================
+  // ACTION PAGE LOGIC
+  // =========================
+  const btnOpen = document.getElementById("btnOpen");
+  const btnContinue = document.getElementById("btnContinue");
+  const hint = document.getElementById("hint");
+
+  const toast = document.getElementById("toast");
+  const btnReopen = document.getElementById("btnReopen");
+  const btnCloseToast = document.getElementById("btnCloseToast");
+
+  let openedOnce = false;
+  let openedAtMs = Number(sessionStorage.getItem("openedAtMs") || "0");
+  let waitTimer = null;
+
+  function timeLeftMs() {
+    if (!openedOnce && !openedAtMs) return MIN_WAIT_MS;
+    const start = openedAtMs || 0;
+    return Math.max(0, (start + MIN_WAIT_MS) - Date.now());
+  }
+
+  function formatSec(ms) {
+    return Math.ceil(ms / 1000);
+  }
+
+  function stopWaitTimer() {
+    if (waitTimer) {
+      clearInterval(waitTimer);
+      waitTimer = null;
+    }
+  }
+
+  function startWaitTimer() {
+    stopWaitTimer();
+
+    waitTimer = setInterval(() => {
+      const left = timeLeftMs();
+
+      if (left > 0) {
+        hint.textContent = `Please complete the task, then return. You can continue in about ${formatSec(left)}s.`;
+        btnContinue.disabled = true;
+      } else {
+        stopWaitTimer();
+        qualifyCheck(); // re-evaluate eligibility + enable Continue if allowed
+      }
+    }, 250);
+  }
+
+  function qualifyCheck() {
+    const eligible = eligibleNow();
+
+    // Enable Open only if eligible
+    btnOpen.disabled = !eligible;
+
+    // Continue logic:
+    // must be eligible + offer opened + min wait time passed
+    const canContinue = eligible && openedOnce && timeLeftMs() === 0;
+
+    btnContinue.disabled = !canContinue;
+
+    if (!eligible) {
+      hint.textContent = "";
+      return;
+    }
+
+    if (!openedOnce) {
+      hint.textContent = "Click “Open download page”. A new tab will open.";
+    } else {
+      const left = timeLeftMs();
+      if (left > 0) {
+        hint.textContent = `Please return after completing the task. You can continue in about ${formatSec(left)}s.`;
+        startWaitTimer();
+      } else {
+        hint.textContent = "After completing the install + sign-up, click “Continue”.";
+      }
+    }
+  }
+
+  // Initialize openedOnce if they came back / reloaded
+  if (openedAtMs) openedOnce = true;
+
+  // Run once on load / when arriving at action page
+  qualifyCheck();
+
+  btnOpen.addEventListener("click", () => {
+    window.open(offerUrl, "_blank", "noopener,noreferrer");
+
+    openedOnce = true;
+    openedAtMs = Date.now();
+    sessionStorage.setItem("openedAtMs", String(openedAtMs));
+
+    toast.classList.remove("hidden");
+    hint.textContent = `Complete the install + sign-up and use it for ~1 minute. You can continue in about ${formatSec(MIN_WAIT_MS)}s.`;
+
+    startWaitTimer();
+    qualifyCheck();
+  });
+
+  btnReopen.addEventListener("click", () => {
+    window.open(offerUrl, "_blank", "noopener,noreferrer");
+  });
+
+  btnCloseToast.addEventListener("click", () => toast.classList.add("hidden"));
+
+  btnContinue.addEventListener("click", async () => {
+    // Safety: if they click too early (should be disabled, but just in case)
+    const left = timeLeftMs();
+    if (left > 0) {
+      hint.textContent = `Please finish the task first. Try again in about ${formatSec(left)}s.`;
+      btnContinue.disabled = true;
+      startWaitTimer();
+      return;
+    }
+
+    btnContinue.disabled = true;
+    btnContinue.textContent = "Checking…";
+    hint.textContent = "";
+
+    try {
+      // STRICT: only complete if postback confirmed conversion
+      const r = await fetch(`${WORKER_BASE}/status?s1=${encodeURIComponent(rid)}`, { cache: "no-store" });
+      const data = await r.json();
+
+      if (data && data.converted === true) {
+        location.href = COMPLETE_URL(rid);
+        return;
+      }
+
+      // Not converted => screenout (strict)
+      location.href = SCREENOUT_URL(rid);
+    } catch (e) {
+      // Verification failed => screenout (strict)
+      location.href = SCREENOUT_URL(rid);
+    }
+  });
+</script>
 </body>
 </html>
+

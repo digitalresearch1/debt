@@ -1,80 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Survey</title>
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; }
-        iframe { 
-            width: 100%; 
-            height: 100vh; 
-            border: none; 
-            display: block; 
-        }
-        .loading {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: Arial;
-            z-index: 1000;
-        }
-    </style>
-    <script>
-        // Listen for messages from iframe
-        window.addEventListener('message', function(event) {
-            if (event.data === 'iframeReady') {
-                document.getElementById('loading').style.display = 'none';
-                console.log('Iframe reported ready');
-            }
-        });
-        
-        // Force focus to iframe for better UX
-        setTimeout(function() {
-            const iframe = document.getElementById('survey');
-            if (iframe) {
-                iframe.focus();
-                // Try to click inside to ensure interactivity
-                try {
-                    iframe.contentWindow.focus();
-                } catch(e) {}
-            }
-        }, 2000);
-    </script>
+  <meta charset="UTF-8">
+  <title>Iframe Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="loading" id="loading">
-        Loading survey... (Security bypass active)
-    </div>
-    
-    <!-- ULTIMATE IFRAME WITH MAXIMUM PERMISSIONS -->
-    <iframe 
-        id="survey"
-        src="https://iframe.kayembakasongo.workers.dev/"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-top-navigation allow-top-navigation-by-user-activation allow-pointer-lock allow-presentation allow-orientation-lock"
-        allow="payment; autoplay; camera; microphone; geolocation"
-        referrerpolicy="no-referrer"
-        scrolling="yes"
-        allowfullscreen
-        webkitallowfullscreen
-        mozallowfullscreen
-    ></iframe>
-    
-    <script>
-        // Auto-hide loading after timeout
-        setTimeout(function() {
-            document.getElementById('loading').style.display = 'none';
-        }, 10000);
-        
-        // Monitor iframe for errors
-        document.getElementById('survey').onerror = function() {
-            document.getElementById('loading').innerHTML = 
-                'Failed to load. <a href="https://trkmcl.com/wy8odpg43k/xwndpp7qne" target="_blank">Open directly</a>';
-        };
-    </script>
+
+  <!-- Replace with your offer link -->
+  <iframe src="https://webfuse.com/+button/"></iframe>
+
 </body>
 </html>
+

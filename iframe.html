@@ -1,51 +1,49 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Continue</title>
+  <meta charset="UTF-8">
+  <title>Embedded Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    body { margin:0; font-family: Arial, sans-serif; background:#f3f4f6; }
-    .wrap { max-width: 460px; margin: 0 auto; padding: 14px; }
-    .frame {
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    iframe {
       width: 100%;
-      height: 68vh;
-      border: 0;
+      height: 80vh;
+      border: none;
       border-radius: 12px;
-      background: #fff;
-      box-shadow: 0 10px 25px rgba(0,0,0,.15);
+      background: #ffffff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     }
-    .btn {
-      display:block;
-      margin-top: 14px;
-      padding: 16px 18px;
-      text-align:center;
-      border-radius: 12px;
-      background:#2563eb;
-      color:#fff;
-      text-decoration:none;
-      font-size: 18px;
-      font-weight: 700;
-    }
-    .hint { text-align:center; color:#6b7280; font-size:13px; margin-top:10px; }
   </style>
 </head>
 <body>
-  <div class="wrap">
 
-    <!-- 1) Keep Webfuse inside iframe (preview / steps) -->
-    <iframe class="frame" src="PASTE_YOUR_WEBFUSE_URL_HERE" loading="lazy"></iframe>
+  <div class="container">
 
-    <!-- 2) MarketCall-tracked click MUST be top-level from your domain -->
-    <!-- Replace MARKETCALL_TRACKING_LINK_HERE with your real MarketCall tracking URL -->
-    <a class="btn"
-       href="https://digitalresearch1.github.io/debt/go.html?to=MARKETCALL_TRACKING_LINK_HERE">
-      Start Now
-    </a>
+    <!-- 🔴 REPLACE THIS URL WITH YOUR WEBFUSE / EMBED URL -->
+    <iframe
+      src="https://trkmcl.com/wy8odpg43k/xwndpp7qne"
+      loading="lazy"
+      allow="clipboard-read; clipboard-write; autoplay"
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
 
-    <div class="hint">If the embedded view doesn’t load, tap Start Now to continue.</div>
   </div>
+
 </body>
 </html>
-
 

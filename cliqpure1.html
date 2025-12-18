@@ -15,16 +15,8 @@
         extend: {
           colors: {
             primary: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
+              50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8',
+              500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81',
             }
           }
         }
@@ -34,6 +26,9 @@
 
   <!-- Brevo base styles -->
   <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+
+  <!-- Tesseract.js (OCR) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
     body {
@@ -155,6 +150,57 @@
     /* Brevo small tweaks */
     #sib-container input::placeholder { text-align:left; font-family: Helvetica, sans-serif; color:#c0ccda; }
     #sib-container a { text-decoration: underline; color: #2BB2FC; }
+
+    /* ===== Mobile-friendly iframe ===== */
+    .iframe-shell {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      height: 78vh;
+      min-height: 620px;
+    }
+    @media (min-width: 768px) {
+      .iframe-shell { height: 780px; min-height: 780px; }
+    }
+    .iframe-shell iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+    .mobile-iframe-bar { display: none; }
+    @media (max-width: 767px) {
+      .mobile-iframe-bar {
+        display: flex;
+        position: sticky;
+        top: 10px;
+        z-index: 30;
+        gap: 10px;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(10px);
+      }
+    }
+
+    /* OCR UI */
+    .mini-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      background: #fff;
+    }
+    .progress-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+    .progress-bar > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      transition: width 0.15s ease;
+    }
+    .sr-only { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
   </style>
 </head>
 
@@ -178,7 +224,10 @@
       </div>
     </div>
     <p class="text-sm md:text-base text-indigo-100/90 max-w-3xl">
-      You’ll be asked to complete a secure debt-relief form, watch a short explainer video, then confirm your email. Please follow each step carefully. Only complete and verified participants are approved.
+ 
+You’ll be asked to complete a secure debt-relief form, watch a short explainer video, then confirm your email. Please follow each step carefully. Only complete and verified participants are approved.
+
+
     </p>
   </div>
 
@@ -196,11 +245,12 @@
           </span>
         </div>
         <p class="text-sm md:text-base text-slate-600">
-          We are collecting feedback from people who are actively looking for real options to reduce or restructure their unsecured debt. This step connects you with a real debt specialist for balances of <span class="font-semibold">$15,000+</span> in unsecured debt.
+          We are collecting feedback from people who are actively looking for real options to reduce or restructure their unsecured debt. This step connects you with a real debt specialist for balances of 
+
+ <span class="font-semibold">$15,000+</span> in unsecured debt.
         </p>
       </div>
     </div>
-
     <div class="eligibility-box p-4 md:p-5 mb-5">
       <h3 class="font-semibold text-slate-900 mb-2 text-sm md:text-base">Who should continue?</h3>
       <ul class="space-y-1.5 text-xs md:text-sm text-slate-700">
@@ -219,14 +269,15 @@
       <ol class="space-y-2 text-xs md:text-sm text-slate-700">
         <li class="flex gap-2"><span class="font-semibold text-primary-700">1.</span><span><strong>Wait for the form to load</strong> in the frame below.</span></li>
         <li class="flex gap-2"><span class="font-semibold text-primary-700">2.</span><span>When it appears, <strong>click “Start Now” inside the form</strong> to begin.</span></li>
-        <li class="flex gap-2"><span class="font-semibold text-primary-700">3.</span><span>After submitting, click <strong>“I submitted the form”</strong> to verify and unlock Step 2.</span></li>
+        <li class="flex gap-2"><span class="font-semibold text-primary-700">3.</span><span>Submit the form, then <strong>take a screenshot of the confirmation / thank you page</strong>.</span></li>
+        <li class="flex gap-2"><span class="font-semibold text-primary-700">4.</span><span>Upload the screenshot below to verify and unlock Step 2.</span></li>
       </ol>
 
       <div class="mt-3 warning-box p-3.5 md:p-4">
         <div class="flex items-start gap-2.5">
           <span class="mt-0.5 text-amber-600">⚠️</span>
           <p class="text-xs md:text-sm text-slate-800">
-            We verify whether the secure form was submitted. If it is not found as submitted, participation cannot be approved.
+            Verification is done by scanning your screenshot for confirmation keywords (OCR). If the keywords are not detected, the next step stays locked.
           </p>
         </div>
       </div>
@@ -242,30 +293,102 @@
       </div>
     </div>
 
+    <!-- Mobile helper bar (phones only) -->
+    <div class="mobile-iframe-bar">
+      <button id="btnScrollToIframe"
+              class="primary-btn px-4 py-2 rounded-xl text-sm font-semibold">
+        ⬇️ Go to form
+      </button>
+      <a href="https://digitalresearch1.github.io/debt/iframe.html"
+         class="px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 bg-slate-50 text-slate-800"
+         target="_blank" rel="noopener">
+        📱 Open full screen
+      </a>
+    </div>
+
     <!-- IFRAME -->
     <div class="mt-2">
       <div class="flex items-center justify-between mb-2">
         <p class="text-xs md:text-sm font-medium text-slate-800">Secure financial form</p>
-        <p id="formStatus" class="text-[11px] md:text-xs text-slate-500">
-          Loading… please wait.
-        </p>
+        <p id="formStatus" class="text-[11px] md:text-xs text-slate-500">Loading… please wait.</p>
       </div>
 
-      <div class="w-full h-[650px] md:h-[780px] rounded-2xl overflow-hidden border border-slate-200 bg-white">
+      <div class="iframe-shell" id="iframeShell">
         <iframe
           id="webfuseFrame"
           src="https://digitalresearch1.github.io/debt/iframe.html"
-          class="w-full border-0"
           loading="lazy"
-          style="height:100%;"
           referrerpolicy="no-referrer-when-downgrade"
           allow="clipboard-read; clipboard-write; autoplay"
         ></iframe>
       </div>
 
       <p class="mt-2 text-[11px] md:text-xs text-slate-500">
-        After you submit the form, return here and click “I submitted the form” to verify.
+        After submitting, take a screenshot of the confirmation page and upload it below.
       </p>
+    </div>
+
+    <!-- OCR VERIFICATION -->
+    <div class="mini-card mt-5 p-4 md:p-5">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h3 class="font-semibold text-slate-900">Verify submission (screenshot)</h3>
+          <p class="text-xs md:text-sm text-slate-600 mt-1">
+            Upload a screenshot of the <strong>confirmation / thank you</strong> page after you submit.
+          </p>
+        </div>
+        <div class="text-[11px] md:text-xs text-slate-500">
+          ID: <span id="txLabel" class="font-mono"></span>
+        </div>
+      </div>
+
+      <!-- Keyword list (editable) -->
+      <div class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
+        <p class="text-xs md:text-sm text-slate-700 font-medium mb-1">Keywords we detect:</p>
+        <p class="text-xs md:text-sm text-slate-600">
+          <span class="font-semibold" id="kwPreview"></span>
+        </p>
+        <p class="text-[11px] md:text-xs text-slate-500 mt-1">
+          Tip: make sure the screenshot includes the page title and the “thank you / submitted / confirmation” text.
+        </p>
+      </div>
+
+      <div class="mt-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <div class="flex-1">
+          <label class="block text-xs md:text-sm font-semibold text-slate-800 mb-1" for="proofFile">
+            Upload screenshot (PNG/JPG)
+          </label>
+          <input id="proofFile" type="file" accept="image/*"
+                 class="block w-full text-sm text-slate-700
+                        file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0
+                        file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700
+                        hover:file:bg-primary-100"
+          />
+          <p class="text-[11px] md:text-xs text-slate-500 mt-1">
+            No preview is shown. OCR runs in your browser.
+          </p>
+        </div>
+
+        <div class="md:w-[240px] flex gap-2">
+          <button id="btnRunOCR"
+                  class="primary-btn w-full px-4 py-2.5 rounded-xl text-sm md:text-base font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                  disabled>
+            Verify screenshot
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="progress-bar" aria-hidden="true">
+          <div id="ocrProgressFill"></div>
+        </div>
+        <p id="ocrStatus" class="mt-2 text-xs md:text-sm text-slate-600">
+          Upload a screenshot to begin verification.
+        </p>
+
+        <!-- Hidden debug text (optional). Keep hidden. -->
+        <textarea id="ocrText" class="sr-only" aria-hidden="true"></textarea>
+      </div>
     </div>
 
     <!-- ACTION BUTTONS -->
@@ -273,8 +396,8 @@
       <button id="btnFormDone"
               class="px-6 py-3 bg-slate-100 text-slate-400 text-sm md:text-base font-semibold rounded-xl cursor-not-allowed"
               disabled>
-        <span class="mr-2">⏳</span>
-        I submitted the form
+        <span class="mr-2">🔒</span>
+        Verified (required)
       </button>
 
       <button id="btnFormQuit"
@@ -305,7 +428,7 @@
           </span>
         </div>
         <p class="text-xs md:text-sm text-slate-600">
-          This quick video explains how the program works for people with higher unsecured debt balances.
+          Watch the video, then click the button to continue.
         </p>
       </div>
     </div>
@@ -345,7 +468,7 @@
           </span>
         </div>
         <p class="text-xs md:text-sm text-slate-600">
-          Provide your email to receive follow-up reminders, then click “Verify & finish study”.
+          Submit your email, then click “Verify & finish study”.
         </p>
       </div>
     </div>
@@ -461,9 +584,10 @@
       Verify & finish study
     </button>
     <p class="mt-2 text-[11px] md:text-xs text-slate-500">
-      If verification fails, you will be redirected to a disqualification page instead of completion.
+      If OCR verification fails, you will be redirected to a disqualification page instead of completion.
     </p>
   </div>
+
 </div>
 
 <script>
@@ -485,8 +609,23 @@
   const completionUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
   const terminationUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
 
-  // Cloudflare verify
-  const verifyFormUrl = `https://marketcall.kayembakasongo.workers.dev/verify-form?transaction_id=${encodeURIComponent(transactionId)}`;
+  // ===== OCR keyword rules (EDIT THESE) =====
+  // Keep them simple words/phrases that appear on the confirmation page.
+  const REQUIRED_KEYWORDS = [
+    "thank you",
+    "thanks",
+    "submitted",
+    "submission",
+    "confirmation",
+    "completed",
+    "success",
+    "we received",
+    "your request",
+    "you are all set"
+  ];
+
+  // For stricter verification, you can require at least 2 hits:
+  const REQUIRED_HITS = 1; // set to 2 if you want stricter checks
 
   // DOM
   const step2Card = document.getElementById('step2Card');
@@ -509,18 +648,31 @@
   const brevoSubmitBtn = document.getElementById('brevoSubmitBtn');
   const btnFinalVerify = document.getElementById('btnFinalVerify');
 
-  // Enable "I submitted" after iframe loads + update notice
+  const txLabel = document.getElementById('txLabel');
+  const kwPreview = document.getElementById('kwPreview');
+  const proofFile = document.getElementById('proofFile');
+  const btnRunOCR = document.getElementById('btnRunOCR');
+  const ocrStatus = document.getElementById('ocrStatus');
+  const ocrProgressFill = document.getElementById('ocrProgressFill');
+  const ocrText = document.getElementById('ocrText');
+
+  // Mobile: scroll to iframe quickly
+  const btnScrollToIframe = document.getElementById('btnScrollToIframe');
+  const iframeShell = document.getElementById('iframeShell');
+  if (btnScrollToIframe && iframeShell) {
+    btnScrollToIframe.addEventListener('click', () => smoothScrollTo(iframeShell));
+  }
+
+  // Show TX + keywords
+  if (txLabel) txLabel.textContent = transactionId;
+  if (kwPreview) kwPreview.textContent = REQUIRED_KEYWORDS.map(k => `"${k}"`).join(", ");
+
+  // Iframe load status
   const webfuseFrame = document.getElementById('webfuseFrame');
   if (webfuseFrame) {
     webfuseFrame.addEventListener('load', () => {
-      if (btnFormDone) {
-        btnFormDone.disabled = false;
-        btnFormDone.classList.remove('cursor-not-allowed', 'bg-slate-100', 'text-slate-400');
-        btnFormDone.classList.add('primary-btn', 'text-white');
-        btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
-      }
       if (formStatus) {
-        formStatus.textContent = 'Form loaded. Click “Start Now” inside the form, then submit it. After submitting, click “I submitted the form”.';
+        formStatus.textContent = 'Form loaded. Click “Start Now” inside the form, then submit it. After submitting, upload your confirmation screenshot below.';
         formStatus.classList.remove('text-slate-500');
         formStatus.classList.add('text-emerald-700');
       }
@@ -547,120 +699,248 @@
     });
   }
 
-  // Verify step 1
-  if (btnFormDone) {
-    btnFormDone.addEventListener('click', async function () {
-      if (btnFormDone.disabled) return;
+  // Enable OCR button when file chosen
+  if (proofFile && btnRunOCR) {
+    proofFile.addEventListener('change', () => {
+      const hasFile = proofFile.files && proofFile.files[0];
+      btnRunOCR.disabled = !hasFile;
+      if (ocrStatus) ocrStatus.textContent = hasFile ? "Ready to verify. Click “Verify screenshot”." : "Upload a screenshot to begin verification.";
+      if (ocrProgressFill) ocrProgressFill.style.width = "0%";
+    });
+  }
 
-      btnFormDone.disabled = true;
-      btnFormDone.innerHTML = '<span class="mr-2">⏳</span>Verifying your submission...';
+  function normalizeText(s) {
+    return (s || "")
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .replace(/[^\p{L}\p{N}\s]/gu, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function countKeywordHits(textNorm, keywords) {
+    let hits = 0;
+    const found = [];
+    for (const k of keywords) {
+      const kk = normalizeText(k);
+      if (!kk) continue;
+      if (textNorm.includes(kk)) {
+        hits += 1;
+        found.push(k);
+      }
+    }
+    return { hits, found };
+  }
+
+  async function preprocessImageToCanvas(file) {
+    // Preprocess to improve OCR on mobile screenshots
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = url;
+    });
+
+    // Scale up a bit for better OCR, but keep reasonable size
+    const maxW = 1400;
+    const scale = Math.min(1.8, maxW / img.width);
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+    // Draw
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(url);
+
+    // Convert to grayscale + increase contrast (simple)
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const d = imgData.data;
+
+    // Contrast boost
+    const contrast = 1.25; // tweak: 1.1 - 1.4
+    const intercept = 128 * (1 - contrast);
+
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      let y = 0.299 * r + 0.587 * g + 0.114 * b; // grayscale
+      y = y * contrast + intercept;               // contrast
+      y = Math.max(0, Math.min(255, y));
+      d[i] = d[i + 1] = d[i + 2] = y;
+      // alpha kept
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+    return canvas;
+  }
+
+  function setOCRProgress(pct) {
+    const p = Math.max(0, Math.min(100, Math.round(pct)));
+    if (ocrProgressFill) ocrProgressFill.style.width = p + "%";
+  }
+
+  function lockUntilVerified() {
+    // keep Step 2 locked
+    if (step2Card) { step2Card.style.opacity = "0.6"; step2Card.classList.remove("active"); }
+    if (videoContainer) videoContainer.classList.add("hidden");
+    if (btnVideoDone) {
+      btnVideoDone.disabled = true;
+      btnVideoDone.classList.add("cursor-not-allowed");
+      btnVideoDone.classList.remove("primary-btn", "text-white");
+      btnVideoDone.classList.add("bg-slate-300", "text-slate-500");
+    }
+  }
+
+  function unlockAfterVerified() {
+    // Step 1 "Verified" indicator
+    if (btnFormDone) {
+      btnFormDone.disabled = false;
+      btnFormDone.classList.remove("bg-slate-100", "text-slate-400", "cursor-not-allowed");
+      btnFormDone.classList.add("bg-emerald-100", "text-emerald-800");
+      btnFormDone.innerHTML = '<span class="mr-2">✅</span>Verified (submission confirmed)';
+    }
+
+    // Unlock Step 2
+    if (step2Card) { step2Card.style.opacity = "1"; step2Card.classList.add("active"); }
+    if (videoContainer) videoContainer.classList.remove("hidden");
+    if (btnVideoDone) {
+      btnVideoDone.disabled = false;
+      btnVideoDone.classList.remove("cursor-not-allowed", "bg-slate-300", "text-slate-500");
+      btnVideoDone.classList.add("primary-btn", "text-white");
+    }
+    setTimeout(() => smoothScrollTo(step2Card), 350);
+  }
+
+  lockUntilVerified();
+
+  // OCR action
+  if (btnRunOCR) {
+    btnRunOCR.addEventListener("click", async () => {
+      if (!proofFile || !proofFile.files || !proofFile.files[0]) return;
+
+      const file = proofFile.files[0];
+
+      btnRunOCR.disabled = true;
+      setOCRProgress(2);
+      if (ocrStatus) ocrStatus.textContent = "Preparing image for verification…";
 
       try {
-        const resp = await fetch(verifyFormUrl, { method: 'GET', headers: { 'Accept': 'application/json' }});
-        const data = await resp.json();
+        const canvas = await preprocessImageToCanvas(file);
+        setOCRProgress(10);
+        if (ocrStatus) ocrStatus.textContent = "Scanning screenshot (OCR)… please wait.";
 
-        if (data && data.submitted) {
-          btnFormDone.classList.remove('primary-btn');
-          btnFormDone.classList.add('bg-emerald-100', 'text-emerald-800');
-          btnFormDone.innerHTML = '<span class="mr-2">✅</span>Form verified';
-
-          // Unlock Step 2
-          if (step2Card) { step2Card.style.opacity = '1'; step2Card.classList.add('active'); }
-          if (videoContainer) videoContainer.classList.remove('hidden');
-          if (btnVideoDone) {
-            btnVideoDone.disabled = false;
-            btnVideoDone.classList.remove('cursor-not-allowed', 'bg-slate-300', 'text-slate-500');
-            btnVideoDone.classList.add('primary-btn', 'text-white');
+        const result = await Tesseract.recognize(
+          canvas,
+          "eng",
+          {
+            logger: (m) => {
+              if (m && m.status === "recognizing text" && typeof m.progress === "number") {
+                setOCRProgress(10 + m.progress * 85); // 10% -> 95%
+              }
+            }
           }
-          setTimeout(() => smoothScrollTo(step2Card), 400);
+        );
 
+        const rawText = (result && result.data && result.data.text) ? result.data.text : "";
+        const textNorm = normalizeText(rawText);
+        if (ocrText) ocrText.value = textNorm;
+
+        const { hits, found } = countKeywordHits(textNorm, REQUIRED_KEYWORDS);
+
+        setOCRProgress(100);
+
+        if (hits >= REQUIRED_HITS) {
+          if (ocrStatus) {
+            ocrStatus.classList.remove("text-slate-600");
+            ocrStatus.classList.add("text-emerald-700");
+            ocrStatus.textContent = `Verification passed. Detected: ${found.slice(0, 4).join(", ")}${found.length > 4 ? "…" : ""}`;
+          }
+          unlockAfterVerified();
         } else {
-          btnFormDone.disabled = false;
-          btnFormDone.classList.remove('primary-btn');
-          btnFormDone.classList.add('bg-red-100', 'text-red-800');
-          btnFormDone.innerHTML = '<span class="mr-2">❌</span>Form not found';
-          alert('We could not verify your form submission. Please ensure you clicked “Start Now” inside the form and submitted it, then try again.');
-
-          setTimeout(() => {
-            btnFormDone.classList.remove('bg-red-100', 'text-red-800');
-            btnFormDone.classList.add('primary-btn', 'text-white');
-            btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
-          }, 3500);
+          if (ocrStatus) {
+            ocrStatus.classList.remove("text-slate-600");
+            ocrStatus.classList.add("text-red-700");
+            ocrStatus.textContent = "Verification failed. Could not detect confirmation keywords. Please upload a clearer screenshot of the thank-you/confirmation page.";
+          }
+          // keep locked
+          lockUntilVerified();
+          btnRunOCR.disabled = false;
         }
       } catch (err) {
-        btnFormDone.disabled = false;
-        btnFormDone.classList.remove('primary-btn');
-        btnFormDone.classList.add('bg-amber-100', 'text-amber-800');
-        btnFormDone.innerHTML = '<span class="mr-2">⚠️</span>Network error';
-
-        setTimeout(() => {
-          btnFormDone.classList.remove('bg-amber-100', 'text-amber-800');
-          btnFormDone.classList.add('primary-btn', 'text-white');
-          btnFormDone.innerHTML = '<span class="mr-2">📋</span>I submitted the form';
-        }, 3500);
+        setOCRProgress(0);
+        if (ocrStatus) {
+          ocrStatus.classList.remove("text-slate-600");
+          ocrStatus.classList.add("text-amber-700");
+          ocrStatus.textContent = "OCR error. Please try again with a clearer screenshot (zoom in so the confirmation text is readable).";
+        }
+        btnRunOCR.disabled = false;
       }
     });
   }
 
   // After video unlock step 3
   if (btnVideoDone) {
-    btnVideoDone.addEventListener('click', function () {
+    btnVideoDone.addEventListener("click", () => {
       if (btnVideoDone.disabled) return;
-      if (step3Card) { step3Card.style.opacity = '1'; step3Card.classList.add('active'); }
-      if (brevoBlock) brevoBlock.classList.remove('hidden');
+      if (step3Card) { step3Card.style.opacity = "1"; step3Card.classList.add("active"); }
+      if (brevoBlock) brevoBlock.classList.remove("hidden");
       smoothScrollTo(step3Card);
     });
   }
 
   // Brevo submit validate then enable final
   if (sibForm) {
-    sibForm.addEventListener('submit', function (e) {
+    sibForm.addEventListener("submit", (e) => {
       let hasError = false;
-      if (emailErr) emailErr.style.display = 'none';
-      if (optinErr) optinErr.style.display = 'none';
+      if (emailErr) emailErr.style.display = "none";
+      if (optinErr) optinErr.style.display = "none";
 
-      const emailVal = (emailInput && emailInput.value ? emailInput.value : '').trim();
+      const emailVal = (emailInput && emailInput.value ? emailInput.value : "").trim();
       if (!emailVal) {
         hasError = true;
-        if (emailErr) { emailErr.textContent = 'Please enter your email address.'; emailErr.style.display = 'block'; }
+        if (emailErr) { emailErr.textContent = "Please enter your email address."; emailErr.style.display = "block"; }
       } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)) {
         hasError = true;
-        if (emailErr) { emailErr.textContent = 'Please enter a valid email address.'; emailErr.style.display = 'block'; }
+        if (emailErr) { emailErr.textContent = "Please enter a valid email address."; emailErr.style.display = "block"; }
       }
+
       if (!optIn || !optIn.checked) {
         hasError = true;
-        if (optinErr) { optinErr.textContent = 'Please agree to the privacy statement to continue.'; optinErr.style.display = 'block'; }
+        if (optinErr) { optinErr.textContent = "Please agree to the privacy statement to continue."; optinErr.style.display = "block"; }
       }
 
       if (hasError) { e.preventDefault(); return; }
 
-      if (brevoSubmitBtn) { brevoSubmitBtn.disabled = true; brevoSubmitBtn.textContent = 'Submitting...'; }
+      if (brevoSubmitBtn) {
+        brevoSubmitBtn.disabled = true;
+        brevoSubmitBtn.textContent = "Submitting...";
+      }
 
-      setTimeout(function () {
+      setTimeout(() => {
         if (btnFinalVerify) {
           btnFinalVerify.disabled = false;
-          btnFinalVerify.classList.remove('cursor-not-allowed', 'bg-slate-300', 'text-slate-500');
-          btnFinalVerify.classList.add('primary-btn', 'text-white');
+          btnFinalVerify.classList.remove("cursor-not-allowed", "bg-slate-300", "text-slate-500");
+          btnFinalVerify.classList.add("primary-btn", "text-white");
         }
-      }, 3500);
+      }, 2500);
     });
   }
 
-  // Final verify -> complete or terminate
+  // Final verify -> completion or termination
   if (btnFinalVerify) {
-    btnFinalVerify.addEventListener('click', async function () {
+    btnFinalVerify.addEventListener("click", () => {
       if (btnFinalVerify.disabled) return;
 
       btnFinalVerify.disabled = true;
-      btnFinalVerify.innerHTML = '⏳ Verifying & finishing...';
+      btnFinalVerify.innerHTML = "⏳ Finishing…";
 
-      try {
-        const resp = await fetch(verifyFormUrl, { method: 'GET', headers: { 'Accept': 'application/json' }});
-        const data = await resp.json();
-        window.location.href = (data && data.submitted) ? completionUrl : terminationUrl;
-      } catch (err) {
-        window.location.href = terminationUrl;
-      }
+      // If Step 1 is not verified, terminate
+      const verified = btnFormDone && btnFormDone.innerText.toLowerCase().includes("verified");
+      window.location.href = verified ? completionUrl : terminationUrl;
     });
   }
 </script>

@@ -85,6 +85,31 @@
       box-shadow: 0 16px 35px rgba(79, 70, 229, 0.45);
     }
 
+    /* ✅ MORE VISIBLE DISQUALIFY BUTTONS */
+    .danger-btn {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #fff;
+      border: 1px solid rgba(220,38,38,0.35);
+      box-shadow: 0 14px 30px rgba(220,38,38,0.25);
+      transition: all 0.2s ease;
+    }
+    .danger-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(220,38,38,0.35);
+      filter: brightness(1.02);
+    }
+    .danger-outline {
+      background: #fff;
+      color: #b91c1c;
+      border: 2px solid #ef4444;
+      transition: all 0.2s ease;
+    }
+    .danger-outline:hover {
+      background: #fef2f2;
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(220,38,38,0.18);
+    }
+
     .warning-box {
       background: #fff7ed;
       border: 1px solid #fed7aa;
@@ -224,10 +249,8 @@
       </div>
     </div>
     <p class="text-sm md:text-base text-indigo-100/90 max-w-3xl">
- 
-You’ll be asked to complete a secure debt-relief form, watch a short explainer video, then confirm your email. Please follow each step carefully. Only complete and verified participants are approved.
-
-
+      You’ll be asked to complete a secure debt-relief form, watch a short explainer video, then confirm your email.
+      Please follow each step carefully. Only complete and verified participants are approved.
     </p>
   </div>
 
@@ -245,12 +268,12 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
           </span>
         </div>
         <p class="text-sm md:text-base text-slate-600">
-          We are collecting feedback from people who are actively looking for real options to reduce or restructure their unsecured debt. This step connects you with a real debt specialist for balances of 
-
- <span class="font-semibold">$15,000+</span> in unsecured debt.
+          We are collecting feedback from people who are actively looking for real options to reduce or restructure their unsecured debt.
+          This step connects you with a real debt specialist for balances of <span class="font-semibold">$15,000+</span> in unsecured debt.
         </p>
       </div>
     </div>
+
     <div class="eligibility-box p-4 md:p-5 mb-5">
       <h3 class="font-semibold text-slate-900 mb-2 text-sm md:text-base">Who should continue?</h3>
       <ul class="space-y-1.5 text-xs md:text-sm text-slate-700">
@@ -282,12 +305,14 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
         </div>
       </div>
     </div>
+
+    <!-- ✅ NOW VISIBLE + WORKING DISQUALIFY BUTTON -->
     <button id="btnStep4Exit"
-            class="action-btn bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium text-xs px-4 py-2 rounded-full">
-     Click here if you don't want to continue
+      class="danger-btn w-full md:w-auto px-6 py-3 rounded-xl font-semibold text-sm md:text-base flex items-center justify-center gap-2">
+      <span>⛔</span>
+      Click here if you don't want to continue
     </button>
-  </section>
-    
+
     <!-- Open offer -->
     <div class="card bg-white rounded-2xl p-6 border border-slate-200 mt-5">
       <h2 class="text-lg font-semibold text-slate-900">Open the third-party form</h2>
@@ -307,135 +332,135 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
           ⚠️ Follow the instructions carefully.
         </p>
       </div>
-    
-    <!-- NOTICE ABOVE IFRAME -->
-    <div id="iframeNotice"
-         class="mb-3 flex items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-amber-900">
-      <span class="text-xl">⏳</span>
-      <div class="text-sm md:text-base">
-        <strong>Please wait for the form to fully load.</strong><br>
-        When it appears, <strong>click “Start Now” inside the form</strong> to begin.
-      </div>
-    </div>
 
-    <!-- Mobile helper bar (phones only) -->
-    <div class="mobile-iframe-bar">
-      <button id="btnScrollToIframe"
-              class="primary-btn px-4 py-2 rounded-xl text-sm font-semibold">
-        ⬇️ Go to form
-      </button>
-      <a href="https://digitalresearch1.github.io/debt/iframe.html"
-         class="px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 bg-slate-50 text-slate-800"
-         target="_blank" rel="noopener">
-        📱 Open full screen
-      </a>
-    </div>
-
-    <!-- IFRAME -->
-    <div class="mt-2">
-      <div class="flex items-center justify-between mb-2">
-        <p class="text-xs md:text-sm font-medium text-slate-800">Secure financial form</p>
-        <p id="formStatus" class="text-[11px] md:text-xs text-slate-500">Loading… please wait.</p>
+      <!-- NOTICE ABOVE IFRAME -->
+      <div id="iframeNotice"
+           class="mb-3 flex items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-amber-900">
+        <span class="text-xl">⏳</span>
+        <div class="text-sm md:text-base">
+          <strong>Please wait for the form to fully load.</strong><br>
+          When it appears, <strong>click “Start Now” inside the form</strong> to begin.
+        </div>
       </div>
 
-      <div class="iframe-shell" id="iframeShell">
-        <iframe
-          id="webfuseFrame"
-          src="https://digitalresearch1.github.io/debt/iframe.html"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          allow="clipboard-read; clipboard-write; autoplay"
-        ></iframe>
+      <!-- Mobile helper bar (phones only) -->
+      <div class="mobile-iframe-bar">
+        <button id="btnScrollToIframe"
+                class="primary-btn px-4 py-2 rounded-xl text-sm font-semibold">
+          ⬇️ Go to form
+        </button>
+        <a href="https://digitalresearch1.github.io/debt/iframe.html"
+           class="px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 bg-slate-50 text-slate-800"
+           target="_blank" rel="noopener">
+          📱 Open full screen
+        </a>
       </div>
 
-      <p class="mt-2 text-[11px] md:text-xs text-slate-500">
-        After submitting, take a screenshot of the confirmation page and upload it below.
-      </p>
-    </div>
+      <!-- IFRAME -->
+      <div class="mt-2">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-xs md:text-sm font-medium text-slate-800">Secure financial form</p>
+          <p id="formStatus" class="text-[11px] md:text-xs text-slate-500">Loading… please wait.</p>
+        </div>
 
-    <!-- OCR VERIFICATION -->
-    <div class="mini-card mt-5 p-4 md:p-5">
-      <div class="flex items-start justify-between gap-3">
-        <div>
-          <h3 class="font-semibold text-slate-900">Verify submission (screenshot)</h3>
-          <p class="text-xs md:text-sm text-slate-600 mt-1">
-            Upload a screenshot of the <strong>confirmation / thank you</strong> page after you submit.
+        <div class="iframe-shell" id="iframeShell">
+          <iframe
+            id="webfuseFrame"
+            src="https://digitalresearch1.github.io/debt/iframe.html"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allow="clipboard-read; clipboard-write; autoplay"
+          ></iframe>
+        </div>
+
+        <p class="mt-2 text-[11px] md:text-xs text-slate-500">
+          After submitting, take a screenshot of the confirmation page and upload it below.
+        </p>
+      </div>
+
+      <!-- OCR VERIFICATION -->
+      <div class="mini-card mt-5 p-4 md:p-5">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="font-semibold text-slate-900">Verify submission (screenshot)</h3>
+            <p class="text-xs md:text-sm text-slate-600 mt-1">
+              Upload a screenshot of the <strong>confirmation / thank you</strong> page after you submit.
+            </p>
+          </div>
+          <div class="text-[11px] md:text-xs text-slate-500">
+            ID: <span id="txLabel" class="font-mono"></span>
+          </div>
+        </div>
+
+        <div class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
+          <p class="text-xs md:text-sm text-slate-700 font-medium mb-1">Keywords we detect:</p>
+          <p class="text-xs md:text-sm text-slate-600">
+            <span class="font-semibold" id="kwPreview"></span>
           </p>
-        </div>
-        <div class="text-[11px] md:text-xs text-slate-500">
-          ID: <span id="txLabel" class="font-mono"></span>
-        </div>
-      </div>
-
-      <!-- Keyword list (editable) -->
-      <div class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
-        <p class="text-xs md:text-sm text-slate-700 font-medium mb-1">Keywords we detect:</p>
-        <p class="text-xs md:text-sm text-slate-600">
-          <span class="font-semibold" id="kwPreview"></span>
-        </p>
-        <p class="text-[11px] md:text-xs text-slate-500 mt-1">
-          Tip: make sure the screenshot includes the page title and the “thank you / submitted / confirmation” text.
-        </p>
-      </div>
-
-      <div class="mt-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-        <div class="flex-1">
-          <label class="block text-xs md:text-sm font-semibold text-slate-800 mb-1" for="proofFile">
-            Upload screenshot (PNG/JPG)
-          </label>
-          <input id="proofFile" type="file" accept="image/*"
-                 class="block w-full text-sm text-slate-700
-                        file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0
-                        file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700
-                        hover:file:bg-primary-100"
-          />
           <p class="text-[11px] md:text-xs text-slate-500 mt-1">
-            No preview is shown. OCR runs in your browser.
+            Tip: make sure the screenshot includes the page title and the “thank you / submitted / confirmation” text.
           </p>
         </div>
 
-        <div class="md:w-[240px] flex gap-2">
-          <button id="btnRunOCR"
-                  class="primary-btn w-full px-4 py-2.5 rounded-xl text-sm md:text-base font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
-                  disabled>
-            Verify screenshot
-          </button>
+        <div class="mt-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+          <div class="flex-1">
+            <label class="block text-xs md:text-sm font-semibold text-slate-800 mb-1" for="proofFile">
+              Upload screenshot (PNG/JPG)
+            </label>
+            <input id="proofFile" type="file" accept="image/*"
+                   class="block w-full text-sm text-slate-700
+                          file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0
+                          file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700
+                          hover:file:bg-primary-100"
+            />
+            <p class="text-[11px] md:text-xs text-slate-500 mt-1">
+              No preview is shown. OCR runs in your browser.
+            </p>
+          </div>
+
+          <div class="md:w-[240px] flex gap-2">
+            <button id="btnRunOCR"
+                    class="primary-btn w-full px-4 py-2.5 rounded-xl text-sm md:text-base font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                    disabled>
+              Verify screenshot
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="progress-bar" aria-hidden="true">
+            <div id="ocrProgressFill"></div>
+          </div>
+          <p id="ocrStatus" class="mt-2 text-xs md:text-sm text-slate-600">
+            Upload a screenshot to begin verification.
+          </p>
+          <textarea id="ocrText" class="sr-only" aria-hidden="true"></textarea>
         </div>
       </div>
 
-      <div class="mt-4">
-        <div class="progress-bar" aria-hidden="true">
-          <div id="ocrProgressFill"></div>
-        </div>
-        <p id="ocrStatus" class="mt-2 text-xs md:text-sm text-slate-600">
-          Upload a screenshot to begin verification.
-        </p>
+      <!-- ACTION BUTTONS -->
+      <div class="flex flex-wrap gap-3 mt-5">
+        <button id="btnFormDone"
+                class="px-6 py-3 bg-slate-100 text-slate-400 text-sm md:text-base font-semibold rounded-xl cursor-not-allowed"
+                disabled>
+          <span class="mr-2">🔒</span>
+          Verified (required)
+        </button>
 
-        <!-- Hidden debug text (optional). Keep hidden. -->
-        <textarea id="ocrText" class="sr-only" aria-hidden="true"></textarea>
+        <!-- ✅ MORE VISIBLE DISQUALIFY BUTTON -->
+        <button id="btnFormQuit"
+                class="danger-outline px-6 py-3 rounded-xl font-semibold text-sm md:text-base flex items-center gap-2">
+          <span>🚫</span>
+          I don't meet the requirements
+        </button>
       </div>
-    </div>
 
-    <!-- ACTION BUTTONS -->
-    <div class="flex flex-wrap gap-3 mt-5">
-      <button id="btnFormDone"
-              class="px-6 py-3 bg-slate-100 text-slate-400 text-sm md:text-base font-semibold rounded-xl cursor-not-allowed"
-              disabled>
-        <span class="mr-2">🔒</span>
-        Verified (required)
-      </button>
-
-      <button id="btnFormQuit"
-              class="px-5 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm md:text-base font-medium rounded-xl border border-slate-200 transition">
-        I don't meet the requirements
-      </button>
-    </div>
-
-    <div class="flex flex-wrap gap-2 mt-5">
-      <span class="feature-badge"><span>📞</span> Live specialist call</span>
-      <span class="feature-badge"><span>💰</span> $15,000+ unsecured debt</span>
-      <span class="reminder-badge"><span>📧</span> 3-day follow-up</span>
-      <span class="feature-badge"><span>⏱️</span> 24–48h response</span>
+      <div class="flex flex-wrap gap-2 mt-5">
+        <span class="feature-badge"><span>📞</span> Live specialist call</span>
+        <span class="feature-badge"><span>💰</span> $15,000+ unsecured debt</span>
+        <span class="reminder-badge"><span>📧</span> 3-day follow-up</span>
+        <span class="feature-badge"><span>⏱️</span> 24–48h response</span>
+      </div>
     </div>
   </div>
 
@@ -635,7 +660,6 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
   const terminationUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
 
   // ===== OCR keyword rules (EDIT THESE) =====
-  // Keep them simple words/phrases that appear on the confirmation page.
   const REQUIRED_KEYWORDS = [
     "thank you",
     "thanks",
@@ -648,9 +672,7 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
     "your request",
     "you are all set"
   ];
-
-  // For stricter verification, you can require at least 2 hits:
-  const REQUIRED_HITS = 1; // set to 2 if you want stricter checks
+  const REQUIRED_HITS = 1;
 
   // DOM
   const step2Card = document.getElementById('step2Card');
@@ -658,6 +680,7 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
 
   const btnFormDone = document.getElementById('btnFormDone');
   const btnFormQuit = document.getElementById('btnFormQuit');
+  const btnStep4Exit = document.getElementById('btnStep4Exit'); // ✅ ADDED
   const formStatus = document.getElementById('formStatus');
   const iframeNotice = document.getElementById('iframeNotice');
 
@@ -692,6 +715,15 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
   if (txLabel) txLabel.textContent = transactionId;
   if (kwPreview) kwPreview.textContent = REQUIRED_KEYWORDS.map(k => `"${k}"`).join(", ");
 
+  // ✅ NEW: Exit / Disqualify button handler
+  if (btnStep4Exit) {
+    btnStep4Exit.addEventListener('click', () => {
+      if (confirm("You are about to exit. You will be redirected to disqualification. Continue?")) {
+        window.location.href = terminationUrl;
+      }
+    });
+  }
+
   // Iframe load status
   const webfuseFrame = document.getElementById('webfuseFrame');
   if (webfuseFrame) {
@@ -715,7 +747,7 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
     }, { once: true });
   }
 
-  // Quit / terminate
+  // Quit / terminate (existing button)
   if (btnFormQuit) {
     btnFormQuit.addEventListener('click', function () {
       if (confirm("If you don't meet the requirements or cannot complete the form, you may exit the study. Continue?")) {
@@ -758,7 +790,6 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
   }
 
   async function preprocessImageToCanvas(file) {
-    // Preprocess to improve OCR on mobile screenshots
     const img = new Image();
     const url = URL.createObjectURL(file);
     await new Promise((resolve, reject) => {
@@ -767,7 +798,6 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
       img.src = url;
     });
 
-    // Scale up a bit for better OCR, but keep reasonable size
     const maxW = 1400;
     const scale = Math.min(1.8, maxW / img.width);
     const w = Math.round(img.width * scale);
@@ -778,25 +808,21 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
     canvas.height = h;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-    // Draw
     ctx.drawImage(img, 0, 0, w, h);
     URL.revokeObjectURL(url);
 
-    // Convert to grayscale + increase contrast (simple)
     const imgData = ctx.getImageData(0, 0, w, h);
     const d = imgData.data;
 
-    // Contrast boost
-    const contrast = 1.25; // tweak: 1.1 - 1.4
+    const contrast = 1.25;
     const intercept = 128 * (1 - contrast);
 
     for (let i = 0; i < d.length; i += 4) {
       const r = d[i], g = d[i + 1], b = d[i + 2];
-      let y = 0.299 * r + 0.587 * g + 0.114 * b; // grayscale
-      y = y * contrast + intercept;               // contrast
+      let y = 0.299 * r + 0.587 * g + 0.114 * b;
+      y = y * contrast + intercept;
       y = Math.max(0, Math.min(255, y));
       d[i] = d[i + 1] = d[i + 2] = y;
-      // alpha kept
     }
 
     ctx.putImageData(imgData, 0, 0);
@@ -809,7 +835,6 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
   }
 
   function lockUntilVerified() {
-    // keep Step 2 locked
     if (step2Card) { step2Card.style.opacity = "0.6"; step2Card.classList.remove("active"); }
     if (videoContainer) videoContainer.classList.add("hidden");
     if (btnVideoDone) {
@@ -821,7 +846,6 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
   }
 
   function unlockAfterVerified() {
-    // Step 1 "Verified" indicator
     if (btnFormDone) {
       btnFormDone.disabled = false;
       btnFormDone.classList.remove("bg-slate-100", "text-slate-400", "cursor-not-allowed");
@@ -829,7 +853,6 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
       btnFormDone.innerHTML = '<span class="mr-2">✅</span>Verified (submission confirmed)';
     }
 
-    // Unlock Step 2
     if (step2Card) { step2Card.style.opacity = "1"; step2Card.classList.add("active"); }
     if (videoContainer) videoContainer.classList.remove("hidden");
     if (btnVideoDone) {
@@ -842,11 +865,9 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
 
   lockUntilVerified();
 
-  // OCR action
   if (btnRunOCR) {
     btnRunOCR.addEventListener("click", async () => {
       if (!proofFile || !proofFile.files || !proofFile.files[0]) return;
-
       const file = proofFile.files[0];
 
       btnRunOCR.disabled = true;
@@ -864,7 +885,7 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
           {
             logger: (m) => {
               if (m && m.status === "recognizing text" && typeof m.progress === "number") {
-                setOCRProgress(10 + m.progress * 85); // 10% -> 95%
+                setOCRProgress(10 + m.progress * 85);
               }
             }
           }
@@ -891,7 +912,6 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
             ocrStatus.classList.add("text-red-700");
             ocrStatus.textContent = "Verification failed. Could not detect confirmation keywords. Please upload a clearer screenshot of the thank-you/confirmation page.";
           }
-          // keep locked
           lockUntilVerified();
           btnRunOCR.disabled = false;
         }
@@ -907,7 +927,6 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
     });
   }
 
-  // After video unlock step 3
   if (btnVideoDone) {
     btnVideoDone.addEventListener("click", () => {
       if (btnVideoDone.disabled) return;
@@ -917,7 +936,6 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
     });
   }
 
-  // Brevo submit validate then enable final
   if (sibForm) {
     sibForm.addEventListener("submit", (e) => {
       let hasError = false;
@@ -955,15 +973,12 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
     });
   }
 
-  // Final verify -> completion or termination
   if (btnFinalVerify) {
     btnFinalVerify.addEventListener("click", () => {
       if (btnFinalVerify.disabled) return;
-
       btnFinalVerify.disabled = true;
       btnFinalVerify.innerHTML = "⏳ Finishing…";
 
-      // If Step 1 is not verified, terminate
       const verified = btnFormDone && btnFormDone.innerText.toLowerCase().includes("verified");
       window.location.href = verified ? completionUrl : terminationUrl;
     });
@@ -972,3 +987,4 @@ You’ll be asked to complete a secure debt-relief form, watch a short explainer
 
 </body>
 </html>
+

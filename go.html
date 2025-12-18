@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Redirecting…</title>
+  <meta name="referrer" content="origin" />
+</head>
+<body>
+<script>
+  // go.html?to=https%3A%2F%2Fexample.com
+  const to = new URLSearchParams(location.search).get("to");
+  if (!to) {
+    document.body.textContent = "Missing destination.";
+  } else {
+    location.replace(to);
+  }
+</script>
+</body>
+</html>

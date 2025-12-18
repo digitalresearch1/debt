@@ -13,42 +13,65 @@
       height: 100%;
       overflow: hidden;
       font-family: Arial, sans-serif;
-      background: #000;
+      background: #ffffff;
     }
 
-    /* Viewport wrapper (acts like a crop window) */
+    /* Viewport wrapper (crop window) */
     .frame-viewport {
       position: relative;
       width: 100vw;
       height: 100vh;
-      overflow: hidden; /* IMPORTANT: crops footer */
-      background: #000;
+      overflow: hidden;
+      background: #ffffff;
     }
 
-    /*
-      Make iframe slightly taller than viewport,
-      then shift it up so the footer goes below the visible area.
-      Adjust the numbers if needed.
-    */
+    /* Default (DESKTOP / TABLET) */
     .frame-viewport iframe {
       position: absolute;
-      top: -50px;              /* move content UP (hide header area if any) */
+      top: -50px;
       left: 0;
       width: 100%;
-      height: calc(100% + 120px); /* extra height so bottom can be cropped */
+      height: calc(100% + 120px);
       border: none;
       display: block;
     }
 
-    /* Optional: extra mask at bottom (covers any remaining footer pixels) */
     .bottom-mask {
       position: absolute;
       left: 0;
       right: 0;
       bottom: 0;
-      height: 50px;   /* increase if footer still visible */
-      background:  #ffffff;
-      pointer-events: none; /* don't block clicks above */
+      height: 50px;
+      background: #ffffff;
+      pointer-events: none;
+    }
+
+    /* =========================
+       MOBILE ADJUSTMENTS
+       ========================= */
+    @media (max-width: 768px) {
+
+      .frame-viewport iframe {
+        top: -20px;                 /* less top crop on mobile */
+        height: calc(100% + 200px); /* more bottom crop (mobile footer is taller) */
+      }
+
+      .bottom-mask {
+        height: 90px;               /* hide mobile footer */
+      }
+    }
+
+    /* EXTRA SMALL PHONES */
+    @media (max-width: 420px) {
+
+      .frame-viewport iframe {
+        top: -10px;
+        height: calc(100% + 240px);
+      }
+
+      .bottom-mask {
+        height: 110px;
+      }
     }
   </style>
 </head>
@@ -66,3 +89,4 @@
   </div>
 </body>
 </html>
+

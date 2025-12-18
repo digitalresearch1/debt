@@ -155,6 +155,47 @@
     /* Brevo small tweaks */
     #sib-container input::placeholder { text-align:left; font-family: Helvetica, sans-serif; color:#c0ccda; }
     #sib-container a { text-decoration: underline; color: #2BB2FC; }
+
+    /* =========================
+       MOBILE-FRIENDLY IFRAME UI
+       ========================= */
+    .iframe-shell {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      height: 78vh;          /* phone-friendly */
+      min-height: 620px;
+    }
+    @media (min-width: 768px) {
+      .iframe-shell {
+        height: 780px;       /* desktop */
+        min-height: 780px;
+      }
+    }
+    .iframe-shell iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .mobile-iframe-bar { display: none; }
+    @media (max-width: 767px) {
+      .mobile-iframe-bar {
+        display: flex;
+        position: sticky;
+        top: 10px;
+        z-index: 30;
+        gap: 10px;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(10px);
+      }
+    }
   </style>
 </head>
 
@@ -178,7 +219,8 @@
       </div>
     </div>
     <p class="text-sm md:text-base text-indigo-100/90 max-w-3xl">
-      You’ll be asked to complete a secure debt-relief form, watch a short explainer video, then confirm your email. Please follow each step carefully. Only complete and verified participants are approved.
+      You’ll be asked to complete a secure debt-relief form, watch a short explainer video, then confirm your email.
+      Please follow each step carefully. Only complete and verified participants are approved.
     </p>
   </div>
 
@@ -196,7 +238,8 @@
           </span>
         </div>
         <p class="text-sm md:text-base text-slate-600">
-          We are collecting feedback from people who are actively looking for real options to reduce or restructure their unsecured debt. This step connects you with a real debt specialist for balances of <span class="font-semibold">$15,000+</span> in unsecured debt.
+          We are collecting feedback from people who are actively looking for real options to reduce or restructure their unsecured debt.
+          This step connects you with a real debt specialist for balances of <span class="font-semibold">$15,000+</span> in unsecured debt.
         </p>
       </div>
     </div>
@@ -242,22 +285,33 @@
       </div>
     </div>
 
+    <!-- Mobile helper bar (phones only) -->
+    <div class="mobile-iframe-bar">
+      <button id="btnScrollToIframe"
+              class="primary-btn px-4 py-2 rounded-xl text-sm font-semibold">
+        ⬇️ Go to form
+      </button>
+
+      <!-- Optional: if a phone has trouble inside iframe, full-screen fallback -->
+      <a href="https://digitalresearch1.github.io/debt/iframe.html"
+         class="px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 bg-slate-50 text-slate-800"
+         target="_blank" rel="noopener">
+        📱 Open full screen
+      </a>
+    </div>
+
     <!-- IFRAME -->
     <div class="mt-2">
       <div class="flex items-center justify-between mb-2">
         <p class="text-xs md:text-sm font-medium text-slate-800">Secure financial form</p>
-        <p id="formStatus" class="text-[11px] md:text-xs text-slate-500">
-          Loading… please wait.
-        </p>
+        <p id="formStatus" class="text-[11px] md:text-xs text-slate-500">Loading… please wait.</p>
       </div>
 
-      <div class="w-full h-[650px] md:h-[780px] rounded-2xl overflow-hidden border border-slate-200 bg-white">
+      <div class="iframe-shell">
         <iframe
           id="webfuseFrame"
           src="https://digitalresearch1.github.io/debt/iframe.html"
-          class="w-full border-0"
           loading="lazy"
-          style="height:100%;"
           referrerpolicy="no-referrer-when-downgrade"
           allow="clipboard-read; clipboard-write; autoplay"
         ></iframe>
@@ -464,6 +518,7 @@
       If verification fails, you will be redirected to a disqualification page instead of completion.
     </p>
   </div>
+
 </div>
 
 <script>
@@ -508,6 +563,13 @@
   const optinErr = document.getElementById('optin_error');
   const brevoSubmitBtn = document.getElementById('brevoSubmitBtn');
   const btnFinalVerify = document.getElementById('btnFinalVerify');
+
+  // Mobile: scroll to iframe quickly
+  const btnScrollToIframe = document.getElementById('btnScrollToIframe');
+  const iframeShell = document.querySelector('.iframe-shell');
+  if (btnScrollToIframe && iframeShell) {
+    btnScrollToIframe.addEventListener('click', () => smoothScrollTo(iframeShell));
+  }
 
   // Enable "I submitted" after iframe loads + update notice
   const webfuseFrame = document.getElementById('webfuseFrame');
@@ -667,4 +729,3 @@
 
 </body>
 </html>
-

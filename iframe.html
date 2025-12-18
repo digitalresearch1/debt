@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Embedded Page</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    /* Reset */
     html, body {
       margin: 0;
       padding: 0;
@@ -17,25 +16,53 @@
       background: #000;
     }
 
-    /* Fullscreen iframe */
-    iframe {
+    /* Viewport wrapper (acts like a crop window) */
+    .frame-viewport {
+      position: relative;
       width: 100vw;
       height: 100vh;
+      overflow: hidden; /* IMPORTANT: crops footer */
+      background: #000;
+    }
+
+    /*
+      Make iframe slightly taller than viewport,
+      then shift it up so the footer goes below the visible area.
+      Adjust the numbers if needed.
+    */
+    .frame-viewport iframe {
+      position: absolute;
+      top: -100px;              /* move content UP (hide header area if any) */
+      left: 0;
+      width: 100%;
+      height: calc(100% + 80px); /* extra height so bottom can be cropped */
       border: none;
       display: block;
     }
+
+    /* Optional: extra mask at bottom (covers any remaining footer pixels) */
+    .bottom-mask {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 50px;   /* increase if footer still visible */
+      background:  #ffffff;
+      pointer-events: none; /* don't block clicks above */
+    }
   </style>
 </head>
+
 <body>
+  <div class="frame-viewport">
+    <iframe
+      src="https://webfuse.com/+button/"
+      loading="eager"
+      allow="clipboard-read; clipboard-write; autoplay"
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
 
-  <!-- 🔴 FULL-PAGE IFRAME -->
-  <iframe
-    src="https://webfuse.com/+button/"
-    loading="eager"
-    allow="clipboard-read; clipboard-write; autoplay"
-    referrerpolicy="no-referrer-when-downgrade">
-  </iframe>
-
+    <div class="bottom-mask"></div>
+  </div>
 </body>
 </html>
-

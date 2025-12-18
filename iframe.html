@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,32 +19,57 @@
       background: #ffffff;
     }
 
+    /* Crop window */
     .frame-viewport {
       position: relative;
       width: 100vw;
       height: 100vh;
-      overflow: hidden; /* crops footer */
+      overflow: hidden;
       background: #ffffff;
     }
 
+    /* Desktop defaults */
     .frame-viewport iframe {
       position: absolute;
-      top: -50px;                 /* move content up */
+      top: -50px;                 /* crop top a bit */
       left: 0;
       width: 100%;
-      height: calc(100% + 120px); /* extra height so bottom is cropped */
+      height: calc(100% + 120px); /* extra height so bottom can be cropped */
       border: none;
       display: block;
     }
 
+    /* Bottom mask (hides footer area visually) */
     .bottom-mask {
       position: absolute;
       left: 0;
       right: 0;
       bottom: 0;
-      height: 50px;       /* increase if footer still visible */
+      height: 50px;
       background: #ffffff;
       pointer-events: none;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      .frame-viewport iframe {
+        top: -40px;
+        height: calc(100% + 200px);
+      }
+      .bottom-mask {
+        height: 80px;
+      }
+    }
+
+    /* Very small phones */
+    @media (max-width: 420px) {
+      .frame-viewport iframe {
+        top: -30px;
+        height: calc(100% + 240px);
+      }
+      .bottom-mask {
+        height: 90px;
+      }
     }
   </style>
 </head>

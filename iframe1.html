@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Embedded Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+    }
+
+    .frame-viewport {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden; /* crops footer */
+      background: #ffffff;
+    }
+
+    .frame-viewport iframe {
+      position: absolute;
+      top: -50px;                 /* move content up */
+      left: 0;
+      width: 100%;
+      height: calc(100% + 120px); /* extra height so bottom is cropped */
+      border: none;
+      display: block;
+    }
+
+    .bottom-mask {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 50px;       /* increase if footer still visible */
+      background: #ffffff;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="frame-viewport">
+    <iframe
+      src="https://webfuse.com/+button1/"
+      loading="eager"
+      allow="clipboard-read; clipboard-write; autoplay"
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+
+    <div class="bottom-mask"></div>
+  </div>
+</body>
+</html>

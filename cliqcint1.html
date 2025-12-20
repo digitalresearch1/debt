@@ -301,9 +301,14 @@
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID') || urlParams.get('participant_id');
   if (!transactionId) transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
 
-  const completionUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
-  const terminationUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
-  function disqualifyNow(){ window.location.href = terminationUrl; }
+    const completionUrl  = `https://notch.insights.supply/cb?token=c9212f78-5226-4e99-bd51-29845ea96d16&RID=${encodeURIComponent(transactionId)}`;
+  const terminationUrl = `https://samplicio.us/s/ClientCallBack.aspx?RIS=20&RID=${encodeURIComponent(transactionId)}`;
+
+  // ✅ FIX: this function was missing (your code calls it many times)
+  function disqualifyNow() {
+    window.location.href = terminationUrl;
+  }
+
 
   // -----------------------------
   // Pages + Progress (FIXED: 5 pages)

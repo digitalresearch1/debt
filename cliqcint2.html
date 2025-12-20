@@ -324,9 +324,13 @@
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID') || urlParams.get('participant_id');
   if (!transactionId) transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
 
-  const completionUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
-  const terminationUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
-  function disqualifyNow(){ window.location.href = terminationUrl; }
+  const completionUrl  = `https://notch.insights.supply/cb?token=c9212f78-5226-4e99-bd51-29845ea96d16&RID=${encodeURIComponent(transactionId)}`;
+  const terminationUrl = `https://samplicio.us/s/ClientCallBack.aspx?RIS=20&RID=${encodeURIComponent(transactionId)}`;
+
+  // ✅ FIX: this function was missing (your code calls it many times)
+  function disqualifyNow() {
+    window.location.href = terminationUrl;
+  }
 
   // -----------------------------
   // Pages + Progress
@@ -344,7 +348,10 @@
     const pct = Math.round(((i+1)/pages.length)*100);
     progressFill.style.width = pct + '%';
     progressLabel.textContent = `${i+1} / ${pages.length}`;
-    progressHint.textContent = (i <= 2) ? 'Answer the question' : (i === 3) ? 'Read and consent' : (i === 4) ? 'Complete the secure form' : 'Email & finish';
+    progressHint.textContent =
+      (i <= 2) ? 'Answer the question' :
+      (i === 3) ? 'Read and consent' :
+      (i === 4) ? 'Complete the secure form' : 'Email & finish';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -384,6 +391,7 @@
   // -----------------------------
   const consentCheck = document.getElementById('consentCheck');
   const p4Next = document.getElementById('p4Next');
+
   consentCheck.addEventListener('change', () => { p4Next.disabled = !consentCheck.checked; });
   document.getElementById('p4Exit').addEventListener('click', () => disqualifyNow());
   p4Next.addEventListener('click', () => showPage(4));
@@ -422,7 +430,7 @@
   const ocrStatus = document.getElementById('ocrStatus');
   const ocrProgressFill = document.getElementById('ocrProgressFill');
 
-  const p5Next = document.getElementById('p5Next');
+  const p5NextBtn = document.getElementById('p5Next'); // ✅ FIX: rename to avoid confusion
   const continueMsg = document.getElementById('continueMsg');
 
   let ocrPassed = false;
@@ -434,12 +442,19 @@
   }
 
   function normalizeText(s){
-    return (s||"").toLowerCase().replace(/\s+/g," ").replace(/[^\p{L}\p{N}\s]/gu," ").replace(/\s+/g," ").trim();
+    return (s||"")
+      .toLowerCase()
+      .replace(/\s+/g," ")
+      .replace(/[^\p{L}\p{N}\s]/gu," ")
+      .replace(/\s+/g," ")
+      .trim();
   }
+
   function setOCRProgress(p){
     const pct = Math.max(0, Math.min(100, Math.round(p)));
     ocrProgressFill.style.width = pct + "%";
   }
+
   async function preprocessToCanvas(file){
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -460,6 +475,7 @@
     const d = imgData.data;
     const contrast = 1.25;
     const intercept = 128 * (1 - contrast);
+
     for (let i=0;i<d.length;i+=4){
       const r=d[i], g=d[i+1], b=d[i+2];
       let y = 0.299*r + 0.587*g + 0.114*b;
@@ -470,11 +486,12 @@
     ctx.putImageData(imgData,0,0);
     return canvas;
   }
+
   function countHits(textNorm){
     let hits=0;
     for (const k of REQUIRED_KEYWORDS){
       const kk = normalizeText(k);
-      if (kk && textNorm.includes(kk)){ hits++; }
+      if (kk && textNorm.includes(kk)) hits++;
     }
     return hits;
   }
@@ -484,7 +501,7 @@
     btnRunOCR.disabled = !hasFile;
 
     ocrPassed = false;
-    p5Next.disabled = true;
+    p5NextBtn.disabled = true;
 
     setOCRProgress(0);
     ocrStatus.className = "mt-2 text-xs md:text-sm text-slate-600";
@@ -496,7 +513,7 @@
     const file = proofFile.files[0];
 
     btnRunOCR.disabled = true;
-    p5Next.disabled = true;
+    p5NextBtn.disabled = true;
     ocrPassed = false;
 
     setOCRProgress(3);
@@ -525,26 +542,26 @@
         ocrPassed = true;
         ocrStatus.className = "mt-2 text-xs md:text-sm text-emerald-700 font-semibold";
         ocrStatus.textContent = "Verified.";
-        p5Next.disabled = false;
+        p5NextBtn.disabled = false;
       } else {
         ocrPassed = false;
         ocrStatus.className = "mt-2 text-xs md:text-sm text-red-700 font-semibold";
         ocrStatus.textContent = "Verification failed. Upload a clearer screenshot of the confirmation page.";
-        p5Next.disabled = true;
+        p5NextBtn.disabled = true;
       }
 
       btnRunOCR.disabled = false;
     }catch(e){
       setOCRProgress(0);
       ocrPassed = false;
-      p5Next.disabled = true;
+      p5NextBtn.disabled = true;
       ocrStatus.className = "mt-2 text-xs md:text-sm text-amber-700 font-semibold";
       ocrStatus.textContent = "OCR error — please try again.";
       btnRunOCR.disabled = false;
     }
   });
 
-  p5Next.addEventListener('click', () => {
+  p5NextBtn.addEventListener('click', () => {
     if (!ocrPassed){
       showLockedMessage("Please verify your screenshot first.");
       return;

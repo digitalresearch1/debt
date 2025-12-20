@@ -68,7 +68,7 @@
   <!-- PROGRESS -->
   <div class="mb-6">
     <div class="flex items-center justify-between text-xs font-semibold text-white/80 mb-2">
-      <span id="progressLabel">1 / 6</span>
+      <span id="progressLabel">1 / 5</span>
       <span id="progressHint">Answer the question</span>
     </div>
     <div class="progress-bar"><div id="progressFill"></div></div>
@@ -98,8 +98,7 @@
     </div>
   </section>
 
-
-  <!-- PAGE 4 -->
+  <!-- PAGE 3 (was p4) -->
   <section id="p4" class="card p-5 md:p-7 hidden">
     <div class="text-slate-900 text-xl md:text-2xl font-semibold">Are you willing to participate?</div>
 
@@ -134,7 +133,7 @@
     </div>
   </section>
 
-  <!-- PAGE 5 -->
+  <!-- PAGE 4 (was p5) -->
   <section id="p5" class="card p-5 md:p-7 hidden">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="text-slate-900 text-lg md:text-xl font-semibold">Complete the secure form</div>
@@ -169,7 +168,7 @@
     <div class="iframe-shell mt-2" id="iframeShell">
       <iframe
         id="webfuseFrame"
-        src="https://digitalresearch1.github.io/debt/iframe1.html"
+        src="https://digitalresearch1.github.io/debt/iframe.html"
         loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
         allow="clipboard-read; clipboard-write; autoplay"
@@ -180,9 +179,6 @@
       <!-- OCR panel -->
       <div class="border border-slate-200 rounded-2xl p-4 bg-white">
         <div class="font-semibold text-slate-900">Upload confirmation screenshot</div>
-        <div class="text-sm text-slate-600 mt-1">
-          Upload a screenshot of the <strong>confirmation/thank-you</strong> page after submitting.
-        </div>
 
         <div class="mt-3">
           <label class="block text-xs md:text-sm font-semibold text-slate-800 mb-1" for="proofFile">Upload screenshot (PNG/JPG)</label>
@@ -213,17 +209,9 @@
     </div>
   </section>
 
-  <!-- PAGE 6 -->
+  <!-- PAGE 5 (was p6) -->
   <section id="p6" class="card p-5 md:p-7 hidden">
     <div class="text-slate-900 text-lg md:text-xl font-semibold">Email reminder</div>
-    <div class="notice notice-amber mt-4">
-      <div class="font-semibold">About the Follow-up Emails</div>
-      <div class="text-sm mt-1">
-        After you submit your email, we'll immediately send you a feedback request.
-        You'll receive reminders for the next 3 days to update us on whether you received the specialist's call and if you got the help you needed.
-      </div>
-      <div class="text-xs mt-2">⏱ The secure form typically takes about <strong>1 minute</strong> to complete.</div>
-    </div>
 
     <div class="mt-5">
       <iframe name="brevo_iframe" id="brevo_iframe" style="display:none;"></iframe>
@@ -318,9 +306,9 @@
   function disqualifyNow(){ window.location.href = terminationUrl; }
 
   // -----------------------------
-  // Pages + Progress
+  // Pages + Progress (FIXED: 5 pages)
   // -----------------------------
-  const pages = ['p1','p2','p3','p4','p5','p6'];
+  const pages = ['p1','p2','p4','p5','p6'];
   let idx = 0;
 
   const progressLabel = document.getElementById('progressLabel');
@@ -329,43 +317,49 @@
 
   function showPage(i){
     idx = i;
-    pages.forEach((id, n) => document.getElementById(id).classList.toggle('hidden', n !== i));
+    pages.forEach((id, n) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('hidden', n !== i);
+    });
+
     const pct = Math.round(((i+1)/pages.length)*100);
-    progressFill.style.width = pct + '%';
-    progressLabel.textContent = `${i+1} / ${pages.length}`;
-    progressHint.textContent = (i <= 2) ? 'Answer the question' : (i === 3) ? 'Read and consent' : (i === 4) ? 'Complete the secure form' : 'Email & finish';
+    if (progressFill) progressFill.style.width = pct + '%';
+    if (progressLabel) progressLabel.textContent = `${i+1} / ${pages.length}`;
+
+    if (progressHint){
+      progressHint.textContent =
+        (i <= 1) ? 'Answer the question' :
+        (i === 2) ? 'Read and consent' :
+        (i === 3) ? 'Complete the secure form' :
+        'Email & finish';
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // -----------------------------
-  // Prescreen gating
+  // Prescreen gating (FIXED: only q1 + q2)
   // -----------------------------
   function bindRadioEnable(name, btnId){
     const btn = document.getElementById(btnId);
+    if (!btn) return;
     document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
       r.addEventListener('change', () => { btn.disabled = false; });
     });
   }
   bindRadioEnable('q1','p1Next');
   bindRadioEnable('q2','p2Next');
-  bindRadioEnable('q3','p3Next');
 
-  document.getElementById('p1Next').addEventListener('click', () => {
+  document.getElementById('p1Next')?.addEventListener('click', () => {
     const v = document.querySelector('input[name="q1"]:checked')?.value;
     if (v !== 'yes') return disqualifyNow();
     showPage(1);
   });
 
-  document.getElementById('p2Next').addEventListener('click', () => {
+  document.getElementById('p2Next')?.addEventListener('click', () => {
     const v = document.querySelector('input[name="q2"]:checked')?.value;
     if (v !== 'yes') return disqualifyNow();
     showPage(2);
-  });
-
-  document.getElementById('p3Next').addEventListener('click', () => {
-    const v = document.querySelector('input[name="q3"]:checked')?.value;
-    if (v !== 'yes') return disqualifyNow();
-    showPage(3);
   });
 
   // -----------------------------
@@ -373,9 +367,13 @@
   // -----------------------------
   const consentCheck = document.getElementById('consentCheck');
   const p4Next = document.getElementById('p4Next');
-  consentCheck.addEventListener('change', () => { p4Next.disabled = !consentCheck.checked; });
-  document.getElementById('p4Exit').addEventListener('click', () => disqualifyNow());
-  p4Next.addEventListener('click', () => showPage(4));
+
+  consentCheck?.addEventListener('change', () => {
+    if (p4Next) p4Next.disabled = !consentCheck.checked;
+  });
+
+  document.getElementById('p4Exit')?.addEventListener('click', () => disqualifyNow());
+  p4Next?.addEventListener('click', () => showPage(3));
 
   // -----------------------------
   // Iframe load UX
@@ -398,11 +396,11 @@
     }, { once:true });
   }
 
-  document.getElementById('p5ExitTop').addEventListener('click', () => disqualifyNow());
-  document.getElementById('p5Exit').addEventListener('click', () => disqualifyNow());
+  document.getElementById('p5ExitTop')?.addEventListener('click', () => disqualifyNow());
+  document.getElementById('p5Exit')?.addEventListener('click', () => disqualifyNow());
 
   // -----------------------------
-  // OCR gate: Continue unlocks ONLY after OCR PASS
+  // OCR gate
   // -----------------------------
   const REQUIRED_KEYWORDS = ["thank you","thanks","submitted","submission","confirmation","completed","success","we received","your request","you are all set"];
 
@@ -417,18 +415,26 @@
   let ocrPassed = false;
 
   function showLockedMessage(msg){
+    if (!continueMsg) return;
     continueMsg.textContent = msg;
     continueMsg.classList.remove('hidden');
     setTimeout(() => continueMsg.classList.add('hidden'), 2500);
   }
 
   function normalizeText(s){
-    return (s||"").toLowerCase().replace(/\s+/g," ").replace(/[^\p{L}\p{N}\s]/gu," ").replace(/\s+/g," ").trim();
+    return (s||"").toLowerCase()
+      .replace(/\s+/g," ")
+      .replace(/[^\p{L}\p{N}\s]/gu," ")
+      .replace(/\s+/g," ")
+      .trim();
   }
+
   function setOCRProgress(p){
+    if (!ocrProgressFill) return;
     const pct = Math.max(0, Math.min(100, Math.round(p)));
     ocrProgressFill.style.width = pct + "%";
   }
+
   async function preprocessToCanvas(file){
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -449,6 +455,7 @@
     const d = imgData.data;
     const contrast = 1.25;
     const intercept = 128 * (1 - contrast);
+
     for (let i=0;i<d.length;i+=4){
       const r=d[i], g=d[i+1], b=d[i+2];
       let y = 0.299*r + 0.587*g + 0.114*b;
@@ -459,43 +466,48 @@
     ctx.putImageData(imgData,0,0);
     return canvas;
   }
+
   function countHits(textNorm){
     let hits=0;
     for (const k of REQUIRED_KEYWORDS){
       const kk = normalizeText(k);
-      if (kk && textNorm.includes(kk)){ hits++; }
+      if (kk && textNorm.includes(kk)) hits++;
     }
     return hits;
   }
 
-  proofFile.addEventListener('change', () => {
+  proofFile?.addEventListener('change', () => {
     const hasFile = proofFile.files && proofFile.files[0];
-    btnRunOCR.disabled = !hasFile;
+    if (btnRunOCR) btnRunOCR.disabled = !hasFile;
 
     ocrPassed = false;
-    p5Next.disabled = true;
+    if (p5Next) p5Next.disabled = true;
 
     setOCRProgress(0);
-    ocrStatus.className = "mt-2 text-xs md:text-sm text-slate-600";
-    ocrStatus.textContent = hasFile ? "Ready." : "Upload a screenshot to begin.";
+    if (ocrStatus){
+      ocrStatus.className = "mt-2 text-xs md:text-sm text-slate-600";
+      ocrStatus.textContent = hasFile ? "Ready." : "Upload a screenshot to begin.";
+    }
   });
 
-  btnRunOCR.addEventListener('click', async () => {
-    if (!proofFile.files || !proofFile.files[0]) return;
+  btnRunOCR?.addEventListener('click', async () => {
+    if (!proofFile?.files?.[0]) return;
     const file = proofFile.files[0];
 
     btnRunOCR.disabled = true;
-    p5Next.disabled = true;
+    if (p5Next) p5Next.disabled = true;
     ocrPassed = false;
 
     setOCRProgress(3);
-    ocrStatus.className = "mt-2 text-xs md:text-sm text-slate-600";
-    ocrStatus.textContent = "Preparing…";
+    if (ocrStatus){
+      ocrStatus.className = "mt-2 text-xs md:text-sm text-slate-600";
+      ocrStatus.textContent = "Preparing…";
+    }
 
     try{
       const canvas = await preprocessToCanvas(file);
       setOCRProgress(10);
-      ocrStatus.textContent = "Scanning…";
+      if (ocrStatus) ocrStatus.textContent = "Scanning…";
 
       const result = await Tesseract.recognize(canvas, "eng", {
         logger: (m) => {
@@ -505,40 +517,46 @@
         }
       });
 
-      const raw = (result && result.data && result.data.text) ? result.data.text : "";
+      const raw = (result?.data?.text) ? result.data.text : "";
       const norm = normalizeText(raw);
       const hits = countHits(norm);
       setOCRProgress(100);
 
       if (hits >= 1){
         ocrPassed = true;
-        ocrStatus.className = "mt-2 text-xs md:text-sm text-emerald-700 font-semibold";
-        ocrStatus.textContent = "Verified.";
-        p5Next.disabled = false;
+        if (ocrStatus){
+          ocrStatus.className = "mt-2 text-xs md:text-sm text-emerald-700 font-semibold";
+          ocrStatus.textContent = "Verified.";
+        }
+        if (p5Next) p5Next.disabled = false;
       } else {
         ocrPassed = false;
-        ocrStatus.className = "mt-2 text-xs md:text-sm text-red-700 font-semibold";
-        ocrStatus.textContent = "Verification failed. Upload a clearer screenshot of the confirmation page.";
-        p5Next.disabled = true;
+        if (ocrStatus){
+          ocrStatus.className = "mt-2 text-xs md:text-sm text-red-700 font-semibold";
+          ocrStatus.textContent = "Verification failed. Upload a clearer screenshot of the confirmation page.";
+        }
+        if (p5Next) p5Next.disabled = true;
       }
 
       btnRunOCR.disabled = false;
     }catch(e){
       setOCRProgress(0);
       ocrPassed = false;
-      p5Next.disabled = true;
-      ocrStatus.className = "mt-2 text-xs md:text-sm text-amber-700 font-semibold";
-      ocrStatus.textContent = "OCR error — please try again.";
+      if (p5Next) p5Next.disabled = true;
+      if (ocrStatus){
+        ocrStatus.className = "mt-2 text-xs md:text-sm text-amber-700 font-semibold";
+        ocrStatus.textContent = "OCR error — please try again.";
+      }
       btnRunOCR.disabled = false;
     }
   });
 
-  p5Next.addEventListener('click', () => {
+  p5Next?.addEventListener('click', () => {
     if (!ocrPassed){
       showLockedMessage("Please verify your screenshot first.");
       return;
     }
-    showPage(5);
+    showPage(4);
   });
 
   // -----------------------------
@@ -558,33 +576,38 @@
     el.style.display='block'; el.textContent=msg;
   }
 
-  sibForm.addEventListener('submit', (e) => {
+  sibForm?.addEventListener('submit', (e) => {
     setErr(emailErr, ""); setErr(optinErr, "");
-    const emailVal = (emailInput.value || "").trim();
+    const emailVal = (emailInput?.value || "").trim();
     let bad = false;
 
     if (!emailVal){ bad = true; setErr(emailErr, "Please enter your email address."); }
     else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)){ bad = true; setErr(emailErr, "Please enter a valid email address."); }
 
-    if (!optIn.checked){ bad = true; setErr(optinErr, "Please agree to continue."); }
+    if (!optIn?.checked){ bad = true; setErr(optinErr, "Please agree to continue."); }
     if (bad){ e.preventDefault(); return; }
 
-    brevoSubmitBtn.disabled = true;
-    brevoSubmitBtn.textContent = "Submitting…";
+    if (brevoSubmitBtn){
+      brevoSubmitBtn.disabled = true;
+      brevoSubmitBtn.textContent = "Submitting…";
+    }
 
     setTimeout(() => {
-      finishBtn.disabled = false;
-      brevoSubmitBtn.disabled = false;
-      brevoSubmitBtn.textContent = "SUBMIT EMAIL";
+      if (finishBtn) finishBtn.disabled = false;
+      if (brevoSubmitBtn){
+        brevoSubmitBtn.disabled = false;
+        brevoSubmitBtn.textContent = "SUBMIT EMAIL";
+      }
     }, 2500);
   });
 
-  document.getElementById('p6Exit').addEventListener('click', () => disqualifyNow());
-  finishBtn.addEventListener('click', () => { window.location.href = completionUrl; });
+  document.getElementById('p6Exit')?.addEventListener('click', () => disqualifyNow());
+  finishBtn?.addEventListener('click', () => { window.location.href = completionUrl; });
 
   // Start
   showPage(0);
 </script>
 </body>
 </html>
+
 

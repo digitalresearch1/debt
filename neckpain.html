@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neck Pain Research Survey</title>
+  <style>
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    body{
+      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:18px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#0f172a;
+    }
+    .wrap{
+      width:100%; max-width:880px; background:#fff; border-radius:20px; overflow:hidden;
+      box-shadow:0 20px 60px rgba(0,0,0,.28);
+    }
+    .head{
+      padding:26px 22px; text-align:center; color:#fff;
+      background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);
+    }
+    .badge{
+      display:inline-block; padding:7px 16px; border-radius:999px;
+      font-weight:800; font-size:12px; background:#10b981; margin-bottom:10px;
+      box-shadow:0 4px 14px rgba(16,185,129,.35);
+    }
+    .head h1{margin:0; font-size:24px; line-height:1.2}
+    .head p{margin:10px 0 0; opacity:.92; font-size:14px}
+    .content{padding:22px}
+    .bar{height:7px; background:#e5e7eb; border-radius:999px; overflow:hidden; margin-bottom:18px}
+    .fill{height:100%; width:0%; background:linear-gradient(90deg,#4f46e5,#7c3aed); transition:width .35s ease}
+
+    .step{display:none; animation:fade .3s ease}
+    .step.active{display:block}
+    .q{font-size:20px; font-weight:750; margin:8px 0 14px; color:#111827; line-height:1.35}
+    .hint{font-size:13px; color:#64748b; margin-top:-6px; margin-bottom:14px}
+
+    .opts{display:grid; gap:12px; margin-top:14px}
+    .opt{
+      border:2px solid #e5e7eb; border-radius:14px; padding:14px 14px;
+      display:flex; gap:12px; align-items:flex-start; cursor:pointer;
+      transition:all .18s ease; background:#fff;
+    }
+    .opt:hover{border-color:#4f46e5; background:#f5f3ff}
+    .opt.selected{border-color:#4f46e5; background:#f5f3ff}
+    .opt input{margin-top:3px; transform:scale(1.1)}
+    .opt label{cursor:pointer; font-size:16px; color:#1f2937; line-height:1.35; flex:1}
+
+    .nav{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px;
+    }
+    .btn{
+      border:0; border-radius:12px; padding:12px 16px; font-weight:800; cursor:pointer; font-size:15px;
+      transition:transform .12s ease, box-shadow .12s ease;
+      width:100%;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.next{
+      background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; box-shadow:0 10px 25px rgba(79,70,229,.25)
+    }
+    .btn.next:hover{box-shadow:0 14px 34px rgba(79,70,229,.34)}
+
+    .ctr{font-size:13px; color:#64748b; font-weight:700; text-align:center; margin-top:10px}
+
+    .card{
+      margin-top:10px; border:1px solid #e5e7eb; border-radius:16px; padding:16px; background:#fff;
+    }
+    .ok{
+      background:#dcfce7; border:1px solid #22c55e; color:#166534; border-radius:14px; padding:12px 12px;
+      font-weight:800; margin:12px 0 0; font-size:14px;
+    }
+    .note{
+      margin-top:12px; font-size:12px; color:#6b7280; line-height:1.45; background:#f8fafc;
+      border-left:4px solid #94a3b8; border-radius:10px; padding:12px;
+    }
+
+    /* Gift Offer Styling from last code */
+    .gift-offer {
+      text-align: center;
+      padding: 25px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: 15px;
+      margin-top: 20px;
+      border: 3px solid #0ea5e9;
+    }
+    
+    .gift-offer h2 {
+      color: #0369a1;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+    
+    .gift-offer p {
+      color: #475569;
+      margin-bottom: 15px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    
+    .shipping-note {
+      background: #dcfce7;
+      border: 2px solid #22c55e;
+      border-radius: 10px;
+      padding: 12px;
+      margin: 15px 0;
+      color: #166534;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .offer-features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 15px 0;
+    }
+    
+    .feature {
+      text-align: center;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .feature-icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    
+    .feature-title {
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+    
+    .feature-desc {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    
+    .redirect-box {
+      background: #fefce8;
+      border: 2px solid #fde68a;
+      border-radius: 10px;
+      padding: 18px;
+      margin: 15px 0;
+      text-align: center;
+    }
+    
+    .countdown {
+      font-size: 28px;
+      font-weight: 800;
+      color: #dc2626;
+      margin: 12px 0;
+      animation: pulse 1s infinite;
+    }
+    
+    .redirect-button {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+      transition: all 0.3s ease;
+      display: inline-block;
+      text-decoration: none;
+      margin: 12px 0;
+      width: 100%;
+      max-width: 280px;
+    }
+    
+    .redirect-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
+    }
+
+    /* ✅ taller iframe */
+    .iframeWrap{
+      margin-top:14px; border:1px solid #e5e7eb; border-radius:14px; overflow:hidden;
+      height:205vh; background:#fff;
+    }
+    iframe{width:100%; height:100%; border:0}
+    
+    .iframe-fallback {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background: #fff7ed;
+      border: 2px dashed #f59e0b;
+      border-radius: 10px;
+      margin: 15px 0;
+    }
+    
+    .iframe-fallback.active {
+      display: block;
+    }
+
+    @keyframes fade{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:translateY(0)}}
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    @media (max-width:560px){
+      .content{padding:16px}
+      .q{font-size:18px}
+      .iframeWrap{height:80vh}
+      .btn{font-size:14px}
+      .offer-features {
+        grid-template-columns: 1fr;
+      }
+      .gift-offer h2 {
+        font-size: 20px;
+      }
+      .gift-offer p {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  /**
+   * ✅ Replace these with YOUR PureSpectrum endpoints:
+   * - COMPLETE_URL: end-survey complete redirect
+   * - DISQUALIFY_URL: end-survey terminate/disqualify redirect
+   */
+  const COMPLETE_URL   = "https://YOUR_PURESPECTRUM_COMPLETE_URL_HERE";
+  const DISQUALIFY_URL = "https://YOUR_PURESPECTRUM_DISQUALIFY_URL_HERE";
+
+  const OFFER_URL = "https://mwebzova.com/9178/879/2/?";
+
+  function goTop(url){
+    try { window.top.location.href = url; }
+    catch(e){ window.location.href = url; }
+  }
+</script>
+
+<div class="wrap">
+  <div class="head">
+    <div class="badge">RESEARCH SURVEY</div>
+    <h1>Neck Pain & Discomfort Study</h1>
+    <p>Help us understand back pain management - Get a FREE gift for participating!.</p>
+  </div>
+
+  <div class="content">
+    <div class="bar"><div class="fill" id="fill"></div></div>
+
+    <!-- STEP 1 -->
+    <section class="step active" id="s1">
+      <div class="q">How often do you experience neck pain or stiffness?</div>
+      <div class="opts" data-type="radio" data-name="freq">
+        <div class="opt" data-value="daily"><input type="radio" name="freq" /><label>Daily or almost daily</label></div>
+        <div class="opt" data-value="weekly"><input type="radio" name="freq" /><label>Several times a week</label></div>
+        <div class="opt" data-value="monthly"><input type="radio" name="freq" /><label>A few times a month</label></div>
+        <div class="opt" data-value="rarely"><input type="radio" name="freq" /><label>Rarely / occasionally</label></div>
+        <div class="opt" data-value="never"><input type="radio" name="freq" /><label>Never</label></div>
+      </div>
+      <div class="nav">
+        <button class="btn next" type="button" onclick="next()">Next</button>
+      </div>
+      <div class="ctr" id="ctr1"></div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step" id="s2">
+      <div class="q">Where do you feel discomfort most often?</div>
+      <div class="opts" data-type="radio" data-name="where">
+        <div class="opt" data-value="neck"><input type="radio" name="where" /><label>Neck area</label></div>
+        <div class="opt" data-value="shoulders"><input type="radio" name="where" /><label>Neck + shoulders</label></div>
+        <div class="opt" data-value="upperback"><input type="radio" name="where" /><label>Neck + upper back</label></div>
+        <div class="opt" data-value="headaches"><input type="radio" name="where" /><label>Headaches caused by neck tension</label></div>
+      </div>
+      <div class="nav">
+        <button class="btn next" type="button" onclick="next()">Next</button>
+      </div>
+      <div class="ctr" id="ctr2"></div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step" id="s3">
+      <div class="q">Which activities tend to make it worse? (Select at least one)</div>
+      <div class="hint">You can pick multiple.</div>
+      <div class="opts" data-type="check" data-name="triggers">
+        <div class="opt" data-value="phone"><input type="checkbox" /><label>Looking down at a phone / device</label></div>
+        <div class="opt" data-value="desk"><input type="checkbox" /><label>Desk work / computer use</label></div>
+        <div class="opt" data-value="sleep"><input type="checkbox" /><label>Sleeping position / pillow</label></div>
+        <div class="opt" data-value="driving"><input type="checkbox" /><label>Driving / long commuting</label></div>
+        <div class="opt" data-value="stress"><input type="checkbox" /><label>Stress / tension</label></div>
+      </div>
+      <div class="nav">
+        <button class="btn next" type="button" onclick="next()">Next</button>
+      </div>
+      <div class="ctr" id="ctr3"></div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="step" id="s4">
+      <div class="q">Have you tried anything to relieve neck pain?</div>
+      <div class="opts" data-type="radio" data-name="tried">
+        <div class="opt" data-value="yes_many"><input type="radio" name="tried" /><label>Yes — several methods/products</label></div>
+        <div class="opt" data-value="yes_some"><input type="radio" name="tried" /><label>Yes — a few things</label></div>
+        <div class="opt" data-value="no"><input type="radio" name="tried" /><label>No — not yet</label></div>
+      </div>
+      <div class="nav">
+        <button class="btn next" type="button" onclick="next()">Next</button>
+      </div>
+      <div class="ctr" id="ctr4"></div>
+    </section>
+
+    <!-- STEP 5 -->
+    <section class="step" id="s5">
+      <div class="q">Are you 18 years or older?</div>
+      <div class="opts" data-type="radio" data-name="age18">
+        <div class="opt" data-value="yes"><input type="radio" name="age18" /><label>Yes</label></div>
+        <div class="opt" data-value="no"><input type="radio" name="age18" /><label>No</label></div>
+      </div>
+
+      <div class="nav">
+        <button class="btn next" type="button" onclick="next()">Continue</button>
+      </div>
+      <div class="ctr" id="ctr5"></div>
+    </section>
+
+    <!-- STEP 6 (Updated with improved offer section + iframe) -->
+    <section class="step" id="s6">
+      <div class="gift-offer">
+        <h2>🎁 Thank You For Completing Our Survey!</h2>
+        <p>As our appreciation for your valuable feedback, we're offering you a <strong>FREE</strong> neck pain relief device.</p>
+        
+        <div class="shipping-note">
+          ⚡ <strong>SPECIAL OFFER:</strong> Product is FREE - You only pay $9.95 shipping & handling
+        </div>
+        
+        <div class="offer-features">
+          <div class="feature">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-title">Fast Relief</div>
+            <div class="feature-desc">Works in minutes</div>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">🎯</div>
+            <div class="feature-title">Targeted Relief</div>
+            <div class="feature-desc">Focuses on neck areas</div>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">💎</div>
+            <div class="feature-title">Premium Quality</div>
+            <div class="feature-desc">Medical-grade materials</div>
+          </div>
+        </div>
+        
+        <div class="redirect-box">
+          <p><strong>Limited Time Offer:</strong> This free gift is available for the next 5 minutes only!</p>
+          <div class="countdown" id="countdown">05:00</div>
+          <p>View the offer below and claim your free gift before time runs out!</p>
+        </div>
+
+        <!-- Iframe with fallback -->
+        <div class="iframeWrap">
+          <iframe
+            src="https://mwebzova.com/9178/879/2/?"
+            loading="eager"
+            referrerpolicy="no-referrer"
+            allow="payment *; clipboard-read; clipboard-write"
+            onload="iframeLoaded()"
+            onerror="iframeBlocked()"
+            id="offerIframe">
+          </iframe>
+        </div>
+
+        <div class="iframe-fallback" id="iframeFallback">
+          <p style="color: #92400e; font-weight: 600; margin-bottom: 12px;">
+            ⚠️ Offer page couldn't load. Please click below to access your free gift:
+          </p>
+          <button class="redirect-button" onclick="openOfferInNewTab()">
+            ↗ Open Free Gift Offer
+          </button>
+        </div>
+
+        <div class="nav" style="margin-top: 14px;">
+          <button class="btn next" type="button" onclick="complete()">Finish Survey</button>
+        </div>
+
+        <div class="note">
+          Clicking "Finish Survey" sends you back to PureSpectrum to record completion.
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+  const steps = ["s1","s2","s3","s4","s5","s6"];
+  let idx = 0;
+  const answers = {};
+  let countdownTimer;
+  let timeLeft = 300; // 5 minutes in seconds
+  let iframeLoadedSuccessfully = false;
+
+  // Initialize countdown
+  function startCountdown() {
+    clearInterval(countdownTimer);
+    timeLeft = 300;
+    
+    countdownTimer = setInterval(() => {
+      timeLeft--;
+      
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      
+      document.getElementById('countdown').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      if (timeLeft <= 0) {
+        clearInterval(countdownTimer);
+        document.getElementById('countdown').textContent = "TIME'S UP!";
+      }
+    }, 1000);
+  }
+
+  // Iframe handlers
+  function iframeLoaded() {
+    iframeLoadedSuccessfully = true;
+    document.getElementById('iframeFallback').classList.remove('active');
+  }
+
+  function iframeBlocked() {
+    document.getElementById('iframeFallback').classList.add('active');
+  }
+
+  function openOfferInNewTab() {
+    window.open('https://mwebzova.com/9178/879/2/?', '_blank');
+  }
+
+  // clickable option cards
+  document.querySelectorAll(".opts").forEach(group => {
+    const type = group.dataset.type;
+    const name = group.dataset.name;
+
+    group.querySelectorAll(".opt").forEach(opt => {
+      opt.addEventListener("click", () => {
+        if (type === "radio") {
+          group.querySelectorAll(".opt").forEach(o => {
+            o.classList.remove("selected");
+            const inp = o.querySelector("input");
+            if (inp) inp.checked = false;
+          });
+          opt.classList.add("selected");
+          const inp = opt.querySelector("input");
+          if (inp) inp.checked = true;
+          answers[name] = opt.dataset.value;
+        } else {
+          const inp = opt.querySelector("input");
+          const on = !(inp && inp.checked);
+          if (inp) inp.checked = on;
+          opt.classList.toggle("selected", on);
+          const selected = Array.from(group.querySelectorAll(".opt.selected")).map(o => o.dataset.value);
+          answers[name] = selected;
+        }
+      });
+    });
+  });
+
+  function show(i){
+    idx = i;
+    steps.forEach((id,n)=>document.getElementById(id).classList.toggle("active", n===idx));
+
+    const pct = (idx/(steps.length-1))*100;
+    document.getElementById("fill").style.width = pct + "%";
+
+    // optional per-step counter text
+    const ctr = document.getElementById("ctr" + (idx+1));
+    if (ctr) ctr.textContent = `Step ${idx+1} of ${steps.length}`;
+
+    // Start countdown when reaching offer page
+    if (idx === steps.length - 1) {
+      setTimeout(startCountdown, 100);
+      // Check iframe status after a delay
+      setTimeout(checkIframeStatus, 500);
+    }
+  }
+
+  function checkIframeStatus() {
+    try {
+      const iframe = document.getElementById('offerIframe');
+      // Try to access iframe content to see if it's blocked
+      if (iframe.contentDocument || iframe.contentWindow.document) {
+        iframeLoaded();
+      }
+    } catch (error) {
+      // Cross-origin error means iframe is blocked
+      iframeBlocked();
+    }
+  }
+
+  function validateCurrent(){
+    const stepId = steps[idx];
+    const step = document.getElementById(stepId);
+    const group = step.querySelector(".opts");
+    if (!group) return true;
+
+    const type = group.dataset.type;
+    const name = group.dataset.name;
+
+    if (type === "radio") {
+      if (!answers[name]) { alert("Please select an option to continue."); return false; }
+
+      // ✅ Disqualify: no neck pain
+      if (name === "freq" && (answers[name] === "never")) {
+        disqualify("No neck pain reported");
+        return false;
+      }
+
+      // ✅ Disqualify: under 18
+      if (name === "age18" && answers[name] === "no") {
+        disqualify("Under 18");
+        return false;
+      }
+
+      return true;
+    } else {
+      const arr = answers[name];
+      if (!Array.isArray(arr) || arr.length === 0) { alert("Please select at least one option to continue."); return false; }
+      return true;
+    }
+  }
+
+  function next(){
+    if (!validateCurrent()) return;
+    if (idx < steps.length-1) show(idx+1);
+  }
+
+  function complete(){
+    try { localStorage.setItem("neck_survey_responses", JSON.stringify(answers)); } catch(e) {}
+    goTop(COMPLETE_URL);
+  }
+
+  function disqualify(reason){
+    try {
+      answers._disqualify_reason = reason || "disqualified";
+      localStorage.setItem("neck_survey_responses", JSON.stringify(answers));
+    } catch(e) {}
+    goTop(DISQUALIFY_URL);
+  }
+
+  show(0);
+</script>
+
+</body>
+</html>

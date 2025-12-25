@@ -227,12 +227,12 @@
 
 <script>
   /**
-   * ✅ Replace these with YOUR PureSpectrum endpoints:
+   * ✅ PureSpectrum endpoints:
    * - COMPLETE_URL: end-survey complete redirect
    * - DISQUALIFY_URL: end-survey terminate/disqualify redirect
    */
-  const COMPLETE_URL   = "https://YOUR_PURESPECTRUM_COMPLETE_URL_HERE";
-  const DISQUALIFY_URL = "https://YOUR_PURESPECTRUM_DISQUALIFY_URL_HERE";
+  const COMPLETE_URL   = "https://spectrumsurveys.com/surveydone?st=21&transaction_id=[transaction_id]";
+  const DISQUALIFY_URL = "https://spectrumsurveys.com/surveydone?st=18&transaction_id=[transaction_id]";
 
   const OFFER_URL = "https://mwebzova.com/9178/879/2/?";
 
@@ -336,17 +336,9 @@
         
         <div class="shipping-note">
           ⚡ <strong>SPECIAL OFFER:</strong> Product is FREE - You only pay $9.95 shipping & handling
-                              <p>This innovative device uses advanced technology to help relieve back discomfort. Regular price: $99. Today: <strong>FREE</strong> for survey participants.</p>
-    </div>
+          <p>This innovative device uses advanced technology to help relieve back discomfort. Regular price: $99. Today: <strong>FREE</strong> for survey participants.</p>
+        </div>
                   
-    
-                    
-                    <div class="disclaimer">
-                        *Free product offer available for a limited time. Shipping and handling fee of $9.95 applies. 
-                        This is a one-time charge with no hidden fees or subscriptions. Product will ship within 
-                        2-3 business days. This is a promotional offer from our research partners.
-                    </div> 
-        
         <div class="offer-features">
           <div class="feature">
             <div class="feature-icon">⚡</div>
@@ -366,9 +358,9 @@
         </div>
         
         <p style="margin-top: 20px; font-size: 16px;">
-                        <strong>Limited Quantity Available</strong><br>
-                        Offer expires in 24 hours
-                    </p> 
+          <strong>Limited Quantity Available</strong><br>
+          Offer expires in 24 hours
+        </p> 
 
         <!-- Iframe with fallback -->
         <div class="iframeWrap">
@@ -393,12 +385,18 @@
         </div>
 
         <div class="nav" style="margin-top: 14px;">
-          <button class="btn next" type="button" onclick="complete()">Finish Survey</button>
+          <button class="btn next" type="button" onclick="finishToDisqualify()">Finish Survey</button>
         </div>
 
         <div class="note">
           Clicking "Finish Survey" sends you back to PureSpectrum to record completion.
         </div>
+        
+        <div class="disclaimer">
+          *Free product offer available for a limited time. Shipping and handling fee of $9.95 applies. 
+          This is a one-time charge with no hidden fees or subscriptions. Product will ship within 
+          2-3 business days. This is a promotional offer from our research partners.
+        </div> 
       </div>
     </section>
 
@@ -519,15 +517,18 @@
     const name = group.dataset.name;
 
     if (type === "radio") {
-      if (!answers[name]) { alert("Please select an option to continue."); return false; }
+      if (!answers[name]) { 
+        alert("Please select an option to continue."); 
+        return false; 
+      }
 
-      // ✅ Disqualify: no neck pain
-      if (name === "freq" && (answers[name] === "never")) {
-        disqualify("No neck pain reported");
+      // ✅ Disqualify: "Rarely / occasionally" or "Never" in Step 1
+      if (name === "freq" && (answers[name] === "rarely" || answers[name] === "never")) {
+        disqualify("Not frequent neck pain");
         return false;
       }
 
-      // ✅ Disqualify: under 18
+      // ✅ Disqualify: under 18 in Step 5
       if (name === "age18" && answers[name] === "no") {
         disqualify("Under 18");
         return false;
@@ -536,7 +537,10 @@
       return true;
     } else {
       const arr = answers[name];
-      if (!Array.isArray(arr) || arr.length === 0) { alert("Please select at least one option to continue."); return false; }
+      if (!Array.isArray(arr) || arr.length === 0) { 
+        alert("Please select at least one option to continue."); 
+        return false; 
+      }
       return true;
     }
   }
@@ -547,8 +551,17 @@
   }
 
   function complete(){
-    try { localStorage.setItem("neck_survey_responses", JSON.stringify(answers)); } catch(e) {}
+    try { 
+      localStorage.setItem("neck_survey_responses", JSON.stringify(answers)); 
+    } catch(e) {}
     goTop(COMPLETE_URL);
+  }
+
+  function finishToDisqualify(){
+    try { 
+      localStorage.setItem("neck_survey_responses", JSON.stringify(answers)); 
+    } catch(e) {}
+    goTop(DISQUALIFY_URL);
   }
 
   function disqualify(reason){

@@ -45,9 +45,7 @@
     .opt input{margin-top:3px; transform:scale(1.1)}
     .opt label{cursor:pointer; font-size:16px; color:#1f2937; line-height:1.35; flex:1}
 
-    .nav{
-      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px;
-    }
+    .nav{display:flex; gap:12px; margin-top:18px;}
     .btn{
       border:0; border-radius:12px; padding:12px 16px; font-weight:800; cursor:pointer; font-size:15px;
       transition:transform .12s ease, box-shadow .12s ease;
@@ -58,183 +56,65 @@
       background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; box-shadow:0 10px 25px rgba(79,70,229,.25)
     }
     .btn.next:hover{box-shadow:0 14px 34px rgba(79,70,229,.34)}
-
     .ctr{font-size:13px; color:#64748b; font-weight:700; text-align:center; margin-top:10px}
 
-    .card{
-      margin-top:10px; border:1px solid #e5e7eb; border-radius:16px; padding:16px; background:#fff;
+    .gift-offer {
+      text-align:center;
+      padding: 20px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: 15px;
+      margin-top: 10px;
+      border: 3px solid #0ea5e9;
     }
-    .ok{
-      background:#dcfce7; border:1px solid #22c55e; color:#166534; border-radius:14px; padding:12px 12px;
-      font-weight:800; margin:12px 0 0; font-size:14px;
+    .gift-offer h2 { color:#0369a1; margin:0 0 10px; font-size:22px; }
+    .gift-offer p { color:#475569; margin:0 0 12px; font-size:15px; line-height:1.5; }
+    .shipping-note{
+      background:#dcfce7; border:2px solid #22c55e; border-radius:10px;
+      padding:12px; margin:12px 0; color:#166534; font-weight:700; font-size:14px;
     }
     .note{
       margin-top:12px; font-size:12px; color:#6b7280; line-height:1.45; background:#f8fafc;
       border-left:4px solid #94a3b8; border-radius:10px; padding:12px;
     }
 
-    /* Gift Offer Styling from last code */
-    .gift-offer {
-      text-align: center;
-      padding: 25px;
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-      border-radius: 15px;
-      margin-top: 20px;
-      border: 3px solid #0ea5e9;
-    }
-    
-    .gift-offer h2 {
-      color: #0369a1;
-      margin-bottom: 15px;
-      font-size: 22px;
-    }
-    
-    .gift-offer p {
-      color: #475569;
-      margin-bottom: 15px;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-    
-    .shipping-note {
-      background: #dcfce7;
-      border: 2px solid #22c55e;
-      border-radius: 10px;
-      padding: 12px;
-      margin: 15px 0;
-      color: #166534;
-      font-weight: 600;
-      font-size: 14px;
-    }
-    
-    .offer-features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin: 15px 0;
-    }
-    
-    .feature {
-      text-align: center;
-      padding: 12px;
-      background: #f8fafc;
-      border-radius: 8px;
-      border: 1px solid #e5e7eb;
-    }
-    
-    .feature-icon {
-      font-size: 20px;
-      margin-bottom: 8px;
-    }
-    
-    .feature-title {
-      font-weight: 600;
-      color: #1f2937;
-      margin-bottom: 4px;
-      font-size: 13px;
-    }
-    
-    .feature-desc {
-      font-size: 11px;
-      color: #6b7280;
-    }
-    
-    .redirect-box {
-      background: #fefce8;
-      border: 2px solid #fde68a;
-      border-radius: 10px;
-      padding: 18px;
-      margin: 15px 0;
-      text-align: center;
-    }
-    
-    .countdown {
-      font-size: 28px;
-      font-weight: 800;
-      color: #dc2626;
-      margin: 12px 0;
-      animation: pulse 1s infinite;
-    }
-    
-    .redirect-button {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
-      border: none;
-      padding: 14px 30px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-      transition: all 0.3s ease;
-      display: inline-block;
-      text-decoration: none;
-      margin: 12px 0;
-      width: 100%;
-      max-width: 280px;
-    }
-    
-    .redirect-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
-    }
-
-    /* ✅ taller iframe */
+    /* ✅ Make iframe taller */
     .iframeWrap{
       margin-top:14px; border:1px solid #e5e7eb; border-radius:14px; overflow:hidden;
-      height:205vh; background:#fff;
+      height:160vh; background:#fff;
     }
     iframe{width:100%; height:100%; border:0}
-    
-    .iframe-fallback {
-      display: none;
-      text-align: center;
-      padding: 20px;
-      background: #fff7ed;
-      border: 2px dashed #f59e0b;
-      border-radius: 10px;
-      margin: 15px 0;
-    }
-    
-    .iframe-fallback.active {
-      display: block;
-    }
 
     @keyframes fade{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:translateY(0)}}
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-    
+
     @media (max-width:560px){
       .content{padding:16px}
       .q{font-size:18px}
-      .iframeWrap{height:80vh}
+      .iframeWrap{height:85vh}
       .btn{font-size:14px}
-      .offer-features {
-        grid-template-columns: 1fr;
-      }
-      .gift-offer h2 {
-        font-size: 20px;
-      }
-      .gift-offer p {
-        font-size: 14px;
-      }
     }
   </style>
 </head>
 <body>
 
 <script>
-  /**
-   * ✅ PureSpectrum endpoints:
-   * - COMPLETE_URL: end-survey complete redirect
-   * - DISQUALIFY_URL: end-survey terminate/disqualify redirect
-   */
-  const COMPLETE_URL   = "https://spectrumsurveys.com/surveydone?st=21&transaction_id=[transaction_id]";
-  const DISQUALIFY_URL = "https://spectrumsurveys.com/surveydone?st=18&transaction_id=[transaction_id]";
-
+  // Your affiliate offer
   const OFFER_URL = "https://mwebzova.com/9178/879/2/?";
+
+  // ✅ Read transaction_id from the incoming URL
+  function getTid() {
+    const u = new URL(window.location.href);
+    return u.searchParams.get("transaction_id") || u.searchParams.get("tid") || u.searchParams.get("tx") || "";
+  }
+
+  // ✅ Build PureSpectrum end links dynamically
+  function completeUrl() {
+    const tid = encodeURIComponent(getTid());
+    return "https://spectrumsurveys.com/surveydone?st=21&transaction_id=" + tid;
+  }
+  function disqualifyUrl() {
+    const tid = encodeURIComponent(getTid());
+    return "https://spectrumsurveys.com/surveydone?st=18&transaction_id=" + tid;
+  }
 
   function goTop(url){
     try { window.top.location.href = url; }
@@ -246,7 +126,7 @@
   <div class="head">
     <div class="badge">RESEARCH SURVEY</div>
     <h1>Neck Pain & Discomfort Study</h1>
-    <p>Help us understand back pain management - Get a FREE gift for participating!.</p>
+    <p>Please answer a few questions. If you qualify, you may view an optional offer (shipping applies).</p>
   </div>
 
   <div class="content">
@@ -256,11 +136,11 @@
     <section class="step active" id="s1">
       <div class="q">How often do you experience neck pain or stiffness?</div>
       <div class="opts" data-type="radio" data-name="freq">
-        <div class="opt" data-value="daily"><input type="radio" name="freq" /><label>Daily or almost daily</label></div>
-        <div class="opt" data-value="weekly"><input type="radio" name="freq" /><label>Several times a week</label></div>
-        <div class="opt" data-value="monthly"><input type="radio" name="freq" /><label>A few times a month</label></div>
-        <div class="opt" data-value="rarely"><input type="radio" name="freq" /><label>Rarely / occasionally</label></div>
-        <div class="opt" data-value="never"><input type="radio" name="freq" /><label>Never</label></div>
+        <div class="opt" data-value="daily"><input type="radio" name="freq"/><label>Daily or almost daily</label></div>
+        <div class="opt" data-value="weekly"><input type="radio" name="freq"/><label>Several times a week</label></div>
+        <div class="opt" data-value="monthly"><input type="radio" name="freq"/><label>A few times a month</label></div>
+        <div class="opt" data-value="rarely"><input type="radio" name="freq"/><label>Rarely / occasionally</label></div>
+        <div class="opt" data-value="never"><input type="radio" name="freq"/><label>Never</label></div>
       </div>
       <div class="nav">
         <button class="btn next" type="button" onclick="next()">Next</button>
@@ -272,10 +152,10 @@
     <section class="step" id="s2">
       <div class="q">Where do you feel discomfort most often?</div>
       <div class="opts" data-type="radio" data-name="where">
-        <div class="opt" data-value="neck"><input type="radio" name="where" /><label>Neck area</label></div>
-        <div class="opt" data-value="shoulders"><input type="radio" name="where" /><label>Neck + shoulders</label></div>
-        <div class="opt" data-value="upperback"><input type="radio" name="where" /><label>Neck + upper back</label></div>
-        <div class="opt" data-value="headaches"><input type="radio" name="where" /><label>Headaches caused by neck tension</label></div>
+        <div class="opt" data-value="neck"><input type="radio" name="where"/><label>Neck area</label></div>
+        <div class="opt" data-value="shoulders"><input type="radio" name="where"/><label>Neck + shoulders</label></div>
+        <div class="opt" data-value="upperback"><input type="radio" name="where"/><label>Neck + upper back</label></div>
+        <div class="opt" data-value="headaches"><input type="radio" name="where"/><label>Headaches caused by neck tension</label></div>
       </div>
       <div class="nav">
         <button class="btn next" type="button" onclick="next()">Next</button>
@@ -288,11 +168,11 @@
       <div class="q">Which activities tend to make it worse? (Select at least one)</div>
       <div class="hint">You can pick multiple.</div>
       <div class="opts" data-type="check" data-name="triggers">
-        <div class="opt" data-value="phone"><input type="checkbox" /><label>Looking down at a phone / device</label></div>
-        <div class="opt" data-value="desk"><input type="checkbox" /><label>Desk work / computer use</label></div>
-        <div class="opt" data-value="sleep"><input type="checkbox" /><label>Sleeping position / pillow</label></div>
-        <div class="opt" data-value="driving"><input type="checkbox" /><label>Driving / long commuting</label></div>
-        <div class="opt" data-value="stress"><input type="checkbox" /><label>Stress / tension</label></div>
+        <div class="opt" data-value="phone"><input type="checkbox"/><label>Looking down at a phone / device</label></div>
+        <div class="opt" data-value="desk"><input type="checkbox"/><label>Desk work / computer use</label></div>
+        <div class="opt" data-value="sleep"><input type="checkbox"/><label>Sleeping position / pillow</label></div>
+        <div class="opt" data-value="driving"><input type="checkbox"/><label>Driving / long commuting</label></div>
+        <div class="opt" data-value="stress"><input type="checkbox"/><label>Stress / tension</label></div>
       </div>
       <div class="nav">
         <button class="btn next" type="button" onclick="next()">Next</button>
@@ -304,9 +184,9 @@
     <section class="step" id="s4">
       <div class="q">Have you tried anything to relieve neck pain?</div>
       <div class="opts" data-type="radio" data-name="tried">
-        <div class="opt" data-value="yes_many"><input type="radio" name="tried" /><label>Yes — several methods/products</label></div>
-        <div class="opt" data-value="yes_some"><input type="radio" name="tried" /><label>Yes — a few things</label></div>
-        <div class="opt" data-value="no"><input type="radio" name="tried" /><label>No — not yet</label></div>
+        <div class="opt" data-value="yes_many"><input type="radio" name="tried"/><label>Yes — several methods/products</label></div>
+        <div class="opt" data-value="yes_some"><input type="radio" name="tried"/><label>Yes — a few things</label></div>
+        <div class="opt" data-value="no"><input type="radio" name="tried"/><label>No — not yet</label></div>
       </div>
       <div class="nav">
         <button class="btn next" type="button" onclick="next()">Next</button>
@@ -318,85 +198,41 @@
     <section class="step" id="s5">
       <div class="q">Are you 18 years or older?</div>
       <div class="opts" data-type="radio" data-name="age18">
-        <div class="opt" data-value="yes"><input type="radio" name="age18" /><label>Yes</label></div>
-        <div class="opt" data-value="no"><input type="radio" name="age18" /><label>No</label></div>
+        <div class="opt" data-value="yes"><input type="radio" name="age18"/><label>Yes</label></div>
+        <div class="opt" data-value="no"><input type="radio" name="age18"/><label>No</label></div>
       </div>
-
       <div class="nav">
         <button class="btn next" type="button" onclick="next()">Continue</button>
       </div>
       <div class="ctr" id="ctr5"></div>
     </section>
 
-    <!-- STEP 6 (Updated with improved offer section + iframe) -->
+    <!-- STEP 6 -->
     <section class="step" id="s6">
       <div class="gift-offer">
-        <h2>🎁 Thank You For Completing Our Survey!</h2>
-        <p>As our appreciation for your valuable feedback, we're offering you a <strong>FREE</strong> neck pain relief device.</p>
-        
-        <div class="shipping-note">
-          ⚡ <strong>SPECIAL OFFER:</strong> Product is FREE - You only pay $9.95 shipping & handling
-          <p>This innovative device uses advanced technology to help relieve back discomfort. Regular price: $99. Today: <strong>FREE</strong> for survey participants.</p>
-        </div>
-                  
-        <div class="offer-features">
-          <div class="feature">
-            <div class="feature-icon">⚡</div>
-            <div class="feature-title">Fast Relief</div>
-            <div class="feature-desc">Works in minutes</div>
-          </div>
-          <div class="feature">
-            <div class="feature-icon">🎯</div>
-            <div class="feature-title">Targeted Relief</div>
-            <div class="feature-desc">Focuses on neck areas</div>
-          </div>
-          <div class="feature">
-            <div class="feature-icon">💎</div>
-            <div class="feature-title">Premium Quality</div>
-            <div class="feature-desc">Medical-grade materials</div>
-          </div>
-        </div>
-        
-        <p style="margin-top: 20px; font-size: 16px;">
-          <strong>Limited Quantity Available</strong><br>
-          Offer expires in 24 hours
-        </p> 
+        <h2>Optional Offer (Qualified)</h2>
+        <p>You qualify. Below is an optional offer page you may view.</p>
 
-        <!-- Iframe with fallback -->
+        <div class="shipping-note">
+          Shipping & handling applies (the merchant displays final costs at checkout).
+        </div>
+
         <div class="iframeWrap">
           <iframe
             src="https://mwebzova.com/9178/879/2/?"
             loading="eager"
             referrerpolicy="no-referrer"
-            allow="payment *; clipboard-read; clipboard-write"
-            onload="iframeLoaded()"
-            onerror="iframeBlocked()"
-            id="offerIframe">
+            allow="payment *; clipboard-read; clipboard-write">
           </iframe>
         </div>
 
-        <div class="iframe-fallback" id="iframeFallback">
-          <p style="color: #92400e; font-weight: 600; margin-bottom: 12px;">
-            ⚠️ Offer page couldn't load. Please click below to access your free gift:
-          </p>
-          <button class="redirect-button" onclick="openOfferInNewTab()">
-            ↗ Open Free Gift Offer
-          </button>
-        </div>
-
-        <div class="nav" style="margin-top: 14px;">
-          <button class="btn next" type="button" onclick="finishToDisqualify()">Finish Survey</button>
-        </div>
+        <button class="btn next" type="button" onclick="complete()" style="margin-top:14px;">
+          Finish Survey
+        </button>
 
         <div class="note">
-          Clicking "Finish Survey" sends you back to PureSpectrum to record completion.
+          “Finish Survey” sends you back to PureSpectrum to record completion.
         </div>
-        
-        <div class="disclaimer">
-          *Free product offer available for a limited time. Shipping and handling fee of $9.95 applies. 
-          This is a one-time charge with no hidden fees or subscriptions. Product will ship within 
-          2-3 business days. This is a promotional offer from our research partners.
-        </div> 
       </div>
     </section>
 
@@ -407,46 +243,8 @@
   const steps = ["s1","s2","s3","s4","s5","s6"];
   let idx = 0;
   const answers = {};
-  let countdownTimer;
-  let timeLeft = 300; // 5 minutes in seconds
-  let iframeLoadedSuccessfully = false;
 
-  // Initialize countdown
-  function startCountdown() {
-    clearInterval(countdownTimer);
-    timeLeft = 300;
-    
-    countdownTimer = setInterval(() => {
-      timeLeft--;
-      
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      
-      document.getElementById('countdown').textContent = 
-        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      
-      if (timeLeft <= 0) {
-        clearInterval(countdownTimer);
-        document.getElementById('countdown').textContent = "TIME'S UP!";
-      }
-    }, 1000);
-  }
-
-  // Iframe handlers
-  function iframeLoaded() {
-    iframeLoadedSuccessfully = true;
-    document.getElementById('iframeFallback').classList.remove('active');
-  }
-
-  function iframeBlocked() {
-    document.getElementById('iframeFallback').classList.add('active');
-  }
-
-  function openOfferInNewTab() {
-    window.open('https://mwebzova.com/9178/879/2/?', '_blank');
-  }
-
-  // clickable option cards
+  // option cards
   document.querySelectorAll(".opts").forEach(group => {
     const type = group.dataset.type;
     const name = group.dataset.name;
@@ -468,8 +266,7 @@
           const on = !(inp && inp.checked);
           if (inp) inp.checked = on;
           opt.classList.toggle("selected", on);
-          const selected = Array.from(group.querySelectorAll(".opt.selected")).map(o => o.dataset.value);
-          answers[name] = selected;
+          answers[name] = Array.from(group.querySelectorAll(".opt.selected")).map(o => o.dataset.value);
         }
       });
     });
@@ -478,38 +275,13 @@
   function show(i){
     idx = i;
     steps.forEach((id,n)=>document.getElementById(id).classList.toggle("active", n===idx));
-
-    const pct = (idx/(steps.length-1))*100;
-    document.getElementById("fill").style.width = pct + "%";
-
-    // optional per-step counter text
+    document.getElementById("fill").style.width = ((idx/(steps.length-1))*100) + "%";
     const ctr = document.getElementById("ctr" + (idx+1));
     if (ctr) ctr.textContent = `Step ${idx+1} of ${steps.length}`;
-
-    // Start countdown when reaching offer page
-    if (idx === steps.length - 1) {
-      setTimeout(startCountdown, 100);
-      // Check iframe status after a delay
-      setTimeout(checkIframeStatus, 500);
-    }
-  }
-
-  function checkIframeStatus() {
-    try {
-      const iframe = document.getElementById('offerIframe');
-      // Try to access iframe content to see if it's blocked
-      if (iframe.contentDocument || iframe.contentWindow.document) {
-        iframeLoaded();
-      }
-    } catch (error) {
-      // Cross-origin error means iframe is blocked
-      iframeBlocked();
-    }
   }
 
   function validateCurrent(){
-    const stepId = steps[idx];
-    const step = document.getElementById(stepId);
+    const step = document.getElementById(steps[idx]);
     const group = step.querySelector(".opts");
     if (!group) return true;
 
@@ -517,29 +289,22 @@
     const name = group.dataset.name;
 
     if (type === "radio") {
-      if (!answers[name]) { 
-        alert("Please select an option to continue."); 
-        return false; 
-      }
+      if (!answers[name]) { alert("Please select an option to continue."); return false; }
 
-      // ✅ Disqualify: "Rarely / occasionally" or "Never" in Step 1
+      // ✅ Screenouts (Terminate):
       if (name === "freq" && (answers[name] === "rarely" || answers[name] === "never")) {
-        disqualify("Not frequent neck pain");
+        disqualify("Not enough neck pain frequency");
         return false;
       }
-
-      // ✅ Disqualify: under 18 in Step 5
       if (name === "age18" && answers[name] === "no") {
         disqualify("Under 18");
         return false;
       }
-
       return true;
     } else {
-      const arr = answers[name];
-      if (!Array.isArray(arr) || arr.length === 0) { 
-        alert("Please select at least one option to continue."); 
-        return false; 
+      if (!Array.isArray(answers[name]) || answers[name].length === 0) {
+        alert("Please select at least one option to continue.");
+        return false;
       }
       return true;
     }
@@ -551,25 +316,24 @@
   }
 
   function complete(){
-    try { 
-      localStorage.setItem("neck_survey_responses", JSON.stringify(answers)); 
-    } catch(e) {}
-    goTop(COMPLETE_URL);
-  }
-
-  function finishToDisqualify(){
-    try { 
-      localStorage.setItem("neck_survey_responses", JSON.stringify(answers)); 
-    } catch(e) {}
-    goTop(DISQUALIFY_URL);
+    if (!getTid()) {
+      alert("Missing transaction_id in the URL. PureSpectrum must open this survey with a transaction_id parameter.");
+      return;
+    }
+    try { localStorage.setItem("neck_survey_responses", JSON.stringify(answers)); } catch(e){}
+    goTop(completeUrl());
   }
 
   function disqualify(reason){
+    if (!getTid()) {
+      alert("Missing transaction_id in the URL. PureSpectrum must open this survey with a transaction_id parameter.");
+      return;
+    }
     try {
-      answers._disqualify_reason = reason || "disqualified";
+      answers._dq_reason = reason || "disqualified";
       localStorage.setItem("neck_survey_responses", JSON.stringify(answers));
-    } catch(e) {}
-    goTop(DISQUALIFY_URL);
+    } catch(e){}
+    goTop(disqualifyUrl());
   }
 
   show(0);

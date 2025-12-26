@@ -1,56 +1,712 @@
-function doPost(e) {
-  try {
-    const body = JSON.parse(e.postData.contents || "{}");
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Survey</title>
 
-    // ✅ Put your Sheet ID + sheet name here
-    const SHEET_ID = "REPLACE_WITH_YOUR_SHEET_ID";
-    const TAB_NAME = "Responses";
+  <!-- Tailwind (styling) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    const ss = SpreadsheetApp.openById(SHEET_ID);
-    const sh = ss.getSheetByName(TAB_NAME) || ss.insertSheet(TAB_NAME);
+  <!-- ✅ Tesseract.js v6 -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/tesseract.min.js"></script>
 
-    // Create header once
-    if (sh.getLastRow() === 0) {
-      sh.appendRow([
-        "timestamp","transaction_id","hasDebt","totalDebt",
-        "creditCards","personalLoans","medicalDebt","nonFederalStudentLoans",
-        "autoLoan","collections","payday","otherUnsecured",
-        "willing","called","ocrVerified",
-        "reachedSpecialist","helpful","nextStepsExplained","comments"
-      ]);
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    .card { border:1px solid rgb(226 232 240); border-radius: 18px; background:#fff; }
+    .btn { border-radius: 14px; padding: 12px 14px; font-weight: 700; }
+    .btn-primary { background:#111827; color:#fff; }
+    .btn-primary:disabled { opacity:.45; cursor:not-allowed; }
+    .btn-secondary { background:#f3f4f6; color:#111827; }
+    .chip { border:1px solid rgb(226 232 240); border-radius:999px; padding:6px 10px; background:#fff; font-weight:600; }
+    input[type="number"]{ appearance:textfield; }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+    .mono { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+  <main class="max-w-xl mx-auto p-4 sm:p-6">
+    <div class="flex items-center justify-between mb-3">
+      <div class="text-sm text-slate-600">
+        <span class="chip">Debt Feedback Survey</span>
+      </div>
+      <div id="stepPills" class="flex gap-1"></div>
+    </div>
+
+    <div class="card shadow-sm p-4 sm:p-6">
+      <!-- PAGES -->
+      <section id="page-1" class="page space-y-4">
+        <div class="space-y-2">
+          <p class="text-lg font-semibold">Do you currently have any debt?</p>
+          <p class="text-sm text-slate-600">Answer honestly to continue.</p>
+        </div>
+
+        <div class="space-y-2">
+          <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50">
+            <input type="radio" name="hasDebt" value="yes" class="mt-1" />
+            <div>
+              <div class="font-semibold">Yes</div>
+              <div class="text-sm text-slate-600">I currently have debt.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50">
+            <input type="radio" name="hasDebt" value="no" class="mt-1" />
+            <div>
+              <div class="font-semibold">No</div>
+              <div class="text-sm text-slate-600">I do not have any debt.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="pt-2">
+          <button id="p1Next" class="btn btn-primary w-full">Next</button>
+          <p id="p1Err" class="text-sm text-red-600 mt-2 hidden"></p>
+        </div>
+      </section>
+
+      <section id="page-2" class="page space-y-5 hidden">
+        <div class="space-y-1">
+          <p class="text-lg font-semibold">About how much do you owe in each category?</p>
+          <p class="text-sm text-slate-600">Enter “0” if it does not apply. Use USD amounts.</p>
+        </div>
+
+        <div class="space-y-3">
+          <!-- 8 categories (user requested). The first 4 are the key ones. -->
+          <div class="grid grid-cols-1 gap-3">
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="font-semibold">Credit Cards</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-slate-600">$</span>
+                <input id="amt-credit" type="number" min="0" inputmode="numeric" class="w-full rounded-xl border border-slate-200 px-3 py-2" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="font-semibold">Personal Loans</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-slate-600">$</span>
+                <input id="amt-personal" type="number" min="0" inputmode="numeric" class="w-full rounded-xl border border-slate-200 px-3 py-2" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="font-semibold">Medical Debt</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-slate-600">$</span>
+                <input id="amt-medical" type="number" min="0" inputmode="numeric" class="w-full rounded-xl border border-slate-200 px-3 py-2" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="font-semibold">Non-Federal Student Loans</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-slate-600">$</span>
+                <input id="amt-student" type="number" min="0" inputmode="numeric" class="w-full rounded-xl border border-slate-200 px-3 py-2" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="font-semibold">Payday Loans</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-slate-600">$</span>
+                <input id="amt-payday" type="number" min="0" inputmode="numeric" class="w-full rounded-xl border border-slate-200 px-3 py-2" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="font-semibold">Collections / Charge-offs</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-slate-600">$</span>
+                <input id="amt-collections" type="number" min="0" inputmode="numeric" class="w-full rounded-xl border border-slate-200 px-3 py-2" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="font-semibold">Auto Loan Deficiency (after repossession)</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-slate-600">$</span>
+                <input id="amt-auto" type="number" min="0" inputmode="numeric" class="w-full rounded-xl border border-slate-200 px-3 py-2" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="font-semibold">Other Unsecured Debt</div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-slate-600">$</span>
+                <input id="amt-other" type="number" min="0" inputmode="numeric" class="w-full rounded-xl border border-slate-200 px-3 py-2" placeholder="0" />
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3">
+            <div class="flex items-center justify-between">
+              <div class="text-sm text-slate-700 font-semibold">Estimated total</div>
+              <div id="totalDisplay" class="mono font-bold">$0</div>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">This total is calculated automatically from your entries.</p>
+          </div>
+        </div>
+
+        <div class="pt-1 space-y-2">
+          <button id="p2Next" class="btn btn-primary w-full">Next</button>
+          <p id="p2Err" class="text-sm text-red-600 hidden"></p>
+        </div>
+      </section>
+
+      <section id="page-3" class="page space-y-4 hidden">
+        <div class="space-y-3">
+          <p class="text-lg font-semibold">This survey would like your feedback on a debt consultation experience.</p>
+          <p class="text-sm text-slate-700">
+            To take part, you’ll need to use your mobile phone to place a call to a toll-free number and speak with a debt specialist.
+            After the call, you’ll answer a few short questions about how it went.
+          </p>
+          <p class="text-base font-semibold">Are you willing to participate?</p>
+        </div>
+
+        <div class="space-y-2">
+          <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50">
+            <input type="radio" name="willing" value="yes" class="mt-1" />
+            <div>
+              <div class="font-semibold">Yes</div>
+              <div class="text-sm text-slate-600">I’m willing to call using my mobile phone and share feedback afterward.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50">
+            <input type="radio" name="willing" value="no" class="mt-1" />
+            <div>
+              <div class="font-semibold">No</div>
+              <div class="text-sm text-slate-600">I do not want to participate.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="pt-2 space-y-2">
+          <button id="p3Next" class="btn btn-primary w-full">Next</button>
+          <p id="p3Err" class="text-sm text-red-600 hidden"></p>
+        </div>
+      </section>
+
+      <section id="page-4" class="page space-y-4 hidden">
+        <div class="space-y-2">
+          <p class="text-lg font-semibold">Next: Call a toll-free number to discuss your debt with a CuraDebt agent.</p>
+          <p class="text-sm text-slate-700">
+            You’ll speak with a specialist about your situation and possible options. After the call, return here to tell us how it went.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+          <div class="text-sm text-slate-600 font-semibold">Toll-free number</div>
+
+          <!-- Click-to-call -->
+          <a href="tel:18776452065" class="block text-center btn btn-primary w-full">
+            Call 1 (877) 645-2065
+          </a>
+
+          <p class="text-xs text-slate-600">
+            Tip: Use your <b>mobile phone</b> to place the call. When you’re done, come back to this page and continue.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 p-4 space-y-2">
+          <p class="text-sm text-slate-700">
+            <b>Important:</b> CuraDebt is a real company. We selected them for this feedback study, but we are not CuraDebt and we are not associated with them.
+            The call is to discuss your debt and see what help may be available. There is no obligation to sign up for any debt relief service.
+            Call as if you were calling a regular company — they will ask real questions about your debt.
+          </p>
+        </div>
+
+        <div class="space-y-2 pt-1">
+          <p class="text-base font-semibold">Have you placed the call?</p>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50">
+            <input type="radio" name="called" value="yes" class="mt-1" />
+            <div>
+              <div class="font-semibold">Yes, I called</div>
+              <div class="text-sm text-slate-600">I’m ready to upload my call-log screenshot next.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50">
+            <input type="radio" name="called" value="no" class="mt-1" />
+            <div>
+              <div class="font-semibold">Not yet</div>
+              <div class="text-sm text-slate-600">I still need to place the call.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="pt-2 space-y-2">
+          <!-- No Back button on this step -->
+          <button id="p4Next" class="btn btn-primary w-full">Next</button>
+          <p id="p4Err" class="text-sm text-red-600 hidden"></p>
+        </div>
+      </section>
+
+      <section id="page-5" class="page space-y-4 hidden">
+        <div class="space-y-2">
+          <p class="text-lg font-semibold">Upload your call log screenshot</p>
+          <p class="text-sm text-slate-700">
+            Please upload a screenshot of your call log showing the number and a call duration of at least <b>5 minutes</b>,
+            so we can verify you called.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 p-4 space-y-3">
+          <div class="text-sm text-slate-600 font-semibold">Screenshot requirements</div>
+          <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+            <li>Must show the phone number <b>1 (877) 645-2065</b> (or clearly the same digits).</li>
+            <li>Must show call duration of <b>5 minutes or more</b> (example: “5 min”, “06:12”, etc.).</li>
+          </ul>
+
+          <input id="ocrFile" type="file" accept="image/*" class="block w-full text-sm" />
+
+          <button id="runOcrBtn" class="btn btn-secondary w-full">Verify screenshot</button>
+
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3 space-y-1">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-semibold">Verification status</div>
+              <div id="attemptsPill" class="text-xs font-bold text-slate-700 mono">Attempts: 0 / 3</div>
+            </div>
+            <p id="ocrStatus" class="text-sm text-slate-700">Upload an image, then tap “Verify screenshot”.</p>
+            <details class="text-xs text-slate-600">
+              <summary class="cursor-pointer">Show detected text (debug)</summary>
+              <pre id="ocrText" class="whitespace-pre-wrap break-words mt-2"></pre>
+            </details>
+          </div>
+        </div>
+
+        <div class="pt-2 space-y-2">
+          <!-- Next is locked until OCR passes -->
+          <button id="p5Next" class="btn btn-primary w-full" disabled>Next</button>
+          <p class="text-xs text-slate-600">
+            If verification fails 3 times, you will be disqualified automatically.
+          </p>
+        </div>
+      </section>
+
+      <section id="page-6" class="page space-y-4 hidden">
+        <div class="space-y-2">
+          <p class="text-lg font-semibold">Quick feedback</p>
+          <p class="text-sm text-slate-700">Please answer a few short questions about your call experience.</p>
+        </div>
+
+        <div class="space-y-3">
+          <div class="p-3 rounded-xl border border-slate-200">
+            <label class="font-semibold block mb-2">How would you rate the call overall?</label>
+            <select id="qRate" class="w-full rounded-xl border border-slate-200 px-3 py-2">
+              <option value="">Select one</option>
+              <option>Excellent</option>
+              <option>Good</option>
+              <option>Okay</option>
+              <option>Poor</option>
+              <option>Very poor</option>
+            </select>
+          </div>
+
+          <div class="p-3 rounded-xl border border-slate-200">
+            <label class="font-semibold block mb-2">Did you feel the specialist understood your situation?</label>
+            <select id="qUnderstand" class="w-full rounded-xl border border-slate-200 px-3 py-2">
+              <option value="">Select one</option>
+              <option>Yes</option>
+              <option>Somewhat</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <div class="p-3 rounded-xl border border-slate-200">
+            <label class="font-semibold block mb-2">What was the most helpful part of the call?</label>
+            <textarea id="qHelpful" rows="3" class="w-full rounded-xl border border-slate-200 px-3 py-2" placeholder="Type a short answer..."></textarea>
+          </div>
+
+          <div class="p-3 rounded-xl border border-slate-200">
+            <label class="font-semibold block mb-2">Did you receive any next steps or options to consider?</label>
+            <select id="qNextSteps" class="w-full rounded-xl border border-slate-200 px-3 py-2">
+              <option value="">Select one</option>
+              <option>Yes</option>
+              <option>No</option>
+              <option>Not sure</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2 space-y-2">
+          <button id="submitBtn" class="btn btn-primary w-full">Finish</button>
+          <p id="p6Err" class="text-sm text-red-600 hidden"></p>
+          <p class="text-xs text-slate-500">
+            Submitting will redirect you to completion.
+          </p>
+        </div>
+      </section>
+
+      <!-- DISQUALIFIED PAGE (internal) -->
+      <section id="page-disq" class="page space-y-3 hidden">
+        <p class="text-lg font-semibold text-red-700">You are not eligible for this study.</p>
+        <p class="text-sm text-slate-700">Redirecting now…</p>
+      </section>
+    </div>
+
+    <p class="text-xs text-slate-500 mt-4">
+      Note: This is a feedback survey experience. Do not share sensitive information beyond what you are comfortable discussing.
+    </p>
+  </main>
+
+<script>
+  // =========================
+  // CONFIG
+  // =========================
+  const PHONE_CANON = "18776452065";
+  const PHONE_TEL = "tel:18776452065";
+  const FAIL_BASE = "https://spectrumsurveys.com/surveydone?st=18&transaction_id=";
+  const SUCCESS_BASE = "https://spectrumsurveys.com/surveydone?st=21&transaction_id=";
+
+  // =========================
+  // HELPERS
+  // =========================
+  const $ = (id) => document.getElementById(id);
+
+  function getTransactionId() {
+    const url = new URL(window.location.href);
+    return url.searchParams.get("transaction_id") || url.searchParams.get("tid") || "";
+  }
+
+  function redirectFail() {
+    const tid = encodeURIComponent(getTransactionId());
+    window.location.href = FAIL_BASE + tid;
+  }
+
+  function redirectSuccess() {
+    const tid = encodeURIComponent(getTransactionId());
+    window.location.href = SUCCESS_BASE + tid;
+  }
+
+  function showErr(elId, msg) {
+    const el = $(elId);
+    el.textContent = msg;
+    el.classList.remove("hidden");
+  }
+
+  function hideErr(elId) {
+    const el = $(elId);
+    el.classList.add("hidden");
+    el.textContent = "";
+  }
+
+  function toNum(v) {
+    const n = Number(String(v || "").replace(/[^\d.]/g, ""));
+    return isFinite(n) ? n : 0;
+  }
+
+  function money(n) {
+    try {
+      return n.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    } catch {
+      return "$" + Math.round(n);
+    }
+  }
+
+  // =========================
+  // STEPS UI
+  // =========================
+  const pageIds = ["page-1","page-2","page-3","page-4","page-5","page-6"];
+  let current = 0;
+
+  function renderStepPills() {
+    const wrap = $("stepPills");
+    wrap.innerHTML = "";
+    for (let i = 0; i < pageIds.length; i++) {
+      const dot = document.createElement("div");
+      dot.className = "h-2.5 w-2.5 rounded-full " + (i === current ? "bg-slate-900" : "bg-slate-300");
+      wrap.appendChild(dot);
+    }
+  }
+
+  function showPage(idx) {
+    current = idx;
+    for (const id of pageIds) $(id).classList.add("hidden");
+    $("page-disq").classList.add("hidden");
+    $(pageIds[idx]).classList.remove("hidden");
+    renderStepPills();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showDisqAndRedirect() {
+    for (const id of pageIds) $(id).classList.add("hidden");
+    $("page-disq").classList.remove("hidden");
+    renderStepPills();
+    setTimeout(redirectFail, 800);
+  }
+
+  // =========================
+  // LOGIC: Step 1
+  // =========================
+  $("p1Next").addEventListener("click", () => {
+    hideErr("p1Err");
+    const choice = document.querySelector('input[name="hasDebt"]:checked')?.value;
+    if (!choice) return showErr("p1Err", "Please select Yes or No to continue.");
+
+    if (choice === "no") {
+      // Disqualify
+      showDisqAndRedirect();
+      return;
+    }
+    showPage(1);
+  });
+
+  // =========================
+  // LOGIC: Step 2 (Amounts)
+  // =========================
+  const amtIds = [
+    "amt-credit","amt-personal","amt-medical","amt-student",
+    "amt-payday","amt-collections","amt-auto","amt-other"
+  ];
+
+  function computeTotal() {
+    let total = 0;
+    for (const id of amtIds) total += toNum($(id).value);
+    $("totalDisplay").textContent = money(total);
+    return total;
+  }
+
+  for (const id of amtIds) {
+    $(id).addEventListener("input", computeTotal);
+  }
+  computeTotal();
+
+  $("p2Next").addEventListener("click", () => {
+    hideErr("p2Err");
+    const total = computeTotal();
+
+    // Don't show the threshold to the user, but enforce it silently:
+    if (total < 10000) {
+      showDisqAndRedirect();
+      return;
+    }
+    showPage(2);
+  });
+
+  // =========================
+  // LOGIC: Step 3 (Willingness)
+  // =========================
+  $("p3Next").addEventListener("click", () => {
+    hideErr("p3Err");
+    const choice = document.querySelector('input[name="willing"]:checked')?.value;
+    if (!choice) return showErr("p3Err", "Please select an option to continue.");
+    if (choice === "no") {
+      showDisqAndRedirect();
+      return;
+    }
+    showPage(3);
+  });
+
+  // =========================
+  // LOGIC: Step 4 (Call done)
+  // =========================
+  $("p4Next").addEventListener("click", () => {
+    hideErr("p4Err");
+    const choice = document.querySelector('input[name="called"]:checked')?.value;
+    if (!choice) return showErr("p4Err", "Please select an option to continue.");
+    if (choice === "no") return showErr("p4Err", "Please place the call first, then come back and select “Yes, I called”.");
+    showPage(4);
+  });
+
+  // =========================
+  // OCR: Step 5
+  // =========================
+  let ocrAttempts = 0;
+  let ocrPassed = false;
+
+  function setAttemptsUI() {
+    $("attemptsPill").textContent = `Attempts: ${ocrAttempts} / 3`;
+  }
+
+  function normalizeDigits(text) {
+    return (text || "").replace(/\D+/g, "");
+  }
+
+  function textHasPhone(text) {
+    const digits = normalizeDigits(text);
+    // accept:
+    // - 18776452065 (11)
+    // - 8776452065 (10)
+    return digits.includes(PHONE_CANON) || digits.includes(PHONE_CANON.slice(1));
+  }
+
+  function parseDurationSeconds(text) {
+    const t = (text || "").toLowerCase();
+
+    // Match "12 min", "5 mins", "6 minute"
+    const m1 = t.match(/(\d{1,3})\s*(min|mins|minute|minutes)\b/);
+    if (m1) {
+      const mins = parseInt(m1[1], 10);
+      if (Number.isFinite(mins)) return mins * 60;
     }
 
-    const d = body.debts || {};
-    sh.appendRow([
-      body.timestamp || new Date().toISOString(),
-      body.transaction_id || "",
-      body.hasDebt || "",
-      body.totalDebt || 0,
-      d.creditCards || 0,
-      d.personalLoans || 0,
-      d.medicalDebt || 0,
-      d.nonFederalStudentLoans || 0,
-      d.autoLoan || 0,
-      d.collections || 0,
-      d.payday || 0,
-      d.otherUnsecured || 0,
-      body.willing || "",
-      body.called || "",
-      body.ocrVerified ? "yes" : "no",
-      body.feedback_reachedSpecialist || "",
-      body.feedback_helpful || "",
-      body.feedback_nextStepsExplained || "",
-      body.feedback_comments || ""
-    ]);
+    // Match time formats like "06:12" (mm:ss) or "1:05:30" (hh:mm:ss)
+    // Prefer the longest match
+    const times = [...t.matchAll(/\b(\d{1,2}):(\d{2})(?::(\d{2}))?\b/g)];
+    if (times.length) {
+      // take the last match (often the actual duration)
+      const last = times[times.length - 1];
+      const a = parseInt(last[1], 10);
+      const b = parseInt(last[2], 10);
+      const c = last[3] ? parseInt(last[3], 10) : null;
 
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: true }))
-      .setMimeType(ContentService.MimeType.JSON);
+      if (c !== null && Number.isFinite(a) && Number.isFinite(b) && Number.isFinite(c)) {
+        // hh:mm:ss
+        return (a * 3600) + (b * 60) + c;
+      }
+      if (Number.isFinite(a) && Number.isFinite(b)) {
+        // mm:ss
+        return (a * 60) + b;
+      }
+    }
 
-  } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return 0;
   }
-}
+
+  function preprocessToCanvas(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        // Scale up (helps OCR)
+        const scale = 2;
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.floor(img.width * scale);
+        canvas.height = Math.floor(img.height * scale);
+        const ctx = canvas.getContext("2d");
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Simple contrast + grayscale
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imgData.data;
+
+        // Increase contrast
+        const contrast = 25; // mild
+        const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+        for (let i = 0; i < d.length; i += 4) {
+          const r = d[i], g = d[i+1], b = d[i+2];
+          // grayscale
+          let y = 0.299*r + 0.587*g + 0.114*b;
+          // contrast
+          y = factor * (y - 128) + 128;
+          // clamp
+          y = Math.max(0, Math.min(255, y));
+          d[i] = d[i+1] = d[i+2] = y;
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        resolve(canvas);
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  async function runOcr() {
+    const file = $("ocrFile").files?.[0];
+    if (!file) {
+      $("ocrStatus").textContent = "Please choose an image first.";
+      return;
+    }
+
+    $("ocrStatus").textContent = "Running verification…";
+    $("ocrText").textContent = "";
+    $("p5Next").disabled = true;
+
+    try {
+      const canvas = await preprocessToCanvas(file);
+
+      const result = await Tesseract.recognize(
+        canvas,
+        "eng",
+        {
+          logger: (m) => {
+            if (m?.status) {
+              $("ocrStatus").textContent = `Verifying… ${m.status}${m.progress != null ? " " + Math.round(m.progress*100) + "%" : ""}`;
+            }
+          }
+        }
+      );
+
+      const text = (result?.data?.text || "").trim();
+      $("ocrText").textContent = text || "(no text detected)";
+
+      const hasPhone = textHasPhone(text);
+      const durSec = parseDurationSeconds(text);
+      const hasDuration = durSec >= 300; // 5 minutes
+
+      if (hasPhone && hasDuration) {
+        ocrPassed = true;
+        $("ocrStatus").textContent = "✅ Verified: number and 5+ minute duration detected. You may continue.";
+        $("p5Next").disabled = false;
+        return;
+      }
+
+      // Failed
+      ocrAttempts += 1;
+      setAttemptsUI();
+
+      const reasons = [];
+      if (!hasPhone) reasons.push("phone number not detected");
+      if (!hasDuration) reasons.push("5+ minute duration not detected");
+
+      $("ocrStatus").textContent = "❌ Verification failed (" + reasons.join(", ") + "). Please upload a clearer screenshot and try again.";
+
+      if (ocrAttempts >= 3) {
+        $("ocrStatus").textContent = "❌ Verification failed 3 times. You are being disqualified…";
+        setTimeout(redirectFail, 900);
+      }
+    } catch (e) {
+      ocrAttempts += 1;
+      setAttemptsUI();
+      $("ocrStatus").textContent = "❌ Verification error. Please try again with a clearer screenshot.";
+
+      if (ocrAttempts >= 3) {
+        $("ocrStatus").textContent = "❌ Verification failed 3 times. You are being disqualified…";
+        setTimeout(redirectFail, 900);
+      }
+    }
+  }
+
+  $("runOcrBtn").addEventListener("click", runOcr);
+
+  $("p5Next").addEventListener("click", () => {
+    // gate: must pass OCR
+    if (!ocrPassed) return;
+    showPage(5);
+  });
+
+  setAttemptsUI();
+
+  // =========================
+  // Step 6 submit -> success redirect
+  // =========================
+  $("submitBtn").addEventListener("click", () => {
+    hideErr("p6Err");
+    const rate = $("qRate").value;
+    const understand = $("qUnderstand").value;
+    const nextSteps = $("qNextSteps").value;
+
+    if (!rate || !understand || !nextSteps) {
+      showErr("p6Err", "Please answer the required questions (the dropdowns) to finish.");
+      return;
+    }
+
+    // (Optional) Here you could POST responses to your server/webhook.
+    // For PureSpectrum completion, redirect:
+    redirectSuccess();
+  });
+
+  // Start
+  showPage(0);
+</script>
+</body>
+</html>
 

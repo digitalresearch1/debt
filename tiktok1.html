@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Survey</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ✅ Tesseract.js v6 -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/tesseract.min.js"></script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .card { border: 1px solid rgb(226 232 240); border-radius: 18px; }
+    .btn { border-radius: 14px; padding: 12px 14px; font-weight: 600; }
+    .btn-primary { background: #111827; color: white; }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-ghost { background: white; border: 1px solid rgb(226 232 240); }
+    .muted { color: rgb(100 116 139); }
+    .mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+  <main class="max-w-xl mx-auto p-4 sm:p-6">
+    <div class="card bg-white p-5 sm:p-6 shadow-sm">
+      <!-- Top note (no big title) -->
+      <div class="text-sm muted mb-4">
+        Please answer the questions below.
+      </div>
+
+      <!-- Step containers -->
+      <section id="step1" class="space-y-4">
+        <div class="text-base font-semibold">1) What device are you using to take this survey?</div>
+        <div class="space-y-2">
+          <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer">
+            <input type="radio" name="device" value="iphone" class="h-4 w-4">
+            <span>iPhone</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer">
+            <input type="radio" name="device" value="ipad" class="h-4 w-4">
+            <span>iPad</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer">
+            <input type="radio" name="device" value="android" class="h-4 w-4">
+            <span>Android phone/tablet</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer">
+            <input type="radio" name="device" value="desktop" class="h-4 w-4">
+            <span>Desktop/Laptop computer</span>
+          </label>
+        </div>
+
+        <div id="uaWarn" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm">
+          It looks like you may be on a desktop/laptop. This survey requires iOS (iPhone/iPad) and will disqualify desktop users.
+        </div>
+
+        <button id="step1Next" class="btn btn-primary w-full" disabled>Next</button>
+      </section>
+
+      <section id="step2" class="space-y-4 hidden">
+        <div class="text-base font-semibold">
+          2) This survey would like your feedback on an app. To take part, you’ll need to use your mobile phone to download a mobile app. Are you willing to participate?
+        </div>
+
+        <div class="space-y-2">
+          <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer">
+            <input type="radio" name="consent" value="yes" class="h-4 w-4">
+            <span>Yes</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer">
+            <input type="radio" name="consent" value="no" class="h-4 w-4">
+            <span>No</span>
+          </label>
+        </div>
+
+        <button id="step2Next" class="btn btn-primary w-full" disabled>Continue</button>
+      </section>
+
+      <section id="step3" class="space-y-4 hidden">
+        <div class="text-base font-semibold">3) Download & test the app (iOS only)</div>
+
+        <div class="text-sm muted space-y-2">
+          <p>
+            Tap the button below to open the app task in a new tab. Follow the instructions there.
+          </p>
+          <p class="font-medium text-slate-900">
+            Important: You must complete this on iPhone or iPad (iOS).
+          </p>
+        </div>
+
+        <button id="openTask" class="btn btn-ghost w-full">
+          Open the app task (new tab)
+        </button>
+
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm">
+          After you finish, return to this page. On the next step you must upload a screenshot showing the app on your home screen.
+          <div class="mt-2">
+            App name to show in screenshot: <span class="font-semibold">OpenVPN</span>
+          </div>
+        </div>
+
+        <button id="step3Next" class="btn btn-primary w-full">I’m done — Next</button>
+      </section>
+
+      <section id="step4" class="space-y-4 hidden">
+        <div class="text-base font-semibold">4) Upload proof (screenshot)</div>
+
+        <div class="text-sm muted space-y-2">
+          <p>
+            Upload a screenshot that clearly shows the app on your home screen.
+          </p>
+          <p>
+            We will verify your screenshot by detecting the text <span class="font-semibold">OpenVPN</span>.
+          </p>
+        </div>
+
+        <input id="file" type="file" accept="image/*" class="block w-full text-sm" />
+
+        <div id="previewWrap" class="hidden">
+          <img id="preview" alt="Preview" class="w-full rounded-xl border border-slate-200" />
+        </div>
+
+        <button id="verifyBtn" class="btn btn-primary w-full" disabled>Verify screenshot</button>
+
+        <div id="status" class="hidden p-3 rounded-xl border text-sm"></div>
+
+        <div id="debug" class="hidden p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm">
+          <div class="font-semibold mb-1">Detected text (snippet)</div>
+          <pre id="detectedText" class="whitespace-pre-wrap text-xs mono"></pre>
+        </div>
+
+        <div class="flex gap-3">
+          <button id="showDebug" class="btn btn-ghost w-full hidden">Show detected text</button>
+          <button id="hideDebug" class="btn btn-ghost w-full hidden">Hide detected text</button>
+        </div>
+
+        <button id="finishBtn" class="btn btn-primary w-full hidden">Finish survey</button>
+      </section>
+    </div>
+
+    <div class="text-xs muted mt-4">
+      Tip: For best verification, use a clear screenshot (not blurry), with the app name visible.
+    </div>
+  </main>
+
+  <script>
+    // =========================
+    // CONFIG
+    // =========================
+    const TASK_URL = "https://data527.click/d96ed81366e2820b1e47/bc5a542fa7/?placementName=default";
+    const COMPLETE_BASE = "https://spectrumsurveys.com/surveydone?st=21&transaction_id=";
+    const DISQUALIFY_BASE = "https://spectrumsurveys.com/surveydone?st=18&transaction_id=";
+
+    const MAX_ATTEMPTS = 3;
+    const REQUIRED_KEYWORDS = ["openvpn"]; // case-insensitive match
+
+    // =========================
+    // HELPERS
+    // =========================
+    const $ = (id) => document.getElementById(id);
+
+    function getTransactionId() {
+      const url = new URL(window.location.href);
+      return url.searchParams.get("transaction_id") || url.searchParams.get("tid") || "";
+    }
+
+    function redirectDone(isComplete) {
+      const tid = encodeURIComponent(getTransactionId() || "missing");
+      window.location.href = (isComplete ? COMPLETE_BASE : DISQUALIFY_BASE) + tid;
+    }
+
+    function showStep(n) {
+      ["step1","step2","step3","step4"].forEach((s, i) => {
+        $(s).classList.toggle("hidden", (i+1) !== n);
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function setStatus(type, msg) {
+      const box = $("status");
+      box.classList.remove("hidden");
+      box.classList.remove("bg-emerald-50","border-emerald-200","text-emerald-900");
+      box.classList.remove("bg-amber-50","border-amber-200","text-amber-900");
+      box.classList.remove("bg-rose-50","border-rose-200","text-rose-900");
+      if (type === "ok") box.classList.add("bg-emerald-50","border-emerald-200","text-emerald-900");
+      if (type === "warn") box.classList.add("bg-amber-50","border-amber-200","text-amber-900");
+      if (type === "err") box.classList.add("bg-rose-50","border-rose-200","text-rose-900");
+      box.textContent = msg;
+    }
+
+    function isLikelyDesktopUA() {
+      const ua = navigator.userAgent || "";
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
+      return !isMobile;
+    }
+
+    // =========================
+    // STEP 1: DEVICE
+    // =========================
+    const step1Next = $("step1Next");
+    const uaWarn = $("uaWarn");
+
+    if (isLikelyDesktopUA()) {
+      uaWarn.classList.remove("hidden");
+    }
+
+    document.querySelectorAll('input[name="device"]').forEach(r => {
+      r.addEventListener("change", () => {
+        step1Next.disabled = false;
+      });
+    });
+
+    step1Next.addEventListener("click", () => {
+      const device = document.querySelector('input[name="device"]:checked')?.value;
+
+      // Disqualify desktop
+      if (device === "desktop") return redirectDone(false);
+
+      // Only iOS allowed (iPhone/iPad)
+      if (device !== "iphone" && device !== "ipad") return redirectDone(false);
+
+      showStep(2);
+    });
+
+    // =========================
+    // STEP 2: CONSENT
+    // =========================
+    const step2Next = $("step2Next");
+
+    document.querySelectorAll('input[name="consent"]').forEach(r => {
+      r.addEventListener("change", () => {
+        step2Next.disabled = false;
+      });
+    });
+
+    step2Next.addEventListener("click", () => {
+      const consent = document.querySelector('input[name="consent"]:checked')?.value;
+      if (consent !== "yes") return redirectDone(false);
+      showStep(3);
+    });
+
+    // =========================
+    // STEP 3: OPEN TASK
+    // =========================
+    $("openTask").addEventListener("click", () => {
+      window.open(TASK_URL, "_blank", "noopener,noreferrer");
+    });
+
+    $("step3Next").addEventListener("click", () => showStep(4));
+
+    // =========================
+    // STEP 4: OCR VERIFY
+    // =========================
+    let attempts = 0;
+    let currentImage = null;
+
+    const fileInput = $("file");
+    const verifyBtn = $("verifyBtn");
+    const finishBtn = $("finishBtn");
+    const preview = $("preview");
+    const previewWrap = $("previewWrap");
+    const detectedTextEl = $("detectedText");
+    const debugBox = $("debug");
+    const showDebug = $("showDebug");
+    const hideDebug = $("hideDebug");
+
+    function setDebugVisible(vis) {
+      debugBox.classList.toggle("hidden", !vis);
+      showDebug.classList.toggle("hidden", vis);
+      hideDebug.classList.toggle("hidden", !vis);
+    }
+
+    showDebug.addEventListener("click", () => setDebugVisible(true));
+    hideDebug.addEventListener("click", () => setDebugVisible(false));
+
+    fileInput.addEventListener("change", async (e) => {
+      setStatus("warn", "Ready to verify. Please click “Verify screenshot”.");
+      finishBtn.classList.add("hidden");
+      setDebugVisible(false);
+
+      const file = e.target.files?.[0];
+      if (!file) {
+        verifyBtn.disabled = true;
+        previewWrap.classList.add("hidden");
+        currentImage = null;
+        return;
+      }
+
+      const url = URL.createObjectURL(file);
+      preview.src = url;
+      previewWrap.classList.remove("hidden");
+      verifyBtn.disabled = false;
+
+      currentImage = file;
+    });
+
+    function normalizeText(txt) {
+      return (txt || "").toLowerCase().replace(/\s+/g, " ").trim();
+    }
+
+    function containsAllKeywords(txt) {
+      const t = normalizeText(txt);
+      return REQUIRED_KEYWORDS.every(k => t.includes(k));
+    }
+
+    async function runOCR(file) {
+      // Use an Image object -> canvas to standardize size (helps OCR reliability)
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+
+      const maxW = 1400; // keep it reasonably sized for speed
+      const scale = Math.min(1, maxW / img.width);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+
+      // Light contrast boost (often helps home screen text)
+      ctx.drawImage(img, 0, 0, w, h);
+      const im = ctx.getImageData(0, 0, w, h);
+      const data = im.data;
+      for (let i = 0; i < data.length; i += 4) {
+        // simple contrast
+        const r = data[i], g = data[i+1], b = data[i+2];
+        let y = 0.2126*r + 0.7152*g + 0.0722*b; // luminance
+        y = (y - 128) * 1.25 + 128;
+        y = Math.max(0, Math.min(255, y));
+        data[i] = data[i+1] = data[i+2] = y;
+      }
+      ctx.putImageData(im, 0, 0);
+
+      setStatus("warn", "Verifying… please wait.");
+      verifyBtn.disabled = true;
+
+      const { data: result } = await Tesseract.recognize(canvas, "eng", {
+        logger: (m) => {
+          // optional: could show progress
+        }
+      });
+
+      return result.text || "";
+    }
+
+    verifyBtn.addEventListener("click", async () => {
+      if (!currentImage) return;
+
+      attempts += 1;
+
+      try {
+        const text = await runOCR(currentImage);
+        detectedTextEl.textContent = text.slice(0, 2000);
+        $("showDebug").classList.remove("hidden"); // allow user to see what was detected if needed
+
+        if (containsAllKeywords(text)) {
+          setStatus("ok", "Verified ✅ We detected “OpenVPN” in your screenshot.");
+          finishBtn.classList.remove("hidden");
+          verifyBtn.disabled = true;
+          return;
+        }
+
+        if (attempts >= MAX_ATTEMPTS) {
+          setStatus("err", `We could not verify “OpenVPN” after ${MAX_ATTEMPTS} attempts. You are disqualified.`);
+          return redirectDone(false);
+        }
+
+        setStatus(
+          "warn",
+          `We could not detect “OpenVPN”. Please upload a clearer screenshot (attempt ${attempts}/${MAX_ATTEMPTS}).`
+        );
+        verifyBtn.disabled = false;
+
+      } catch (err) {
+        if (attempts >= MAX_ATTEMPTS) {
+          setStatus("err", `Verification error after ${MAX_ATTEMPTS} attempts. You are disqualified.`);
+          return redirectDone(false);
+        }
+        setStatus("warn", "Verification had an error. Please try again with a different/clearer screenshot.");
+        verifyBtn.disabled = false;
+      }
+    });
+
+    finishBtn.addEventListener("click", () => redirectDone(true));
+  </script>
+</body>
+</html>

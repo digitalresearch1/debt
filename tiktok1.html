@@ -1,420 +1,265 @@
+
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mobile App Feedback Survey</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>VPN App Experience Research Study</title>
 
-  <!-- Tailwind (optional, for styling) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- ✅ Tesseract.js (latest major v6) -->
+  <!-- Tesseract.js v6 -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/tesseract.min.js"></script>
 
   <style>
-    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
-    .card { border:1px solid rgb(226 232 240); border-radius: 18px; background:#fff; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .card { border: 1px solid rgb(226 232 240); border-radius: 18px; }
     .mono { font-variant-numeric: tabular-nums; }
-    .btn { border-radius: 12px; padding: 10px 14px; font-weight: 600; }
-    .btn-primary { background:#111827; color:#fff; }
-    .btn-secondary { background:#f3f4f6; color:#111827; }
-    .small { font-size: 12px; color: #6b7280; }
   </style>
 </head>
 
 <body class="bg-slate-50 text-slate-900">
-  <main class="max-w-xl mx-auto p-4 sm:p-6">
-    <div class="card p-5 sm:p-6 shadow-sm">
-      <div class="flex items-start justify-between gap-3">
-        <div>
-          <h1 class="text-lg font-semibold">Quick App Feedback Survey</h1>
-          <p class="text-sm text-slate-600 mt-1">
-            This survey would like your feedback on an app. To take part, you’ll need to use your mobile phone to download a mobile app.
-          </p>
-        </div>
-        <div class="text-xs text-slate-500 mono" id="txBox"></div>
-      </div>
+<main class="max-w-xl mx-auto px-4 py-10">
 
-      <!-- Status banner -->
-      <div id="banner" class="mt-4 hidden rounded-xl border p-3 text-sm"></div>
-
-      <!-- Step container -->
-      <div id="stepWrap" class="mt-5 space-y-6">
-
-        <!-- STEP 0: Auto device check -->
-        <div id="autoCheck" class="rounded-xl border border-slate-200 p-4">
-          <div class="flex items-start gap-3">
-            <div class="mt-0.5">📱</div>
-            <div>
-              <div class="font-semibold">Device check</div>
-              <div class="text-sm text-slate-600 mt-1">
-                We are verifying device eligibility. This study is <b>iOS only</b> (iPhone / iPad).
-              </div>
-
-              <div class="mt-2 text-xs text-slate-500 mono space-y-1">
-                <div id="envLine"></div>
-                <div id="uaInfo"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 1: Q1 Device question -->
-        <div id="q1" class="space-y-3 hidden">
-          <div class="font-semibold">1) What device are you using right now?</div>
-          <div class="space-y-2">
-            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <input type="radio" name="device" value="ios" id="devIOS" />
-              <span>iPhone / iPad (iOS)</span>
-            </label>
-            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <input type="radio" name="device" value="android" id="devAndroid" />
-              <span>Android phone / tablet</span>
-            </label>
-            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <input type="radio" name="device" value="desktop" id="devDesktop" />
-              <span>Desktop / Laptop</span>
-            </label>
-          </div>
-
-          <div class="flex gap-2 pt-2">
-            <button class="btn btn-primary" id="q1Next">Next</button>
-          </div>
-
-          <div class="small">
-            Note: This study is <b>iOS only</b>. Android and Desktop/Laptop will be disqualified.
-          </div>
-        </div>
-
-        <!-- STEP 2: Consent screener -->
-        <div id="q2" class="space-y-3 hidden">
-          <div class="font-semibold">
-            2) This survey would like your feedback on a new app. To take part, you'll need to use your mobile phone to download a mobile app. Are you willing to participate?
-          </div>
-          <div class="space-y-2">
-            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <input type="radio" name="consent" value="yes" />
-              <span>Yes</span>
-            </label>
-            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <input type="radio" name="consent" value="no" />
-              <span>No</span>
-            </label>
-          </div>
-          <div class="flex gap-2 pt-2">
-            <button class="btn btn-secondary" id="q2Back">Back</button>
-            <button class="btn btn-primary" id="q2Next">Next</button>
-          </div>
-        </div>
-
-        <!-- STEP 3: Open link + instructions -->
-        <div id="task" class="space-y-3 hidden">
-          <div class="font-semibold">3) Download & test the app</div>
-          <div class="text-sm text-slate-600">
-            Tap the button below to open the link in a new tab. Follow the instructions there to download the app.
-            When you finish, come back to this page.
-          </div>
-
-          <div class="rounded-xl border border-slate-200 p-4 bg-slate-50">
-            <div class="font-semibold text-sm">Proof of completion</div>
-            <ul class="list-disc pl-5 text-sm text-slate-700 mt-2 space-y-1">
-              <li>After installing, take a screenshot showing the app on your Home Screen.</li>
-              <li>The app name must be visible: <b>OpenVPN</b>.</li>
-              <li>Upload that screenshot on the next step for verification.</li>
-            </ul>
-          </div>
-
-          <div class="flex flex-wrap gap-2 pt-1">
-            <a
-              id="openLinkBtn"
-              class="btn btn-primary inline-flex items-center gap-2"
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open the link
-              <span aria-hidden="true">↗</span>
-            </a>
-            <button class="btn btn-secondary" id="taskNext">I’m done — upload proof</button>
-          </div>
-
-          <div class="small">
-            If the proof screenshot can’t be verified, you may be disqualified.
-          </div>
-        </div>
-
-        <!-- STEP 4: Upload + OCR -->
-        <div id="upload" class="space-y-3 hidden">
-          <div class="font-semibold">4) Upload your Home Screen screenshot (must show “OpenVPN”)</div>
-
-          <input id="file" type="file" accept="image/*" class="block w-full text-sm" />
-
-          <div class="rounded-xl border border-slate-200 p-4">
-            <div class="text-sm text-slate-700">
-              OCR will check your screenshot for the word: <b>openvpn</b>
-            </div>
-
-            <div class="mt-3 flex items-center gap-2">
-              <button class="btn btn-primary" id="verifyBtn">Verify screenshot</button>
-              <button class="btn btn-secondary" id="uploadBack">Back</button>
-            </div>
-
-            <div id="ocrStatus" class="mt-3 text-sm text-slate-600"></div>
-            <div class="mt-2 small mono" id="attemptsBox"></div>
-          </div>
-
-          <div class="small">
-            Tip: Make sure the app name is clearly visible in the screenshot (not cropped).
-          </div>
-        </div>
-
-        <!-- STEP 5: Finish -->
-        <div id="finish" class="space-y-3 hidden">
-          <div class="font-semibold">All set</div>
-          <div class="text-sm text-slate-600">
-            Verification passed. Click finish to submit.
-          </div>
-          <div class="flex gap-2 pt-2">
-            <button class="btn btn-primary" id="finishBtn">Finish</button>
-          </div>
-        </div>
-
-      </div>
+  <!-- MAIN -->
+  <section class="card bg-white shadow-sm p-6 space-y-5">
+    <div class="space-y-2">
+      <p class="text-sm text-slate-600">App experience research study</p>
+      <p class="text-lg font-semibold">Try a VPN app for ~1 minute (then share feedback)</p>
     </div>
 
-    <p class="small mt-4 text-center">
-      iOS only • Desktop/Android disqualify automatically
+    <!-- DISCLOSURE / PURPOSE -->
+    <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-700 space-y-2">
+      <p class="font-semibold text-slate-900">Purpose of this study</p>
+      <p>
+        This is a short <strong>independent user-experience study</strong> about first impressions of a VPN app.
+        <strong>Install</strong> and use it for a few minutes. Give us your honest review about it. 
+      </p>
+      <p class="text-xs text-slate-500">
+        
+      </p>
+    </div>
+
+    <!-- OPTIONAL: SCREENSHOT PREVIEW YOU UPLOADED -->
+    <!-- Replace src with your hosted image URL if you want to show an example screenshot -->
+    <!--
+    <div class="rounded-xl border border-slate-200 overflow-hidden">
+      <img src="YOUR_HOSTED_SCREENSHOT_URL.png" alt="Example screen" class="w-full block">
+    </div>
+    -->
+
+    <!-- INSTRUCTIONS -->
+    <div class="text-sm text-slate-700 space-y-2">
+      <p class="font-semibold text-slate-900">What to do</p>
+      <ol class="list-decimal pl-5 space-y-1">
+        <li>Tap <strong>Open VPN Download</strong> to visit the offer page.</li>
+        <li>Click on Install VPN app and open it for about <strong>Use it for a few minutes</strong>.</li>
+        <li>Return here and upload a <strong>home screen screenshot</strong> showing the app icon/name.</li>
+        <li>After validation, answer a few quick feedback questions and finish.</li>
+      </ol>
+      <p class="text-xs text-slate-500">
+        A clear home screen screenshot where the app name is visible works best.
+      </p>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <button id="btnOpen"
+        class="rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800">
+        Open VPN Download
+      </button>
+
+      <button id="btnGoFeedback"
+        class="rounded-xl px-4 py-3 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40"
+        disabled>
+        Continue to feedback
+      </button>
+    </div>
+
+    <p id="hint" class="text-xs text-slate-500"></p>
+
+    <!-- SCREENSHOT + OCR -->
+    <div class="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+      <p class="text-sm font-semibold">Upload home screen screenshot (required)</p>
+      <p class="text-xs text-slate-600">
+        We unlock “Continue” only if we detect the VPN app name (or “VPN”) in your screenshot.
+      </p>
+
+      <input id="shot" type="file" accept="image/*" class="block w-full text-sm"/>
+
+      <button id="btnOcr"
+        class="rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white disabled:opacity-40"
+        disabled>
+        Validate screenshot
+      </button>
+
+      <div>
+        <span class="text-xs text-slate-600">OCR status</span>
+        <span id="ocrPct" class="text-xs mono ml-2">0%</span>
+        <div class="h-2 bg-slate-200 rounded mt-1">
+          <div id="ocrBar" class="h-full bg-indigo-600" style="width:0%"></div>
+        </div>
+        <p id="ocrMsg" class="text-xs text-slate-600 mt-1"></p>
+      </div>
+
+      <p id="gateMsg" class="text-xs text-slate-500"></p>
+    </div>
+  </section>
+
+  <!-- FEEDBACK -->
+  <section id="feedback" class="card bg-white shadow-sm p-6 mt-6 space-y-4 hidden">
+    <p class="text-lg font-semibold">VPN app feedback</p>
+
+    <div class="space-y-2 text-sm">
+      <p class="font-semibold">1) Was the install/open process easy?</p>
+      <label class="block"><input type="radio" name="ease" value="very_easy"> Very easy</label>
+      <label class="block"><input type="radio" name="ease" value="ok"> Okay</label>
+      <label class="block"><input type="radio" name="ease" value="hard"> Hard</label>
+      <label class="block"><input type="radio" name="ease" value="didnt_install"> I didn’t install</label>
+    </div>
+
+    <div class="space-y-2 text-sm">
+      <p class="font-semibold">2) What did you notice in the first minute?</p>
+      <textarea id="notice" class="w-full border border-slate-300 rounded-xl p-3 text-sm" rows="3"
+        placeholder="Example: onboarding screens, ads, paywall, permissions, speed..."></textarea>
+    </div>
+
+    <div class="space-y-2 text-sm">
+      <p class="font-semibold">3) Would you keep this VPN installed?</p>
+      <label class="block"><input type="radio" name="keep" value="yes"> Yes</label>
+      <label class="block"><input type="radio" name="keep" value="no"> No</label>
+      <label class="block"><input type="radio" name="keep" value="not_sure"> Not sure</label>
+    </div>
+
+    <div class="space-y-2 text-sm">
+      <p class="font-semibold">4) Why?</p>
+      <textarea id="why" class="w-full border border-slate-300 rounded-xl p-3 text-sm" rows="3"
+        placeholder="Tell us what you liked or disliked."></textarea>
+    </div>
+
+    <button id="btnSubmit"
+      class="w-full rounded-xl px-4 py-3 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800">
+      Submit & finish
+    </button>
+
+    <p class="text-xs text-slate-500">
+      By submitting, you confirm this feedback is based on your own experience.
     </p>
-  </main>
+  </section>
+
+</main>
 
 <script>
-  // ========= CONFIG =========
-  const SURVEY_LINK = "https://data527.click/d96ed81366e2820b1e47/bc5a542fa7/?placementName=default";
+/** ✅ YOUR LINKS **/
+const OFFER_URL = "https://data527.click/d96ed81366e2820b1e47/a28a92a800/?placementName=default";
 
-  // PureSpectrum redirect URLs:
-  const COMPLETE_URL_BASE = "https://spectrumsurveys.com/surveydone?st=21&transaction_id="; // complete
-  const DISQUAL_URL_BASE  = "https://spectrumsurveys.com/surveydone?st=18&transaction_id="; // disqualify
+/** Set this to your “complete”/thank-you redirect (CloudResearch / PureSpectrum / etc.) **/
+const COMPLETE_URL = "https://example.com/complete";
 
-  const REQUIRED_WORD = "openvpn";
-  const MAX_FAILS = 3;
+/** ✅ What OCR should look for in the screenshot.
+ * Put the actual VPN app name shown under the icon.
+ * From your screenshot text, this might be: "Secure360" (edit if different)
+ */
+const EXPECTED_APP_KEYWORDS = [
+  "secure360",   // <-- change to your real app label
+  "vpn"
+];
 
-  // ========= HELPERS =========
-  const $ = (id) => document.getElementById(id);
+let verified = false;
+let attempts = 0;
+const MAX_ATTEMPTS = 3;
 
-  function getTx() {
-    const u = new URL(window.location.href);
-    return u.searchParams.get("transaction_id")
-        || u.searchParams.get("tid")
-        || u.searchParams.get("tx")
-        || "";
-  }
+const btnOpen = document.getElementById("btnOpen");
+const btnOcr = document.getElementById("btnOcr");
+const btnGo = document.getElementById("btnGoFeedback");
+const shot = document.getElementById("shot");
+const ocrMsg = document.getElementById("ocrMsg");
+const gateMsg = document.getElementById("gateMsg");
+const ocrBar = document.getElementById("ocrBar");
+const ocrPct = document.getElementById("ocrPct");
 
-  function showBanner(type, msg) {
-    const b = $("banner");
-    b.classList.remove("hidden");
-    b.textContent = msg;
+btnOpen.onclick = () => {
+  window.open(OFFER_URL, "_blank", "noopener,noreferrer");
+  gateMsg.textContent = "After you try the VPN app, upload your home screen screenshot below.";
+};
 
-    b.className = "mt-4 rounded-xl border p-3 text-sm";
-    if (type === "disqualify") b.classList.add("border-red-200","bg-red-50","text-red-800");
-    else if (type === "ok")    b.classList.add("border-emerald-200","bg-emerald-50","text-emerald-800");
-    else                       b.classList.add("border-slate-200","bg-slate-50","text-slate-700");
-  }
+shot.onchange = () => {
+  btnOcr.disabled = !shot.files || !shot.files[0];
+};
 
-  function showStep(stepId) {
-    ["autoCheck","q1","q2","task","upload","finish"].forEach(id => $(id).classList.add("hidden"));
-    $(stepId).classList.remove("hidden");
-  }
+function setProgress(pct, msg) {
+  ocrBar.style.width = pct + "%";
+  ocrPct.textContent = pct + "%";
+  if (msg) ocrMsg.textContent = msg;
+}
 
-  function goDisqualify(reason) {
-    showBanner("disqualify", reason || "You are not eligible for this study.");
-    const tx = getTx();
-    window.location.href = DISQUAL_URL_BASE + encodeURIComponent(tx);
-  }
+btnOcr.onclick = async () => {
+  const file = shot.files[0];
+  if (!file) return;
 
-  function goComplete() {
-    const tx = getTx();
-    window.location.href = COMPLETE_URL_BASE + encodeURIComponent(tx);
-  }
+  attempts += 1;
+  btnOcr.disabled = true;
+  btnGo.disabled = true;
+  verified = false;
 
-  // ========= DEVICE DETECTION (AUTO) =========
-  function detectEnvironment() {
-    const ua = (navigator.userAgent || "").toLowerCase();
-    const platform = (navigator.platform || "").toLowerCase();
+  setProgress(5, "Starting OCR…");
 
-    // iPadOS can identify as Mac; detect by touch points.
-    const isIPadOS = (platform.includes("mac") && navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
-
-    const isIOS = /iphone|ipad|ipod/.test(ua) || isIPadOS;
-    const isAndroid = /android/.test(ua);
-
-    // Desktop-like if neither iOS nor Android.
-    const isDesktopLike = (!isIOS && !isAndroid);
-
-    return { isIOS, isAndroid, isDesktopLike, ua, platform, isIPadOS };
-  }
-
-  // extra “guard” you asked for: run the device check not just on load,
-  // but ALSO whenever user tries to continue (Q1/Q2/Task/Upload/Finish).
-  function enforceIOSOrDisqualify() {
-    const env = detectEnvironment();
-    if (env.isAndroid) {
-      goDisqualify("Disqualified: Android devices are not eligible. This study is iOS only.");
-      return false;
-    }
-    if (env.isDesktopLike && !env.isIOS) {
-      goDisqualify("Disqualified: Desktop/Laptop devices are not eligible. Please use an iPhone or iPad.");
-      return false;
-    }
-    // Must be iOS
-    if (!env.isIOS) {
-      goDisqualify("Disqualified: This study is iOS only (iPhone/iPad).");
-      return false;
-    }
-    return true;
-  }
-
-  // ========= STATE =========
-  let fails = 0;
-
-  // ========= INIT =========
-  (function init() {
-    $("openLinkBtn").href = SURVEY_LINK;
-
-    const tx = getTx();
-    $("txBox").textContent = tx ? `transaction_id: ${tx}` : "";
-
-    const env = detectEnvironment();
-    $("envLine").textContent = `Detected: ${env.isIOS ? "iOS" : env.isAndroid ? "Android" : "Desktop/Other"}${env.isIPadOS ? " (iPadOS)" : ""}`;
-    $("uaInfo").textContent = `UA: ${env.ua}`;
-
-    // Auto-disqualify immediately if not iOS
-    if (!enforceIOSOrDisqualify()) return;
-
-    // If iOS, auto-select iOS on Q1 (still shows the question as you wanted)
-    $("devIOS").checked = true;
-
-    // Optional: you can disable Android/Desktop choices since you only allow iOS
-    // (keeps the question but prevents wrong selections)
-    $("devAndroid").disabled = true;
-    $("devDesktop").disabled = true;
-
-    showBanner("ok", "Eligible device detected (iOS). Please answer the questions below.");
-    showStep("q1");
-  })();
-
-  // ========= Q1 logic =========
-  $("q1Next").addEventListener("click", () => {
-    // Re-check device right here too
-    if (!enforceIOSOrDisqualify()) return;
-
-    const sel = document.querySelector('input[name="device"]:checked');
-    if (!sel) { showBanner("info", "Please select your device."); return; }
-
-    // Even if they somehow select wrong, disqualify
-    if (sel.value === "desktop") return goDisqualify("Disqualified: Desktop/Laptop devices are not eligible. Please use an iPhone or iPad.");
-    if (sel.value === "android") return goDisqualify("Disqualified: Android devices are not eligible. This study is iOS only.");
-
-    showStep("q2");
-  });
-
-  // ========= Q2 logic =========
-  $("q2Back").addEventListener("click", () => {
-    if (!enforceIOSOrDisqualify()) return;
-    showStep("q1");
-  });
-
-  $("q2Next").addEventListener("click", () => {
-    if (!enforceIOSOrDisqualify()) return;
-
-    const sel = document.querySelector('input[name="consent"]:checked');
-    if (!sel) { showBanner("info", "Please answer the consent question."); return; }
-    if (sel.value === "no") {
-      goDisqualify("Disqualified: You selected that you are not willing to participate.");
-      return;
-    }
-    showStep("task");
-  });
-
-  // ========= Task logic =========
-  $("taskNext").addEventListener("click", () => {
-    if (!enforceIOSOrDisqualify()) return;
-    showStep("upload");
-  });
-
-  // ========= Upload logic =========
-  $("uploadBack").addEventListener("click", () => {
-    if (!enforceIOSOrDisqualify()) return;
-    showStep("task");
-  });
-
-  function normalizeText(t) {
-    return (t || "")
-      .toLowerCase()
-      .replace(/[^\w\s]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
-
-  function setOCRStatus(msg) {
-    $("ocrStatus").textContent = msg;
-    $("attemptsBox").textContent = `Failed attempts: ${fails} / ${MAX_FAILS}`;
-  }
-
-  $("verifyBtn").addEventListener("click", async () => {
-    if (!enforceIOSOrDisqualify()) return;
-
-    const file = $("file").files && $("file").files[0];
-    if (!file) { setOCRStatus("Please choose an image first."); return; }
-
-    if (file.size > 12 * 1024 * 1024) {
-      setOCRStatus("That image is quite large. Please upload a smaller screenshot (under 12MB).");
-      return;
-    }
-
-    setOCRStatus("Reading screenshot…");
-
-    try {
-      const { data } = await Tesseract.recognize(file, "eng", {
-        logger: (m) => {
-          if (m.status === "recognizing text" && typeof m.progress === "number") {
-            const pct = Math.round(m.progress * 100);
-            setOCRStatus(`OCR in progress… ${pct}%`);
-          }
-        }
-      });
-
-      const raw = data && data.text ? data.text : "";
-      const text = normalizeText(raw);
-
-      if (text.includes(REQUIRED_WORD)) {
-        showBanner("ok", "✅ Verified: “OpenVPN” detected in your screenshot.");
-        showStep("finish");
-        return;
+  const worker = await Tesseract.createWorker("eng", 1, {
+    logger: m => {
+      if (m.status === "recognizing text") {
+        const pct = Math.max(5, Math.min(95, Math.round((m.progress || 0) * 95)));
+        setProgress(pct);
       }
-
-      fails += 1;
-      if (fails >= MAX_FAILS) {
-        goDisqualify("Disqualified: We could not verify the required proof screenshot after multiple attempts.");
-        return;
-      }
-
-      setOCRStatus(`Not verified: we could not detect “${REQUIRED_WORD}”. Please upload a clearer Home Screen screenshot showing the app name.`);
-    } catch (err) {
-      fails += 1;
-      if (fails >= MAX_FAILS) {
-        goDisqualify("Disqualified: Verification failed multiple times.");
-        return;
-      }
-      setOCRStatus("OCR error occurred. Please try again with a clearer screenshot.");
-      console.error(err);
     }
   });
 
-  // ========= Finish =========
-  $("finishBtn").addEventListener("click", () => {
-    if (!enforceIOSOrDisqualify()) return;
-    goComplete();
-  });
+  try {
+    const { data } = await worker.recognize(file);
+    const text = (data.text || "").toLowerCase().replace(/\s+/g, " ");
+
+    await worker.terminate();
+    setProgress(100);
+
+    const hit = EXPECTED_APP_KEYWORDS.some(k => text.includes(k.toLowerCase()));
+
+    if (hit) {
+      verified = true;
+      ocrMsg.textContent = "✅ Detected VPN app text in the screenshot. Continue unlocked.";
+      btnGo.disabled = false;
+      btnOcr.disabled = false;
+    } else {
+      const left = MAX_ATTEMPTS - attempts;
+      ocrMsg.textContent =
+        "❌ We couldn’t detect the VPN app name. Please upload a clearer home-screen screenshot (app label visible).";
+
+      if (left > 0) {
+        gateMsg.textContent = `Attempts left: ${left}.`;
+        btnOcr.disabled = false;
+      } else {
+        gateMsg.textContent = "Maximum attempts reached.";
+        // If you want a disqualify redirect, put it here:
+        // window.location.href = "https://example.com/disqualify";
+      }
+    }
+  } catch (e) {
+    try { await worker.terminate(); } catch (_) {}
+    setProgress(0, "OCR error. Please try again with a clearer screenshot.");
+    btnOcr.disabled = false;
+  }
+};
+
+btnGo.onclick = () => {
+  if (!verified) return;
+  document.getElementById("feedback").classList.remove("hidden");
+  document.getElementById("feedback").scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
+document.getElementById("btnSubmit").onclick = () => {
+  // (Optional) You can send feedback to your server here via fetch().
+  window.location.href = COMPLETE_URL;
+};
 </script>
+
 </body>
 </html>

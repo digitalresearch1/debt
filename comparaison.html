@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Debt Offer Match Feedback Survey</title>
+
+  <!-- Tailwind (styling) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ✅ Tesseract.js v6 (OCR) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/tesseract.min.js"></script>
+
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    .card { border:1px solid rgb(226 232 240); border-radius: 18px; background:#fff; }
+    .btn { border-radius: 12px; padding: 10px 14px; font-weight: 800; }
+    .btn-primary { background:#111827; color:#fff; }
+    .btn-primary:disabled { opacity:.45; cursor:not-allowed; }
+    .btn-secondary { background:#f3f4f6; color:#111827; }
+    .mono { font-variant-numeric: tabular-nums; }
+    input[type="radio"] { width: 16px; height: 16px; }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
+    .linkbtn { text-decoration:none; }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+  <main class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-xl">
+      <div class="card shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b bg-white">
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-slate-600">Survey</div>
+            <div class="text-sm text-slate-600 mono" id="stepIndicator">Step 1 / 5</div>
+          </div>
+          <div class="mt-2 h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div id="progressBar" class="h-2 bg-slate-900 rounded-full" style="width:20%"></div>
+          </div>
+        </div>
+
+        <div class="p-5" id="content"></div>
+
+        <div class="px-5 py-4 border-t bg-white flex items-center justify-between gap-3">
+          <button id="backBtn" class="btn btn-secondary" type="button">Back</button>
+          <button id="nextBtn" class="btn btn-primary" type="button">Next</button>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-500 mt-3 leading-relaxed">
+        Tip: For best results, complete this on your mobile phone (especially the screenshot verification step).
+      </p>
+    </div>
+  </main>
+
+  <script>
+    /***********************
+     * ✅ CONFIG
+     ***********************/
+    // Redirects (provided)
+    const REDIRECT_PASS = "https://spectrumsurveys.com/surveydone?st=21&transaction_id=[transaction_id]";
+    const REDIRECT_FAIL = "https://spectrumsurveys.com/surveydone?st=18&transaction_id=[transaction_id]";
+
+    // Website participants must use
+    const TARGET_SITE = "https://debt-comparisons.com/";
+
+    // OCR limits
+    const OCR_MAX_ATTEMPTS = 3;
+
+    // ✅ Qualification rule (silent): total of these categories must be >= this amount.
+    // (User asked: do NOT show this number to participants.)
+    const MIN_QUALIFY_AMOUNT = 15000;
+
+    // ✅ Google Sheet (Apps Script Web App URL) — replace with your deployed URL
+    // Must accept POST JSON and append to your sheet.
+    const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/REPLACE_ME/exec";
+
+    /***********************
+     * Helpers
+     ***********************/
+    const $ = (id) => document.getElementById(id);
+
+    function getTransactionId() {
+      const p = new URLSearchParams(location.search);
+      return p.get("transaction_id") || "";
+    }
+
+    function buildRedirect(templateUrl) {
+      const tid = getTransactionId();
+      return templateUrl.replace("[transaction_id]", encodeURIComponent(tid || ""));
+    }
+
+    function redirectFail() { window.location.href = buildRedirect(REDIRECT_FAIL); }
+    function redirectPass() { window.location.href = buildRedirect(REDIRECT_PASS); }
+
+    function money(n) {
+      const v = Number(n || 0);
+      if (!isFinite(v)) return "$0";
+      return v.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    }
+
+    function clamp0(n) {
+      n = Number(n);
+      if (!isFinite(n) || n < 0) return 0;
+      return n;
+    }
+
+    function normalizeText(s) {
+      return (s || "")
+        .toLowerCase()
+        .replace(/[^\w\s$]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    /***********************
+     * State
+     ***********************/
+    const TOTAL_STEPS = 5;
+    let step = 1;
+    let ocrAttempts = 0;
+
+    const form = {
+      hasDebt: null, // "yes" | "no"
+      debts: {
+        creditCards: 0,
+        personalLoans: 0,
+        medicalDebt: 0,
+        privateStudentLoans: 0,
+        autoLoan: 0,
+        collections: 0,
+        payday: 0,
+        otherUnsecured: 0
+      },
+      usedSite: null,     // yes/no
+      ocrVerified: false,
+      ocrText: "",
+      feedback: {
+        offersCount: "",
+        contactedAny: null,  // yes/no
+        willUse: null,       // yes/maybe/no
+        comments: ""
+      }
+    };
+
+    function totalDebtAll() {
+      const d = form.debts;
+      return clamp0(d.creditCards) + clamp0(d.personalLoans) + clamp0(d.medicalDebt) + clamp0(d.privateStudentLoans) +
+             clamp0(d.autoLoan) + clamp0(d.collections) + clamp0(d.payday) + clamp0(d.otherUnsecured);
+    }
+
+    function qualifySilently() {
+      // Silent rule requested:
+      // Only totals from these categories count toward qualification:
+      // - Credit card debt
+      // - Unsecured personal loans
+      // - Private student loans
+      const d = form.debts;
+      const qualifyingTotal =
+        clamp0(d.creditCards) +
+        clamp0(d.personalLoans) +
+        clamp0(d.privateStudentLoans);
+
+      return qualifyingTotal >= MIN_QUALIFY_AMOUNT;
+    }
+
+    /***********************
+     * Rendering
+     ***********************/
+    function setStepUI() {
+      $("stepIndicator").textContent = `Step ${step} / ${TOTAL_STEPS}`;
+      $("progressBar").style.width = `${(step / TOTAL_STEPS) * 100}%`;
+
+      // Back button rules:
+      // - Hide back on the site instructions step and OCR step (keeps flow clean)
+      const backBtn = $("backBtn");
+      backBtn.style.visibility = (step === 3 || step === 4) ? "hidden" : "visible";
+
+      // Next button label
+      $("nextBtn").textContent = (step === TOTAL_STEPS) ? "Submit" : "Next";
+
+      // Default: disabled until valid
+      $("nextBtn").disabled = true;
+    }
+
+    function debtRow(label, key, value) {
+      return `
+        <div class="flex items-center justify-between gap-3 p-3 rounded-2xl border bg-white">
+          <div class="font-semibold text-sm">${label}</div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-500">$</span>
+            <input
+              class="w-36 border rounded-xl p-2 text-right mono"
+              type="number"
+              min="0"
+              step="100"
+              inputmode="numeric"
+              placeholder="0"
+              value="${Number(value || 0)}"
+              data-debtkey="${key}"
+            />
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      setStepUI();
+      const content = $("content");
+
+      /******** Step 1: Do you have debt? ********/
+      if (step === 1) {
+        content.innerHTML = `
+          <h1 class="text-lg font-extrabold mb-3">Do you currently have any personal debt?</h1>
+          <div class="space-y-3">
+            <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+              <input type="radio" name="hasDebt" value="yes" class="mt-1">
+              <div>
+                <div class="font-semibold">Yes</div>
+                <div class="text-sm text-slate-600">I have one or more debts.</div>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+              <input type="radio" name="hasDebt" value="no" class="mt-1">
+              <div>
+                <div class="font-semibold">No</div>
+                <div class="text-sm text-slate-600">I do not have any debt.</div>
+              </div>
+            </label>
+          </div>
+        `;
+
+        if (form.hasDebt) {
+          content.querySelector(`input[name="hasDebt"][value="${form.hasDebt}"]`).checked = true;
+          $("nextBtn").disabled = false;
+        }
+
+        content.querySelectorAll('input[name="hasDebt"]').forEach(r => {
+          r.addEventListener("change", () => {
+            form.hasDebt = r.value;
+            $("nextBtn").disabled = false;
+          });
+        });
+      }
+
+      /******** Step 2: Debt amounts ********/
+      if (step === 2) {
+        const d = form.debts;
+        content.innerHTML = `
+          <h1 class="text-lg font-extrabold mb-1">About how much do you currently owe?</h1>
+          <p class="text-sm text-slate-600 mb-4">
+            Enter an estimated amount for any categories that apply (USD). If a category does not apply, leave it as 0.
+          </p>
+
+          <div class="space-y-3">
+            ${debtRow("Credit Cards", "creditCards", d.creditCards)}
+            ${debtRow("Personal Loans", "personalLoans", d.personalLoans)}
+            ${debtRow("Medical Debt", "medicalDebt", d.medicalDebt)}
+            ${debtRow("Private Student Loans", "privateStudentLoans", d.privateStudentLoans)}
+            ${debtRow("Auto Loan (non-lease)", "autoLoan", d.autoLoan)}
+            ${debtRow("Collections", "collections", d.collections)}
+            ${debtRow("Payday / Cash Advance", "payday", d.payday)}
+            ${debtRow("Other Unsecured Debt", "otherUnsecured", d.otherUnsecured)}
+          </div>
+
+          <div class="mt-4 p-3 rounded-xl bg-slate-50 border">
+            <div class="text-sm text-slate-700 flex items-center justify-between">
+              <span class="font-semibold">Current total (estimate)</span>
+              <span class="mono font-extrabold" id="totalDebtDisplay">${money(totalDebtAll())}</span>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-500 mt-3">
+            Please do your best estimate.
+          </p>
+        `;
+
+        // Enable next if they entered any debt at all (we still silently qualify on Next click)
+        $("nextBtn").disabled = !(totalDebtAll() > 0);
+
+        content.querySelectorAll('input[data-debtkey]').forEach(inp => {
+          inp.addEventListener("input", () => {
+            const key = inp.getAttribute("data-debtkey");
+            form.debts[key] = clamp0(inp.value);
+            $("totalDebtDisplay").textContent = money(totalDebtAll());
+            $("nextBtn").disabled = !(totalDebtAll() > 0);
+          });
+        });
+      }
+
+      /******** Step 3: Use the site + instructions ********/
+      if (step === 3) {
+        content.innerHTML = `
+          <h1 class="text-lg font-extrabold mb-2">Next: Get your matched offers</h1>
+
+          <div class="p-4 rounded-2xl border bg-white">
+            <p class="text-sm text-slate-700 leading-relaxed">
+              In this step, you will complete a short form on a debt-relief comparison website.
+              The website may display matched offers from one or more partner services that could help with your situation.
+              <br><br>
+              <b>What to do:</b><br>
+              1) Tap the button below to open the website on your phone.<br>
+              2) Complete the short form.<br>
+              3) When your results/offers are shown, take a screenshot of that results page (example: a “Congratulations / you qualify for offers” page).<br>
+              4) Return here and upload the screenshot on the next step so we can verify participation.
+            </p>
+
+            <a
+              href="${TARGET_SITE}"
+              target="_blank"
+              rel="noopener"
+              class="mt-4 inline-flex items-center justify-center w-full btn btn-primary linkbtn"
+            >
+              Open ${new URL(TARGET_SITE).hostname}
+            </a>
+
+            <div class="mt-3 text-xs text-slate-600 leading-relaxed">
+              <b>Important:</b> This website is a real third-party service that matches people with potential debt-help offers.
+              We are not the debt companies shown on the results page. There is no obligation to sign up for any service.
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <div class="font-semibold mb-2">Have you completed the form and reached the results/offers page?</div>
+            <div class="space-y-3">
+              <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+                <input type="radio" name="usedSite" value="yes" class="mt-1">
+                <div>
+                  <div class="font-semibold">Yes</div>
+                  <div class="text-sm text-slate-600">I completed it and saw my results/offers.</div>
+                </div>
+              </label>
+
+              <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+                <input type="radio" name="usedSite" value="no" class="mt-1">
+                <div>
+                  <div class="font-semibold">Not yet</div>
+                  <div class="text-sm text-slate-600">I still need to complete it.</div>
+                </div>
+              </label>
+            </div>
+          </div>
+        `;
+
+        if (form.usedSite) {
+          content.querySelector(`input[name="usedSite"][value="${form.usedSite}"]`).checked = true;
+          $("nextBtn").disabled = !(form.usedSite === "yes");
+        }
+
+        content.querySelectorAll('input[name="usedSite"]').forEach(r => {
+          r.addEventListener("change", () => {
+            form.usedSite = r.value;
+            $("nextBtn").disabled = !(form.usedSite === "yes");
+          });
+        });
+      }
+
+      /******** Step 4: OCR screenshot verification ********/
+      if (step === 4) {
+        const attemptsLeft = OCR_MAX_ATTEMPTS - ocrAttempts;
+
+        content.innerHTML = `
+          <h1 class="text-lg font-extrabold mb-2">Upload your results screenshot</h1>
+          <p class="text-sm text-slate-700 leading-relaxed mb-4">
+            Upload a screenshot of the <b>results/offers</b> page you received after completing the form on
+            <b>${new URL(TARGET_SITE).hostname}</b>.
+            <br><br>
+            The screenshot should clearly show a results page (for example: “Congratulations” and/or “qualify for offers”).
+          </p>
+
+          <div class="p-4 rounded-2xl border bg-white">
+            <div class="text-sm font-semibold">Upload screenshot</div>
+            <input id="ocrFile" type="file" accept="image/*" class="mt-2 block w-full text-sm" />
+
+            <button id="runOcrBtn" class="btn btn-primary mt-3 w-full" type="button">
+              Verify Screenshot
+            </button>
+
+            <div id="ocrStatus" class="mt-3 text-sm text-slate-700"></div>
+
+            <div class="mt-3 text-xs text-slate-600">
+              Attempts remaining: <b>${attemptsLeft}</b> / ${OCR_MAX_ATTEMPTS}
+            </div>
+          </div>
+
+          <div class="mt-4 p-3 rounded-xl bg-slate-50 border text-xs text-slate-600">
+            If verification fails ${OCR_MAX_ATTEMPTS} times, you will be disqualified.
+          </div>
+        `;
+
+        // Next disabled until OCR passes
+        $("nextBtn").disabled = !form.ocrVerified;
+
+        const runBtn = $("runOcrBtn");
+        const fileInp = $("ocrFile");
+        const status = $("ocrStatus");
+
+        runBtn.addEventListener("click", async () => {
+          const file = fileInp.files && fileInp.files[0];
+          if (!file) {
+            status.innerHTML = `<span class="text-red-700 font-semibold">Please upload a screenshot first.</span>`;
+            return;
+          }
+
+          runBtn.disabled = true;
+          status.innerHTML = `Verifying… (this can take a few seconds)`;
+
+          try {
+            const { data } = await Tesseract.recognize(file, "eng", {
+              logger: (m) => {
+                if (m.status === "recognizing text") {
+                  status.innerHTML = `Verifying… <span class="mono">${Math.round((m.progress || 0) * 100)}%</span>`;
+                }
+              }
+            });
+
+            const text = (data && data.text) ? data.text : "";
+            form.ocrText = text;
+
+            const ok = ocrMeetsRules(text);
+
+            if (ok) {
+              form.ocrVerified = true;
+              status.innerHTML = `
+                <span class="text-green-700 font-extrabold">Verified ✓</span>
+                <div class="text-xs text-slate-600 mt-1">You can continue.</div>
+              `;
+              $("nextBtn").disabled = false;
+            } else {
+              ocrAttempts += 1;
+              form.ocrVerified = false;
+              $("nextBtn").disabled = true;
+
+              const left = OCR_MAX_ATTEMPTS - ocrAttempts;
+
+              if (left <= 0) {
+                status.innerHTML = `
+                  <span class="text-red-700 font-extrabold">Verification failed.</span>
+                  <div class="text-xs text-slate-600 mt-1">No attempts remaining. Redirecting…</div>
+                `;
+                setTimeout(() => redirectFail(), 800);
+                return;
+              }
+
+              status.innerHTML = `
+                <span class="text-red-700 font-extrabold">Could not verify.</span>
+                <div class="text-xs text-slate-600 mt-1">
+                  Please upload a clearer screenshot of your results/offers page.
+                  Attempts remaining: <b>${left}</b>.
+                </div>
+              `;
+
+              // Re-render to update attempts count text
+              setTimeout(() => render(), 500);
+            }
+          } catch (e) {
+            ocrAttempts += 1;
+            const left = OCR_MAX_ATTEMPTS - ocrAttempts;
+
+            if (left <= 0) {
+              status.innerHTML = `
+                <span class="text-red-700 font-extrabold">OCR error.</span>
+                <div class="text-xs text-slate-600 mt-1">No attempts remaining. Redirecting…</div>
+              `;
+              setTimeout(() => redirectFail(), 800);
+              return;
+            }
+
+            status.innerHTML = `
+              <span class="text-red-700 font-extrabold">OCR error.</span>
+              <div class="text-xs text-slate-600 mt-1">Please try again. Attempts remaining: <b>${left}</b>.</div>
+            `;
+          } finally {
+            runBtn.disabled = false;
+          }
+        });
+      }
+
+      /******** Step 5: Short feedback survey ********/
+      if (step === 5) {
+        content.innerHTML = `
+          <h1 class="text-lg font-extrabold mb-2">Quick feedback</h1>
+          <p class="text-sm text-slate-600 mb-4">
+            Answer a few short questions about your experience on the website.
+          </p>
+
+          <div class="space-y-4">
+            <div class="p-4 rounded-2xl border bg-white">
+              <div class="font-semibold mb-2">How many offers or partner options were shown to you?</div>
+              <input
+                id="offersCount"
+                type="number"
+                min="0"
+                step="1"
+                inputmode="numeric"
+                class="w-full border rounded-xl p-3 mono"
+                placeholder="Enter a number (example: 2)"
+              />
+              <div class="text-xs text-slate-500 mt-2">If you are not sure, enter your best estimate.</div>
+            </div>
+
+            <div class="p-4 rounded-2xl border bg-white">
+              <div class="font-semibold mb-2">Did you choose to connect with any service shown?</div>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input type="radio" name="contactedAny" value="yes">
+                  <span>Yes</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input type="radio" name="contactedAny" value="no">
+                  <span>No</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl border bg-white">
+              <div class="font-semibold mb-2">Do you think you will use any of the services shown?</div>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input type="radio" name="willUse" value="yes">
+                  <span>Yes</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input type="radio" name="willUse" value="maybe">
+                  <span>Maybe</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input type="radio" name="willUse" value="no">
+                  <span>No</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl border bg-white">
+              <div class="font-semibold mb-2">Any comments? (optional)</div>
+              <textarea
+                id="comments"
+                rows="4"
+                class="w-full border rounded-xl p-3"
+                placeholder="Tell us what was clear/confusing, what you liked, etc..."
+              ></textarea>
+            </div>
+          </div>
+        `;
+
+        // Restore values
+        $("offersCount").value = form.feedback.offersCount || "";
+        $("comments").value = form.feedback.comments || "";
+
+        if (form.feedback.contactedAny) {
+          content.querySelector(`input[name="contactedAny"][value="${form.feedback.contactedAny}"]`).checked = true;
+        }
+        if (form.feedback.willUse) {
+          content.querySelector(`input[name="willUse"][value="${form.feedback.willUse}"]`).checked = true;
+        }
+
+        const validate = () => {
+          const offersOk = String(form.feedback.offersCount || "").trim() !== "";
+          const ok = offersOk && !!form.feedback.contactedAny && !!form.feedback.willUse;
+          $("nextBtn").disabled = !ok;
+        };
+
+        $("offersCount").addEventListener("input", (e) => {
+          form.feedback.offersCount = (e.target.value || "").trim();
+          validate();
+        });
+
+        content.querySelectorAll('input[name="contactedAny"]').forEach(r => {
+          r.addEventListener("change", () => {
+            form.feedback.contactedAny = r.value;
+            validate();
+          });
+        });
+
+        content.querySelectorAll('input[name="willUse"]').forEach(r => {
+          r.addEventListener("change", () => {
+            form.feedback.willUse = r.value;
+            validate();
+          });
+        });
+
+        $("comments").addEventListener("input", (e) => {
+          form.feedback.comments = e.target.value || "";
+        });
+
+        validate();
+      }
+    }
+
+    /***********************
+     * OCR Rules (results page)
+     * We verify presence of common text from the results page screenshots:
+     * - "congratulations"
+     * - "qualify" + "offers"
+     * - "debt" (context)
+     ***********************/
+    function ocrMeetsRules(rawText) {
+      const t = normalizeText(rawText);
+
+      // Flexible matches to handle OCR mistakes
+      const hasCongrats = t.includes("congratulations") || t.includes("congrats");
+      const hasQualifyOffers =
+        (t.includes("qualify") || t.includes("qualified") || t.includes("qualification")) &&
+        (t.includes("offer") || t.includes("offers"));
+      const hasDebtContext = t.includes("debt") || t.includes("debt relief") || t.includes("relief");
+
+      // Accept if it looks like the results page
+      return (hasCongrats && hasDebtContext) || (hasQualifyOffers && hasDebtContext);
+    }
+
+    /***********************
+     * Navigation
+     ***********************/
+    $("backBtn").addEventListener("click", () => {
+      if (step <= 1) return;
+      step -= 1;
+      render();
+    });
+
+    $("nextBtn").addEventListener("click", async () => {
+      // Step 1
+      if (step === 1) {
+        if (form.hasDebt === "no") return redirectFail();
+        if (form.hasDebt !== "yes") return;
+        step = 2; render(); return;
+      }
+
+      // Step 2 (silent qualify)
+      if (step === 2) {
+        if (!qualifySilently()) return redirectFail();
+        step = 3; render(); return;
+      }
+
+      // Step 3
+      if (step === 3) {
+        if (form.usedSite !== "yes") return;
+        step = 4; render(); return;
+      }
+
+      // Step 4 (must be OCR verified)
+      if (step === 4) {
+        if (!form.ocrVerified) return;
+        step = 5; render(); return;
+      }
+
+      // Step 5 submit
+      if (step === 5) {
+        $("nextBtn").disabled = true;
+        $("nextBtn").textContent = "Submitting…";
+        try {
+          await submitToGoogleSheet();
+          redirectPass();
+        } catch (e) {
+          alert("Could not submit. Please try again.");
+          $("nextBtn").disabled = false;
+          $("nextBtn").textContent = "Submit";
+        }
+      }
+    });
+
+    /***********************
+     * Submit to Google Sheet (Apps Script Web App)
+     ***********************/
+    async function submitToGoogleSheet() {
+      if (!GOOGLE_SHEET_WEBAPP_URL || GOOGLE_SHEET_WEBAPP_URL.includes("REPLACE_ME")) {
+        // If you didn't set your Apps Script URL yet, just allow pass.
+        return;
+      }
+
+      // For privacy, we don't send raw OCR text by default.
+      // If you want it, add: ocrText: form.ocrText
+      const payload = {
+        transaction_id: getTransactionId(),
+        timestamp: new Date().toISOString(),
+
+        hasDebt: form.hasDebt,
+
+        debts: { ...form.debts },
+        totalDebtAll: totalDebtAll(),
+
+        usedSite: form.usedSite,
+        ocrVerified: form.ocrVerified,
+
+        offersCount: form.feedback.offersCount,
+        contactedAny: form.feedback.contactedAny,
+        willUse: form.feedback.willUse,
+        comments: form.feedback.comments || ""
+      };
+
+      const res = await fetch(GOOGLE_SHEET_WEBAPP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        mode: "cors"
+      });
+
+      if (!res.ok) throw new Error("Sheet submit failed");
+    }
+
+    /***********************
+     * Init
+     ***********************/
+    // Enable Next button for step 1 only after a selection
+    // We handle this by rendering then attaching listeners inside each step.
+    render();
+  </script>
+</body>
+</html>

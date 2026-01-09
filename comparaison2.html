@@ -189,9 +189,14 @@
           <ol class="list-decimal list-inside text-gray-700 space-y-2">
             <li><strong>Open the debt matching website</strong> using the button below (it opens in a new tab).</li>
             <li><strong>Complete the short form</strong> on the website until you reach the results page.</li>
-            <li>The website will show a <strong>results / special offers</strong> page with one or more partner offers. <strong>Take a screenshot</strong> of that page.</li>
+            <li>
+              On the results page, you will see <strong>one or more partner offers</strong>.
+              <strong>Please click at least one offer</strong> to view details and check whether it fits your needs or could help you.
+              If you choose to use a service or call any of the companies shown, you may do so — it is optional and only if you want help.
+            </li>
+            <li><strong>Take a screenshot</strong> of the results page (showing the heading and offers).</li>
             <li><strong>Upload your screenshot</strong> below. We use OCR to verify that you reached the results page.</li>
-            <li>After verification, answer a few short questions about how many offers you saw and whether you would consider using any service.</li>
+            <li>After verification, answer a few short questions about the offers you saw and your experience.</li>
           </ol>
         </div>
 
@@ -201,6 +206,7 @@
           <p class="text-gray-700 mt-2">
             The website you will use is a real third-party service that may match people with potential debt-help offers.
             We are not the website and we are not the debt companies shown on the results page. There is no obligation to sign up for any service.
+            <strong>You may choose to contact or call any provider shown, but it is not required.</strong>
           </p>
         </div>
 
@@ -219,6 +225,10 @@
             <div>
               <div class="font-semibold text-gray-800">Debt matching website</div>
               <div class="text-sm text-gray-600">Complete the short questionnaire until you see your results / special offers page.</div>
+              <div class="text-xs text-gray-600 mt-1">
+                After the results load, <b>click at least one offer</b> to view details and see if it fits your needs or could help you.
+                If you choose to use or call any service shown, you may do so (optional).
+              </div>
             </div>
             <button id="openWebsiteBtn"
                     class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
@@ -265,6 +275,24 @@
           <h3 class="text-lg font-semibold text-emerald-900">Step 3: Quick Feedback</h3>
 
           <div class="mt-4 grid gap-4">
+
+            <!-- ✅ NEW REQUIRED: clicked at least one offer -->
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <div class="font-semibold text-gray-800">Did you click at least one offer to view details?</div>
+              <p class="text-xs text-gray-600 mt-1">
+                Please click at least one offer to view details and check if it fits your needs or could help you.
+                If you choose to use or call any of the services shown, you may do so — it is optional and only if you want help.
+              </p>
+              <div class="mt-3 space-y-2 text-gray-700">
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="clickedOffer" value="yes"> Yes (I clicked at least one offer)
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="clickedOffer" value="no"> No
+                </label>
+              </div>
+            </div>
+
             <div class="bg-white border border-emerald-100 rounded-lg p-4">
               <label class="block font-semibold text-gray-800">How many offers or partner options were shown to you?</label>
               <input id="offersCount" type="number" min="0" step="1" inputmode="numeric"
@@ -295,6 +323,10 @@
               <textarea id="comments" rows="4" class="mt-2 w-full border rounded-lg p-3"
                         placeholder="Share anything about the experience..."></textarea>
             </div>
+          </div>
+
+          <div class="mt-4 text-xs text-emerald-900">
+            ✅ To finish, you must click at least one offer, upload a valid screenshot, and answer the required questions.
           </div>
         </div>
 
@@ -485,7 +517,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const offers = (offersCountEl.value || '').trim();
     const connected = document.querySelector('input[name="connected"]:checked');
     const consider = document.querySelector('input[name="consider"]:checked');
-    return offers !== '' && !!connected && !!consider;
+
+    // ✅ NEW: must have clickedOffer = yes
+    const clickedOffer = document.querySelector('input[name="clickedOffer"]:checked');
+    const clickedOk = clickedOffer && clickedOffer.value === 'yes';
+
+    return offers !== '' && !!connected && !!consider && clickedOk;
   }
 
   function updateFinishGate() {
@@ -579,6 +616,9 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('input[name="connected"]').forEach(r => r.addEventListener('change', updateFinishGate));
   document.querySelectorAll('input[name="consider"]').forEach(r => r.addEventListener('change', updateFinishGate));
 
+  // ✅ NEW: gate finish by clickedOffer
+  document.querySelectorAll('input[name="clickedOffer"]').forEach(r => r.addEventListener('change', updateFinishGate));
+
   // init
   window.__ocr_ok = false;
   setFinishEnabled(false);
@@ -587,5 +627,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-
 

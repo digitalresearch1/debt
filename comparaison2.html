@@ -27,7 +27,6 @@
       animation: spin 1s linear infinite;
     }
     @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
-
     .qualification-list li {
       background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2322c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>') no-repeat left center;
       padding-left: 30px;
@@ -36,7 +35,6 @@
   </style>
 </head>
 
-<!-- ✅ FIXED: removed vertical-centering that caused big top/bottom "space" -->
 <body class="bg-gray-100 min-h-screen p-4 md:p-6">
   <div class="form-all w-full max-w-4xl mx-auto bg-white rounded-2xl p-6 md:p-8 lg:p-12">
 
@@ -157,6 +155,39 @@
             <li>You can take and upload a screenshot of the results page that shows your matched offers.</li>
           </ul>
           <p class="text-xs text-gray-600 mt-2">Note: Some participants may not qualify to continue based on their answers.</p>
+        </div>
+
+        <!-- ✅ Added: What is unsecured debt -->
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6">
+          <details class="group">
+            <summary class="cursor-pointer flex items-center justify-between font-semibold text-gray-800">
+              <span>What is unsecured debt?</span>
+              <span class="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+
+            <div class="mt-3 text-gray-700 text-sm leading-relaxed">
+              <p class="mb-2">
+                <strong>Unsecured debt</strong> is a type of debt that isn’t backed by collateral.
+                This means the debt is not tied to a specific asset like a house or vehicle.
+              </p>
+
+              <p class="mb-2">Common examples of unsecured debt include:</p>
+
+              <ul class="list-disc list-inside mb-2">
+                <li>Credit card balances</li>
+                <li>Personal loans</li>
+                <li>Medical bills</li>
+                <li>Private student loans</li>
+                <li>Collections accounts</li>
+                <li>Payday or cash advance loans</li>
+              </ul>
+
+              <p>
+                If you’re unable to pay unsecured debt, lenders generally cannot take your personal
+                property to recover the money, although the debt may be sent to collections or affect your credit.
+              </p>
+            </div>
+          </details>
         </div>
 
         <!-- How to participate -->
@@ -315,7 +346,6 @@ document.addEventListener('DOMContentLoaded', function() {
     transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 
-  // ✅ FIXED: proper strings / template literals
   const abandonUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
   const finishUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
 
@@ -368,8 +398,14 @@ document.addEventListener('DOMContentLoaded', function() {
     Object.values(debts).forEach(v => t += (Number(v) || 0));
     debtTotalEl.textContent = '$' + t.toLocaleString();
 
-    // Hidden qualification: credit cards + personal loans + private student loans >= 15000
-    const qualifyingSum = (debts.cc || 0) + (debts.pl || 0) + (debts.psl || 0);
+    // ✅ UPDATED qualification: CC + PL + PSL + AUTO + COLLECTIONS + PAYDAY >= 15000
+    const qualifyingSum =
+      (debts.cc   || 0) +
+      (debts.pl   || 0) +
+      (debts.psl  || 0) +
+      (debts.auto || 0) +
+      (debts.col  || 0) +
+      (debts.pay  || 0);
 
     if (qualifyingSum >= 15000) s2Next.classList.remove('disabled-btn');
     else s2Next.classList.add('disabled-btn');

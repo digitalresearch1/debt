@@ -1,3 +1,4 @@
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en" class="supernova">
 <head>
@@ -6,7 +7,7 @@
   <meta name="HandheldFriendly" content="true">
   <title>Debt Offer Match Feedback Survey</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- ✅ Tesseract.js v6 -->
@@ -34,6 +35,19 @@
       background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2322c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>') no-repeat left center;
       padding-left: 30px;
       margin-bottom: 8px;
+    }
+
+    /* Subtle attention animation for CTA block */
+    @keyframes softPulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.01); }
+    }
+    .cta-pulse { animation: softPulse 1.6s ease-in-out infinite; }
+
+    /* Reduce motion accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      .cta-pulse { animation: none !important; }
+      .action-btn:hover { transform: none !important; }
     }
   </style>
 </head>
@@ -79,53 +93,47 @@
          ========================= -->
     <div id="screen2" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
       <h2 class="text-xl font-semibold text-gray-800 mb-2">About how much do you currently owe?</h2>
-      <p class="text-gray-700 mb-4">
+      <p class="text-gray-700 mb-2">
         Enter an estimated amount for any categories that apply (USD). If a category does not apply, leave it as 0.
       </p>
- <p class="mt-2 text-xs text-slate-500">
-          Please indicate the true amount of debt you currently owe. Honest responses are important to us, whether the amount is small or significant.
-        </p>      
 
-      <div class="space-y-3">
+      <p class="mt-2 text-xs text-slate-500">
+        Please indicate the true amount of debt you currently owe. Honest responses are important to us, whether the amount is small or significant.
+      </p>
+
+      <!-- ✅ Categories aligned to the debts they are looking for -->
+      <div class="space-y-3 mt-4">
+
         <div class="flex justify-between items-center p-3 bg-white border rounded-xl">
-          <span>Credit Cards</span>
+          <span>💳 Credit Card Debt</span>
           <input data-k="cc" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
         </div>
 
         <div class="flex justify-between items-center p-3 bg-white border rounded-xl">
-          <span>Personal Loans</span>
+          <span>🏦 Personal Loans</span>
           <input data-k="pl" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
         </div>
 
         <div class="flex justify-between items-center p-3 bg-white border rounded-xl">
-          <span>Medical Debt</span>
-          <input data-k="md" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
-        </div>
-
-        <div class="flex justify-between items-center p-3 bg-white border rounded-xl">
-          <span>Private Student Loans</span>
-          <input data-k="psl" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
-        </div>
-
-        <div class="flex justify-between items-center p-3 bg-white border rounded-xl">
-          <span>Auto Loan (non-lease)</span>
-          <input data-k="auto" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
-        </div>
-
-        <div class="flex justify-between items-center p-3 bg-white border rounded-xl">
-          <span>Collections</span>
-          <input data-k="col" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
-        </div>
-
-        <div class="flex justify-between items-center p-3 bg-white border rounded-xl">
-          <span>Payday / Cash Advance</span>
+          <span>📈 Payday / High Interest Loans</span>
           <input data-k="pay" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
         </div>
 
         <div class="flex justify-between items-center p-3 bg-white border rounded-xl">
-          <span>Other Unsecured Debt</span>
-          <input data-k="oth" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
+          <span>🎓 Non-Federal Student Loans</span>
+          <input data-k="nsl" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
         </div>
+
+        <div class="flex justify-between items-center p-3 bg-white border rounded-xl">
+          <span>📣 Collections Accounts</span>
+          <input data-k="col" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
+        </div>
+
+        <div class="flex justify-between items-center p-3 bg-white border rounded-xl">
+          <span>🚘 Auto Deficiencies / Leases</span>
+          <input data-k="auto" type="number" min="0" class="w-32 border rounded-lg p-2 text-right" value="0">
+        </div>
+
       </div>
 
       <div class="mt-4 p-3 bg-slate-100 border rounded-xl flex justify-between">
@@ -150,7 +158,7 @@
 
       <!-- Header -->
       <div class="form-header-group header-large mb-8 p-6 rounded-xl text-white text-center">
-        <h1 class="text-2xl md:text-3xl font-bold">Debt Offer Match Feedback Survey</h1>
+        <h1 class="text-2xl md:text-3xl font-extrabold">Debt Offer Match Feedback Survey</h1>
         <p class="mt-2 text-base md:text-lg">Help us understand how clear and useful a debt-offer matching experience is.</p>
       </div>
 
@@ -170,7 +178,7 @@
       <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
         <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
         <ol class="list-decimal list-inside text-gray-700 space-y-2">
-          <li><strong>Open the debt matching website</strong> using the button below (it opens in a new tab).</li>
+          <li><strong>Click OPEN WEBSITE</strong> below (it opens in a new tab).</li>
           <li><strong>Complete the short form</strong> on the website until you reach the results page.</li>
           <li>The website will show a <strong>results / special offers</strong> page with one or more partner offers. <strong>Take a screenshot</strong> of that page.</li>
           <li><strong>Upload your screenshot</strong> below. We use OCR to verify that you reached the results page.</li>
@@ -188,29 +196,38 @@
         </p>
       </div>
 
-      <!-- Step 1: Open website -->
+      <!-- Step 1 -->
       <h2 class="text-2xl font-bold text-center text-gray-800 my-6">
         Step 1: Open the website and complete the form to view your matched offers
       </h2>
-     
+
       <div class="mt-3 text-xs text-gray-600">
-  ⚠️ <b>Important:</b> The website will open in a <b>new tab</b>. Please do not close this survey tab.  
-  Complete the form on the new tab, then <b>return to this tab</b> to upload your screenshot and finish the survey.
-</div>
+        ⚠️ <b>Important:</b> The website will open in a <b>new tab</b>. Please do not close this survey tab.
+        Complete the form on the new tab, then <b>return to this tab</b> to upload your screenshot and finish the survey.
+      </div>
 
-
-      <div class="p-4 bg-white border border-gray-200 rounded-lg">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div>
-            <div class="font-semibold text-gray-800">Debt matching website</div>
-            <div class="text-sm text-gray-600">Complete the short questionnaire until you see your results / special offers page.</div>
+      <!-- ✅ MORE VISIBLE CTA BLOCK -->
+      <div class="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 border border-blue-700 rounded-2xl shadow-lg cta-pulse mt-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="text-white">
+            <div class="text-lg font-extrabold">👉 Required Step: Open the Debt Matching Website</div>
+            <div class="text-sm opacity-95 mt-1">
+              You <b>must click the button</b> to open the website, complete the form, and reach the results page.
+            </div>
           </div>
-          <button id="openWebsiteBtn" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg" type="button">
-            Open Website
+
+          <button id="openWebsiteBtn" class="action-btn bg-white text-blue-700 font-extrabold py-4 px-8 rounded-xl shadow-md hover:bg-blue-50 hover:scale-105 flex items-center gap-2" type="button">
+            <span class="text-xl">🔗</span>
+            OPEN WEBSITE
           </button>
         </div>
-        <div class="mt-3 text-xs text-gray-600">
-          Tip: Use your <b>mobile phone</b>. After you reach the results page, take a screenshot that clearly shows the heading and offers.
+
+        <div class="mt-3 text-xs text-blue-100">
+          ⚠️ This step is mandatory. You cannot finish the survey without visiting the website and uploading your results screenshot.
+        </div>
+
+        <div class="mt-3 text-xs text-blue-100">
+          Tip: After you reach the results page, take a screenshot that clearly shows the heading and offers.
         </div>
       </div>
 
@@ -221,6 +238,14 @@
           Upload a screenshot of the results page you received after completing the form.
           Your screenshot should show wording like <b>“Congratulations”</b> and/or <b>“You qualify for special offers”</b> and display one or more offer cards.
         </p>
+
+        <!-- ✅ EXTRA “MUST CLICK” BANNER -->
+        <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-lg mt-4">
+          <p class="text-sm text-yellow-900 font-semibold">
+            ℹ️ If you have not clicked the <b>OPEN WEBSITE</b> button above and completed the form, please do so now before uploading a screenshot.
+            Screenshots without a valid results page will be rejected.
+          </p>
+        </div>
 
         <div class="mt-4">
           <input type="file" id="imageUpload" accept="image/*"
@@ -240,7 +265,7 @@
         </div>
       </div>
 
-      <!-- Quick feedback (shown after verification) -->
+      <!-- Quick feedback -->
       <div id="feedbackBlock" class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg mt-8" style="display:none;">
         <h3 class="text-lg font-semibold text-emerald-900">Step 3: Quick Feedback</h3>
         <div class="mt-4 grid gap-4">
@@ -329,7 +354,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const debtTotalEl = document.getElementById('debtTotal');
 
   let hasDebt = null;
-  let debts = { cc:0, pl:0, md:0, psl:0, auto:0, col:0, pay:0, oth:0 };
+
+  // ✅ Updated debt keys based on your eligibility categories
+  let debts = { cc:0, pl:0, pay:0, nsl:0, col:0, auto:0 };
 
   // enable Next once selected
   document.querySelectorAll('input[name="hasDebt"]').forEach(r => {
@@ -363,10 +390,15 @@ document.addEventListener('DOMContentLoaded', function() {
     Object.values(debts).forEach(v => t += (Number(v) || 0));
     debtTotalEl.textContent = '$' + t.toLocaleString();
 
-    // Hidden qualification: credit cards + personal loans + private student loans >= 15000
-    const qualifyingSum = (debts.cc || 0) + (debts.pl || 0) + (debts.psl || 0);
+    // ✅ Eligibility rule (UPDATED):
+    // Qualify if ANY single category >= 15000 OR sum of ALL listed categories >= 15000
+    const values = Object.values(debts).map(v => Number(v) || 0);
+    const anyOver = values.some(v => v >= 15000);
+    const sumAll = values.reduce((a,b)=>a+b,0);
 
-    if (qualifyingSum >= 15000) s2Next.classList.remove('disabled-btn');
+    const qualifies = anyOver || (sumAll >= 15000);
+
+    if (qualifies) s2Next.classList.remove('disabled-btn');
     else s2Next.classList.add('disabled-btn');
   }
 
@@ -409,6 +441,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const commentsEl = document.getElementById('comments');
 
   const targetWebsite = 'https://trkmcl.com/lv87gxq8z3/w40ml11ynm';
+
+  // ✅ HARD ENFORCEMENT: user must click OPEN WEBSITE before OCR verify
+  let websiteOpened = false;
 
   // OCR attempts
   const MAX_ATTEMPTS = 3;
@@ -462,6 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Open site
   openWebsiteBtn.addEventListener('click', function() {
+    websiteOpened = true;
     window.open(targetWebsite, '_blank', 'noopener');
   });
 
@@ -478,6 +514,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // OCR verify
   validateButton.addEventListener('click', async function() {
+    // ✅ Enforce click first
+    if (!websiteOpened) {
+      validationResult.textContent = '❌ Please click the OPEN WEBSITE button and complete the form before uploading a screenshot.';
+      validationResult.style.color = 'red';
+      validationResult.style.display = 'block';
+      return;
+    }
+
     if (!imageUpload.files || imageUpload.files.length === 0) {
       validationResult.textContent = '❌ Please upload the screenshot first.';
       validationResult.style.color = 'red';
@@ -532,7 +576,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (left <= 0) {
         validationResult.textContent = '❌ Verification failed. No attempts remaining. Redirecting...';
         setTimeout(() => { window.location.href = abandonUrl; }, 800);
-      }
+        }
     } finally {
       validateButton.disabled = false;
     }
@@ -553,4 +597,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-

@@ -1,841 +1,642 @@
-<!DOCTYPE HTML>
+
+<!doctype html>
 <html lang="en" class="supernova">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
-  <meta name="HandheldFriendly" content="true">
-  <title>Financial Wellness Research Study</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1" />
+  <meta name="HandheldFriendly" content="true" />
+  <title>Debt Offer Match Feedback Survey</title>
 
-  <!-- Fonts + Tailwind -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Brevo base styles -->
+  <!-- ✅ Tesseract.js v6 -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/tesseract.min.js"></script>
+
   <style>
-    @font-face {
-      font-display: block;
-      font-family: Roboto;
-      src: url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/7529907e9eaf8ebb5220c5f9850e3811.woff2) format("woff2"),
-           url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/25c678feafdc175a70922a116c9be3e7.woff) format("woff");
-    }
-
-    @font-face {
-      font-display: fallback;
-      font-family: Roboto;
-      font-weight: 600;
-      src: url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/6e9caeeafb1f3491be3e32744bc30440.woff2) format("woff2"),
-           url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/71501f0d8d5aa95960f6475d5487d4c2.woff) format("woff");
-    }
-
-    @font-face {
-      font-display: fallback;
-      font-family: Roboto;
-      font-weight: 700;
-      src: url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/3ef7cf158f310cf752d5ad08cd0e7e60.woff2) format("woff2"),
-           url(https://assets.brevo.com/font/Roboto/Latin/bold/normal/ece3a1d82f18b60bcce0211725c476aa.woff) format("woff");
-    }
-
-    #sib-container input::placeholder {
-      text-align: left;
-      font-family: Helvetica, sans-serif;
-      color: #c0ccda;
-    }
-
-    #sib-container a {
-      text-decoration: underline;
-      color: #2BB2FC;
-    }
-
-    body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-
+    body { font-family: 'Inter', sans-serif; }
+    .form-all { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .form-header-group { background: linear-gradient(120deg, #60a5fa 0%, #2563eb 100%); }
     .action-btn { transition: background-color 0.3s, transform 0.2s; cursor: pointer; }
-    .action-btn:hover:not(.disabled-btn) { transform: translateY(-2px); }
-
-    .chat-bubble {
-      max-width: 80%;
-      border-radius: 1rem;
-      padding: 0.75rem 1rem;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-    }
-    .chat-bot  { background-color: #eef2ff; color: #111827; align-self: flex-start; }
-    .chat-user { background-color: #4f46e5; color: white; align-self: flex-end; }
-
+    .action-btn:hover { transform: translateY(-2px); }
     .disabled-btn { opacity: 0.5; pointer-events: none; cursor: not-allowed; }
-
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #2563eb;
+      border-radius: 50%;
+      width: 30px; height: 30px;
+      animation: spin 1s linear infinite;
     }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
 
-    .video-wrapper {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
-      border-radius: 0.75rem;
-      overflow: hidden;
-      background: #000;
-    }
-    .video-wrapper iframe {
-      width: 100%;
-      height: 100%;
-      display: block;
-      border: 0;
+    .qualification-list li {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2322c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>') no-repeat left center;
+      padding-left: 30px;
+      margin-bottom: 8px;
     }
 
-    @media (max-width: 768px) {
-      .video-wrapper { height: 220px; }
-    }
-    @media (min-width: 769px) {
-      .video-wrapper { height: 480px; }
-    }
-
-    .fade-out {
-      animation: fadeOutUp 0.35s forwards ease-out;
-    }
-    @keyframes fadeOutUp {
-      0%   { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-6px); }
-    }
+    /* ✅ Range aesthetics */
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 34px; }
+    input[type=range]::-webkit-slider-runnable-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
+    input[type=range]::-moz-range-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -10px; width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
+    input[type=range]::-moz-range-thumb { width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
   </style>
-
-  <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
 </head>
-<body class="bg-gray-100 min-h-screen">
 
-<div id="chatOverlay" class="w-full bg-white flex flex-col max-w-5xl mx-auto min-h-screen shadow-lg">
-  <!-- Chat header -->
-  <div class="p-4 bg-indigo-600 text-white text-center shadow">
-    <h1 class="text-xl font-bold">Financial Wellness Screening Chat</h1>
-    <p class="text-xs mt-1 text-indigo-100">
-      Please answer a few quick questions so we can see if this private study is a good fit for you.
-    </p>
-  </div>
+<body class="bg-gray-100 min-h-screen p-4 md:p-6">
+  <div class="form-all w-full max-w-4xl mx-auto bg-white rounded-2xl p-6 md:p-8 lg:p-12">
 
-  <!-- Chat body -->
-  <div class="flex-1 flex flex-col bg-slate-50 p-4">
-    <div id="chatWindow" class="chat-container"></div>
-    <div id="chatControls" class="mt-4 flex flex-wrap gap-2 bg-white border-t border-slate-200 p-3 rounded-lg"></div>
-  </div>
-</div>
+    <div id="mainContent">
+
+      <!-- ========================= PRESCREENER 1 ========================= -->
+      <div id="screen1" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-3">Do you currently have any personal debt?</h2>
+
+        <div class="space-y-3">
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="radio" name="hasDebt" value="yes" class="mt-1">
+            <div>
+              <div class="font-semibold">Yes</div>
+              <div class="text-sm text-slate-600">I have one or more debts.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="radio" name="hasDebt" value="no" class="mt-1">
+            <div>
+              <div class="font-semibold">No</div>
+              <div class="text-sm text-slate-600">I do not have any debt.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button id="screen1Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Next
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= PRESCREENER 2: DEBT TYPES ========================= -->
+      <div id="screen2" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Which types of debt do you currently have?</h2>
+        <p class="text-gray-700 mb-4 text-sm">Select all that apply.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="credit_cards">
+            <div>
+              <div class="font-semibold">Credit Cards</div>
+              <div class="text-xs text-slate-600">Visa / Mastercard / store cards.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="personal_loans">
+            <div>
+              <div class="font-semibold">Personal Loans</div>
+              <div class="text-xs text-slate-600">Unsecured installment loans.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="medical">
+            <div>
+              <div class="font-semibold">Medical Debt</div>
+              <div class="text-xs text-slate-600">Hospital / clinic bills.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="private_student_loans">
+            <div>
+              <div class="font-semibold">Private Student Loans</div>
+              <div class="text-xs text-slate-600">Not federal loans.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="auto_loan">
+            <div>
+              <div class="font-semibold">Auto Loan</div>
+              <div class="text-xs text-slate-600">Vehicle loan (non-lease).</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="collections">
+            <div>
+              <div class="font-semibold">Collections</div>
+              <div class="text-xs text-slate-600">Accounts in collections.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="payday">
+            <div>
+              <div class="font-semibold">Payday / Cash Advance</div>
+              <div class="text-xs text-slate-600">Short-term or advance loans.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="other">
+            <div>
+              <div class="font-semibold">Other</div>
+              <div class="text-xs text-slate-600">Other debts.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button id="screen2Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Next
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= PRESCREENER 3: SLIDER TOTAL ========================= -->
+      <div id="screen3" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">About how much debt do you currently have in total?</h2>
+        <p class="text-gray-700 mb-4 text-sm">Use the slider to select your total estimated debt (USD).</p>
+
+        <div class="bg-white border rounded-xl p-4">
+          <div class="text-center">
+            <div id="debtAmountDisplay" class="text-5xl font-extrabold text-blue-600">$0</div>
+            <div class="text-xs text-gray-600 mt-1">Total estimated debt</div>
+          </div>
+
+          <div class="mt-4">
+            <input type="range" id="debtSlider" min="0" max="100000" value="0" step="100">
+          </div>
+
+          <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
+            <label class="text-sm text-gray-700 sm:col-span-1" for="debtNumber">Or type exact amount</label>
+            <input type="text" id="debtNumber" inputmode="numeric"
+                   class="sm:col-span-2 w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500"
+                   placeholder="e.g. 12,450">
+          </div>
+
+          <p id="moveHint" class="text-sm text-gray-600 mt-2 text-center">
+            Please move the slider (or type your amount) to continue.
+          </p>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button id="screen3Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Next
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= MAIN SURVEY ========================= -->
+      <div id="surveyAfterScreener" style="display:none;">
+
+        <!-- Header -->
+        <div class="form-header-group header-large mb-8 p-6 rounded-xl text-white text-center">
+          <h1 class="text-2xl md:text-3xl font-bold">Debt Offer Match Feedback Survey</h1>
+          <p class="mt-2 text-base md:text-lg">Help us understand how clear and useful a debt-offer matching experience is.</p>
+        </div>
+
+        <!-- Who can participate -->
+        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-3">Who Can Participate?</h2>
+          <p class="text-gray-700 mb-4">Please proceed if the following is true for you:</p>
+          <ul class="qualification-list list-none">
+            <li>You currently have personal debt.</li>
+            <li>You are willing to complete a short questionnaire on your mobile phone.</li>
+            <li>You can take and upload a screenshot showing what appeared after you submitted the form.</li>
+          </ul>
+          <p class="text-xs text-gray-600 mt-2">Note: Some participants may not qualify to continue based on their answers.</p>
+        </div>
+
+        <!-- How to participate (UPDATED) -->
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
+          <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
+          <ol class="list-decimal list-inside text-gray-700 space-y-2">
+            <li><strong>Open the website</strong> using the button below (it opens in a new tab).</li>
+            <li><strong>Complete and submit the form</strong> on the website.</li>
+            <li>
+              After submitting, you may see either:
+              <ul class="list-disc list-inside mt-2 text-gray-700">
+                <li>a <strong>results page</strong> showing one or more offers, or</li>
+                <li>you may be <strong>redirected directly to one offer</strong>.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Take a screenshot</strong> of what you see after submitting
+              (results page or the offer page you were redirected to).
+            </li>
+            <li>
+              <strong>Optional:</strong> If you want to enroll, sign up, or call a company shown, you may do so —
+              it is completely your choice.
+            </li>
+            <li><strong>Return to this survey tab</strong> and upload your screenshot below for verification.</li>
+            <li>After verification, answer a few short questions about what you saw.</li>
+          </ol>
+        </div>
+
+        <!-- Important info -->
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
+          <h3 class="text-lg font-semibold text-amber-900">Important</h3>
+          <p class="text-gray-700 mt-2">
+            The website you will use is a real third-party service that may show offers from independent providers.
+            We are not the website and we are not the companies shown. There is no obligation to sign up for any service.
+          </p>
+        </div>
+
+        <!-- Step 1: Open website -->
+        <h2 class="text-2xl font-bold text-center text-gray-800 my-6">
+          Step 1: Open the website and submit the form
+        </h2>
+
+        <div class="mt-3 text-xs text-gray-600">
+          ⚠️ <b>Important:</b> The website will open in a <b>new tab</b>. Please do not close this survey tab.
+          Complete and submit the form, then <b>return to this tab</b> to upload your screenshot and finish the survey.
+        </div>
+
+        <div class="p-4 bg-white border border-gray-200 rounded-lg mt-3">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <div class="font-semibold text-gray-800">Website</div>
+              <div class="text-sm text-gray-600">
+                Complete and submit the form. After submission, screenshot what appears (results page or direct offer redirect).
+              </div>
+            </div>
+            <button id="openWebsiteBtn"
+                    class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
+                    type="button">
+              Open Website
+            </button>
+          </div>
+
+          <div class="mt-3 text-xs text-gray-600">
+            Tip: Use your <b>mobile phone</b>. Make sure the screenshot clearly shows the page title/headline and visible offer details.
+          </div>
+        </div>
+
+        <!-- Verification -->
+        <div class="p-4 bg-orange-50 border border-orange-200 rounded-lg mt-8">
+          <h3 class="text-lg font-semibold text-orange-800">Step 2: Upload & Verify Screenshot</h3>
+          <p class="text-gray-700 mt-2">
+            Upload a screenshot of what you saw immediately after submitting the form
+            (either the results page or a direct offer page).
+          </p>
+
+          <div class="mt-4">
+            <input type="file" id="imageUpload" accept="image/*"
+              class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"/>
+          </div>
+
+          <div class="mt-4 text-center">
+            <button id="validateButton"
+                    class="action-btn w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg"
+                    type="button">
+              Verify Screenshot
+            </button>
+          </div>
+
+          <div id="validationResult" class="mt-4 text-center font-semibold" style="display:none;"></div>
+
+          <div class="mt-3 text-xs text-gray-600">
+            Attempts remaining: <b><span id="attemptsLeft">3</span></b>
+          </div>
+        </div>
+
+        <!-- Quick feedback (shown after verification) -->
+        <div id="feedbackBlock" class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg mt-8" style="display:none;">
+          <h3 class="text-lg font-semibold text-emerald-900">Step 3: Quick Feedback</h3>
+
+          <div class="mt-4 grid gap-4">
+
+            <!-- NEW: What did you see? -->
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <div class="font-semibold text-gray-800">What did you see after submitting the form?</div>
+              <div class="mt-2 space-y-2 text-gray-700">
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="whatSaw" value="results"> Results page with multiple offers
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="whatSaw" value="direct"> Redirected directly to one offer
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="whatSaw" value="other"> Something else / not sure
+                </label>
+              </div>
+            </div>
+
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <label class="block font-semibold text-gray-800">How many offers/options were shown (if any)?</label>
+              <input id="offersCount" type="number" min="0" step="1" inputmode="numeric"
+                     class="mt-2 w-full border rounded-lg p-3"
+                     placeholder="Enter a number (example: 2)" />
+              <p class="text-xs text-gray-600 mt-2">If you were redirected to one offer, enter 1.</p>
+            </div>
+
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <div class="font-semibold text-gray-800">Did you click anything or continue on the offer page?</div>
+              <div class="mt-2 space-y-2 text-gray-700">
+                <label class="flex items-center gap-2"><input type="radio" name="connected" value="yes"> Yes</label>
+                <label class="flex items-center gap-2"><input type="radio" name="connected" value="no"> No</label>
+              </div>
+              <p class="text-xs text-gray-600 mt-2">
+                Optional: if you decided to sign up or call, that was your choice.
+              </p>
+            </div>
+
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <div class="font-semibold text-gray-800">Would you consider any offer you saw?</div>
+              <div class="mt-2 space-y-2 text-gray-700">
+                <label class="flex items-center gap-2"><input type="radio" name="consider" value="yes"> Yes</label>
+                <label class="flex items-center gap-2"><input type="radio" name="consider" value="maybe"> Maybe</label>
+                <label class="flex items-center gap-2"><input type="radio" name="consider" value="no"> No</label>
+              </div>
+            </div>
+
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <label class="block font-semibold text-gray-800">Any comments? (optional)</label>
+              <textarea id="comments" rows="4" class="mt-2 w-full border rounded-lg p-3"
+                        placeholder="Share anything about what you saw after submitting the form..."></textarea>
+            </div>
+          </div>
+
+          <div class="mt-4 text-xs text-emerald-900">
+            ✅ To finish, upload a valid screenshot and answer the required questions.
+          </div>
+        </div>
+
+        <!-- Finish -->
+        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mt-8">
+          <h3 class="text-lg font-semibold text-yellow-800">❗ Important</h3>
+          <p class="text-gray-700 mt-2">
+            To finish, you must upload a valid screenshot and complete the short feedback questions.
+          </p>
+        </div>
+
+        <div class="mt-8 flex flex-col md:flex-row justify-center gap-4">
+          <button id="abandonSurveyButton"
+                  class="action-btn inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg"
+                  type="button">
+            Abandon Survey
+          </button>
+
+          <button id="finishSurveyButton"
+                  class="action-btn inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg disabled-btn"
+                  type="button">
+            Finish Survey
+          </button>
+        </div>
+
+      </div><!-- /surveyAfterScreener -->
+    </div><!-- /mainContent -->
+  </div><!-- /form-all -->
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const urlParams = new URLSearchParams(window.location.search);
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
+  if (!transactionId) transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
 
-  // PureSpectrum only
-  const src = 'ps';
+  const abandonUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
+  const finishUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
 
-  if (!transactionId) {
-    transactionId = 'tx_' + Date.now().toString(36) +
-      Math.random().toString(36).substring(2);
+  const screen1 = document.getElementById('screen1');
+  const screen2 = document.getElementById('screen2');
+  const screen3 = document.getElementById('screen3');
+  const surveyAfterScreener = document.getElementById('surveyAfterScreener');
+
+  const s1Next = document.getElementById('screen1Next');
+  const s2Next = document.getElementById('screen2Next');
+  const s3Next = document.getElementById('screen3Next');
+
+  let hasDebt = null;
+
+  const debtTypeEls = Array.from(document.querySelectorAll('.debtType'));
+  const debtSlider = document.getElementById('debtSlider');
+  const debtAmountDisplay = document.getElementById('debtAmountDisplay');
+  const debtNumber = document.getElementById('debtNumber');
+  const moveHint = document.getElementById('moveHint');
+
+  let amountWasSet = false;
+  let debtTotalValue = 0;
+
+  function toInt(s){
+    const n = parseInt(String(s||'').replace(/[^\d]/g,''), 10);
+    return isNaN(n) ? 0 : n;
+  }
+  function fmtMoney(n){
+    return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
+  }
+  function setSliderUI(val){
+    const v = Math.max(0, Math.min(100000, toInt(val)));
+    debtTotalValue = v;
+    debtSlider.value = String(v);
+    debtNumber.value = v ? v.toLocaleString('en-US') : '';
+    debtAmountDisplay.textContent = v >= 100000 ? `${fmtMoney(v)}+` : fmtMoney(v);
+  }
+  function updateSliderGate(){
+    if (amountWasSet) s3Next.classList.remove('disabled-btn');
+    else s3Next.classList.add('disabled-btn');
+  }
+  function markAmountSet(){
+    amountWasSet = true;
+    if (moveHint) moveHint.style.display = 'none';
+    updateSliderGate();
   }
 
-  const chatWindow   = document.getElementById('chatWindow');
-  const chatControls = document.getElementById('chatControls');
+  setSliderUI(0);
+  updateSliderGate();
 
-  // =========================
-  // PureSpectrum + Offer + Worker
-  // =========================
-
-  const psScreenoutUrl =
-    `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
-
-  function getScreenoutUrl() {
-    return psScreenoutUrl;
-  }
-
-  // STRICT PANEL OFFER LINK (NEW)
-  const offerBaseUrl    = 'https://trkmcl.com/wy8odpg43k/xwndpp7qne';
-  const offerTrackedUrl = offerBaseUrl + '?subid=' + encodeURIComponent(transactionId);
-
-  const workerFinishUrl =
-    'https://marketcall.kayembakasongo.workers.dev/finish' +
-    '?transaction_id=' + encodeURIComponent(transactionId) +
-    '&src=ps';
-
-  // ----- Helpers -----
-  function scrollToBottom() {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-  }
-
-  function addBotMessage(text) {
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble chat-bot';
-    bubble.innerHTML = text;
-    chatWindow.appendChild(bubble);
-    scrollToBottom();
-  }
-
-  function addUserMessage(text) {
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble chat-user ml-auto';
-    bubble.textContent = text;
-    chatWindow.appendChild(bubble);
-    scrollToBottom();
-  }
-
-  function clearControls() {
-    chatControls.innerHTML = '';
-  }
-
-  function renderOptions(options) {
-    clearControls();
-    options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.className =
-        'px-3 py-2 text-xs md:text-sm rounded-full border border-slate-300 bg-white hover:bg-slate-100 text-slate-900';
-      btn.textContent = opt.label;
-      btn.addEventListener('click', () => opt.onClick());
-      chatControls.appendChild(btn);
+  document.querySelectorAll('input[name="hasDebt"]').forEach(r => {
+    r.addEventListener('change', () => {
+      hasDebt = r.value;
+      s1Next.classList.remove('disabled-btn');
     });
-    scrollToBottom();
-  }
+  });
 
-  function fadeOutAllAndThen(nextFn) {
-    const nodes = Array.from(chatWindow.children);
-    if (!nodes.length) {
-      nextFn();
+  function updateTypesGate(){
+    const any = debtTypeEls.some(x => x.checked);
+    if (any) s2Next.classList.remove('disabled-btn');
+    else s2Next.classList.add('disabled-btn');
+  }
+  debtTypeEls.forEach(x => x.addEventListener('change', updateTypesGate));
+  updateTypesGate();
+
+  debtSlider.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
+  debtSlider.addEventListener('change', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
+  debtNumber.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
+  debtNumber.addEventListener('blur', ()=> {
+    const v = toInt(debtNumber.value);
+    debtNumber.value = v ? v.toLocaleString('en-US') : '';
+  });
+
+  s1Next.addEventListener('click', () => {
+    if (s1Next.classList.contains('disabled-btn')) return;
+    if (hasDebt === 'no') { window.location.href = abandonUrl; return; }
+    screen1.style.display = 'none';
+    screen2.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  s2Next.addEventListener('click', () => {
+    if (s2Next.classList.contains('disabled-btn')) return;
+    screen2.style.display = 'none';
+    screen3.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  s3Next.addEventListener('click', () => {
+    if (s3Next.classList.contains('disabled-btn')) return;
+
+    /* NOTE: you can keep your silent min rule here if you still want it
+       (it does not display anything to the participant) */
+    if (debtTotalValue < 15000) {
+      window.location.href = abandonUrl;
       return;
     }
-    nodes.forEach(node => node.classList.add('fade-out'));
-    setTimeout(() => {
-      chatWindow.innerHTML = '';
-      nextFn();
-    }, 360);
+
+    screen3.style.display = 'none';
+    surveyAfterScreener.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  // MAIN SURVEY
+  const openWebsiteBtn = document.getElementById('openWebsiteBtn');
+  const abandonSurveyButton = document.getElementById('abandonSurveyButton');
+  const finishSurveyButton = document.getElementById('finishSurveyButton');
+
+  const validateButton = document.getElementById('validateButton');
+  const imageUpload = document.getElementById('imageUpload');
+  const validationResult = document.getElementById('validationResult');
+
+  const feedbackBlock = document.getElementById('feedbackBlock');
+  const attemptsLeftEl = document.getElementById('attemptsLeft');
+
+  const offersCountEl = document.getElementById('offersCount');
+  const commentsEl = document.getElementById('comments');
+
+  const targetWebsite = 'https://trkmcl.com/wy8odpg43k/p98vjj0e83';
+
+  const MAX_ATTEMPTS = 3;
+  let attemptsUsed = 0;
+  attemptsLeftEl.textContent = String(MAX_ATTEMPTS - attemptsUsed);
+
+  // ✅ Make OCR accept either results page OR direct offer page words
+  const SIGNALS = [
+    'congratulations','you qualify','special offers','pre-qualified','qualified',
+    'offer','offers','recommended','approval','approved','apply now','next steps',
+    'debt','relief','settlement','lower payment','payment'
+  ];
+
+  function normalize(s) {
+    return (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function hasEnoughSignals(text) {
+    const t = normalize(text);
+    let hits = 0;
+    for (const s of SIGNALS) if (t.includes(normalize(s))) hits++;
+    return hits >= 2;
+  }
+  function setFinishEnabled(enabled) {
+    if (enabled) finishSurveyButton.classList.remove('disabled-btn');
+    else finishSurveyButton.classList.add('disabled-btn');
+  }
+  function feedbackIsComplete() {
+    const offers = (offersCountEl.value || '').trim();
+    const connected = document.querySelector('input[name="connected"]:checked');
+    const consider = document.querySelector('input[name="consider"]:checked');
+    const whatSaw = document.querySelector('input[name="whatSaw"]:checked');
+    return offers !== '' && !!connected && !!consider && !!whatSaw;
+  }
+  function updateFinishGate() {
+    const can = window.__ocr_ok === true && feedbackIsComplete();
+    setFinishEnabled(can);
   }
 
-  function addVideoBubble() {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'w-full mb-4';
+  openWebsiteBtn.addEventListener('click', () => window.open(targetWebsite, '_blank', 'noopener'));
+  abandonSurveyButton.addEventListener('click', () => window.location.href = abandonUrl);
 
-    const title = document.createElement('p');
-    title.className = 'text-[11px] font-semibold text-slate-700 mb-2';
-    title.textContent =
-      'Here is a short Facebook video explaining the program for people with high balances:';
-    wrapper.appendChild(title);
+  finishSurveyButton.addEventListener('click', () => {
+    if (!finishSurveyButton.classList.contains('disabled-btn')) window.location.href = finishUrl;
+  });
 
-    const videoContainer = document.createElement('div');
-    videoContainer.className = 'video-wrapper';
-
-    const iframe = document.createElement('iframe');
-    iframe.src =
-      'https://www.facebook.com/plugins/video.php?height=314&href=' +
-      encodeURIComponent('https://www.facebook.com/reel/1205740158030889/') +
-      '&show_text=true&width=860&t=0';
-    iframe.style.border = 'none';
-    iframe.style.overflow = 'hidden';
-    iframe.scrolling = 'no';
-    iframe.frameBorder = '0';
-    iframe.allowFullscreen = true;
-    iframe.setAttribute(
-      'allow',
-      'autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share'
-    );
-
-    videoContainer.appendChild(iframe);
-    wrapper.appendChild(videoContainer);
-
-    const hint = document.createElement('p');
-    hint.className = 'text-[11px] text-slate-600 mt-2';
-    hint.textContent =
-      'Please watch the Facebook video. The Next button will unlock after a short moment.';
-    wrapper.appendChild(hint);
-
-    chatWindow.appendChild(wrapper);
-    scrollToBottom();
-  }
-
-  function addOfferLinkBubble() {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'w-full mb-4';
-
-    const title = document.createElement('p');
-    title.className = 'text-[11px] font-semibold text-slate-700 mb-2';
-    title.textContent =
-      'Next, open the secure website in a new tab to complete the full financial form:';
-    wrapper.appendChild(title);
-
-    const card = document.createElement('div');
-    card.className =
-      'w-full max-w-xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col items-center gap-3';
-
-    const desc = document.createElement('p');
-    desc.className = 'text-xs text-slate-700 text-center';
-    desc.innerHTML =
-      'Click the button below to open the form. Fill everything out honestly, then return to this page.<br><br>' +
-      '<strong>If you see a question like “Where did you hear about this program?”, please select <span style="text-decoration:underline;">Facebook</span> so your answers match this study.</strong>';
-    card.appendChild(desc);
-
-    const linkBtn = document.createElement('a');
-    linkBtn.href = offerTrackedUrl;
-    linkBtn.target = '_blank';
-    linkBtn.rel    = 'noopener noreferrer';
-    linkBtn.className =
-      'action-btn inline-flex items-center justify-center px-5 py-3 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700';
-    linkBtn.textContent = 'Open Secure Form';
-    card.appendChild(linkBtn);
-
-    const note = document.createElement('p');
-    note.className = 'text-[11px] text-slate-500 text-center';
-    note.textContent =
-      'After submitting the form, come back and click “I completed the form” below.';
-    card.appendChild(note);
-
-    wrapper.appendChild(card);
-    chatWindow.appendChild(wrapper);
-    scrollToBottom();
-  }
-
-  function disqualify(reasonText) {
-    const finalReason =
-      reasonText ||
-      'Based on your answers, you do not match the profile for this particular research study.';
-
-    addBotMessage(finalReason);
-    addBotMessage(
-      'Please click the button below to exit this survey. Thank you for your time.'
-    );
-
-    const screenoutUrl = getScreenoutUrl();
-
-    renderOptions([
-      {
-        label: 'Exit survey',
-        onClick: () => {
-          window.location.href = screenoutUrl;
-        }
-      }
-    ]);
-  }
-
-  // -------------------------
-  // 3-QUESTION PRESCREENER
-  // -------------------------
-
-  function startChat() {
-    addBotMessage(
-      "Hi, I'm Chloe. I'll quickly check in just a few questions if this private financial study is a good fit for you."
-    );
-    setTimeout(stepQ1Debt, 700);
-  }
-
-  // Q1 – Debt amount (strict: only >=15k passes)
-  function stepQ1Debt() {
-    addBotMessage(
-      'First, about how much unsecured debt do you currently have? ' +
-      '(Credit cards, personal loans — not including mortgage or auto loans.)'
-    );
-    renderOptions([
-      {
-        label: 'Less than $5,000',
-        onClick: () => {
-          addUserMessage('Less than $5,000');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'For this specific project, we are focusing on people with more than $15,000 in unsecured balances.'
-            );
-          });
-        }
-      },
-      {
-        label: '$5,000 - $9,999',
-        onClick: () => {
-          addUserMessage('$5,000 - $9,999');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'For this specific project, we are focusing on people with more than $15,000 in unsecured balances.'
-            );
-          });
-        }
-      },
-      {
-        label: '$10,000 - $14,999',
-        onClick: () => {
-          addUserMessage('$10,000 - $14,999');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'For this specific project, we are focusing on people with more than $15,000 in unsecured balances.'
-            );
-          });
-        }
-      },
-      {
-        label: '$15,000 - $24,999',
-        onClick: () => {
-          addUserMessage('$15,000 - $24,999');
-          fadeOutAllAndThen(stepQ2Ability);
-        }
-      },
-      {
-        label: '$25,000 - $39,999',
-        onClick: () => {
-          addUserMessage('$25,000 - $39,999');
-          fadeOutAllAndThen(stepQ2Ability);
-        }
-      },
-      {
-        label: '$40,000 or more',
-        onClick: () => {
-          addUserMessage('$40,000 or more');
-          fadeOutAllAndThen(stepQ2Ability);
-        }
-      }
-    ]);
-  }
-
-  // Q2 – Ability to pay
-  function stepQ2Ability() {
-    addBotMessage(
-      'Could you realistically afford at least about $250–$350 per month toward a structured plan if it helped reduce your debt?'
-    );
-    renderOptions([
-      {
-        label: 'Yes',
-        onClick: () => {
-          addUserMessage('Yes, I could afford that');
-          fadeOutAllAndThen(stepQ3IntentAndCall);
-        }
-      },
-      {
-        label: 'No',
-        onClick: () => {
-          addUserMessage('No, I really cannot');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'This project focuses on people who are able to commit at least around $250–$350 per month to a structured plan.'
-            );
-          });
-        }
-      }
-    ]);
-  }
-
-  // Q3 – Intent + call consent combined
-  function stepQ3IntentAndCall() {
-    addBotMessage(
-      'Are you seriously looking for real help with your debt and okay with receiving a phone call from a financial specialist about your options?'
-    );
-    renderOptions([
-      {
-        label: 'Yes, I’m seriously looking for help and okay with a call',
-        onClick: () => {
-          addUserMessage('Yes, I want help and I’m okay with a call');
-          fadeOutAllAndThen(finishQual);
-        }
-      },
-      {
-        label: 'No, I’m just testing / not okay with a call',
-        onClick: () => {
-          addUserMessage('No, I’m just testing / not okay with a call');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'This project is only for people who genuinely want help and agree to receive a call from a specialist.'
-            );
-          });
-        }
-      }
-    ]);
-  }
-
-  // If they pass all 3 strict questions
-  function finishQual() {
-    addBotMessage('Great, you look like a strong match for this study. 🎉');
-    addBotMessage(
-      'Before we move forward, please watch this short Facebook video about the program. ' +
-      'The Next button will unlock after a short moment.'
-    );
-    addVideoBubble();
-
-    // Render the "I've watched the video" button but lock it for 40 seconds
-    renderOptions([
-      {
-        label: "I've watched the video",
-        onClick: () => {
-          addUserMessage("I've watched the video");
-          fadeOutAllAndThen(stepSourceQuestion);
-        }
-      }
-    ]);
-
-    // Lock the button immediately
-    const btn = chatControls.querySelector('button');
-    if (btn) {
-      btn.disabled = true;
-      btn.classList.add('disabled-btn', 'bg-slate-300', 'cursor-not-allowed');
-      btn.classList.remove('hover:bg-slate-100');
-
-      let waitSeconds = 40;
-      const originalLabel = "I've watched the video";
-
-      btn.textContent = originalLabel + ` (${waitSeconds}s)`;
-
-      const countdown = setInterval(() => {
-        waitSeconds--;
-        if (waitSeconds <= 0) {
-          clearInterval(countdown);
-          btn.disabled = false;
-          btn.classList.remove('disabled-btn', 'bg-slate-300', 'cursor-not-allowed');
-          btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'text-white');
-          btn.textContent = originalLabel;
-          addBotMessage(
-            '✅ You can now continue. If you haven\'t already, please make sure you watched the Facebook video so the call makes sense.'
-          );
-        } else {
-          btn.textContent = originalLabel + ` (${waitSeconds}s)`;
-        }
-      }, 1000);
-    }
-  }
-
-  // New step: force “Facebook” as source
-  function stepSourceQuestion() {
-    addBotMessage(
-      'Quick check: where did you first hear about this debt relief program?'
-    );
-    addBotMessage(
-      '<span style="font-size:11px; color:#4b5563;">For this particular study, we are only including people who saw it on Facebook.</span>'
-    );
-    renderOptions([
-      {
-        label: 'Facebook',
-        onClick: () => {
-          addUserMessage('Facebook');
-          fadeOutAllAndThen(stepWebsiteLinkStep);
-        }
-      },
-      {
-        label: 'Google / Search',
-        onClick: () => {
-          addUserMessage('Google / Search');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'For this project, we are only including people who first saw this program on Facebook.'
-            );
-          });
-        }
-      },
-      {
-        label: 'A friend or family member',
-        onClick: () => {
-          addUserMessage('A friend or family member');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'For this project, we are only including people who first saw this program on Facebook.'
-            );
-          });
-        }
-      },
-      {
-        label: 'Another website / Other',
-        onClick: () => {
-          addUserMessage('Another website / Other');
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'For this project, we are only including people who first saw this program on Facebook.'
-            );
-          });
-        }
-      }
-    ]);
-  }
-
-  // ------------------------
-  // OFFER STEP
-  // ------------------------
-  function stepWebsiteLinkStep() {
-    addBotMessage(
-      'Perfect, thanks! We\'ll mark that you discovered this program on <strong>Facebook</strong> for this study.'
-    );
-    addBotMessage(
-      'Next, you\'ll open a secure website in a new tab to complete the full financial form. ' +
-      'Please fill it out with accurate information, then return to this page. ' +
-      '⚠️ We automatically verify if the form was successfully submitted. ' +
-      'If it is not submitted, your participation will NOT be approved.'
-    );
-    addOfferLinkBubble();
-
-    renderOptions([
-      {
-        label: 'I completed the form',
-        onClick: () => {
-          addUserMessage('I completed the form');
-          fadeOutAllAndThen(stepEmailGate);
-        }
-      },
-      {
-        label: "I don't want to continue",
-        onClick: () => {
-          addUserMessage("I don't want to continue");
-          fadeOutAllAndThen(() => {
-            disqualify(
-              'No problem at all. We will not count this as a full participation.'
-            );
-          });
-        }
-      }
-    ]);
-  }
-
-  // ------------------------
-  // EMAIL GATE – BREVO
-  // ------------------------
-  function stepEmailGate() {
-    addBotMessage(
-      'Before we can proceed to verification, your email is <strong>mandatory</strong> so we can send you a reminder and summary of your options. ' +
-      'Please submit your email below. Once it is saved, the green <strong>Continue</strong> button will unlock.'
-    );
-
-    const formHtml = `
-      <div id="brevoBlock" class="w-full mb-4">
-        <div class="sib-form" style="text-align: center; background-color: #EFF2F7;">
-          <div id="sib-form-container" class="sib-form-container">
-            <div id="sib-container"
-                 class="sib-container--large sib-container--vertical"
-                 style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:3px; border-width:1px; border-color:#C0CCD9; border-style:solid; margin:0 auto;">
-
-              <!-- Hidden iframe so the form posts to Brevo without leaving this page -->
-              <iframe name="brevo_iframe" id="brevo_iframe" style="display:none;"></iframe>
-
-              <form id="sib-form"
-                    method="POST"
-                    action="https://52bcaf92.sibforms.com/serve/MUIFAO5vlejSCs-rWtk8_hSGgyILb9Oi-aOLbS_zI5_FjrtRovBWkBZlGVuoCXxEbmOMZMrdo0ZllgcfYtt7jPnKOHgyHT2TYdf3Q-xFXArnK8ikp21kPr7-iXsfMeK4CtD4cAPf2oHHMJLw5OtgVzgyKMt0hXTJ3UiMJVGUXzHbWENuGdgb7j-x2xeZ6iW5f9ix4gocwCjOBdct"
-                    target="brevo_iframe">
-
-                <div style="padding: 8px 0;">
-                  <div class="sib-form-block"
-                       style="font-size:18px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;">
-                    <p>Survey Feedback Reminder</p>
-                  </div>
-                </div>
-
-                <div style="padding: 4px 0;">
-                  <div class="sib-form-block"
-                       style="font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858; background-color:transparent;">
-                    <div class="sib-text-form-block">
-                      <p>Please provide your email so we can send you a reminder about this survey and the outcome of your request.</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div style="padding: 8px 0;">
-                  <div class="sib-input sib-form-block">
-                    <div class="form__entry entry_block">
-                      <div class="form__label-row">
-                        <label class="entry__label"
-                               style="font-weight: 700; text-align:left; font-size:14px; font-family:Helvetica, sans-serif; color:#3c4858;"
-                               for="EMAIL" data-required="*">
-                          Enter your email address
-                        </label>
-
-                        <div class="entry__field">
-                          <input class="input"
-                                 type="text"
-                                 id="EMAIL"
-                                 name="EMAIL"
-                                 autocomplete="off"
-                                 placeholder="EMAIL"
-                                 data-required="true"
-                                 required />
-                        </div>
-                      </div>
-
-                      <label id="email_error"
-                             class="entry__error entry__error--primary"
-                             style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px;">
-                      </label>
-                      <label class="entry__specification"
-                             style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
-                        Provide your email address to subscribe. For example: abc@xyz.com
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div style="padding: 8px 0;">
-                  <div class="sib-optin sib-form-block">
-                    <div class="form__entry entry_mcq">
-                      <div class="form__label-row">
-                        <div class="entry__choice">
-                          <label style="display:flex; align-items:flex-start; gap:6px;">
-                            <input type="checkbox"
-                                   class="input_replaced"
-                                   value="1"
-                                   id="OPT_IN"
-                                   name="OPT_IN" />
-                            <span class="checkbox checkbox_tick_positive"></span>
-                            <span style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#3C4858;">
-                              I agree to receive your email and accept the data privacy statement.
-                            </span>
-                          </label>
-                        </div>
-                      </div>
-                      <label id="optin_error"
-                             class="entry__error entry__error--primary"
-                             style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px;">
-                      </label>
-                      <label class="entry__specification"
-                             style="font-size:11px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4;">
-                        You may unsubscribe at any time using the link in our emails.
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div style="padding: 8px 0%;">
-                  <div class="sib-form-block" style="text-align: left">
-                    <button id="brevoSubmitBtn"
-                            class="sib-form-block__button sib-form-block__button-with-loader"
-                            style="font-size:14px; text-align:center; font-weight:700; font-family:Helvetica, sans-serif; color:#FFFFFF; background-color:#3E4857; border-radius:9999px; border-width:0px; width:100%; padding:8px 0;"
-                            type="submit">
-                      SUBMIT
-                    </button>
-                  </div>
-                </div>
-
-                <input type="text" name="email_address_check" value="" class="input--hidden">
-                <input type="hidden" name="locale" value="en">
-                <input type="hidden" name="html_type" value="simple">
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    const formWrapper = document.createElement('div');
-    formWrapper.className = 'w-full mb-4';
-    formWrapper.innerHTML = formHtml;
-    chatWindow.appendChild(formWrapper);
-
-    // Continue button (locked until email is valid+submitted)
-    clearControls();
-    const continueButton = document.createElement('button');
-    continueButton.id = 'mandatoryContinueBtn';
-    continueButton.className =
-      'action-btn w-full px-5 py-3 rounded-full bg-slate-400 text-white font-bold disabled-btn cursor-not-allowed';
-    continueButton.textContent = 'Continue to Finish Screen (Email Required)';
-    continueButton.disabled = true;
-    chatControls.appendChild(continueButton);
-
-    continueButton.addEventListener('click', () => {
-      if (!continueButton.disabled) {
-        addUserMessage('Continue to Finish Screen');
-        fadeOutAllAndThen(stepWaitAndFinish);
-      }
-    });
-
-    // Front-end validation + unlocking logic
-    const sibForm    = document.getElementById('sib-form');
-    const emailInput = document.getElementById('EMAIL');
-    const optIn      = document.getElementById('OPT_IN');
-    const emailErr   = document.getElementById('email_error');
-    const optinErr   = document.getElementById('optin_error');
-    const submitBtn  = document.getElementById('brevoSubmitBtn');
-
-    if (sibForm) {
-      sibForm.addEventListener('submit', function(e) {
-        let hasError = false;
-        emailErr.style.display = 'none';
-        optinErr.style.display = 'none';
-
-        const emailVal = (emailInput.value || '').trim();
-
-        if (!emailVal) {
-          hasError = true;
-          emailErr.textContent = 'Please enter your email address.';
-          emailErr.style.display = 'block';
-        } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)) {
-          hasError = true;
-          emailErr.textContent = 'Please enter a valid email address.';
-          emailErr.style.display = 'block';
-        }
-
-        if (!optIn.checked) {
-          hasError = true;
-          optinErr.textContent = 'Please agree to the privacy statement to continue.';
-          optinErr.style.display = 'block';
-        }
-
-        if (hasError) {
-          e.preventDefault();
-          return;
-        }
-
-        // Let it POST to Brevo via hidden iframe
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting...';
-        addBotMessage('Saving your email securely, please wait...');
-
-        // After a short delay, unlock the Continue button
-        setTimeout(() => {
-          const brevoBlock = document.getElementById('brevoBlock');
-          if (brevoBlock) brevoBlock.classList.add('hidden');
-
-          continueButton.disabled = false;
-          continueButton.classList.remove('disabled-btn', 'bg-slate-400', 'cursor-not-allowed');
-          continueButton.classList.add('bg-green-600', 'hover:bg-green-700');
-          continueButton.textContent = 'Continue to Finish Screen';
-
-          addBotMessage('✅ <strong>Success!</strong> Your email is saved. Please click the green button below to finalize your participation.');
-        }, 3500);
-      });
+  validateButton.addEventListener('click', async () => {
+    if (!imageUpload.files || imageUpload.files.length === 0) {
+      validationResult.textContent = '❌ Please upload the screenshot first.';
+      validationResult.style.color = 'red';
+      validationResult.style.display = 'block';
+      return;
     }
 
-    scrollToBottom();
-  }
+    const file = imageUpload.files[0];
+    validationResult.style.display = 'block';
+    validationResult.style.color = 'orange';
+    validationResult.innerHTML = '<div class="loader mx-auto"></div><p class="mt-2">Analyzing screenshot...</p>';
 
-  // ------------------------
-  // 60s WAIT + WORKER REDIRECT
-  // ------------------------
-  function stepWaitAndFinish() {
-    let seconds = 60;
+    validateButton.disabled = true;
+    setFinishEnabled(false);
 
-    addBotMessage(
-      'Thank you. We will now verify your form and email submission with our partner system. ' +
-      'This usually takes under a minute.'
-    );
+    try {
+      const { data: { text } } = await Tesseract.recognize(file, 'eng', { logger: () => {} });
+      const ok = hasEnoughSignals(text);
 
-    const countdownBubble = document.createElement('div');
-    countdownBubble.className = 'chat-bubble chat-bot';
-    countdownBubble.id = 'countdownBubble';
-    countdownBubble.textContent = 'Checking your submission... 60 seconds remaining';
-    chatWindow.appendChild(countdownBubble);
-    scrollToBottom();
-
-    renderOptions([
-      {
-        label: 'Cancel and exit',
-        onClick: () => {
-          window.location.href = getScreenoutUrl();
-        }
-      }
-    ]);
-
-    const interval = setInterval(() => {
-      seconds--;
-      if (seconds <= 0) {
-        clearInterval(interval);
-        countdownBubble.textContent = 'Done! Redirecting now...';
-        scrollToBottom();
-        setTimeout(() => {
-          window.location.href = workerFinishUrl;
-        }, 800);
+      if (ok) {
+        window.__ocr_ok = true;
+        validationResult.textContent = '✅ Screenshot validated successfully! Please complete the questions below, then finish the survey.';
+        validationResult.style.color = 'green';
+        feedbackBlock.style.display = 'block';
+        updateFinishGate();
       } else {
-        countdownBubble.textContent =
-          'Checking your submission... ' + seconds + ' seconds remaining';
-      }
-    }, 1000);
-  }
+        attemptsUsed += 1;
+        const left = MAX_ATTEMPTS - attemptsUsed;
+        attemptsLeftEl.textContent = String(left);
 
-  // Start chat
-  startChat();
+        window.__ocr_ok = false;
+        feedbackBlock.style.display = 'none';
+        validationResult.textContent = '❌ We could not verify that page. Please upload the screenshot from the page you saw after submitting the form.';
+        validationResult.style.color = 'red';
+
+        if (left <= 0) {
+          validationResult.textContent = '❌ Verification failed. No attempts remaining. Redirecting...';
+          setTimeout(() => { window.location.href = abandonUrl; }, 800);
+        }
+      }
+    } catch (error) {
+      attemptsUsed += 1;
+      const left = MAX_ATTEMPTS - attemptsUsed;
+      attemptsLeftEl.textContent = String(left);
+
+      window.__ocr_ok = false;
+      feedbackBlock.style.display = 'none';
+      validationResult.textContent = '❌ Error analyzing image. Please try again.';
+      validationResult.style.color = 'red';
+
+      if (left <= 0) {
+        validationResult.textContent = '❌ Verification failed. No attempts remaining. Redirecting...';
+        setTimeout(() => { window.location.href = abandonUrl; }, 800);
+      }
+    } finally {
+      validateButton.disabled = false;
+    }
+  });
+
+  offersCountEl.addEventListener('input', updateFinishGate);
+  commentsEl.addEventListener('input', updateFinishGate);
+  document.querySelectorAll('input[name="connected"]').forEach(r => r.addEventListener('change', updateFinishGate));
+  document.querySelectorAll('input[name="consider"]').forEach(r => r.addEventListener('change', updateFinishGate));
+  document.querySelectorAll('input[name="whatSaw"]').forEach(r => r.addEventListener('change', updateFinishGate));
+
+  window.__ocr_ok = false;
+  setFinishEnabled(false);
 });
 </script>
 
 </body>
 </html>
-

@@ -214,30 +214,35 @@
           <p class="text-xs text-gray-600 mt-2">Note: Some participants may not qualify to continue based on their answers.</p>
         </div>
 
-        <!-- ✅ REMOVED: "What is unsecured debt?" block -->
-
         <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
           <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
           <ol class="list-decimal list-inside text-gray-700 space-y-2">
             <li><strong>Open the debt matching website</strong> using the button below (it opens in a new tab).</li>
-            <li><strong>Complete the short form</strong> on the website until you reach the results page (or are directed to an offer).</li>
+
+            <!-- ✅ UPDATED (real info, no obligation language) -->
+            <li>
+              <strong>Complete the short form</strong> on the website using <strong>real, accurate information</strong>
+              (if the details are incorrect, the form may <strong>not submit</strong> or you may <strong>not reach</strong> the results/offers screen).
+              Continue until you reach the results page (or are directed to an offer).
+            </li>
+
             <li>
               On the results page, you may see <strong>one or more partner offers</strong> or you may be directed to an offer page.
-              <strong>Please click at least one offer</strong> to view details and check whether it fits your needs or could help you.
-              If you choose to enroll, use a service, or call any company shown, you may do so — it is optional and only if you want help.
+              <strong>Please click at least one offer</strong> to view details and check whether it fits your needs or could help you.If you choose to enroll, use a service, or call any company shown, you may do so. it is optional and only if you want help.
             </li>
+
             <li><strong>Take a screenshot</strong> of what you see after submitting the form (results page / offers / special offers).</li>
             <li><strong>Upload your screenshot</strong> below. We use OCR to verify that you reached the offer/results screen.</li>
             <li>After verification, answer a few short questions about what you saw and your experience.</li>
           </ol>
         </div>
 
+        <!-- ✅ UPDATED: removed "no obligation" + "not required" text -->
         <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
           <h3 class="text-lg font-semibold text-amber-900">Important</h3>
           <p class="text-gray-700 mt-2">
             The website you will use is a real third-party service that may match people with potential debt-help offers.
-            We are not the website and we are not the debt companies shown. There is no obligation to sign up for any service.
-            <strong>You may choose to contact any provider shown, but it is not required.</strong>
+            We are not the website and we are not the debt companies shown.
           </p>
         </div>
 
@@ -303,10 +308,11 @@
 
           <div class="mt-4 grid gap-4">
 
+            <!-- ✅ UPDATED: removed optional/enroll/call sentence -->
             <div class="bg-white border border-emerald-100 rounded-lg p-4">
               <div class="font-semibold text-gray-800">Did you click at least one offer to view details?</div>
               <p class="text-xs text-gray-600 mt-1">
-                Please click at least one offer to view details. If you choose to enroll or call any service shown, you may do so — optional.
+                Please click at least one offer to view details.
               </p>
               <div class="mt-3 space-y-2 text-gray-700">
                 <label class="flex items-center gap-2">
@@ -484,7 +490,6 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
 
-    // ✅ OTP removed: go straight to survey
     screen3.style.display = 'none';
     surveyAfterScreener.style.display = 'block';
     window.scrollTo(0, 0);
@@ -619,3 +624,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+

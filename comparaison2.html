@@ -40,6 +40,9 @@
     input[type=range]::-moz-range-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -10px; width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
     input[type=range]::-moz-range-thumb { width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
+
+    /* ✅ Remove text selection highlights on buttons */
+    button { user-select: none; -webkit-user-select: none; }
   </style>
 </head>
 
@@ -207,7 +210,7 @@
           <h2 class="text-xl font-semibold text-gray-800 mb-3">Who Can Participate?</h2>
           <p class="text-gray-700 mb-4">Please proceed if the following is true for you:</p>
           <ul class="qualification-list list-none">
-            <li>You currently have unsecured debt.</li>
+            <li>You currently have unsecured debt of 15000$ or more.</li>
             <li>You are willing to complete a short debt-relief questionnaire on your mobile phone.</li>
             <li>You can take and upload a screenshot of the results page that shows your matched offers.</li>
           </ul>
@@ -219,16 +222,19 @@
           <ol class="list-decimal list-inside text-gray-700 space-y-2">
             <li><strong>Open the debt matching website</strong> using the button below (it opens in a new tab).</li>
 
-            <!-- ✅ UPDATED (real info, no obligation language) -->
+            <!-- ✅ UPDATED: slider is first + real info -->
             <li>
-              <strong>Complete the short form</strong> on the website using <strong>real, accurate information</strong>
+              <strong>On the website, the first screen you will see is the debt amount slider.</strong>
+              Please <strong>move the slider</strong> to select the amount you owe (the page may not continue unless the slider is moved),
+              then continue completing the form using <strong>real, accurate information</strong>
               (if the details are incorrect, the form may <strong>not submit</strong> or you may <strong>not reach</strong> the results/offers screen).
               Continue until you reach the results page (or are directed to an offer).
             </li>
 
+            <!-- ✅ UPDATED: removed “optional/enroll/call” sentence -->
             <li>
               On the results page, you may see <strong>one or more partner offers</strong> or you may be directed to an offer page.
-              <strong>Please click at least one offer</strong> to view details and check whether it fits your needs or could help you.If you choose to enroll, use a service, or call any company shown, you may do so. it is optional and only if you want help.
+              <strong>Please click at least one offer</strong> to view details and check whether it fits your needs or could help you.
             </li>
 
             <li><strong>Take a screenshot</strong> of what you see after submitting the form (results page / offers / special offers).</li>
@@ -237,7 +243,7 @@
           </ol>
         </div>
 
-        <!-- ✅ UPDATED: removed "no obligation" + "not required" text -->
+        <!-- ✅ UPDATED: removed “no obligation” / “not required” -->
         <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
           <h3 class="text-lg font-semibold text-amber-900">Important</h3>
           <p class="text-gray-700 mt-2">
@@ -261,7 +267,7 @@
               <div class="font-semibold text-gray-800">Debt matching website</div>
               <div class="text-sm text-gray-600">Complete the short questionnaire until you see your results / special offers (or are sent to an offer).</div>
               <div class="text-xs text-gray-600 mt-1">
-                After the results load, <b>click at least one offer</b> to view details.
+                The first screen is a <b>debt amount slider</b> — please <b>move the slider</b> to continue.
               </div>
             </div>
             <button id="openWebsiteBtn"
@@ -308,7 +314,6 @@
 
           <div class="mt-4 grid gap-4">
 
-            <!-- ✅ UPDATED: removed optional/enroll/call sentence -->
             <div class="bg-white border border-emerald-100 rounded-lg p-4">
               <div class="font-semibold text-gray-800">Did you click at least one offer to view details?</div>
               <p class="text-xs text-gray-600 mt-1">
@@ -389,6 +394,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // ✅ Block browser back button (no back navigation)
+  history.pushState(null, "", location.href);
+  window.addEventListener('popstate', function () {
+    history.pushState(null, "", location.href);
+  });
+
   const urlParams = new URLSearchParams(window.location.search);
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
   if (!transactionId) transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
@@ -624,4 +635,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-

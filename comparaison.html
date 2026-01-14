@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" class="supernova">
 <head>
@@ -10,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Tesseract.js v6 -->
+  <!-- ✅ Tesseract.js v6 -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/tesseract.min.js"></script>
 
   <style>
@@ -35,12 +34,16 @@
       margin-bottom: 8px;
     }
 
-    /* Range aesthetics */
+    /* ✅ Range aesthetics */
     input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 34px; }
     input[type=range]::-webkit-slider-runnable-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
     input[type=range]::-moz-range-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -10px; width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
     input[type=range]::-moz-range-thumb { width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
+
+    /* Income buttons (like your screenshot) */
+    .income-btn { transition: transform .15s ease, opacity .15s ease; }
+    .income-btn:hover { transform: translateY(-1px); }
   </style>
 </head>
 
@@ -96,7 +99,7 @@
           <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
             <input type="checkbox" class="mt-1 debtType" value="personal_loans">
             <div>
-              <div class="font-semibold">Unsecured Personal Loans</div>
+              <div class="font-semibold">Personal Loans</div>
               <div class="text-xs text-slate-600">Unsecured installment loans.</div>
             </div>
           </label>
@@ -109,7 +112,7 @@
             </div>
           </label>
 
-          <!-- Shown, disqualify on Next if selected -->
+          <!-- shown, but not targeted -->
           <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
             <input type="checkbox" class="mt-1 debtType" value="medical">
             <div>
@@ -151,19 +154,50 @@
           </label>
         </div>
 
+        <!-- ✅ Next always clickable (seamless) -->
         <div class="mt-4 text-center">
           <button id="screen2Next"
-                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg"
                   type="button">
             Next
           </button>
         </div>
       </div>
 
-      <!-- ========================= PRESCREENER 3: SLIDER TOTAL ========================= -->
+      <!-- ========================= PRESCREENER 3: INCOME (>= 30000 qualifies, hidden) ========================= -->
+      <div id="screenIncome" class="p-6 bg-white border border-gray-200 rounded-xl mb-6" style="display:none;">
+        <div class="flex justify-between items-center mb-4 text-sm text-gray-500">
+          <div><strong>50%</strong> complete</div>
+          <div>~2 minutes remaining</div>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+          What is your annual income?
+        </h2>
+
+        <div class="space-y-3">
+          <button data-income="0" class="income-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg" type="button">
+            No Income
+          </button>
+
+          <button data-income="15000" class="income-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg" type="button">
+            Under $30,000
+          </button>
+
+          <button data-income="30000" class="income-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg" type="button">
+            $30,000 to $100,000
+          </button>
+
+          <button data-income="100001" class="income-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg" type="button">
+            Over $100,000
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= PRESCREENER 4: DEBT AMOUNT SLIDER ========================= -->
       <div id="screen3" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">About how much unsecured debt do you currently have in total?</h2>
-        <p class="text-gray-700 mb-4 text-sm">Use the slider to select your total estimated unsecured debt (USD).</p>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">About how much debt do you currently have in total?</h2>
+        <p class="text-gray-700 mb-4 text-sm">Use the slider to select your total estimated debt (USD).</p>
 
         <div class="bg-white border rounded-xl p-4">
           <div class="text-center">
@@ -204,19 +238,17 @@
           <p class="mt-2 text-base md:text-lg">Help us understand how clear and useful a debt-offer matching experience is.</p>
         </div>
 
-        <!-- ✅ REMOVED: "Who Can Participate?" block completely -->
-
-   <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
           <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
           <ol class="list-decimal list-inside text-gray-700 space-y-2">
             <li><strong>Open the debt matching website</strong> using the button below (it opens in a new tab).</li>
             <li>
               <strong>The first screen you will see is a debt amount slider.</strong>
               Please move the slider to select the total amount you owe, then continue through the form.
-              This study focuses on individuals with <strong>$15,000 or more</strong> in unsecured debt, so please answer accurately.
+             <strong> This study focuses on individuals with</strong> <strong>$15,000 or more</strong> in unsecured debt, so please answer accurately.
             </li>
             <li>
-              When asked about debt type, select what applies to you (for example, <strong>credit card debt</strong>, which is the main focus of this study).
+              When asked about debt type, select what applies to you (for example, <strong>credit card debt</strong>, <strong> which is the main focus of this study).</strong>
               When asked about income, select the bracket that matches your real situation.
             </li>
             <li>
@@ -226,22 +258,13 @@
             </li>
             <li>
               On the results page, you may see one or more partner offers or you may be directed to an offer page.
-              <strong>Please click at least one offer</strong> to view details and check whether it fits your needs. <strong> If you wish to enroll in or call any of the programs shown, you may do so to receive help with your situation.</strong>
-
+              <strong>Please click at least one offer</strong> to view details and check whether it fits your needs or could help you.
+             <strong>If you wish to call or enroll in any of the programs shown, you may do so to receive help for your situation.</strong>
             </li>
             <li><strong>Take a screenshot</strong> of what you see after submitting the form (results page / offers / special offers).</li>
             <li><strong>Upload your screenshot</strong> below. We use OCR to verify that you reached the offer/results screen.</li>
             <li>After verification, answer a few short questions about what you saw and your experience.</li>
           </ol>
-        </div>
-
-
-        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
-          <h3 class="text-lg font-semibold text-amber-900">Important</h3>
-          <p class="text-gray-700 mt-2">
-            The website you will use is a real third-party service that may match people with potential debt-help offers.
-            We are not the website and we are not the debt companies shown.
-          </p>
         </div>
 
         <h2 class="text-2xl font-bold text-center text-gray-800 my-6">
@@ -383,10 +406,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Prevent browser back (basic)
-  history.pushState(null, '', location.href);
-  window.addEventListener('popstate', () => history.pushState(null, '', location.href));
-
   const urlParams = new URLSearchParams(window.location.search);
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
   if (!transactionId) transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
@@ -394,12 +413,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const abandonUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
   const finishUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
 
-  // Hidden qualification rules (not shown to participants)
-  const MIN_DEBT = 15000;
-  const ALLOWED_TYPES = new Set(['credit_cards','personal_loans','private_student_loans']);
-
   const screen1 = document.getElementById('screen1');
   const screen2 = document.getElementById('screen2');
+  const screenIncome = document.getElementById('screenIncome');
   const screen3 = document.getElementById('screen3');
   const surveyAfterScreener = document.getElementById('surveyAfterScreener');
 
@@ -442,11 +458,10 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSliderGate();
   }
 
-  // Initialize slider at 0
   setSliderUI(0);
   updateSliderGate();
 
-  // Screen1 gate
+  // Screen 1 enable
   document.querySelectorAll('input[name="hasDebt"]').forEach(r => {
     r.addEventListener('change', () => {
       hasDebt = r.value;
@@ -454,16 +469,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Screen2 gate
-  function updateTypesGate(){
-    const any = debtTypeEls.some(x => x.checked);
-    if (any) s2Next.classList.remove('disabled-btn');
-    else s2Next.classList.add('disabled-btn');
-  }
-  debtTypeEls.forEach(x => x.addEventListener('change', updateTypesGate));
-  updateTypesGate();
-
-  // Slider move detection
+  // Slider must be moved/typed
   debtSlider.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
   debtSlider.addEventListener('change', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
   debtNumber.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
@@ -472,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function() {
     debtNumber.value = v ? v.toLocaleString('en-US') : '';
   });
 
-  // Navigation
+  // Navigate Screen 1 -> Screen 2
   s1Next.addEventListener('click', () => {
     if (s1Next.classList.contains('disabled-btn')) return;
     if (hasDebt === 'no') { window.location.href = abandonUrl; return; }
@@ -481,29 +487,48 @@ document.addEventListener('DOMContentLoaded', function() {
     window.scrollTo(0, 0);
   });
 
-  // Debt type enforcement only on Next
+  // Screen 2 (Debt types) -> Income (seamless; disqualify only on Next)
   s2Next.addEventListener('click', () => {
-    if (s2Next.classList.contains('disabled-btn')) return;
-
+    // Allowed: credit_cards, personal_loans, private_student_loans
     const selected = debtTypeEls.filter(x => x.checked).map(x => x.value);
-    const hasAllowed = selected.some(v => ALLOWED_TYPES.has(v));
-    const hasDisallowed = selected.some(v => !ALLOWED_TYPES.has(v));
 
-    if (!hasAllowed || hasDisallowed) {
+    // If any disallowed OR nothing selected -> disqualify silently on Next
+    const allowed = new Set(['credit_cards','personal_loans','private_student_loans']);
+    const hasAny = selected.length > 0;
+    const hasDisallowed = selected.some(v => !allowed.has(v));
+
+    if (!hasAny || hasDisallowed) {
       window.location.href = abandonUrl;
       return;
     }
 
     screen2.style.display = 'none';
-    screen3.style.display = 'block';
+    screenIncome.style.display = 'block';
     window.scrollTo(0, 0);
   });
 
-  // Debt amount enforcement (hidden)
+  // Income buttons (>= 30000 qualifies; under disqualifies silently)
+  document.querySelectorAll('.income-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const incomeValue = parseInt(btn.dataset.income, 10);
+
+      if (incomeValue < 30000) {
+        window.location.href = abandonUrl;
+        return;
+      }
+
+      screenIncome.style.display = 'none';
+      screen3.style.display = 'block';
+      window.scrollTo(0, 0);
+    });
+  });
+
+  // Screen 3 -> Main survey (silent min debt)
   s3Next.addEventListener('click', () => {
     if (s3Next.classList.contains('disabled-btn')) return;
 
-    if (debtTotalValue < MIN_DEBT) {
+    // ✅ silent min (hidden logic)
+    if (debtTotalValue < 15000) {
       window.location.href = abandonUrl;
       return;
     }
@@ -642,4 +667,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
 

@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en" class="supernova">
 <head>
@@ -9,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- ✅ Tesseract.js v6 -->
+  <!-- Tesseract.js v6 -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/tesseract.min.js"></script>
 
   <style>
@@ -34,16 +35,12 @@
       margin-bottom: 8px;
     }
 
-    /* ✅ Range aesthetics */
+    /* Range aesthetics */
     input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 34px; }
     input[type=range]::-webkit-slider-runnable-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
     input[type=range]::-moz-range-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -10px; width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
     input[type=range]::-moz-range-thumb { width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
-
-    /* Income buttons (like your screenshot) */
-    .income-btn { transition: transform .15s ease, opacity .15s ease; }
-    .income-btn:hover { transform: translateY(-1px); }
   </style>
 </head>
 
@@ -99,7 +96,7 @@
           <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
             <input type="checkbox" class="mt-1 debtType" value="personal_loans">
             <div>
-              <div class="font-semibold">Personal Loans</div>
+              <div class="font-semibold">Unsecured Personal Loans</div>
               <div class="text-xs text-slate-600">Unsecured installment loans.</div>
             </div>
           </label>
@@ -112,7 +109,6 @@
             </div>
           </label>
 
-          <!-- shown, but not targeted -->
           <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
             <input type="checkbox" class="mt-1 debtType" value="medical">
             <div>
@@ -154,50 +150,19 @@
           </label>
         </div>
 
-        <!-- ✅ Next always clickable (seamless) -->
         <div class="mt-4 text-center">
           <button id="screen2Next"
-                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
                   type="button">
             Next
           </button>
         </div>
       </div>
 
-      <!-- ========================= PRESCREENER 3: INCOME (>= 30000 qualifies, hidden) ========================= -->
-      <div id="screenIncome" class="p-6 bg-white border border-gray-200 rounded-xl mb-6" style="display:none;">
-        <div class="flex justify-between items-center mb-4 text-sm text-gray-500">
-          <div><strong>50%</strong> complete</div>
-          <div>~2 minutes remaining</div>
-        </div>
-
-        <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">
-          What is your annual income?
-        </h2>
-
-        <div class="space-y-3">
-          <button data-income="0" class="income-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg" type="button">
-            No Income
-          </button>
-
-          <button data-income="15000" class="income-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg" type="button">
-            Under $30,000
-          </button>
-
-          <button data-income="30000" class="income-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg" type="button">
-            $30,000 to $100,000
-          </button>
-
-          <button data-income="100001" class="income-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg" type="button">
-            Over $100,000
-          </button>
-        </div>
-      </div>
-
-      <!-- ========================= PRESCREENER 4: DEBT AMOUNT SLIDER ========================= -->
+      <!-- ========================= PRESCREENER 3: SLIDER TOTAL ========================= -->
       <div id="screen3" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">About how much debt do you currently have in total?</h2>
-        <p class="text-gray-700 mb-4 text-sm">Use the slider to select your total estimated debt (USD).</p>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">About how much unsecured debt do you currently have in total?</h2>
+        <p class="text-gray-700 mb-4 text-sm">Use the slider to select your total estimated unsecured debt (USD).</p>
 
         <div class="bg-white border rounded-xl p-4">
           <div class="text-center">
@@ -238,65 +203,112 @@
           <p class="mt-2 text-base md:text-lg">Help us understand how clear and useful a debt-offer matching experience is.</p>
         </div>
 
+        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-3">Who Can Participate?</h2>
+          <p class="text-gray-700 mb-4">Please proceed if the following is true for you:</p>
+          <ul class="qualification-list list-none space-y-2">
+            <li>You currently have <strong>$15,000 or more in unsecured debt</strong>, preferably credit card or personal loan debt.</li>
+            <li>You have a <strong>yearly income of $50,000 or more</strong> and the ability to make monthly payments <strong>if you ever choose to enroll</strong> (enrollment is completely optional).</li>
+            <li>You are willing to complete a short debt-relief questionnaire on your <strong>device</strong>.</li>
+            <li>You can take and upload a <strong>screenshot of the results page</strong> showing your matched offers.</li>
+          </ul>
+          <p class="text-xs text-gray-600 mt-2">
+            Note: Some participants may not qualify to continue based on their answers.
+          </p>
+        </div>
+
         <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
           <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
           <ol class="list-decimal list-inside text-gray-700 space-y-2">
-            <li><strong>Open the debt matching website</strong> using the button below (it opens in a new tab).</li>
-            <li>
-              <strong>The first screen you will see is a debt amount slider.</strong>
-              Please move the slider to select the total amount you owe, then continue through the form.
-             <strong> This study focuses on individuals with</strong> <strong>$15,000 or more</strong> in unsecured debt, so please answer accurately.
-            </li>
-            <li>
-              When asked about debt type, select what applies to you (for example, <strong>credit card debt</strong>, <strong> which is the main focus of this study).</strong>
-              When asked about income, select the bracket that matches your real situation.
-            </li>
-            <li>
-              <strong>Complete the short form</strong> using real, accurate information
-              (if the details are incorrect, the form may not submit or you may not reach the results/offers screen).
-              Continue until you reach the results page (or are directed to an offer).
-            </li>
-            <li>
-              On the results page, you may see one or more partner offers or you may be directed to an offer page.
-              <strong>Please click at least one offer</strong> to view details and check whether it fits your needs or could help you.
-             <strong>If you wish to call or enroll in any of the programs shown, you may do so to receive help for your situation.</strong>
-            </li>
-            <li><strong>Take a screenshot</strong> of what you see after submitting the form (results page / offers / special offers).</li>
-            <li><strong>Upload your screenshot</strong> below. We use OCR to verify that you reached the offer/results screen.</li>
-            <li>After verification, answer a few short questions about what you saw and your experience.</li>
+            <li><strong>Click “Open Website”</strong> below to load the debt matching website inside this page (embedded window).</li>
+            <li><strong>Move the debt amount slider</strong> to select your total debt amount (this study focuses on <strong>$15,000+</strong>).</li>
+            <li>Select your <strong>debt type</strong> and your <strong>income bracket</strong> using your real situation.</li>
+            <li><strong>Complete the form</strong> and submit until you reach the offers/results page.</li>
+            <li>On the results page, <strong>click at least one offer</strong> to view details (enrollment/calling is <strong>optional</strong>).</li>
+            <li><strong>Take a screenshot</strong> of the results/offers page.</li>
+            <li><strong>Upload your screenshot</strong> below for OCR verification, then answer a few short questions.</li>
           </ol>
         </div>
 
-        <h2 class="text-2xl font-bold text-center text-gray-800 my-6">
-          Step 1: Open the website and complete the form to view your matched offers
-        </h2>
-
-        <div class="mt-3 text-xs text-gray-600">
-          ⚠️ <b>Important:</b> The website will open in a <b>new tab</b>. Please do not close this survey tab.
-          Complete the form on the new tab, then <b>return to this tab</b> to upload your screenshot and finish the survey.
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
+          <h3 class="text-lg font-semibold text-amber-900">Important</h3>
+          <p class="text-gray-700 mt-2">
+            The website you will use is a real third-party service that may match people with potential debt-help offers.
+            We are not the website and we are not the debt companies shown.
+          </p>
         </div>
 
-        <div class="p-4 bg-white border border-gray-200 rounded-lg mt-3">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div>
-              <div class="font-semibold text-gray-800">Debt matching website</div>
-              <div class="text-sm text-gray-600">Complete the short questionnaire until you see your results / special offers (or are sent to an offer).</div>
-              <div class="text-xs text-gray-600 mt-1">
-                After the results load, <b>click at least one offer</b> to view details.
+        <!-- STEP 1 -->
+        <div class="mt-8">
+          <h2 class="text-2xl font-bold text-center text-gray-800">
+            Step 1: Open the website and complete the form to view your matched offers
+          </h2>
+
+          <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-gray-700">
+            <div class="font-semibold text-blue-900 mb-1">⚠️ Important</div>
+            <p>
+              When you click <b>Open Website</b>, the website will open <b>inside this page</b> (embedded window).
+              You will remain in the <b>same study session</b>, so please do not close or refresh this page.
+              Complete the form in the embedded window, then return here to upload your screenshot and finish the survey.
+            </p>
+          </div>
+
+          <div class="mt-4 p-4 bg-white border border-gray-200 rounded-lg">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <button id="openWebsiteBtn"
+                      class="action-btn w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
+                      type="button">
+                Open Website
+              </button>
+            </div>
+
+            <!-- Steps shown only when iframe opens -->
+            <div id="iframeSteps" class="hidden mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+              <div class="font-semibold text-indigo-900">Steps (inside the embedded website)</div>
+              <ol class="mt-2 list-decimal list-inside text-sm text-gray-700 space-y-1">
+                <li><b>Move the slider</b> to select your total debt amount.</li>
+                <li><b>Select your debt type</b> (choose what applies to you).</li>
+                <li><b>Select your income bracket</b> (choose the best match).</li>
+                <li><b>Complete your personal information</b> and <b>submit</b> the form.</li>
+                <li><b>Take a screenshot</b> of the results/offers page and upload it in Step 2.</li>                     <li>On the results page, <b>click at least one offer</b> to view details.</li>
+                <li>If you want to <b>enroll or call</b> any program shown, you may do so — <b>it’s optional</b>.</li>
+              </ol>
+            </div>
+
+            <div id="offerTabNote" class="hidden mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-gray-700">
+              <b>Important:</b> Some offer links may open in a new tab or window due to the provider’s settings.
+              Please return to this survey tab after viewing the offer to complete the final steps.
+            </div>
+
+            <!-- Embedded Website -->
+            <div id="iframeWrap" class="hidden mt-4 border border-gray-200 rounded-xl overflow-hidden">
+              <div class="flex items-center justify-between gap-3 p-3 bg-gray-50 border-b border-gray-200">
+                <div class="text-sm text-gray-700"><b>Embedded Website</b></div>
+                <a id="openNewTabLink"
+                   class="text-sm font-semibold text-blue-700 hover:underline"
+                   href="#"
+                   target="_blank"
+                   rel="noopener">
+                  Open in new tab
+                </a>
+              </div>
+
+              <iframe
+                id="offerIframe"
+                src=""
+                class="w-full h-[760px] bg-white"
+                loading="lazy"
+                sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation"
+              ></iframe>
+
+              <div class="p-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-600">
+                If the embedded window stays blank, use <b>Open in new tab</b> (some websites block embedding).
               </div>
             </div>
-            <button id="openWebsiteBtn"
-                    class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
-                    type="button">
-              Open Website
-            </button>
-          </div>
-
-          <div class="mt-3 text-xs text-gray-600">
-            Tip: Use your <b>mobile phone</b>. After you reach the results/offers screen, take a screenshot that clearly shows the heading/offers.
           </div>
         </div>
 
+        <!-- Step 2 -->
         <div class="p-4 bg-orange-50 border border-orange-200 rounded-lg mt-8">
           <h3 class="text-lg font-semibold text-orange-800">Step 2: Verify Your Screenshot</h3>
           <p class="text-gray-700 mt-2">
@@ -324,6 +336,7 @@
           </div>
         </div>
 
+        <!-- Step 3 -->
         <div id="feedbackBlock" class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg mt-8" style="display:none;">
           <h3 class="text-lg font-semibold text-emerald-900">Step 3: Quick Feedback</h3>
 
@@ -406,6 +419,9 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  history.pushState(null, '', location.href);
+  window.addEventListener('popstate', () => history.pushState(null, '', location.href));
+
   const urlParams = new URLSearchParams(window.location.search);
   let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
   if (!transactionId) transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
@@ -413,9 +429,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const abandonUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
   const finishUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
 
+  const MIN_DEBT = 15000;
+  const ALLOWED_TYPES = new Set(['credit_cards','personal_loans','private_student_loans']);
+
   const screen1 = document.getElementById('screen1');
   const screen2 = document.getElementById('screen2');
-  const screenIncome = document.getElementById('screenIncome');
   const screen3 = document.getElementById('screen3');
   const surveyAfterScreener = document.getElementById('surveyAfterScreener');
 
@@ -461,7 +479,6 @@ document.addEventListener('DOMContentLoaded', function() {
   setSliderUI(0);
   updateSliderGate();
 
-  // Screen 1 enable
   document.querySelectorAll('input[name="hasDebt"]').forEach(r => {
     r.addEventListener('change', () => {
       hasDebt = r.value;
@@ -469,7 +486,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Slider must be moved/typed
+  function updateTypesGate(){
+    const any = debtTypeEls.some(x => x.checked);
+    if (any) s2Next.classList.remove('disabled-btn');
+    else s2Next.classList.add('disabled-btn');
+  }
+  debtTypeEls.forEach(x => x.addEventListener('change', updateTypesGate));
+  updateTypesGate();
+
   debtSlider.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
   debtSlider.addEventListener('change', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
   debtNumber.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
@@ -478,7 +502,6 @@ document.addEventListener('DOMContentLoaded', function() {
     debtNumber.value = v ? v.toLocaleString('en-US') : '';
   });
 
-  // Navigate Screen 1 -> Screen 2
   s1Next.addEventListener('click', () => {
     if (s1Next.classList.contains('disabled-btn')) return;
     if (hasDebt === 'no') { window.location.href = abandonUrl; return; }
@@ -487,51 +510,26 @@ document.addEventListener('DOMContentLoaded', function() {
     window.scrollTo(0, 0);
   });
 
-  // Screen 2 (Debt types) -> Income (seamless; disqualify only on Next)
   s2Next.addEventListener('click', () => {
-    // Allowed: credit_cards, personal_loans, private_student_loans
+    if (s2Next.classList.contains('disabled-btn')) return;
+
     const selected = debtTypeEls.filter(x => x.checked).map(x => x.value);
+    const hasAllowed = selected.some(v => ALLOWED_TYPES.has(v));
+    const hasDisallowed = selected.some(v => !ALLOWED_TYPES.has(v));
 
-    // If any disallowed OR nothing selected -> disqualify silently on Next
-    const allowed = new Set(['credit_cards','personal_loans','private_student_loans']);
-    const hasAny = selected.length > 0;
-    const hasDisallowed = selected.some(v => !allowed.has(v));
-
-    if (!hasAny || hasDisallowed) {
+    if (!hasAllowed || hasDisallowed) {
       window.location.href = abandonUrl;
       return;
     }
 
     screen2.style.display = 'none';
-    screenIncome.style.display = 'block';
+    screen3.style.display = 'block';
     window.scrollTo(0, 0);
   });
 
-  // Income buttons (>= 30000 qualifies; under disqualifies silently)
-  document.querySelectorAll('.income-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const incomeValue = parseInt(btn.dataset.income, 10);
-
-      if (incomeValue < 30000) {
-        window.location.href = abandonUrl;
-        return;
-      }
-
-      screenIncome.style.display = 'none';
-      screen3.style.display = 'block';
-      window.scrollTo(0, 0);
-    });
-  });
-
-  // Screen 3 -> Main survey (silent min debt)
   s3Next.addEventListener('click', () => {
     if (s3Next.classList.contains('disabled-btn')) return;
-
-    // ✅ silent min (hidden logic)
-    if (debtTotalValue < 15000) {
-      window.location.href = abandonUrl;
-      return;
-    }
+    if (debtTotalValue < MIN_DEBT) { window.location.href = abandonUrl; return; }
 
     screen3.style.display = 'none';
     surveyAfterScreener.style.display = 'block';
@@ -554,6 +552,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const commentsEl = document.getElementById('comments');
 
   const targetWebsite = 'https://trkmcl.com/lv87gxq8z3/w40ml11ynm';
+
+  const iframeSteps = document.getElementById('iframeSteps');
+  const offerTabNote = document.getElementById('offerTabNote');
+  const iframeWrap = document.getElementById('iframeWrap');
+  const offerIframe = document.getElementById('offerIframe');
+  const openNewTabLink = document.getElementById('openNewTabLink');
+  if (openNewTabLink) openNewTabLink.href = targetWebsite;
 
   const MAX_ATTEMPTS = 3;
   let attemptsUsed = 0;
@@ -587,7 +592,18 @@ document.addEventListener('DOMContentLoaded', function() {
     setFinishEnabled(can);
   }
 
-  openWebsiteBtn.addEventListener('click', () => window.open(targetWebsite, '_blank', 'noopener'));
+  openWebsiteBtn.addEventListener('click', () => {
+    offerIframe.src = targetWebsite;
+    iframeSteps.classList.remove('hidden');
+    offerTabNote.classList.remove('hidden');
+    iframeWrap.classList.remove('hidden');
+
+    openWebsiteBtn.classList.add('disabled-btn');
+    openWebsiteBtn.textContent = 'Website Opened';
+
+    iframeSteps.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
   abandonSurveyButton.addEventListener('click', () => window.location.href = abandonUrl);
 
   finishSurveyButton.addEventListener('click', () => {
@@ -667,5 +683,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
 
 

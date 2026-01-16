@@ -33,13 +33,6 @@
       padding-left: 30px;
       margin-bottom: 8px;
     }
-
-    /* Range aesthetics */
-    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 34px; }
-    input[type=range]::-webkit-slider-runnable-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
-    input[type=range]::-moz-range-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -10px; width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
-    input[type=range]::-moz-range-thumb { width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
   </style>
 </head>
 
@@ -47,155 +40,8 @@
   <div class="form-all w-full max-w-4xl mx-auto bg-white rounded-2xl p-6 md:p-8 lg:p-12">
     <div id="mainContent">
 
-      <!-- ========================= PRESCREENER 1 ========================= -->
-      <div id="screen1" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-3">Do you currently have any personal debt?</h2>
-
-        <div class="space-y-3">
-          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
-            <input type="radio" name="hasDebt" value="yes" class="mt-1">
-            <div>
-              <div class="font-semibold">Yes</div>
-              <div class="text-sm text-slate-600">I have one or more debts.</div>
-            </div>
-          </label>
-
-          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
-            <input type="radio" name="hasDebt" value="no" class="mt-1">
-            <div>
-              <div class="font-semibold">No</div>
-              <div class="text-sm text-slate-600">I do not have any debt.</div>
-            </div>
-          </label>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen1Next"
-                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
-                  type="button">
-            Next
-          </button>
-        </div>
-      </div>
-
-      <!-- ========================= PRESCREENER 2: DEBT TYPES ========================= -->
-      <div id="screen2" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Which types of debt do you currently have?</h2>
-        <p class="text-gray-700 mb-4 text-sm">Select all that apply.</p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
-            <input type="checkbox" class="mt-1 debtType" value="credit_cards">
-            <div>
-              <div class="font-semibold">Credit Cards</div>
-              <div class="text-xs text-slate-600">Visa / Mastercard / store cards.</div>
-            </div>
-          </label>
-
-          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
-            <input type="checkbox" class="mt-1 debtType" value="personal_loans">
-            <div>
-              <div class="font-semibold">Unsecured Personal Loans</div>
-              <div class="text-xs text-slate-600">Unsecured installment loans.</div>
-            </div>
-          </label>
-
-          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
-            <input type="checkbox" class="mt-1 debtType" value="private_student_loans">
-            <div>
-              <div class="font-semibold">Private Student Loans</div>
-              <div class="text-xs text-slate-600">Not federal loans.</div>
-            </div>
-          </label>
-
-          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
-            <input type="checkbox" class="mt-1 debtType" value="medical">
-            <div>
-              <div class="font-semibold">Medical Debt</div>
-              <div class="text-xs text-slate-600">Hospital / clinic bills.</div>
-            </div>
-          </label>
-
-          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
-            <input type="checkbox" class="mt-1 debtType" value="auto_loan">
-            <div>
-              <div class="font-semibold">Auto Loan</div>
-              <div class="text-xs text-slate-600">Vehicle loan (non-lease).</div>
-            </div>
-          </label>
-
-          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
-            <input type="checkbox" class="mt-1 debtType" value="collections">
-            <div>
-              <div class="font-semibold">Collections</div>
-              <div class="text-xs text-slate-600">Accounts in collections.</div>
-            </div>
-          </label>
-
-          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
-            <input type="checkbox" class="mt-1 debtType" value="payday">
-            <div>
-              <div class="font-semibold">Payday / Cash Advance</div>
-              <div class="text-xs text-slate-600">Short-term or advance loans.</div>
-            </div>
-          </label>
-
-          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
-            <input type="checkbox" class="mt-1 debtType" value="other">
-            <div>
-              <div class="font-semibold">Other</div>
-              <div class="text-xs text-slate-600">Other debt types.</div>
-            </div>
-          </label>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen2Next"
-                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
-                  type="button">
-            Next
-          </button>
-        </div>
-      </div>
-
-      <!-- ========================= PRESCREENER 3: SLIDER TOTAL ========================= -->
-      <div id="screen3" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">About how much unsecured debt do you currently have in total?</h2>
-        <p class="text-gray-700 mb-4 text-sm">Use the slider to select your total estimated unsecured debt (USD).</p>
-
-        <div class="bg-white border rounded-xl p-4">
-          <div class="text-center">
-            <div id="debtAmountDisplay" class="text-5xl font-extrabold text-blue-600">$0</div>
-            <div class="text-xs text-gray-600 mt-1">Total estimated unsecured debt</div>
-          </div>
-
-          <div class="mt-4">
-            <input type="range" id="debtSlider" min="0" max="100000" value="0" step="100">
-          </div>
-
-          <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
-            <label class="text-sm text-gray-700 sm:col-span-1" for="debtNumber">Or type exact amount</label>
-            <input type="text" id="debtNumber" inputmode="numeric"
-                   class="sm:col-span-2 w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500"
-                   placeholder="e.g. 12,450">
-          </div>
-
-          <p id="moveHint" class="text-sm text-gray-600 mt-2 text-center">
-            Please move the slider (or type your amount) to continue.
-          </p>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen3Next"
-                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
-                  type="button">
-            Next
-          </button>
-        </div>
-      </div>
-
-      <!-- ========================= MAIN SURVEY ========================= -->
-      <div id="surveyAfterScreener" style="display:none;">
+      <!-- ========================= MAIN SURVEY (NOW FIRST SCREEN) ========================= -->
+      <div id="surveyAfterScreener">
 
         <div class="form-header-group header-large mb-8 p-6 rounded-xl text-white text-center">
           <h1 class="text-2xl md:text-3xl font-bold">Debt Offer Match Feedback Survey</h1>
@@ -207,7 +53,7 @@
           <p class="text-gray-700 mb-4">Please proceed if the following is true for you:</p>
           <ul class="qualification-list list-none space-y-2">
             <li>You currently have <strong>$15,000 or more in unsecured debt</strong>, preferably credit card or personal loan debt.</li>
-            <li>You have a <strong>yearly income of $50,000 or more</strong> and the ability to make monthly payments <strong>if you ever choose to enroll</strong> (enrollment is completely optional).</li>
+            <li>You have a <strong>yearly income of $30,000 or more</strong> and the ability to make monthly payments <strong>if you ever choose to enroll</strong> (enrollment is completely optional).</li>
             <li>You are willing to complete a short debt-relief questionnaire on your <strong>device</strong>.</li>
             <li>You can take and upload a <strong>screenshot of the results page</strong> showing your matched offers.</li>
           </ul>
@@ -343,6 +189,7 @@
           <div class="mt-4 grid gap-4">
             <div class="bg-white border border-emerald-100 rounded-lg p-4">
               <div class="font-semibold text-gray-800">Did you click at least one offer to view details?</div>
+              <p class="text-xs text-gray-600 mt-1">Please click at least one offer to view details.</p>
               <div class="mt-3 space-y-2 text-gray-700">
                 <label class="flex items-center gap-2">
                   <input type="radio" name="clickedOffer" value="yes"> Yes (I clicked at least one offer)
@@ -358,6 +205,7 @@
               <input id="offersCount" type="number" min="0" step="1" inputmode="numeric"
                      class="mt-2 w-full border rounded-lg p-3"
                      placeholder="Enter a number (example: 2)" />
+              <p class="text-xs text-gray-600 mt-2">Enter your best estimate.</p>
             </div>
 
             <div class="bg-white border border-emerald-100 rounded-lg p-4">
@@ -389,6 +237,14 @@
           </div>
         </div>
 
+        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mt-8">
+          <h3 class="text-lg font-semibold text-yellow-800">❗ Important</h3>
+          <p class="text-gray-700 mt-2">
+            To finish, you must upload a valid results screenshot and complete the short feedback questions.
+            If you do not wish to continue, you may abandon the survey.
+          </p>
+        </div>
+
         <div class="mt-8 flex flex-col md:flex-row justify-center gap-4">
           <button id="abandonSurveyButton"
                   class="action-btn inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg"
@@ -412,140 +268,14 @@ document.addEventListener('DOMContentLoaded', function() {
   history.pushState(null, '', location.href);
   window.addEventListener('popstate', () => history.pushState(null, '', location.href));
 
-  // =========================
-  // ✅ PANEL LINKS (UPDATED)
-  // =========================
   const urlParams = new URLSearchParams(window.location.search);
+  let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
+  if (!transactionId) transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
 
-  // Prefer RID from panel; fall back to transaction_id if present
-  let RID = urlParams.get('RID') || urlParams.get('transaction_id') || '';
+  // Keep your PureSpectrum redirects (change later if you want local completion pages)
+  const abandonUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
+  const finishUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
 
-  // If nothing provided, create a fallback ID (helps debugging; panel may ignore)
-  if (!RID) RID = 'RID_' + Date.now().toString(36) + Math.random().toString(36).slice(2);
-
-  // Complete redirect (Client Callback)
-  const finishUrl = `https://notch.insights.supply/cb?token=c9212f78-5226-4e99-bd51-29845ea96d16&RID=${encodeURIComponent(RID)}`;
-
-  // Termination redirect
-  const abandonUrl = `https://samplicio.us/s/ClientCallBack.aspx?RIS=20&RID=${encodeURIComponent(RID)}`;
-
-  // =========================
-  // QUALIFICATION RULES
-  // =========================
-  const MIN_DEBT = 15000;
-  const ALLOWED_TYPES = new Set(['credit_cards','personal_loans','private_student_loans']);
-
-  const screen1 = document.getElementById('screen1');
-  const screen2 = document.getElementById('screen2');
-  const screen3 = document.getElementById('screen3');
-  const surveyAfterScreener = document.getElementById('surveyAfterScreener');
-
-  const s1Next = document.getElementById('screen1Next');
-  const s2Next = document.getElementById('screen2Next');
-  const s3Next = document.getElementById('screen3Next');
-
-  let hasDebt = null;
-  const debtTypeEls = Array.from(document.querySelectorAll('.debtType'));
-
-  const debtSlider = document.getElementById('debtSlider');
-  const debtAmountDisplay = document.getElementById('debtAmountDisplay');
-  const debtNumber = document.getElementById('debtNumber');
-  const moveHint = document.getElementById('moveHint');
-
-  let amountWasSet = false;
-  let debtTotalValue = 0;
-
-  function toInt(s){
-    const n = parseInt(String(s||'').replace(/[^\d]/g,''), 10);
-    return isNaN(n) ? 0 : n;
-  }
-  function fmtMoney(n){
-    return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
-  }
-  function setSliderUI(val){
-    const v = Math.max(0, Math.min(100000, toInt(val)));
-    debtTotalValue = v;
-    debtSlider.value = String(v);
-    debtNumber.value = v ? v.toLocaleString('en-US') : '';
-    debtAmountDisplay.textContent = v >= 100000 ? `${fmtMoney(v)}+` : fmtMoney(v);
-  }
-  function updateSliderGate(){
-    if (amountWasSet) s3Next.classList.remove('disabled-btn');
-    else s3Next.classList.add('disabled-btn');
-  }
-  function markAmountSet(){
-    amountWasSet = true;
-    if (moveHint) moveHint.style.display = 'none';
-    updateSliderGate();
-  }
-
-  setSliderUI(0);
-  updateSliderGate();
-
-  // Screen1 gate
-  document.querySelectorAll('input[name="hasDebt"]').forEach(r => {
-    r.addEventListener('change', () => {
-      hasDebt = r.value;
-      s1Next.classList.remove('disabled-btn');
-    });
-  });
-
-  // Screen2 gate
-  function updateTypesGate(){
-    const any = debtTypeEls.some(x => x.checked);
-    if (any) s2Next.classList.remove('disabled-btn');
-    else s2Next.classList.add('disabled-btn');
-  }
-  debtTypeEls.forEach(x => x.addEventListener('change', updateTypesGate));
-  updateTypesGate();
-
-  // Slider move detection
-  debtSlider.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
-  debtSlider.addEventListener('change', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
-  debtNumber.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
-  debtNumber.addEventListener('blur', ()=> {
-    const v = toInt(debtNumber.value);
-    debtNumber.value = v ? v.toLocaleString('en-US') : '';
-  });
-
-  // Navigation
-  s1Next.addEventListener('click', () => {
-    if (s1Next.classList.contains('disabled-btn')) return;
-    if (hasDebt === 'no') { window.location.href = abandonUrl; return; }
-    screen1.style.display = 'none';
-    screen2.style.display = 'block';
-    window.scrollTo(0, 0);
-  });
-
-  // Debt type enforcement only on Next
-  s2Next.addEventListener('click', () => {
-    if (s2Next.classList.contains('disabled-btn')) return;
-
-    const selected = debtTypeEls.filter(x => x.checked).map(x => x.value);
-    const hasAllowed = selected.some(v => ALLOWED_TYPES.has(v));
-    const hasDisallowed = selected.some(v => !ALLOWED_TYPES.has(v));
-
-    if (!hasAllowed || hasDisallowed) {
-      window.location.href = abandonUrl;
-      return;
-    }
-
-    screen2.style.display = 'none';
-    screen3.style.display = 'block';
-    window.scrollTo(0, 0);
-  });
-
-  // Debt amount enforcement
-  s3Next.addEventListener('click', () => {
-    if (s3Next.classList.contains('disabled-btn')) return;
-    if (debtTotalValue < MIN_DEBT) { window.location.href = abandonUrl; return; }
-
-    screen3.style.display = 'none';
-    surveyAfterScreener.style.display = 'block';
-    window.scrollTo(0, 0);
-  });
-
-  // MAIN SURVEY
   const openWebsiteBtn = document.getElementById('openWebsiteBtn');
   const abandonSurveyButton = document.getElementById('abandonSurveyButton');
   const finishSurveyButton = document.getElementById('finishSurveyButton');
@@ -560,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const offersCountEl = document.getElementById('offersCount');
   const commentsEl = document.getElementById('comments');
 
-  // Change this if you want a different embedded offer page
   const targetWebsite = 'https://trkmcl.com/lv87gxq8z3/w40ml11ynm';
 
   const iframeSteps = document.getElementById('iframeSteps');
@@ -684,6 +413,7 @@ document.addEventListener('DOMContentLoaded', function() {
   commentsEl.addEventListener('input', updateFinishGate);
   document.querySelectorAll('input[name="connected"]').forEach(r => r.addEventListener('change', updateFinishGate));
   document.querySelectorAll('input[name="consider"]').forEach(r => r.addEventListener('change', updateFinishGate));
+  document.querySelectorAll('input[name="clickedOffer"]').forEach(r => r.addEventListener('change', updateFinishGate));
   document.querySelectorAll('input[name="clickedOffer"]').forEach(r => r.addEventListener('change', updateFinishGate));
 
   window.__ocr_ok = false;

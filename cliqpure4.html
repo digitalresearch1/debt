@@ -1,658 +1,987 @@
-
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en" class="supernova">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
-  <meta name="HandheldFriendly" content="true">
-  <title>Survey</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1" />
+  <meta name="HandheldFriendly" content="true" />
+  <title>Debt Offer Match Feedback Survey</title>
 
-  <!-- Fonts + Tailwind -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: { extend: { colors: { primary: {
-        50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',
-        500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81'
-      }}}}
-    }
-  </script>
 
-  <!-- Brevo base styles -->
-  <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
-
-  <!-- OCR -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <!-- ✅ Tesseract.js v6 -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/tesseract.min.js"></script>
 
   <style>
-    body{font-family:'Inter',sans-serif;background:radial-gradient(circle at top,#4f46e5 0,#020617 55%);min-height:100vh;}
-    .shell{background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(15,23,42,.28);border:1px solid rgba(148,163,184,.35);}
-    .card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;}
-    .btn{background:linear-gradient(135deg,#4f46e5 0%,#6366f1 100%);color:#fff;transition:.2s ease;}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 16px 35px rgba(79,70,229,.35);}
-    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none;}
-    a.btn{color:#fff;text-decoration:none;}
-    .danger{background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);color:#fff;border:1px solid rgba(220,38,38,.35);box-shadow:0 14px 30px rgba(220,38,38,.25);transition:.2s ease;}
-    .danger:hover{transform:translateY(-1px);box-shadow:0 18px 40px rgba(220,38,38,.35);}
-    .notice{border-radius:14px;border:1px solid;padding:12px 14px;}
-    .notice-amber{background:#fff7ed;border-color:#fed7aa;color:#7c2d12;}
-    .notice-emerald{background:#ecfdf5;border-color:#6ee7b7;color:#065f46;}
-    .progress-bar{height:10px;border-radius:999px;background:#e5e7eb;overflow:hidden;}
-    .progress-bar>div{height:100%;width:0%;background:linear-gradient(135deg,#4f46e5,#6366f1);transition:width .15s ease;}
-    .hidden{display:none!important;}
-    .qwrap{max-width:720px;margin:0 auto;}
-    .qtext{font-size:1.05rem;color:#0f172a;font-weight:600;}
-    .opt{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid #e5e7eb;border-radius:14px;cursor:pointer;transition:.12s ease;}
-    .opt:hover{background:#f8fafc;}
-    .opt input{width:18px;height:18px;}
-    #sib-container input::placeholder{text-align:left;font-family:Helvetica,sans-serif;color:#c0ccda;}
-    #sib-container a{text-decoration:underline;color:#2BB2FC;}
+    body { font-family: 'Inter', sans-serif; }
+    .form-all { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .form-header-group { background: linear-gradient(120deg, #60a5fa 0%, #2563eb 100%); }
+    .action-btn { transition: background-color 0.3s, transform 0.2s; cursor: pointer; }
+    .action-btn:hover { transform: translateY(-2px); }
+    .disabled-btn { opacity: 0.5; pointer-events: none; cursor: not-allowed; }
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #2563eb;
+      border-radius: 50%;
+      width: 30px; height: 30px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+
+    .qualification-list li {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2322c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>') no-repeat left center;
+      padding-left: 30px;
+      margin-bottom: 8px;
+    }
+
+    /* ✅ Range aesthetics */
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 34px; }
+    input[type=range]::-webkit-slider-runnable-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
+    input[type=range]::-moz-range-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -10px; width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
+    input[type=range]::-moz-range-thumb { width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
   </style>
 </head>
 
-<body class="p-4 md:p-8 flex items-center justify-center">
-<main class="shell w-full max-w-5xl p-4 md:p-8 lg:p-10">
+<body class="bg-gray-100 min-h-screen p-4 md:p-6">
+  <div class="form-all w-full max-w-4xl mx-auto bg-white rounded-2xl p-6 md:p-8 lg:p-12">
 
-  <!-- TOP STRIP -->
-  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-    <div class="inline-flex items-center gap-2 bg-white/10 text-white px-4 py-2 rounded-full text-xs md:text-sm backdrop-blur">
-      <span>🔒</span><span>Private research survey</span>
-    </div>
-    <div class="text-white/80 text-xs md:text-sm">
-      <span class="font-semibold text-white">Estimated:</span> 3–5 minutes
-    </div>
-  </div>
+    <div id="mainContent">
 
-  <!-- PROGRESS -->
-  <div class="mb-6">
-    <div class="flex items-center justify-between text-xs font-semibold text-white/80 mb-2">
-      <span id="progressLabel">1 / 5</span>
-      <span id="progressHint">Answer the question</span>
-    </div>
-    <div class="progress-bar"><div id="progressFill"></div></div>
-  </div>
+      <!-- ========================= PRESCREENER 1 ========================= -->
+      <div id="screen1" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-3">Do you currently have any personal debt?</h2>
 
-  <!-- PAGE 1 -->
-  <section id="p1" class="card p-5 md:p-7 qwrap">
-    <div class="qtext">Do you currently have unsecured debt (credit cards, personal loans, medical bills, etc.)?</div>
-    <div class="mt-4 space-y-3">
-      <label class="opt"><input type="radio" name="q1" value="yes"><span>Yes</span></label>
-      <label class="opt"><input type="radio" name="q1" value="no"><span>No</span></label>
-    </div>
-    <div class="mt-5">
-      <button id="p1Next" class="btn px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-    </div>
-  </section>
+        <div class="space-y-3">
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="radio" name="hasDebt" value="yes" class="mt-1">
+            <div>
+              <div class="font-semibold">Yes</div>
+              <div class="text-sm text-slate-600">I have one or more debts.</div>
+            </div>
+          </label>
 
-  <!-- PAGE 2 -->
-  <section id="p2" class="card p-5 md:p-7 qwrap hidden">
-    <div class="qtext">Is your total unsecured debt approximately <span class="font-semibold">$15,000 or more</span>?</div>
-    <div class="mt-4 space-y-3">
-      <label class="opt"><input type="radio" name="q2" value="yes"><span>Yes</span></label>
-      <label class="opt"><input type="radio" name="q2" value="no"><span>No</span></label>
-    </div>
-    <div class="mt-5">
-      <button id="p2Next" class="btn px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-    </div>
-  </section>
-
-  <!-- PAGE 3 (Consent / explanation) -->
-  <section id="p4" class="card p-5 md:p-7 hidden">
-    <div class="text-slate-900 text-xl md:text-2xl font-semibold">Are you willing to participate?</div>
-
-    <div class="mt-3 text-slate-700 text-sm md:text-base space-y-3">
-      <p>
-        We are writing articles and research studies about debt relief experiences. We are <strong>not</strong> a debt settlement company.
-        For this study, we are collecting feedback from people in debt who are willing to be contacted by a debt settlement company we selected.
-      </p>
-      <p>
-        If you choose to proceed, you will open a secure form (in a new tab) so the company can contact you.
-        A specialist may call within <strong>24–48 hours</strong>.
-      </p>
-
-      <div class="notice notice-amber">
-        <div class="font-semibold">About the Follow-up Emails</div>
-        <div class="text-sm mt-1">
-          After you submit your email, we’ll send you a short follow-up survey immediately. You’ll receive reminders for the next 3 days to tell us
-          whether you received a call, whether you got the help you wanted, and how the agent treated you.
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="radio" name="hasDebt" value="no" class="mt-1">
+            <div>
+              <div class="font-semibold">No</div>
+              <div class="text-sm text-slate-600">I do not have any debt.</div>
+            </div>
+          </label>
         </div>
-        <div class="text-xs mt-2">⏱ The secure form typically takes about <strong>1 minute</strong> to complete.</div>
-      </div>
-    </div>
 
-    <div class="mt-4 flex items-center gap-3">
-      <input id="consentCheck" type="checkbox" class="w-5 h-5">
-      <label for="consentCheck" class="text-sm text-slate-800">I understand this is a research study and I agree to continue.</label>
-    </div>
-
-    <div class="mt-5 flex flex-wrap gap-3">
-      <button id="p4Next" class="btn px-5 py-3 rounded-xl font-semibold w-full md:w-auto" disabled>Continue</button>
-      <button id="p4Exit" class="danger px-5 py-3 rounded-xl font-semibold w-full md:w-auto">I don’t want to continue</button>
-    </div>
-  </section>
-
-  <!-- PAGE 4 (Open new tab + OCR) -->
-  <section id="p5" class="card p-5 md:p-7 hidden">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="text-slate-900 text-lg md:text-xl font-semibold">Complete the secure form</div>
-      <button id="p5ExitTop" class="danger px-4 py-2 rounded-xl font-semibold text-sm">Exit</button>
-    </div>
-
-    <div id="importantBox" class="notice notice-amber mt-4">
-      <div class="font-semibold">Important</div>
-      <div class="mt-1 text-sm">
-        Open the secure form in a new tab.Complete it, then return here and this page will still be open.
-      </div>
-      <div class="mt-2 text-sm">
-        You will typically:
-        <ul class="list-disc list-inside mt-1">
-          <li>Answer <strong>3 quick YES/NO</strong> eligibility questions</li>
-          <li>Enter your <strong>phone number</strong> (may require verification)</li>
-          <li>Provide <strong>email</strong>, basic identity and <strong>address</strong> details</li>
-          <li><strong>Submit</strong> and reach a <strong>confirmation / thank you</strong> page</li>
-        </ul>
-      </div>
-      <div class="mt-2 text-sm">
-        Once you are done completing the form,Take a screenshot of the confirmation/thank-you page after submitting the secure form and upload it here, to allow us to verify that you have complete the form.
-        We verify your screenshot using OCR (text detection). If confirmation keywords are not detected, the next step stays locked.
-      </div>
-    </div>
-
-    <div class="mt-4 flex items-center justify-between">
-      <div class="text-xs md:text-sm font-medium text-slate-800">Secure form</div>
-      <div id="formStatus" class="text-[11px] md:text-xs text-slate-500">Click “Open Secure Form (New Tab)” to begin.</div>
-    </div>
-
-    <!-- NEW TAB OPEN -->
-    <div class="mt-3">
-      <div class="notice notice-amber">
-        <div class="font-semibold">Open the secure form in a new tab</div>
-        <div class="text-sm mt-1">
-          Click below to open the secure form. Complete it, then return here and upload your confirmation screenshot.
+        <div class="mt-4 text-center">
+          <button id="screen1Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Next
+          </button>
         </div>
       </div>
 
-      <div class="mt-3 flex flex-col md:flex-row gap-3">
-        <a
-          id="openFormBtn"
-          href="https://trkmcl.com/wy8odpg43k/xwndpp7qne"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="btn px-5 py-3 rounded-xl font-semibold w-full md:w-auto text-center"
-        >
-          Open Secure Form (New Tab)
-        </a>
+      <!-- ========================= PRESCREENER 2: DEBT TYPES ========================= -->
+      <div id="screen2" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Which types of debt do you currently have?</h2>
+        <p class="text-gray-700 mb-4 text-sm">Select all that apply.</p>
 
-        <button
-          id="copiedBtn"
-          type="button"
-          class="px-5 py-3 rounded-xl font-semibold w-full md:w-auto border border-slate-200 bg-white hover:bg-slate-50"
-        >
-          Copy Link
-        </button>
-      </div>
-    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="credit_cards">
+            <div>
+              <div class="font-semibold">Credit Cards</div>
+              <div class="text-xs text-slate-600">Visa / Mastercard / store cards.</div>
+            </div>
+          </label>
 
-    <div class="mt-4 grid md:grid-cols-2 gap-4">
-      <!-- OCR panel -->
-      <div class="border border-slate-200 rounded-2xl p-4 bg-white">
-        <div class="font-semibold text-slate-900">Upload confirmation screenshot</div>
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="personal_loans">
+            <div>
+              <div class="font-semibold">Personal Loans</div>
+              <div class="text-xs text-slate-600">Unsecured installment loans.</div>
+            </div>
+          </label>
 
-        <div class="mt-3">
-          <label class="block text-xs md:text-sm font-semibold text-slate-800 mb-1" for="proofFile">Upload screenshot (PNG/JPG)</label>
-          <input id="proofFile" type="file" accept="image/*"
-                 class="block w-full text-sm text-slate-700
-                        file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0
-                        file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700
-                        hover:file:bg-primary-100" />
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="medical">
+            <div>
+              <div class="font-semibold">Medical Debt</div>
+              <div class="text-xs text-slate-600">Hospital / clinic bills.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="private_student_loans">
+            <div>
+              <div class="font-semibold">Private Student Loans</div>
+              <div class="text-xs text-slate-600">Not federal loans.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="auto_loan">
+            <div>
+              <div class="font-semibold">Auto Loan</div>
+              <div class="text-xs text-slate-600">Vehicle loan (non-lease).</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="collections">
+            <div>
+              <div class="font-semibold">Collections</div>
+              <div class="text-xs text-slate-600">Accounts in collections.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="payday">
+            <div>
+              <div class="font-semibold">Payday / Cash Advance</div>
+              <div class="text-xs text-slate-600">Short-term or advance loans.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="checkbox" class="mt-1 debtType" value="other">
+            <div>
+              <div class="font-semibold">Other</div>
+              <div class="text-xs text-slate-600">Other unsecured debts.</div>
+            </div>
+          </label>
         </div>
 
-        <div class="mt-3">
-          <button id="btnRunOCR" class="btn w-full px-4 py-3 rounded-xl font-semibold" disabled>Verify screenshot</button>
-        </div>
-
-        <div class="mt-3">
-          <div class="progress-bar"><div id="ocrProgressFill"></div></div>
-          <div id="ocrStatus" class="mt-2 text-xs md:text-sm text-slate-600">Upload a screenshot to begin.</div>
+        <div class="mt-4 text-center">
+          <button id="screen2Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Next
+          </button>
         </div>
       </div>
 
-      <!-- ACTIONS -->
-      <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50 flex flex-col gap-3">
-        <div id="continueMsg" class="text-sm font-semibold text-red-700 hidden"></div>
+      <!-- ========================= PRESCREENER 3: SLIDER TOTAL ========================= -->
+      <div id="screen3" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">About how much debt do you currently have in total?</h2>
+        <p class="text-gray-700 mb-4 text-sm">Use the slider to select your total estimated debt (USD).</p>
 
-        <button id="p5Next" class="btn px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-        <button id="p5Exit" class="danger px-5 py-3 rounded-xl font-semibold w-full">I don’t meet requirements</button>
+        <div class="bg-white border rounded-xl p-4">
+          <div class="text-center">
+            <div id="debtAmountDisplay" class="text-5xl font-extrabold text-blue-600">$0</div>
+            <div class="text-xs text-gray-600 mt-1">Total estimated unsecured debt</div>
+          </div>
+
+          <div class="mt-4">
+            <input type="range" id="debtSlider" min="0" max="100000" value="0" step="100">
+          </div>
+
+          <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
+            <label class="text-sm text-gray-700 sm:col-span-1" for="debtNumber">Or type exact amount</label>
+            <input type="text" id="debtNumber" inputmode="numeric"
+                   class="sm:col-span-2 w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500"
+                   placeholder="e.g. 12,450">
+          </div>
+
+          <p id="moveHint" class="text-sm text-gray-600 mt-2 text-center">
+            Please move the slider (or type your amount) to continue.
+          </p>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button id="screen3Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Next
+          </button>
+        </div>
       </div>
-    </div>
-  </section>
 
-  <!-- PAGE 5 (Email) -->
-  <section id="p6" class="card p-5 md:p-7 hidden">
-    <div class="text-slate-900 text-lg md:text-xl font-semibold">Email reminder</div>
+      <!-- ========================= PRESCREENER 4: OTP VERIFICATION ========================= -->
+      <div id="screen4" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Verify your phone number</h2>
+        <p class="text-gray-700 mb-4 text-sm">
+          Please verify your phone number to continue.
+        </p>
 
-    <div class="mt-5">
-      <iframe name="brevo_iframe" id="brevo_iframe" style="display:none;"></iframe>
+        <div class="bg-white border rounded-xl p-4">
+          <label class="block text-sm font-semibold text-gray-800">US Phone Number</label>
+          <input type="tel" id="otpPhone"
+                 class="mt-2 w-full border rounded-lg p-3"
+                 placeholder="Example: (555) 123-4567" />
 
-      <div id="sib-container"
-           class="sib-container--large sib-container--vertical"
-           style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:10px; border-width:1px; border-color:#C0CCD9; border-style:solid; margin:0 auto; box-shadow:0 10px 30px rgba(15,23,42,0.12); padding:14px 16px;">
+          <div class="mt-3">
+            <button type="button" id="sendOtpBtn"
+                    class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+              Send verification code
+            </button>
+          </div>
 
-        <form id="sib-form"
-              method="POST"
-              action="https://52bcaf92.sibforms.com/serve/MUIFAO5vlejSCs-rWtk8_hSGgyILb9Oi-aOLbS_zI5_FjrtRovBWkBZlGVuoCXxEbmOMZMrdo0ZllgcfYtt7jPnKOHgyHT2TYdf3Q-xFXArnK8ikp21kPr7-iXsfMeK4CtD4cAPf2oHHMJLw5OtgVzgyKMt0hXTJ3UiMJVGUXzHbWENuGdgb7j-x2xeZ6iW5f9ix4gocwCjOBdct"
-              target="brevo_iframe">
-
-          <div style="padding: 6px 6px 0 6px;">
-            <div class="sib-form-block" style="font-size:18px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#111827;">
-              <p>Survey feedback reminder</p>
+          <div id="otpVerifyRow" class="mt-3 hidden">
+            <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+              <input id="otpCode" class="border p-3 rounded-lg w-full sm:w-52" placeholder="6-digit code" maxlength="6" />
+              <button type="button" id="checkOtpBtn"
+                      class="action-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
+                Verify
+              </button>
             </div>
           </div>
 
-          <div style="padding: 8px 6px 0 6px;">
-            <div class="sib-input sib-form-block">
-              <div class="form__entry entry_block">
-                <div class="form__label-row">
-                  <label class="entry__label" style="font-weight:700; text-align:left; font-size:14px; font-family:Helvetica, sans-serif; color:#111827;" for="EMAIL" data-required="*">
-                    Enter your email address
-                  </label>
-                  <div class="entry__field">
-                    <input class="input" type="text" id="EMAIL" name="EMAIL" autocomplete="off" placeholder="you@example.com" data-required="true" required />
-                  </div>
-                </div>
+          <div id="otpStatus" class="mt-3 text-sm text-gray-700"></div>
+          <div class="mt-2 text-xs text-gray-500">You must verify to continue.</div>
+        </div>
 
-                <label id="email_error" class="entry__error entry__error--primary"
-                       style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px; margin-top:6px;"></label>
+        <div class="mt-4 text-center">
+          <button id="screen4Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= PRESCREENER 5: ADDRESS VALIDATION (Geocod.io via Worker) ========================= -->
+      <div id="screen5" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Confirm your US address</h2>
+        <p class="text-gray-700 mb-4 text-sm">
+          Please enter your <b>real US address</b>. We will verify it (pass/fail) before you continue.
+        </p>
+
+        <div class="bg-white border rounded-xl p-4 space-y-3">
+          <div>
+            <label class="block text-sm font-semibold text-gray-800">Street Address</label>
+            <input id="addr1" class="mt-2 w-full border rounded-lg p-3" placeholder="123 Main St" autocomplete="address-line1" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-800">Apt/Suite (optional)</label>
+            <input id="addr2" class="mt-2 w-full border rounded-lg p-3" placeholder="Apt 4B" autocomplete="address-line2" />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-sm font-semibold text-gray-800">City</label>
+              <input id="city" class="mt-2 w-full border rounded-lg p-3" placeholder="Los Angeles" autocomplete="address-level2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-800">State</label>
+              <input id="state" class="mt-2 w-full border rounded-lg p-3" placeholder="CA" maxlength="2" autocomplete="address-level1" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-800">ZIP</label>
+              <input id="zip" class="mt-2 w-full border rounded-lg p-3" placeholder="90001" inputmode="numeric" autocomplete="postal-code" />
+            </div>
+          </div>
+
+          <!-- Hidden fields (optional) -->
+          <input type="hidden" id="addr_ok" value="0" />
+          <input type="hidden" id="addr_accuracy" value="" />
+          <input type="hidden" id="ip_country" value="" />
+          <input type="hidden" id="normalized_address" value="" />
+
+          <div class="mt-2">
+            <button type="button" id="checkAddressBtn"
+                    class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+              Verify Address
+            </button>
+          </div>
+
+          <div id="addrStatus" class="text-sm text-gray-700"></div>
+          <div class="text-xs text-gray-500">
+            Tip: Avoid PO Boxes. Use your real residential address for best results.
+          </div>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button id="screen5Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= MAIN SURVEY (UNCHANGED) ========================= -->
+      <div id="surveyAfterScreener" style="display:none;">
+
+        <!-- Header -->
+        <div class="form-header-group header-large mb-8 p-6 rounded-xl text-white text-center">
+          <h1 class="text-2xl md:text-3xl font-bold">Debt Offer Match Feedback Survey</h1>
+          <p class="mt-2 text-base md:text-lg">Help us understand how clear and useful a debt-offer matching experience is.</p>
+        </div>
+
+        <!-- Who can participate -->
+        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-3">Who Can Participate?</h2>
+          <p class="text-gray-700 mb-4">Please proceed if the following is true for you:</p>
+          <ul class="qualification-list list-none">
+            <li>You currently have unsecured debt.</li>
+            <li>You are willing to complete a short debt-relief questionnaire on your mobile phone.</li>
+            <li>You can take and upload a screenshot of the results page that shows your matched offers.</li>
+          </ul>
+          <p class="text-xs text-gray-600 mt-2">Note: Some participants may not qualify to continue based on their answers.</p>
+        </div>
+
+        <!-- ✅ Visible (No dropdown): What is unsecured debt -->
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">What is unsecured debt?</h3>
+
+          <p class="text-gray-700 text-sm mb-3">
+            <strong>Unsecured debt</strong> is a type of debt that isn’t backed by collateral.
+            This means the debt is not tied to a specific asset like a house or vehicle.
+          </p>
+
+          <p class="text-gray-700 text-sm mb-2">Common examples of unsecured debt include:</p>
+
+          <ul class="list-disc list-inside text-sm text-gray-700 mb-3">
+            <li>Credit card balances</li>
+            <li>Personal loans</li>
+            <li>Medical bills</li>
+            <li>Private student loans</li>
+            <li>Collections accounts</li>
+            <li>Payday or cash advance loans</li>
+          </ul>
+
+          <p class="text-gray-700 text-sm">
+            If you are unable to pay unsecured debt, lenders generally cannot take your personal property to recover the money.
+            However, the debt may be sent to collections and could impact your credit.
+          </p>
+        </div>
+
+        <!-- How to participate -->
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
+          <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
+          <ol class="list-decimal list-inside text-gray-700 space-y-2">
+            <li><strong>Open the debt matching website</strong> using the button below (it opens in a new tab).</li>
+            <li><strong>Complete the short form</strong> on the website until you reach the results page.</li>
+            <li>
+              On the results page, you will see <strong>one or more partner offers</strong>.
+              <strong>Please click at least one offer</strong> to view details and check whether it fits your needs or could help you.
+              If you choose to use a service or call any of the companies shown, you may do so — it is optional and only if you want help.
+            </li>
+            <li><strong>Take a screenshot</strong> of the results page (showing the heading and offers).</li>
+            <li><strong>Upload your screenshot</strong> below. We use OCR to verify that you reached the results page.</li>
+            <li>After verification, answer a few short questions about the offers you saw and your experience.</li>
+          </ol>
+        </div>
+
+        <!-- Important info -->
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
+          <h3 class="text-lg font-semibold text-amber-900">Important</h3>
+          <p class="text-gray-700 mt-2">
+            The website you will use is a real third-party service that may match people with potential debt-help offers.
+            We are not the website and we are not the debt companies shown on the results page. There is no obligation to sign up for any service.
+            <strong>You may choose to contact or call any provider shown, but it is not required.</strong>
+          </p>
+        </div>
+
+        <!-- Step 1: Open website -->
+        <h2 class="text-2xl font-bold text-center text-gray-800 my-6">
+          Step 1: Open the website and complete the form to view your matched offers
+        </h2>
+
+        <div class="mt-3 text-xs text-gray-600">
+          ⚠️ <b>Important:</b> The website will open in a <b>new tab</b>. Please do not close this survey tab.
+          Complete the form on the new tab, then <b>return to this tab</b> to upload your screenshot and finish the survey.
+        </div>
+
+        <div class="p-4 bg-white border border-gray-200 rounded-lg mt-3">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <div class="font-semibold text-gray-800">Debt matching website</div>
+              <div class="text-sm text-gray-600">Complete the short questionnaire until you see your results / special offers page.</div>
+              <div class="text-xs text-gray-600 mt-1">
+                After the results load, <b>click at least one offer</b> to view details and see if it fits your needs or could help you.
+                If you choose to use or call any service shown, you may do so (optional).
               </div>
             </div>
+            <button id="openWebsiteBtn"
+                    class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
+                    type="button">
+              Open Website
+            </button>
           </div>
 
-          <div style="padding: 8px 6px 0 6px;">
-            <div class="sib-optin sib-form-block">
-              <div class="form__entry entry_mcq">
-                <div class="form__label-row">
-                  <div class="entry__choice">
-                    <label style="display:flex; align-items:flex-start; gap:6px;">
-                      <input type="checkbox" class="input_replaced" value="1" id="OPT_IN" name="OPT_IN" />
-                      <span class="checkbox checkbox_tick_positive"></span>
-                      <span style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#374151;">
-                        I agree to receive emails and accept the data privacy statement.
-                      </span>
-                    </label>
-                  </div>
-                </div>
+          <div class="mt-3 text-xs text-gray-600">
+            Tip: Use your <b>mobile phone</b>. After you reach the results page, take a screenshot that clearly shows the heading and offers.
+          </div>
+        </div>
 
-                <label id="optin_error" class="entry__error entry__error--primary"
-                       style="display:none; font-size:13px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949; padding:4px 6px; margin-top:6px;"></label>
+        <!-- Verification -->
+        <div class="p-4 bg-orange-50 border border-orange-200 rounded-lg mt-8">
+          <h3 class="text-lg font-semibold text-orange-800">Step 2: Verify Your Results Screenshot</h3>
+          <p class="text-gray-700 mt-2">
+            Upload a screenshot of the results page you received after completing the form. Your screenshot should show wording like
+            <b>“Congratulations”</b> and/or <b>“You qualify for special offers”</b> and display one or more offer cards.
+          </p>
+
+          <div class="mt-4">
+            <input type="file" id="imageUpload" accept="image/*"
+              class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"/>
+          </div>
+
+          <div class="mt-4 text-center">
+            <button id="validateButton"
+                    class="action-btn w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg"
+                    type="button">
+              Verify Screenshot
+            </button>
+          </div>
+
+          <div id="validationResult" class="mt-4 text-center font-semibold" style="display:none;"></div>
+
+          <div class="mt-3 text-xs text-gray-600">
+            Attempts remaining: <b><span id="attemptsLeft">3</span></b>
+          </div>
+        </div>
+
+        <!-- Quick feedback (shown after verification) -->
+        <div id="feedbackBlock" class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg mt-8" style="display:none;">
+          <h3 class="text-lg font-semibold text-emerald-900">Step 3: Quick Feedback</h3>
+
+          <div class="mt-4 grid gap-4">
+
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <div class="font-semibold text-gray-800">Did you click at least one offer to view details?</div>
+              <p class="text-xs text-gray-600 mt-1">
+                Please click at least one offer to view details and check if it fits your needs or could help you.
+                If you choose to use or call any of the services shown, you may do so — it is optional and only if you want help.
+              </p>
+              <div class="mt-3 space-y-2 text-gray-700">
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="clickedOffer" value="yes"> Yes (I clicked at least one offer)
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="clickedOffer" value="no"> No
+                </label>
               </div>
             </div>
-          </div>
 
-          <div style="padding: 10px 6px 12px 6px;">
-            <div class="sib-form-block" style="text-align: left">
-              <button id="brevoSubmitBtn"
-                      style="font-size:14px; text-align:center; font-weight:700; font-family:Helvetica, sans-serif; color:#FFFFFF; background-color:#4f46e5; border-radius:9999px; border-width:0px; width:100%; padding:10px 0; cursor:pointer;"
-                      type="submit">SUBMIT EMAIL</button>
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <label class="block font-semibold text-gray-800">How many offers or partner options were shown to you?</label>
+              <input id="offersCount" type="number" min="0" step="1" inputmode="numeric"
+                     class="mt-2 w-full border rounded-lg p-3"
+                     placeholder="Enter a number (example: 2)" />
+              <p class="text-xs text-gray-600 mt-2">Enter your best estimate.</p>
+            </div>
+
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <div class="font-semibold text-gray-800">Did you click or connect with any service shown?</div>
+              <div class="mt-2 space-y-2 text-gray-700">
+                <label class="flex items-center gap-2"><input type="radio" name="connected" value="yes"> Yes</label>
+                <label class="flex items-center gap-2"><input type="radio" name="connected" value="no"> No</label>
+              </div>
+            </div>
+
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <div class="font-semibold text-gray-800">Would you consider using any service you were matched with?</div>
+              <div class="mt-2 space-y-2 text-gray-700">
+                <label class="flex items-center gap-2"><input type="radio" name="consider" value="yes"> Yes</label>
+                <label class="flex items-center gap-2"><input type="radio" name="consider" value="maybe"> Maybe</label>
+                <label class="flex items-center gap-2"><input type="radio" name="consider" value="no"> No</label>
+              </div>
+            </div>
+
+            <div class="bg-white border border-emerald-100 rounded-lg p-4">
+              <label class="block font-semibold text-gray-800">Any comments? (optional)</label>
+              <textarea id="comments" rows="4" class="mt-2 w-full border rounded-lg p-3"
+                        placeholder="Share anything about the experience..."></textarea>
             </div>
           </div>
 
-          <input type="text" name="email_address_check" value="" class="input--hidden">
-          <input type="hidden" name="locale" value="en">
-          <input type="hidden" name="html_type" value="simple">
-        </form>
-      </div>
-    </div>
+          <div class="mt-4 text-xs text-emerald-900">
+            ✅ To finish, you must click at least one offer, upload a valid screenshot, and answer the required questions.
+          </div>
+        </div>
 
-    <div class="mt-5 flex flex-wrap gap-3">
-      <button id="finishBtn" class="btn px-5 py-3 rounded-xl font-semibold w-full md:w-auto" disabled>Verify & finish</button>
-      <button id="p6Exit" class="danger px-5 py-3 rounded-xl font-semibold w-full md:w-auto">Exit</button>
-    </div>
-  </section>
+        <!-- Finish -->
+        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mt-8">
+          <h3 class="text-lg font-semibold text-yellow-800">❗ Important</h3>
+          <p class="text-gray-700 mt-2">
+            To finish, you must upload a valid results screenshot and complete the short feedback questions.
+            If you do not wish to continue, you may abandon the survey.
+          </p>
+        </div>
 
-</main>
+        <div class="mt-8 flex flex-col md:flex-row justify-center gap-4">
+          <button id="abandonSurveyButton"
+                  class="action-btn inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg"
+                  type="button">
+            Abandon Survey
+          </button>
+
+          <button id="finishSurveyButton"
+                  class="action-btn inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg disabled-btn"
+                  type="button">
+            Finish Survey
+          </button>
+        </div>
+
+      </div><!-- /surveyAfterScreener -->
+    </div><!-- /mainContent -->
+  </div><!-- /form-all -->
 
 <script>
-  // -----------------------------
-  // Tracking / Redirects
-  // -----------------------------
+document.addEventListener('DOMContentLoaded', function() {
   const urlParams = new URLSearchParams(window.location.search);
-  let transactionId = urlParams.get('transaction_id') || urlParams.get('RID') || urlParams.get('participant_id');
+  let transactionId = urlParams.get('transaction_id') || urlParams.get('RID');
   if (!transactionId) transactionId = 'tx_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
 
-  const completionUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
-  const terminationUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
+  const abandonUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
+  const finishUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
 
-  function disqualifyNow(){ window.location.href = terminationUrl; }
+  const screen1 = document.getElementById('screen1');
+  const screen2 = document.getElementById('screen2');
+  const screen3 = document.getElementById('screen3');
+  const screen4 = document.getElementById('screen4');
+  const screen5 = document.getElementById('screen5');
+  const surveyAfterScreener = document.getElementById('surveyAfterScreener');
 
-  // -----------------------------
-  // Pages + Progress (5 pages)
-  // -----------------------------
-  const pages = ['p1','p2','p4','p5','p6'];
-  let idx = 0;
+  const s1Next = document.getElementById('screen1Next');
+  const s2Next = document.getElementById('screen2Next');
+  const s3Next = document.getElementById('screen3Next');
+  const s4Next = document.getElementById('screen4Next');
+  const s5Next = document.getElementById('screen5Next');
 
-  const progressLabel = document.getElementById('progressLabel');
-  const progressHint  = document.getElementById('progressHint');
-  const progressFill  = document.getElementById('progressFill');
+  const checkAddressBtn = document.getElementById('checkAddressBtn');
+  const addrStatus = document.getElementById('addrStatus');
 
-  function showPage(i){
-    idx = i;
-    pages.forEach((id, n) => {
-      const el = document.getElementById(id);
-      if (el) el.classList.toggle('hidden', n !== i);
+  let hasDebt = null;
+  const debtTypeEls = Array.from(document.querySelectorAll('.debtType'));
+
+  const debtSlider = document.getElementById('debtSlider');
+  const debtAmountDisplay = document.getElementById('debtAmountDisplay');
+  const debtNumber = document.getElementById('debtNumber');
+  const moveHint = document.getElementById('moveHint');
+
+  // ✅ must interact to enable
+  let amountWasSet = false;
+  let debtTotalValue = 0;
+
+  function toInt(s){
+    const n = parseInt(String(s||'').replace(/[^\d]/g,''), 10);
+    return isNaN(n) ? 0 : n;
+  }
+  function fmtMoney(n){
+    return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
+  }
+  function setSliderUI(val){
+    const v = Math.max(0, Math.min(100000, toInt(val)));
+    debtTotalValue = v;
+    debtSlider.value = String(v);
+    debtNumber.value = v ? v.toLocaleString('en-US') : '';
+    debtAmountDisplay.textContent = v >= 100000 ? `${fmtMoney(v)}+` : fmtMoney(v);
+  }
+  function updateSliderGate(){
+    if (amountWasSet) s3Next.classList.remove('disabled-btn');
+    else s3Next.classList.add('disabled-btn');
+  }
+  function markAmountSet(){
+    amountWasSet = true;
+    if (moveHint) moveHint.style.display = 'none';
+    updateSliderGate();
+  }
+
+  // init UI at zero
+  setSliderUI(0);
+  updateSliderGate();
+
+  document.querySelectorAll('input[name="hasDebt"]').forEach(r => {
+    r.addEventListener('change', () => {
+      hasDebt = r.value;
+      s1Next.classList.remove('disabled-btn');
     });
-
-    const pct = Math.round(((i+1)/pages.length)*100);
-    if (progressFill) progressFill.style.width = pct + '%';
-    if (progressLabel) progressLabel.textContent = `${i+1} / ${pages.length}`;
-
-    if (progressHint){
-      progressHint.textContent =
-        (i <= 1) ? 'Answer the question' :
-        (i === 2) ? 'Read and consent' :
-        (i === 3) ? 'Complete the secure form' :
-        'Email & finish';
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // -----------------------------
-  // Prescreen gating (q1 + q2)
-  // -----------------------------
-  function bindRadioEnable(name, btnId){
-    const btn = document.getElementById(btnId);
-    if (!btn) return;
-    document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
-      r.addEventListener('change', () => { btn.disabled = false; });
-    });
-  }
-  bindRadioEnable('q1','p1Next');
-  bindRadioEnable('q2','p2Next');
-
-  document.getElementById('p1Next')?.addEventListener('click', () => {
-    const v = document.querySelector('input[name="q1"]:checked')?.value;
-    if (v !== 'yes') return disqualifyNow();
-    showPage(1);
   });
 
-  document.getElementById('p2Next')?.addEventListener('click', () => {
-    const v = document.querySelector('input[name="q2"]:checked')?.value;
-    if (v !== 'yes') return disqualifyNow();
-    showPage(2);
+  function updateTypesGate(){
+    const any = debtTypeEls.some(x => x.checked);
+    if (any) s2Next.classList.remove('disabled-btn');
+    else s2Next.classList.add('disabled-btn');
+  }
+  debtTypeEls.forEach(x => x.addEventListener('change', updateTypesGate));
+  updateTypesGate();
+
+  // Slider interactions
+  debtSlider.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
+  debtSlider.addEventListener('change', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
+  debtNumber.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
+  debtNumber.addEventListener('blur', ()=> {
+    const v = toInt(debtNumber.value);
+    debtNumber.value = v ? v.toLocaleString('en-US') : '';
   });
 
-  // -----------------------------
-  // Consent
-  // -----------------------------
-  const consentCheck = document.getElementById('consentCheck');
-  const p4Next = document.getElementById('p4Next');
-
-  consentCheck?.addEventListener('change', () => {
-    if (p4Next) p4Next.disabled = !consentCheck.checked;
+  // Navigation (no back)
+  s1Next.addEventListener('click', () => {
+    if (s1Next.classList.contains('disabled-btn')) return;
+    if (hasDebt === 'no') { window.location.href = abandonUrl; return; }
+    screen1.style.display = 'none';
+    screen2.style.display = 'block';
+    window.scrollTo(0, 0);
   });
 
-  document.getElementById('p4Exit')?.addEventListener('click', () => disqualifyNow());
-  p4Next?.addEventListener('click', () => showPage(3));
-
-  // -----------------------------
-  // New Tab UX (replaces iframe UX)
-  // -----------------------------
-  const openFormBtn = document.getElementById('openFormBtn');
-  const copiedBtn = document.getElementById('copiedBtn');
-  const formStatus = document.getElementById('formStatus');
-  const importantBox = document.getElementById('importantBox');
-
-  const proofFile = document.getElementById('proofFile');
-  const btnRunOCR = document.getElementById('btnRunOCR');
-
-  // lock upload until they click open
-  let formOpened = false;
-  if (proofFile) proofFile.disabled = true;
-  if (btnRunOCR) btnRunOCR.disabled = true;
-
-  function markFormOpened(){
-    formOpened = true;
-
-    if (formStatus){
-      formStatus.textContent = "Opened in new tab. Complete the form, then return here and upload your confirmation screenshot.";
-      formStatus.classList.remove('text-slate-500');
-      formStatus.classList.add('text-emerald-700');
-    }
-    if (importantBox){
-      importantBox.classList.remove('notice-amber');
-      importantBox.classList.add('notice-emerald');
-    }
-    if (proofFile) proofFile.disabled = false;
-  }
-
-  openFormBtn?.addEventListener('click', () => {
-    markFormOpened();
+  s2Next.addEventListener('click', () => {
+    if (s2Next.classList.contains('disabled-btn')) return;
+    screen2.style.display = 'none';
+    screen3.style.display = 'block';
+    window.scrollTo(0, 0);
   });
 
-  copiedBtn?.addEventListener('click', async () => {
-    try{
-      await navigator.clipboard.writeText(openFormBtn?.href || "https://trkmcl.com/wy8odpg43k/xwndpp7qne");
-      copiedBtn.textContent = "Copied!";
-      setTimeout(() => copiedBtn.textContent = "Copy Link", 1400);
-    }catch(e){
-      alert("Copy failed. Please copy manually:\n" + (openFormBtn?.href || "https://trkmcl.com/wy8odpg43k/xwndpp7qne"));
-    }
-  });
+  s3Next.addEventListener('click', () => {
+    if (s3Next.classList.contains('disabled-btn')) return;
 
-  document.getElementById('p5ExitTop')?.addEventListener('click', () => disqualifyNow());
-  document.getElementById('p5Exit')?.addEventListener('click', () => disqualifyNow());
-
-  // -----------------------------
-  // OCR gate
-  // -----------------------------
-  const REQUIRED_KEYWORDS = ["thank you","thanks","submitted","submission","confirmation","completed","success","we received","your request","you are all set"];
-
-  const ocrStatus = document.getElementById('ocrStatus');
-  const ocrProgressFill = document.getElementById('ocrProgressFill');
-
-  const p5Next = document.getElementById('p5Next');
-  const continueMsg = document.getElementById('continueMsg');
-
-  let ocrPassed = false;
-
-  function showLockedMessage(msg){
-    if (!continueMsg) return;
-    continueMsg.textContent = msg;
-    continueMsg.classList.remove('hidden');
-    setTimeout(() => continueMsg.classList.add('hidden'), 2500);
-  }
-
-  function normalizeText(s){
-    return (s||"").toLowerCase()
-      .replace(/\s+/g," ")
-      .replace(/[^\p{L}\p{N}\s]/gu," ")
-      .replace(/\s+/g," ")
-      .trim();
-  }
-
-  function setOCRProgress(p){
-    if (!ocrProgressFill) return;
-    const pct = Math.max(0, Math.min(100, Math.round(p)));
-    ocrProgressFill.style.width = pct + "%";
-  }
-
-  async function preprocessToCanvas(file){
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    await new Promise((res, rej) => { img.onload=res; img.onerror=rej; img.src=url; });
-
-    const maxW = 1400;
-    const scale = Math.min(1.8, maxW / img.width);
-    const w = Math.round(img.width * scale);
-    const h = Math.round(img.height * scale);
-
-    const canvas = document.createElement("canvas");
-    canvas.width = w; canvas.height = h;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    ctx.drawImage(img, 0, 0, w, h);
-    URL.revokeObjectURL(url);
-
-    const imgData = ctx.getImageData(0,0,w,h);
-    const d = imgData.data;
-    const contrast = 1.25;
-    const intercept = 128 * (1 - contrast);
-
-    for (let i=0;i<d.length;i+=4){
-      const r=d[i], g=d[i+1], b=d[i+2];
-      let y = 0.299*r + 0.587*g + 0.114*b;
-      y = y*contrast + intercept;
-      y = Math.max(0, Math.min(255, y));
-      d[i]=d[i+1]=d[i+2]=y;
-    }
-    ctx.putImageData(imgData,0,0);
-    return canvas;
-  }
-
-  function countHits(textNorm){
-    let hits=0;
-    for (const k of REQUIRED_KEYWORDS){
-      const kk = normalizeText(k);
-      if (kk && textNorm.includes(kk)) hits++;
-    }
-    return hits;
-  }
-
-  proofFile?.addEventListener('change', () => {
-    if (!formOpened){
-      if (ocrStatus) ocrStatus.textContent = "Please click “Open Secure Form (New Tab)” first.";
-      proofFile.value = "";
+    // ✅ silent min (hidden from user)
+    if (debtTotalValue < 15000) {
+      window.location.href = abandonUrl;
       return;
     }
 
-    const hasFile = proofFile.files && proofFile.files[0];
-    if (btnRunOCR) btnRunOCR.disabled = !hasFile;
+    screen3.style.display = 'none';
+    screen4.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
 
-    ocrPassed = false;
-    if (p5Next) p5Next.disabled = true;
+  // OTP gate
+  window.otpOK = false;
+  function updateOtpGate(){
+    if (window.otpOK === true) s4Next.classList.remove('disabled-btn');
+    else s4Next.classList.add('disabled-btn');
+  }
+  window.__updateOtpGate = updateOtpGate;
+  updateOtpGate();
 
-    setOCRProgress(0);
-    if (ocrStatus){
-      ocrStatus.className = "mt-2 text-xs md:text-sm text-slate-600";
-      ocrStatus.textContent = hasFile ? "Ready." : "Upload a screenshot to begin.";
+  // ✅ After OTP, go to Address screen
+  s4Next.addEventListener('click', () => {
+    if (s4Next.classList.contains('disabled-btn')) return;
+    screen4.style.display = 'none';
+    screen5.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  // ✅ After Address pass, go to main survey
+  s5Next.addEventListener('click', () => {
+    if (s5Next.classList.contains('disabled-btn')) return;
+    screen5.style.display = 'none';
+    surveyAfterScreener.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  // ================== ADDRESS VALIDATION (Geocod.io via your Cloudflare Worker) ==================
+  const ADDRESS_API = "https://address-check.kayembakasongo.workers.dev/address-check";
+
+  function isPOBox(addr){
+    return /p\.?\s*o\.?\s*box|post\s+office\s+box/i.test(addr || "");
+  }
+  function isState2(s){ return /^[A-Za-z]{2}$/.test((s||"").trim()); }
+  function isZip(z){ return /^\d{5}(-\d{4})?$/.test((z||"").trim()); }
+  function norm(s){ return (s||"").trim().toUpperCase(); }
+
+  function setAddressGate(passed){
+    const addrOkEl = document.getElementById("addr_ok");
+    if (addrOkEl) addrOkEl.value = passed ? "1" : "0";
+
+    if (passed) s5Next.classList.remove("disabled-btn");
+    else s5Next.classList.add("disabled-btn");
+  }
+
+  async function verifyAddressPassFail(){
+    const addr1 = (document.getElementById("addr1").value || "").trim();
+    const addr2 = (document.getElementById("addr2").value || "").trim();
+    const city  = (document.getElementById("city").value || "").trim();
+    const state = (document.getElementById("state").value || "").trim();
+    const zip   = (document.getElementById("zip").value || "").trim();
+
+    // Basic client-side checks (cheap)
+    if (!addr1 || addr1.length < 5) return { ok:false, msg:"Please enter a valid street address." };
+    if (isPOBox(addr1)) return { ok:false, msg:"PO Boxes are not accepted. Please use a residential street address." };
+    if (!city || city.length < 2) return { ok:false, msg:"Please enter your city." };
+    if (!isState2(state)) return { ok:false, msg:"State must be 2 letters (example: CA)." };
+    if (!isZip(zip)) return { ok:false, msg:"Please enter a valid ZIP code (5 digits)." };
+
+    const payload = { addr1, addr2, city, state: norm(state), zip };
+
+    const r = await fetch(ADDRESS_API, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await r.json().catch(()=> ({}));
+    if (!r.ok) {
+      return { ok:false, msg: data?.error ? String(data.error) : "Verification failed. Try again." };
+    }
+
+    return {
+      ok: !!data.ok,
+      accuracy: data.accuracy || 0,
+      normalized: data.normalized_address || "",
+      ipCountry: data.ipCountry || ""
+    };
+  }
+
+  checkAddressBtn.addEventListener("click", async () => {
+    addrStatus.className = "text-sm text-gray-700";
+    addrStatus.textContent = "Checking address…";
+
+    try{
+      const res = await verifyAddressPassFail();
+
+      if (!res.ok){
+        setAddressGate(false);
+        addrStatus.className = "text-sm text-red-700";
+        addrStatus.textContent = "Address could not be verified. Please check and try again.";
+        return;
+      }
+
+      // ✅ Save signals (optional)
+      document.getElementById("addr_accuracy").value = String(res.accuracy || "");
+      document.getElementById("ip_country").value = String(res.ipCountry || "");
+      document.getElementById("normalized_address").value = String(res.normalized || "");
+
+      // Optional: soft warning if IP country isn't US (do NOT block)
+      let warn = "";
+      if (res.ipCountry && res.ipCountry !== "US") {
+        warn = " (Network location not US — OK, but double-check your address.)";
+      }
+
+      setAddressGate(true);
+      addrStatus.className = "text-sm text-green-700";
+      addrStatus.textContent = `Verified ✓ Address accepted.${warn}`;
+
+    } catch(e){
+      setAddressGate(false);
+      addrStatus.className = "text-sm text-red-700";
+      addrStatus.textContent = "Error verifying address. Please try again.";
     }
   });
 
-  btnRunOCR?.addEventListener('click', async () => {
-    if (!proofFile?.files?.[0]) return;
-    const file = proofFile.files[0];
+  // Start locked
+  setAddressGate(false);
 
-    btnRunOCR.disabled = true;
-    if (p5Next) p5Next.disabled = true;
-    ocrPassed = false;
+  // MAIN SURVEY (unchanged)
+  const openWebsiteBtn = document.getElementById('openWebsiteBtn');
+  const abandonSurveyButton = document.getElementById('abandonSurveyButton');
+  const finishSurveyButton = document.getElementById('finishSurveyButton');
 
-    setOCRProgress(3);
-    if (ocrStatus){
-      ocrStatus.className = "mt-2 text-xs md:text-sm text-slate-600";
-      ocrStatus.textContent = "Preparing…";
+  const validateButton = document.getElementById('validateButton');
+  const imageUpload = document.getElementById('imageUpload');
+  const validationResult = document.getElementById('validationResult');
+
+  const feedbackBlock = document.getElementById('feedbackBlock');
+  const attemptsLeftEl = document.getElementById('attemptsLeft');
+
+  const offersCountEl = document.getElementById('offersCount');
+  const commentsEl = document.getElementById('comments');
+
+  const targetWebsite = 'https://trkmcl.com/lv87gxq8z3/w40ml11ynm';
+
+  const MAX_ATTEMPTS = 3;
+  let attemptsUsed = 0;
+  attemptsLeftEl.textContent = String(MAX_ATTEMPTS - attemptsUsed);
+
+  const SIGNALS = ['congratulations','you qualify','special offers','debt reduction','apply now','debt','offer'];
+
+  function normalize(s) {
+    return (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function hasEnoughSignals(text) {
+    const t = normalize(text);
+    let hits = 0;
+    for (const s of SIGNALS) if (t.includes(normalize(s))) hits++;
+    return hits >= 2;
+  }
+  function setFinishEnabled(enabled) {
+    if (enabled) finishSurveyButton.classList.remove('disabled-btn');
+    else finishSurveyButton.classList.add('disabled-btn');
+  }
+  function feedbackIsComplete() {
+    const offers = (offersCountEl.value || '').trim();
+    const connected = document.querySelector('input[name="connected"]:checked');
+    const consider = document.querySelector('input[name="consider"]:checked');
+    const clickedOffer = document.querySelector('input[name="clickedOffer"]:checked');
+    const clickedOk = clickedOffer && clickedOffer.value === 'yes';
+    return offers !== '' && !!connected && !!consider && clickedOk;
+  }
+  function updateFinishGate() {
+    const can = window.__ocr_ok === true && feedbackIsComplete();
+    setFinishEnabled(can);
+  }
+
+  openWebsiteBtn.addEventListener('click', () => window.open(targetWebsite, '_blank', 'noopener'));
+  abandonSurveyButton.addEventListener('click', () => window.location.href = abandonUrl);
+
+  finishSurveyButton.addEventListener('click', () => {
+    if (!finishSurveyButton.classList.contains('disabled-btn')) window.location.href = finishUrl;
+  });
+
+  validateButton.addEventListener('click', async () => {
+    if (!imageUpload.files || imageUpload.files.length === 0) {
+      validationResult.textContent = '❌ Please upload the screenshot first.';
+      validationResult.style.color = 'red';
+      validationResult.style.display = 'block';
+      return;
     }
 
-    try{
-      const canvas = await preprocessToCanvas(file);
-      setOCRProgress(10);
-      if (ocrStatus) ocrStatus.textContent = "Scanning…";
+    const file = imageUpload.files[0];
+    validationResult.style.display = 'block';
+    validationResult.style.color = 'orange';
+    validationResult.innerHTML = '<div class="loader mx-auto"></div><p class="mt-2">Analyzing screenshot...</p>';
 
-      const result = await Tesseract.recognize(canvas, "eng", {
-        logger: (m) => {
-          if (m && m.status === "recognizing text" && typeof m.progress === "number"){
-            setOCRProgress(10 + m.progress * 85);
-          }
-        }
-      });
+    validateButton.disabled = true;
+    setFinishEnabled(false);
 
-      const raw = (result?.data?.text) ? result.data.text : "";
-      const norm = normalizeText(raw);
-      const hits = countHits(norm);
-      setOCRProgress(100);
+    try {
+      const { data: { text } } = await Tesseract.recognize(file, 'eng', { logger: () => {} });
+      const ok = hasEnoughSignals(text);
 
-      if (hits >= 1){
-        ocrPassed = true;
-        if (ocrStatus){
-          ocrStatus.className = "mt-2 text-xs md:text-sm text-emerald-700 font-semibold";
-          ocrStatus.textContent = "Verified.";
-        }
-        if (p5Next) p5Next.disabled = false;
+      if (ok) {
+        window.__ocr_ok = true;
+        validationResult.textContent = '✅ Screenshot validated successfully! Please complete the feedback questions below, then finish the survey.';
+        validationResult.style.color = 'green';
+        feedbackBlock.style.display = 'block';
+        updateFinishGate();
       } else {
-        ocrPassed = false;
-        if (ocrStatus){
-          ocrStatus.className = "mt-2 text-xs md:text-sm text-red-700 font-semibold";
-          ocrStatus.textContent = "Verification failed. Upload a clearer screenshot of the confirmation page.";
+        attemptsUsed += 1;
+        const left = MAX_ATTEMPTS - attemptsUsed;
+        attemptsLeftEl.textContent = String(left);
+
+        window.__ocr_ok = false;
+        feedbackBlock.style.display = 'none';
+        validationResult.textContent = '❌ Results page text not found. Please upload the correct results/special offers screenshot.';
+        validationResult.style.color = 'red';
+
+        if (left <= 0) {
+          validationResult.textContent = '❌ Verification failed. No attempts remaining. Redirecting...';
+          setTimeout(() => { window.location.href = abandonUrl; }, 800);
         }
-        if (p5Next) p5Next.disabled = true;
       }
+    } catch (error) {
+      attemptsUsed += 1;
+      const left = MAX_ATTEMPTS - attemptsUsed;
+      attemptsLeftEl.textContent = String(left);
 
-      btnRunOCR.disabled = false;
-    }catch(e){
-      setOCRProgress(0);
-      ocrPassed = false;
-      if (p5Next) p5Next.disabled = true;
-      if (ocrStatus){
-        ocrStatus.className = "mt-2 text-xs md:text-sm text-amber-700 font-semibold";
-        ocrStatus.textContent = "OCR error — please try again.";
+      window.__ocr_ok = false;
+      feedbackBlock.style.display = 'none';
+      validationResult.textContent = '❌ Error analyzing image. Please try again.';
+      validationResult.style.color = 'red';
+
+      if (left <= 0) {
+        validationResult.textContent = '❌ Verification failed. No attempts remaining. Redirecting...';
+        setTimeout(() => { window.location.href = abandonUrl; }, 800);
       }
-      btnRunOCR.disabled = false;
+    } finally {
+      validateButton.disabled = false;
     }
   });
 
-  p5Next?.addEventListener('click', () => {
-    if (!ocrPassed){
-      showLockedMessage("Please verify your screenshot first.");
-      return;
-    }
-    showPage(4);
-  });
+  offersCountEl.addEventListener('input', updateFinishGate);
+  commentsEl.addEventListener('input', updateFinishGate);
+  document.querySelectorAll('input[name="connected"]').forEach(r => r.addEventListener('change', updateFinishGate));
+  document.querySelectorAll('input[name="consider"]').forEach(r => r.addEventListener('change', updateFinishGate));
+  document.querySelectorAll('input[name="clickedOffer"]').forEach(r => r.addEventListener('change', updateFinishGate));
 
-  // -----------------------------
-  // Brevo -> enable finish
-  // -----------------------------
-  const sibForm = document.getElementById('sib-form');
-  const emailInput = document.getElementById('EMAIL');
-  const optIn = document.getElementById('OPT_IN');
-  const emailErr = document.getElementById('email_error');
-  const optinErr = document.getElementById('optin_error');
-  const brevoSubmitBtn = document.getElementById('brevoSubmitBtn');
-  const finishBtn = document.getElementById('finishBtn');
+  window.__ocr_ok = false;
+  setFinishEnabled(false);
+});
+</script>
 
-  function setErr(el, msg){
-    if (!el) return;
-    if (!msg){ el.style.display='none'; el.textContent=''; return; }
-    el.style.display='block'; el.textContent=msg;
+<!-- ✅ OTP MODULE (Firebase) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+  import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBF5wdHyOlOi_bntJHXto7f6RbJMkOdMSE",
+    authDomain: "otp-c6311.firebaseapp.com",
+    projectId: "otp-c6311",
+    storageBucket: "otp-c6311.firebasestorage.app",
+    messagingSenderId: "637495517002",
+    appId: "1:637495517002:web:7bd220994a7611a5606bb3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const phoneInput = document.getElementById('otpPhone');
+  const sendBtn = document.getElementById('sendOtpBtn');
+  const verifyRow = document.getElementById('otpVerifyRow');
+  const codeInput = document.getElementById('otpCode');
+  const checkBtn = document.getElementById('checkOtpBtn');
+  const statusEl = document.getElementById('otpStatus');
+
+  function digitsOnly(s){ return String(s||'').replace(/\D+/g,''); }
+  function toE164US(raw){
+    const d = digitsOnly(raw);
+    const m = d.match(/^1?([2-9]\d{2})([2-9]\d{2})(\d{4})$/);
+    return m ? `+1${m[1]}${m[2]}${m[3]}` : null;
   }
 
-  sibForm?.addEventListener('submit', (e) => {
-    setErr(emailErr, ""); setErr(optinErr, "");
-    const emailVal = (emailInput?.value || "").trim();
-    let bad = false;
+  const verifier = new RecaptchaVerifier(auth, "sendOtpBtn", { size: "invisible" });
+  let confirmationResult = null;
 
-    if (!emailVal){ bad = true; setErr(emailErr, "Please enter your email address."); }
-    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)){ bad = true; setErr(emailErr, "Please enter a valid email address."); }
+  function setOtpOK(val){
+    window.otpOK = !!val;
+    if (typeof window.__updateOtpGate === 'function') window.__updateOtpGate();
+  }
 
-    if (!optIn?.checked){ bad = true; setErr(optinErr, "Please agree to continue."); }
-    if (bad){ e.preventDefault(); return; }
-
-    if (brevoSubmitBtn){
-      brevoSubmitBtn.disabled = true;
-      brevoSubmitBtn.textContent = "Submitting…";
-    }
-
-    setTimeout(() => {
-      if (finishBtn) finishBtn.disabled = false;
-      if (brevoSubmitBtn){
-        brevoSubmitBtn.disabled = false;
-        brevoSubmitBtn.textContent = "SUBMIT EMAIL";
-      }
-    }, 2500);
+  phoneInput.addEventListener('input', () => {
+    setOtpOK(false);
+    statusEl.textContent = '';
   });
 
-  document.getElementById('p6Exit')?.addEventListener('click', () => disqualifyNow());
-  finishBtn?.addEventListener('click', () => { window.location.href = completionUrl; });
+  sendBtn.addEventListener('click', async () => {
+    const e164 = toE164US(phoneInput.value);
+    verifyRow.classList.remove('hidden');
 
-  // Start
-  showPage(0);
+    if (!e164) {
+      statusEl.className = 'mt-3 text-sm text-red-700';
+      statusEl.textContent = 'Please enter a valid US phone number.';
+      return;
+    }
+
+    statusEl.className = 'mt-3 text-sm text-gray-700';
+    statusEl.textContent = 'Sending code…';
+
+    try {
+      confirmationResult = await signInWithPhoneNumber(auth, e164, verifier);
+      statusEl.className = 'mt-3 text-sm text-green-700';
+      statusEl.textContent = 'Code sent. Check your SMS.';
+    } catch (e) {
+      console.error('OTP send error:', e);
+      statusEl.className = 'mt-3 text-sm text-red-700';
+      statusEl.textContent = `Failed to send: ${e?.message || e}`;
+    }
+  });
+
+  checkBtn.addEventListener('click', async () => {
+    const code = (codeInput.value || '').trim();
+
+    if (!confirmationResult) {
+      statusEl.className = 'mt-3 text-sm text-red-700';
+      statusEl.textContent = 'Please click “Send verification code” first.';
+      return;
+    }
+    if (code.length !== 6) {
+      statusEl.className = 'mt-3 text-sm text-red-700';
+      statusEl.textContent = 'Enter the 6-digit code.';
+      return;
+    }
+
+    statusEl.className = 'mt-3 text-sm text-gray-700';
+    statusEl.textContent = 'Verifying…';
+
+    try {
+      await confirmationResult.confirm(code);
+      setOtpOK(true);
+      statusEl.className = 'mt-3 text-sm text-green-700';
+      statusEl.textContent = 'Verified ✓ You may continue.';
+    } catch (e) {
+      console.error('OTP verify error:', e);
+      setOtpOK(false);
+      statusEl.className = 'mt-3 text-sm text-red-700';
+      statusEl.textContent = 'Verification failed. Please try again.';
+    }
+  });
+
+  setOtpOK(false);
 </script>
+
 </body>
 </html>

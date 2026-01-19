@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en" class="supernova">
 <head>
@@ -194,41 +195,98 @@
         </div>
       </div>
 
-      <!-- ========================= PRESCREENER 4: CREDIT SCORE SLIDER ========================= -->
+      <!-- ========================= PRESCREENER 4: CREDIT SCORE CHECK ========================= -->
       <div id="screen4" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">About what is your estimated credit score?</h2>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Credit score check</h2>
         <p class="text-gray-700 mb-4 text-sm">
-          Use the slider to select your best estimate.
-          (If you’re not sure, choose your best guess.)
+          Please enter your estimated credit score to continue. <b>Minimum required: 500+</b>
         </p>
 
-        <div class="bg-white border rounded-xl p-4">
-          <div class="text-center">
-            <div id="creditScoreDisplay" class="text-5xl font-extrabold text-blue-600">300</div>
-            <div class="text-xs text-gray-600 mt-1">Estimated credit score</div>
+        <div class="bg-white border rounded-xl p-4 space-y-3">
+          <div>
+            <label class="block text-sm font-semibold text-gray-800">Estimated Credit Score</label>
+            <input id="creditScore"
+                   type="number"
+                   inputmode="numeric"
+                   min="300"
+                   max="850"
+                   class="mt-2 w-full border rounded-lg p-3"
+                   placeholder="Example: 620" />
+            <div class="text-xs text-gray-500 mt-2">Range: 300–850</div>
           </div>
 
-          <div class="mt-4">
-            <input type="range" id="creditSlider" min="300" max="850" value="300" step="1">
-          </div>
-
-          <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
-            <label class="text-sm text-gray-700 sm:col-span-1" for="creditNumber">Or type exact score</label>
-            <input type="text" id="creditNumber" inputmode="numeric"
-                   class="sm:col-span-2 w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500"
-                   placeholder="e.g. 620">
-          </div>
-
-          <p id="creditMoveHint" class="text-sm text-gray-600 mt-2 text-center">
-            Please move the slider (or type your score) to continue.
-          </p>
+          <div id="creditStatus" class="text-sm text-gray-700"></div>
         </div>
 
         <div class="mt-4 text-center">
           <button id="screen4Next"
                   class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
                   type="button">
-            Next
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= PRESCREENER 5: ADDRESS VALIDATION (Worker) ========================= -->
+      <div id="screen5" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Confirm your US address</h2>
+        <p class="text-gray-700 mb-4 text-sm">
+          Please enter your <b>real US address</b>. We will verify it (pass/fail) before you continue.
+        </p>
+
+        <div class="bg-white border rounded-xl p-4 space-y-3">
+          <div>
+            <label class="block text-sm font-semibold text-gray-800">Street Address</label>
+            <input id="addr1" class="mt-2 w-full border rounded-lg p-3" placeholder="123 Main St" autocomplete="address-line1" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-800">Apt/Suite (optional)</label>
+            <input id="addr2" class="mt-2 w-full border rounded-lg p-3" placeholder="Apt 4B" autocomplete="address-line2" />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-sm font-semibold text-gray-800">City</label>
+              <input id="city" class="mt-2 w-full border rounded-lg p-3" placeholder="Los Angeles" autocomplete="address-level2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-800">State</label>
+              <input id="state" class="mt-2 w-full border rounded-lg p-3" placeholder="CA" maxlength="2" autocomplete="address-level1" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-800">ZIP</label>
+              <input id="zip" class="mt-2 w-full border rounded-lg p-3" placeholder="90001" inputmode="numeric" autocomplete="postal-code" />
+            </div>
+          </div>
+
+          <!-- Hidden fields -->
+          <input type="hidden" id="addr_ok" value="0" />
+          <input type="hidden" id="addr_accuracy" value="" />
+          <input type="hidden" id="ip_country" value="" />
+          <input type="hidden" id="normalized_address" value="" />
+          <input type="hidden" id="credit_ok" value="0" />
+          <input type="hidden" id="credit_score_value" value="" />
+
+          <div class="mt-2">
+            <button type="button" id="checkAddressBtn"
+                    class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+              Verify Address
+            </button>
+          </div>
+
+          <div id="addrStatus" class="text-sm text-gray-700"></div>
+
+          <div class="text-xs text-gray-500">
+            Tip: Avoid PO Boxes. Use your real residential address for best results.
+          </div>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button id="screen5Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Continue
           </button>
         </div>
       </div>
@@ -241,13 +299,24 @@
           <p class="mt-2 text-base md:text-lg">Help us understand how clear and useful a debt-offer matching experience is.</p>
         </div>
 
+        <!-- ✅ IMPORTANT REAL INFO NOTICE (TOP) -->
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
+          <h3 class="text-lg font-semibold text-amber-900">Important: Please use real, accurate information</h3>
+          <p class="text-gray-700 mt-2 text-sm">
+            The website may perform a <strong>soft credit check</strong> (this does not impact your credit score)
+            to match you with the best provider for the help you need.
+            <strong>No SSN is required.</strong> The check may use details like your <strong>full name</strong>,
+            <strong>address</strong>, <strong>phone number</strong>, and <strong>email</strong>.
+            Incorrect information may lead to inaccurate results.
+          </p>
+        </div>
+
         <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-6">
           <h2 class="text-xl font-semibold text-gray-800 mb-3">Who Can Participate?</h2>
           <p class="text-gray-700 mb-4">Please proceed if the following is true for you:</p>
           <ul class="qualification-list list-none space-y-2">
             <li>You currently have <strong>$15,000 or more in unsecured debt</strong>, preferably credit card or personal loan debt.</li>
-            <li>You have a <strong>yearly income of $50,000 or more</strong> and the ability to make monthly payments <strong>if you ever choose to enroll</strong> (enrollment is completely optional).</li>
-            <li>You have an estimated <strong>credit score of 500+</strong>.</li>
+            <li>You have an <strong>income</strong> and the ability to make monthly payments <strong>if you ever choose to enroll</strong> (enrollment is completely optional).</li>
             <li>You are willing to complete a short debt-relief questionnaire on your <strong>device</strong>.</li>
             <li>You can take and upload a <strong>screenshot of the results page</strong> showing your matched offers.</li>
           </ul>
@@ -255,20 +324,6 @@
             Note: Some participants may not qualify to continue based on their answers.
           </p>
         </div>
-
-        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
-          <h3 class="text-lg font-semibold text-amber-900">Important</h3>
-          <p class="text-gray-700 mt-2">
-            The website you will use is a real third-party service that may match people with potential debt-help offers.
-            We are not the website and we are not the debt companies shown.
-          </p>
-<div class="mt-3 text-sm text-gray-700 bg-white/60 border border-amber-100 rounded-lg p-3">
-  <div class="font-semibold text-amber-900 mb-1">Credit score requirement (500+)</div>
-  <p>
-    <b>Please do not participate</b> if you do not have an estimated credit score of <b>500+</b>.
-  </p>
-</div>
-
 
         <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
           <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
@@ -281,6 +336,14 @@
             <li><strong>Take a screenshot</strong> of the results/offers page.</li>
             <li><strong>Upload your screenshot</strong> below for OCR verification, then answer a few short questions.</li>
           </ol>
+        </div>
+
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
+          <h3 class="text-lg font-semibold text-amber-900">Important</h3>
+          <p class="text-gray-700 mt-2">
+            The website you will use is a real third-party service that may match people with potential debt-help offers.
+            We are not the website and we are not the debt companies shown.
+          </p>
         </div>
 
         <!-- STEP 1 -->
@@ -477,18 +540,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const MIN_DEBT = 15000;
   const ALLOWED_TYPES = new Set(['credit_cards','personal_loans','private_student_loans']);
-  const MIN_CREDIT = 500;
+  const MIN_CREDIT_SCORE = 500;
 
   const screen1 = document.getElementById('screen1');
   const screen2 = document.getElementById('screen2');
   const screen3 = document.getElementById('screen3');
   const screen4 = document.getElementById('screen4');
+  const screen5 = document.getElementById('screen5');
   const surveyAfterScreener = document.getElementById('surveyAfterScreener');
 
   const s1Next = document.getElementById('screen1Next');
   const s2Next = document.getElementById('screen2Next');
   const s3Next = document.getElementById('screen3Next');
   const s4Next = document.getElementById('screen4Next');
+  const s5Next = document.getElementById('screen5Next');
 
   let hasDebt = null;
   const debtTypeEls = Array.from(document.querySelectorAll('.debtType'));
@@ -498,17 +563,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const debtNumber = document.getElementById('debtNumber');
   const moveHint = document.getElementById('moveHint');
 
-  // Credit slider
-  const creditSlider = document.getElementById('creditSlider');
-  const creditScoreDisplay = document.getElementById('creditScoreDisplay');
-  const creditNumber = document.getElementById('creditNumber');
-  const creditMoveHint = document.getElementById('creditMoveHint');
+  const creditScoreEl = document.getElementById('creditScore');
+  const creditStatus = document.getElementById('creditStatus');
+
+  const checkAddressBtn = document.getElementById('checkAddressBtn');
+  const addrStatus = document.getElementById('addrStatus');
 
   let amountWasSet = false;
   let debtTotalValue = 0;
-
-  let creditWasSet = false;
-  let creditValue = 300;
 
   function toInt(s){
     const n = parseInt(String(s||'').replace(/[^\d]/g,''), 10);
@@ -524,39 +586,21 @@ document.addEventListener('DOMContentLoaded', function() {
     debtNumber.value = v ? v.toLocaleString('en-US') : '';
     debtAmountDisplay.textContent = v >= 100000 ? `${fmtMoney(v)}+` : fmtMoney(v);
   }
-  function updateDebtGate(){
+  function updateSliderGate(){
     if (amountWasSet) s3Next.classList.remove('disabled-btn');
     else s3Next.classList.add('disabled-btn');
   }
-  function markDebtSet(){
+  function markAmountSet(){
     amountWasSet = true;
     if (moveHint) moveHint.style.display = 'none';
-    updateDebtGate();
+    updateSliderGate();
   }
 
-  function setCreditUI(val){
-    const v = Math.max(300, Math.min(850, toInt(val)));
-    creditValue = v;
-    creditSlider.value = String(v);
-    creditNumber.value = v ? String(v) : '';
-    creditScoreDisplay.textContent = String(v);
-  }
-  function updateCreditGate(){
-    if (creditWasSet) s4Next.classList.remove('disabled-btn');
-    else s4Next.classList.add('disabled-btn');
-  }
-  function markCreditSet(){
-    creditWasSet = true;
-    if (creditMoveHint) creditMoveHint.style.display = 'none';
-    updateCreditGate();
-  }
-
+  // init slider UI
   setSliderUI(0);
-  updateDebtGate();
+  updateSliderGate();
 
-  setCreditUI(300);
-  updateCreditGate();
-
+  // Screen 1 gate
   document.querySelectorAll('input[name="hasDebt"]').forEach(r => {
     r.addEventListener('change', () => {
       hasDebt = r.value;
@@ -564,6 +608,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // Screen 2 gate
   function updateTypesGate(){
     const any = debtTypeEls.some(x => x.checked);
     if (any) s2Next.classList.remove('disabled-btn');
@@ -572,18 +617,16 @@ document.addEventListener('DOMContentLoaded', function() {
   debtTypeEls.forEach(x => x.addEventListener('change', updateTypesGate));
   updateTypesGate();
 
-  debtSlider.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markDebtSet(); });
-  debtSlider.addEventListener('change', (e)=>{ setSliderUI(e.target.value); markDebtSet(); });
-  debtNumber.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markDebtSet(); });
+  // Slider interactions
+  debtSlider.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
+  debtSlider.addEventListener('change', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
+  debtNumber.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
   debtNumber.addEventListener('blur', ()=> {
     const v = toInt(debtNumber.value);
     debtNumber.value = v ? v.toLocaleString('en-US') : '';
   });
 
-  creditSlider.addEventListener('input', (e)=>{ setCreditUI(e.target.value); markCreditSet(); });
-  creditSlider.addEventListener('change', (e)=>{ setCreditUI(e.target.value); markCreditSet(); });
-  creditNumber.addEventListener('input', (e)=>{ setCreditUI(e.target.value); markCreditSet(); });
-
+  // Navigation
   s1Next.addEventListener('click', () => {
     if (s1Next.classList.contains('disabled-btn')) return;
     if (hasDebt === 'no') { window.location.href = abandonUrl; return; }
@@ -618,16 +661,158 @@ document.addEventListener('DOMContentLoaded', function() {
     window.scrollTo(0, 0);
   });
 
+  // ================== CREDIT SCORE GATE (>= 500) ==================
+  function setCreditGate(enabled){
+    const creditOk = document.getElementById('credit_ok');
+    const creditVal = document.getElementById('credit_score_value');
+    if (creditOk) creditOk.value = enabled ? "1" : "0";
+    if (creditVal) creditVal.value = String(toInt(creditScoreEl.value) || "");
+
+    if (enabled) s4Next.classList.remove('disabled-btn');
+    else s4Next.classList.add('disabled-btn');
+  }
+
+  function validateCreditLive(){
+    const score = toInt(creditScoreEl.value);
+    creditStatus.className = "text-sm text-gray-700";
+
+    if (!score){
+      creditStatus.textContent = "";
+      setCreditGate(false);
+      return;
+    }
+
+    if (score < 300 || score > 850){
+      creditStatus.className = "text-sm text-red-700";
+      creditStatus.textContent = "Please enter a valid score between 300 and 850.";
+      setCreditGate(false);
+      return;
+    }
+
+    // ✅ Removed "Sorry..." message (per your request)
+    if (score < MIN_CREDIT_SCORE){
+      creditStatus.textContent = "";
+      creditStatus.className = "text-sm text-gray-700";
+      setCreditGate(false);
+      return;
+    }
+
+    creditStatus.className = "text-sm text-green-700";
+    creditStatus.textContent = "OK ✓ You may continue.";
+    setCreditGate(true);
+  }
+
+  creditScoreEl.addEventListener('input', validateCreditLive);
+  setCreditGate(false);
+
   s4Next.addEventListener('click', () => {
     if (s4Next.classList.contains('disabled-btn')) return;
-    if (creditValue < MIN_CREDIT) { window.location.href = abandonUrl; return; }
-
+    const score = toInt(creditScoreEl.value);
+    if (score < MIN_CREDIT_SCORE) { window.location.href = abandonUrl; return; }
     screen4.style.display = 'none';
+    screen5.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  // ================== ADDRESS VALIDATION (Worker) ==================
+  const ADDRESS_API = "https://address-check.kayembakasongo.workers.dev/address-check";
+
+  function isPOBox(addr){
+    return /p\.?\s*o\.?\s*box|post\s+office\s+box/i.test(addr || "");
+  }
+  function isState2(s){ return /^[A-Za-z]{2}$/.test((s||"").trim()); }
+  function isZip(z){ return /^\d{5}(-\d{4})?$/.test((z||"").trim()); }
+  function norm(s){ return (s||"").trim().toUpperCase(); }
+
+  function setAddressGate(passed){
+    const addrOkEl = document.getElementById("addr_ok");
+    if (addrOkEl) addrOkEl.value = passed ? "1" : "0";
+
+    if (passed) s5Next.classList.remove("disabled-btn");
+    else s5Next.classList.add("disabled-btn");
+  }
+
+  async function verifyAddressPassFail(){
+    const addr1 = (document.getElementById("addr1").value || "").trim();
+    const addr2 = (document.getElementById("addr2").value || "").trim();
+    const city  = (document.getElementById("city").value || "").trim();
+    const state = (document.getElementById("state").value || "").trim();
+    const zip   = (document.getElementById("zip").value || "").trim();
+
+    // Basic client-side checks
+    if (!addr1 || addr1.length < 5) return { ok:false, msg:"Please enter a valid street address." };
+    if (isPOBox(addr1)) return { ok:false, msg:"PO Boxes are not accepted. Please use a residential street address." };
+    if (!city || city.length < 2) return { ok:false, msg:"Please enter your city." };
+    if (!isState2(state)) return { ok:false, msg:"State must be 2 letters (example: CA)." };
+    if (!isZip(zip)) return { ok:false, msg:"Please enter a valid ZIP code (5 digits)." };
+
+    const payload = { addr1, addr2, city, state: norm(state), zip };
+
+    const r = await fetch(ADDRESS_API, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await r.json().catch(()=> ({}));
+    if (!r.ok) {
+      return { ok:false, msg: data?.error ? String(data.error) : "Verification failed. Try again." };
+    }
+
+    return {
+      ok: !!data.ok,
+      accuracy: data.accuracy || 0,
+      normalized: data.normalized_address || "",
+      ipCountry: data.ipCountry || ""
+    };
+  }
+
+  checkAddressBtn.addEventListener("click", async () => {
+    addrStatus.className = "text-sm text-gray-700";
+    addrStatus.textContent = "Checking address…";
+
+    try{
+      const res = await verifyAddressPassFail();
+
+      if (!res.ok){
+        setAddressGate(false);
+        addrStatus.className = "text-sm text-red-700";
+        addrStatus.textContent = "Address could not be verified. Please check and try again.";
+        return;
+      }
+
+      // save signals
+      document.getElementById("addr_accuracy").value = String(res.accuracy || "");
+      document.getElementById("ip_country").value = String(res.ipCountry || "");
+      document.getElementById("normalized_address").value = String(res.normalized || "");
+
+      let warn = "";
+      if (res.ipCountry && res.ipCountry !== "US") {
+        warn = " (Network location not US — OK, but double-check your address.)";
+      }
+
+      setAddressGate(true);
+      addrStatus.className = "text-sm text-green-700";
+      addrStatus.textContent = `Verified ✓ Address accepted.${warn}`;
+
+    } catch(e){
+      setAddressGate(false);
+      addrStatus.className = "text-sm text-red-700";
+      addrStatus.textContent = "Error verifying address. Please try again.";
+    }
+  });
+
+  // start locked
+  setAddressGate(false);
+
+  s5Next.addEventListener('click', () => {
+    if (s5Next.classList.contains('disabled-btn')) return;
+    screen5.style.display = 'none';
     surveyAfterScreener.style.display = 'block';
     window.scrollTo(0, 0);
   });
 
-  // MAIN SURVEY
+  // ================== MAIN SURVEY (Iframe + OCR + finish gate) ==================
   const openWebsiteBtn = document.getElementById('openWebsiteBtn');
   const abandonSurveyButton = document.getElementById('abandonSurveyButton');
   const finishSurveyButton = document.getElementById('finishSurveyButton');

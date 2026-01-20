@@ -40,6 +40,28 @@
     input[type=range]::-moz-range-track { height: 8px; background: #e5e7eb; border-radius: 9999px; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -10px; width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
     input[type=range]::-moz-range-thumb { width: 28px; height: 28px; border-radius: 9999px; background: #2563eb; border: 4px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; }
+
+    .radio-card, .check-card {
+      border: 1px solid rgb(226 232 240);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .radio-card:hover, .check-card:hover { background: rgb(248 250 252); }
+    
+    .progress-indicator {
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #2563eb;
+      transition: width 0.3s ease;
+    }
   </style>
 </head>
 
@@ -194,35 +216,329 @@
         </div>
       </div>
 
-      <!-- ========================= PRESCREENER 4: CREDIT SCORE CHECK ========================= -->
-      <div id="screen4" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Credit score check</h2>
+      <!-- ========================= PRESCREENER 4.1: CREDIT SCORE RANGE ========================= -->
+      <div id="screen4_1" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <div class="progress-indicator">
+          <div class="progress-bar" style="width: 25%"></div>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Credit Information (1 of 5)</h2>
         <p class="text-gray-700 mb-4 text-sm">
-          Please enter your estimated credit score to continue. <b>Minimum required: 500+</b>
+          Please answer the following questions about your credit situation.
         </p>
 
-        <div class="bg-white border rounded-xl p-4 space-y-3">
-          <div>
-            <label class="block text-sm font-semibold text-gray-800">Estimated Credit Score</label>
-            <input id="creditScore"
-                   type="number"
-                   inputmode="numeric"
-                   min="300"
-                   max="850"
-                   class="mt-2 w-full border rounded-lg p-3"
-                   placeholder="Example: 620" />
-            <div class="text-xs text-gray-500 mt-2">Range: 300–850</div>
+        <div class="bg-white border rounded-xl p-4 mb-4">
+          <div class="font-semibold text-gray-800 mb-3">What is your current estimated credit score?</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="csRange" value="300-499" class="scale-125">
+              <div>
+                <div class="font-medium">300–499</div>
+                <div class="text-xs text-slate-500">Poor credit</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="csRange" value="500-549" class="scale-125">
+              <div>
+                <div class="font-medium">500–549</div>
+                <div class="text-xs text-slate-500">Fair credit</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="csRange" value="550-599" class="scale-125">
+              <div>
+                <div class="font-medium">550–599</div>
+                <div class="text-xs text-slate-500">Fair credit</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="csRange" value="600-649" class="scale-125">
+              <div>
+                <div class="font-medium">600–649</div>
+                <div class="text-xs text-slate-500">Good credit</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="csRange" value="650-699" class="scale-125">
+              <div>
+                <div class="font-medium">650–699</div>
+                <div class="text-xs text-slate-500">Good credit</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="csRange" value="700+" class="scale-125">
+              <div>
+                <div class="font-medium">700+</div>
+                <div class="text-xs text-slate-500">Excellent credit</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3 md:col-span-2">
+              <input type="radio" name="csRange" value="not_sure" class="scale-125">
+              <div>
+                <div class="font-medium">I'm not sure</div>
+                <div class="text-xs text-slate-500">I don't know my credit score</div>
+              </div>
+            </label>
           </div>
-
-          <div id="creditStatus" class="text-sm text-gray-700"></div>
         </div>
 
-        <div class="mt-4 text-center">
-          <button id="screen4Next"
+        <div class="mt-6 text-center">
+          <button id="screen4_1Next"
                   class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
                   type="button">
             Continue
           </button>
+        </div>
+      </div>
+
+      <!-- ========================= PRESCREENER 4.2: CREDIT BUREAU ========================= -->
+      <div id="screen4_2" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <div class="progress-indicator">
+          <div class="progress-bar" style="width: 50%"></div>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Credit Information (2 of 5)</h2>
+        <p class="text-gray-700 mb-4 text-sm">
+          Please answer the following questions about your credit situation.
+        </p>
+
+        <div class="bg-white border rounded-xl p-4 mb-4">
+          <div class="font-semibold text-gray-800 mb-3">Which credit bureau score are you referring to?</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="bureau" value="experian" class="scale-125">
+              <div>
+                <div class="font-medium">Experian</div>
+                <div class="text-xs text-slate-500">Most commonly used</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="bureau" value="equifax" class="scale-125">
+              <div>
+                <div class="font-medium">Equifax</div>
+                <div class="text-xs text-slate-500">One of the three bureaus</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="bureau" value="transunion" class="scale-125">
+              <div>
+                <div class="font-medium">TransUnion</div>
+                <div class="text-xs text-slate-500">One of the three bureaus</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3 md:col-span-2">
+              <input type="radio" name="bureau" value="other_or_not_sure" class="scale-125">
+              <div>
+                <div class="font-medium">I'm not sure / I checked a different one</div>
+                <div class="text-xs text-slate-500">I don't know which bureau</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <button id="screen4_2Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= PRESCREENER 4.3: CONFIRM EXPERIAN 500+ ========================= -->
+      <div id="screen4_3" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <div class="progress-indicator">
+          <div class="progress-bar" style="width: 75%"></div>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Credit Information (3 of 5)</h2>
+        <p class="text-gray-700 mb-4 text-sm">
+          Please answer the following questions about your credit situation.
+        </p>
+
+        <div class="bg-white border rounded-xl p-4 mb-4">
+          <div class="font-semibold text-gray-800 mb-3">Are you comfortable confirming that your Experian credit score is 500 or higher?</div>
+          <div class="space-y-3">
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="confirmExperian" value="yes_500plus" class="scale-125">
+              <div>
+                <div class="font-medium">Yes, my Experian score is 500+</div>
+                <div class="text-xs text-slate-500">I confirm my Experian score meets this level</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="confirmExperian" value="no" class="scale-125">
+              <div>
+                <div class="font-medium">No</div>
+                <div class="text-xs text-slate-500">My Experian score is below 500</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="confirmExperian" value="not_sure" class="scale-125">
+              <div>
+                <div class="font-medium">Not sure</div>
+                <div class="text-xs text-slate-500">I'm not sure about my Experian score</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <button id="screen4_3Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= PRESCREENER 4.4: LAST CHECKED ========================= -->
+      <div id="screen4_4" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <div class="progress-indicator">
+          <div class="progress-bar" style="width: 100%"></div>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Credit Information (4 of 5)</h2>
+        <p class="text-gray-700 mb-4 text-sm">
+          Please answer the following questions about your credit situation.
+        </p>
+
+        <div class="bg-white border rounded-xl p-4 mb-4">
+          <div class="font-semibold text-gray-800 mb-3">When did you last check your credit score (any app/site)?</div>
+          <div class="space-y-3">
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="lastChecked" value="today_week" class="scale-125">
+              <div>
+                <div class="font-medium">Today / this week</div>
+                <div class="text-xs text-slate-500">Recently checked</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="lastChecked" value="30d" class="scale-125">
+              <div>
+                <div class="font-medium">Within the last 30 days</div>
+                <div class="text-xs text-slate-500">Checked within a month</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="lastChecked" value="30p" class="scale-125">
+              <div>
+                <div class="font-medium">More than 30 days ago</div>
+                <div class="text-xs text-slate-500">Checked over a month ago</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="lastChecked" value="never_or_not_sure" class="scale-125">
+              <div>
+                <div class="font-medium">I've never checked / not sure</div>
+                <div class="text-xs text-slate-500">Haven't checked recently</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <button id="screen4_4Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= PRESCREENER 4.5: BELOW 500 ========================= -->
+      <div id="screen4_5" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <div class="progress-indicator">
+          <div class="progress-bar" style="width: 100%"></div>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Credit Information (5 of 5)</h2>
+        <p class="text-gray-700 mb-4 text-sm">
+          Please answer the following questions about your credit situation.
+        </p>
+
+        <div class="bg-white border rounded-xl p-4">
+          <div class="font-semibold text-gray-800 mb-3">Have you ever been told your credit score is below 500?</div>
+          <div class="space-y-3">
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="below500" value="yes" class="scale-125">
+              <div>
+                <div class="font-medium">Yes</div>
+                <div class="text-xs text-slate-500">I've been told my score is below 500</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="below500" value="no" class="scale-125">
+              <div>
+                <div class="font-medium">No</div>
+                <div class="text-xs text-slate-500">I've never been told my score is below 500</div>
+              </div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="below500" value="not_sure" class="scale-125">
+              <div>
+                <div class="font-medium">Not sure</div>
+                <div class="text-xs text-slate-500">I don't remember or am not sure</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <button id="screen4_5Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= PRESCREENER 5: RECENT SOFT CHECK ========================= -->
+      <div id="screen5" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Recent pre-qualification check</h2>
+        <p class="text-gray-700 mb-4 text-sm">
+          Have you completed an online pre-qualification or soft credit check for <b>debt relief</b> recently?
+        </p>
+
+        <div class="space-y-3">
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="radio" name="recentSoftCheck" value="7d" class="mt-1">
+            <div>
+              <div class="font-semibold">Yes — within the last 7 days</div>
+              <div class="text-sm text-slate-600">I recently pre-qualified or did a soft check.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="radio" name="recentSoftCheck" value="30d" class="mt-1">
+            <div>
+              <div class="font-semibold">Yes — within the last 30 days</div>
+              <div class="text-sm text-slate-600">It was in the last month.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="radio" name="recentSoftCheck" value="30p" class="mt-1">
+            <div>
+              <div class="font-semibold">Yes — more than 30 days ago</div>
+              <div class="text-sm text-slate-600">It was a while ago.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-xl border bg-white cursor-pointer">
+            <input type="radio" name="recentSoftCheck" value="no" class="mt-1">
+            <div>
+              <div class="font-semibold">No</div>
+              <div class="text-sm text-slate-600">I have not done a pre-qualification recently.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button id="screen5Next"
+                  class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn"
+                  type="button">
+            Continue
+          </button>
+        </div>
+
+        <div class="mt-2 text-xs text-gray-600 text-center">
+          Note: Some participants may not qualify to continue based on their answers.
         </div>
       </div>
 
@@ -250,7 +566,7 @@
         <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
           <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
           <ol class="list-decimal list-inside text-gray-700 space-y-2">
-            <li><strong>Click “Open Website”</strong> below to open the debt matching website in a <strong>new tab</strong>.</li>
+            <li><strong>Click "Open Website"</strong> below to open the debt matching website in a <strong>new tab</strong>.</li>
             <li><strong>Move the debt amount slider</strong> to select your total debt amount (this study focuses on <strong>$15,000+</strong>).</li>
             <li>Select your <strong>debt type</strong> and your <strong>income bracket</strong> using your real situation.</li>
             <li><strong>Complete the form</strong> and submit until you reach the offers/results page.</li>
@@ -278,31 +594,24 @@
             <div class="font-semibold text-blue-900 mb-1">⚠️ Important</div>
             <p>
               When you click <b>Open Website</b>, the website will open in a <b>new tab</b>.
-              Please keep this survey tab open. Complete the form on the website, then <b>return here</b>
-              to upload your screenshot and finish the survey.
+              Please return to this survey tab after you reach the results/offers page to upload your screenshot and finish the survey.
             </p>
           </div>
 
           <div class="mt-4 p-4 bg-white border border-gray-200 rounded-lg">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <button id="openWebsiteBtn"
-                      class="action-btn w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
-                      type="button">
-                Open Website (New Tab)
-              </button>
-              <a id="openNewTabLink"
-                 class="text-sm font-semibold text-blue-700 hover:underline"
+              <a id="openWebsiteBtn"
+                 class="action-btn w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-center"
                  href="#"
                  target="_blank"
                  rel="noopener">
-                Open link again
+                Open Website (New Tab)
               </a>
             </div>
 
             <div class="mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
-              <div class="font-semibold text-indigo-900">Steps (on the website)</div>
+              <div class="font-semibold text-indigo-900">Steps (inside the website)</div>
 
-              <!-- ✅ IMPORTANT TEXT INSIDE STEPS -->
               <div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-gray-700">
                 <b>Important: Please use real, accurate information</b><br>
                 The website may perform a <b>soft credit check</b> (this does not impact your credit score) to match you with the best provider for the help you need.
@@ -315,9 +624,9 @@
                 <li><b>Select your debt type</b> (choose what applies to you).</li>
                 <li><b>Select your income bracket</b> (choose the best match).</li>
                 <li><b>Complete your personal information</b> and <b>submit</b> the form.</li>
+                <li><b>Take a screenshot</b> of the results/offers page and return here for Step 2.</li>
                 <li>On the results page, <b>click at least one offer</b> to view details.</li>
-                <li><b>Take a screenshot</b> of the results/offers page.</li>
-                <li>Return to this survey tab and upload your screenshot in Step 2.</li>
+                <li>If you want to <b>enroll or call</b> any program shown, you may do so — <b>it's optional</b>.</li>
               </ol>
             </div>
           </div>
@@ -328,7 +637,7 @@
           <h3 class="text-lg font-semibold text-orange-800">Step 2: Verify Your Screenshot</h3>
           <p class="text-gray-700 mt-2">
             Upload a screenshot of what you saw after submitting the form. Your screenshot should show wording like
-            <b>“Congratulations”</b> and/or <b>“You qualify for special offers”</b> and display one or more offer cards (or an offer page).
+            <b>"Congratulations"</b> and/or <b>"You qualify for special offers"</b> and display one or more offer cards (or an offer page).
           </p>
 
           <div class="mt-4">
@@ -451,13 +760,23 @@ document.addEventListener('DOMContentLoaded', function() {
   const screen1 = document.getElementById('screen1');
   const screen2 = document.getElementById('screen2');
   const screen3 = document.getElementById('screen3');
-  const screen4 = document.getElementById('screen4');
+  const screen4_1 = document.getElementById('screen4_1');
+  const screen4_2 = document.getElementById('screen4_2');
+  const screen4_3 = document.getElementById('screen4_3');
+  const screen4_4 = document.getElementById('screen4_4');
+  const screen4_5 = document.getElementById('screen4_5');
+  const screen5 = document.getElementById('screen5');
   const surveyAfterScreener = document.getElementById('surveyAfterScreener');
 
   const s1Next = document.getElementById('screen1Next');
   const s2Next = document.getElementById('screen2Next');
   const s3Next = document.getElementById('screen3Next');
-  const s4Next = document.getElementById('screen4Next');
+  const s4_1Next = document.getElementById('screen4_1Next');
+  const s4_2Next = document.getElementById('screen4_2Next');
+  const s4_3Next = document.getElementById('screen4_3Next');
+  const s4_4Next = document.getElementById('screen4_4Next');
+  const s4_5Next = document.getElementById('screen4_5Next');
+  const s5Next = document.getElementById('screen5Next');
 
   let hasDebt = null;
   const debtTypeEls = Array.from(document.querySelectorAll('.debtType'));
@@ -467,8 +786,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const debtNumber = document.getElementById('debtNumber');
   const moveHint = document.getElementById('moveHint');
 
-  const creditScoreEl = document.getElementById('creditScore');
-  const creditStatus = document.getElementById('creditStatus');
+  const openWebsiteBtn = document.getElementById('openWebsiteBtn');
+
+  const targetWebsite = 'https://trkmcl.com/lv87gxq8z3/w40ml11ynm';
+  if (openWebsiteBtn) openWebsiteBtn.href = targetWebsite;
 
   let amountWasSet = false;
   let debtTotalValue = 0;
@@ -500,6 +821,7 @@ document.addEventListener('DOMContentLoaded', function() {
   setSliderUI(0);
   updateSliderGate();
 
+  // Screen 1 gate
   document.querySelectorAll('input[name="hasDebt"]').forEach(r => {
     r.addEventListener('change', () => {
       hasDebt = r.value;
@@ -507,6 +829,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // Screen 2 gate
   function updateTypesGate(){
     const any = debtTypeEls.some(x => x.checked);
     if (any) s2Next.classList.remove('disabled-btn');
@@ -515,6 +838,7 @@ document.addEventListener('DOMContentLoaded', function() {
   debtTypeEls.forEach(x => x.addEventListener('change', updateTypesGate));
   updateTypesGate();
 
+  // Screen 3 slider
   debtSlider.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
   debtSlider.addEventListener('change', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
   debtNumber.addEventListener('input', (e)=>{ setSliderUI(e.target.value); markAmountSet(); });
@@ -523,6 +847,7 @@ document.addEventListener('DOMContentLoaded', function() {
     debtNumber.value = v ? v.toLocaleString('en-US') : '';
   });
 
+  // Navigation between screens
   s1Next.addEventListener('click', () => {
     if (s1Next.classList.contains('disabled-btn')) return;
     if (hasDebt === 'no') { window.location.href = abandonUrl; return; }
@@ -553,58 +878,162 @@ document.addEventListener('DOMContentLoaded', function() {
     if (debtTotalValue < MIN_DEBT) { window.location.href = abandonUrl; return; }
 
     screen3.style.display = 'none';
-    screen4.style.display = 'block';
+    screen4_1.style.display = 'block';
     window.scrollTo(0, 0);
   });
 
-  // Credit score gate
-  function setCreditGate(enabled){
-    if (enabled) s4Next.classList.remove('disabled-btn');
-    else s4Next.classList.add('disabled-btn');
+  // =========================
+  // Screen 4.1: CREDIT SCORE RANGE
+  // =========================
+  function getCheckedVal(name){
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : null;
   }
-  function validateCreditLive(){
-    const score = toInt(creditScoreEl.value);
-    creditStatus.className = "text-sm text-gray-700";
-
-    if (!score){
-      creditStatus.textContent = "";
-      setCreditGate(false);
-      return;
-    }
-    if (score < 300 || score > 850){
-      creditStatus.className = "text-sm text-red-700";
-      creditStatus.textContent = "Please enter a valid score between 300 and 850.";
-      setCreditGate(false);
-      return;
-    }
-    if (score < MIN_CREDIT_SCORE){
-      creditStatus.textContent = ""; // ✅ no disqualify message
-      creditStatus.className = "text-sm text-gray-700";
-      setCreditGate(false);
-      return;
-    }
-
-    creditStatus.className = "text-sm text-green-700";
-    creditStatus.textContent = "OK ✓ You may continue.";
-    setCreditGate(true);
+  
+  function setCreditGate(button, enabled){
+    if (enabled) button.classList.remove('disabled-btn');
+    else button.classList.add('disabled-btn');
+  }
+  
+  // Screen 4.1 validation
+  function validateScreen4_1(){
+    const csRange = getCheckedVal('csRange');
+    setCreditGate(s4_1Next, !!csRange);
+  }
+  
+  // Screen 4.2 validation
+  function validateScreen4_2(){
+    const bureau = getCheckedVal('bureau');
+    setCreditGate(s4_2Next, !!bureau);
+  }
+  
+  // Screen 4.3 validation
+  function validateScreen4_3(){
+    const confirm = getCheckedVal('confirmExperian');
+    setCreditGate(s4_3Next, !!confirm);
+  }
+  
+  // Screen 4.4 validation
+  function validateScreen4_4(){
+    const lastChecked = getCheckedVal('lastChecked');
+    setCreditGate(s4_4Next, !!lastChecked);
+  }
+  
+  // Screen 4.5 validation
+  function validateScreen4_5(){
+    const below500 = getCheckedVal('below500');
+    setCreditGate(s4_5Next, !!below500);
   }
 
-  creditScoreEl.addEventListener('input', validateCreditLive);
-  setCreditGate(false);
+  // Listen for changes on each credit screen
+  document.querySelectorAll('input[name="csRange"]').forEach(r => r.addEventListener('change', validateScreen4_1));
+  document.querySelectorAll('input[name="bureau"]').forEach(r => r.addEventListener('change', validateScreen4_2));
+  document.querySelectorAll('input[name="confirmExperian"]').forEach(r => r.addEventListener('change', validateScreen4_3));
+  document.querySelectorAll('input[name="lastChecked"]').forEach(r => r.addEventListener('change', validateScreen4_4));
+  document.querySelectorAll('input[name="below500"]').forEach(r => r.addEventListener('change', validateScreen4_5));
 
-  s4Next.addEventListener('click', () => {
-    if (s4Next.classList.contains('disabled-btn')) return;
-    const score = toInt(creditScoreEl.value);
-    if (score < MIN_CREDIT_SCORE) { window.location.href = abandonUrl; return; }
+  // Initialize gates
+  setCreditGate(s4_1Next, false);
+  setCreditGate(s4_2Next, false);
+  setCreditGate(s4_3Next, false);
+  setCreditGate(s4_4Next, false);
+  setCreditGate(s4_5Next, false);
 
-    screen4.style.display = 'none';
+  // Navigation between credit screens
+  s4_1Next.addEventListener('click', () => {
+    if (s4_1Next.classList.contains('disabled-btn')) return;
+    
+    const csRange = getCheckedVal('csRange');
+    // Disqualify if score is 300-499 or not sure
+    if (csRange === '300-499' || csRange === 'not_sure') {
+      window.location.href = abandonUrl;
+      return;
+    }
+    
+    screen4_1.style.display = 'none';
+    screen4_2.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  s4_2Next.addEventListener('click', () => {
+    if (s4_2Next.classList.contains('disabled-btn')) return;
+    
+    const bureau = getCheckedVal('bureau');
+    // Disqualify if not Experian
+    if (bureau !== 'experian') {
+      window.location.href = abandonUrl;
+      return;
+    }
+    
+    screen4_2.style.display = 'none';
+    screen4_3.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  s4_3Next.addEventListener('click', () => {
+    if (s4_3Next.classList.contains('disabled-btn')) return;
+    
+    const confirm = getCheckedVal('confirmExperian');
+    // Disqualify if not yes_500plus
+    if (confirm !== 'yes_500plus') {
+      window.location.href = abandonUrl;
+      return;
+    }
+    
+    screen4_3.style.display = 'none';
+    screen4_4.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  s4_4Next.addEventListener('click', () => {
+    if (s4_4Next.classList.contains('disabled-btn')) return;
+    
+    screen4_4.style.display = 'none';
+    screen4_5.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  s4_5Next.addEventListener('click', () => {
+    if (s4_5Next.classList.contains('disabled-btn')) return;
+    
+    const below500 = getCheckedVal('below500');
+    // Disqualify if yes to below 500
+    if (below500 === 'yes') {
+      window.location.href = abandonUrl;
+      return;
+    }
+    
+    screen4_5.style.display = 'none';
+    screen5.style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  // Screen 5 gate
+  function setS5Gate(enabled){
+    if (enabled) s5Next.classList.remove('disabled-btn');
+    else s5Next.classList.add('disabled-btn');
+  }
+
+  let recentSoftCheck = null;
+  document.querySelectorAll('input[name="recentSoftCheck"]').forEach(r => {
+    r.addEventListener('change', () => {
+      recentSoftCheck = r.value;
+      setS5Gate(true);
+    });
+  });
+  setS5Gate(false);
+
+  // Disqualify rule: YES within 7 days
+  s5Next.addEventListener('click', () => {
+    if (s5Next.classList.contains('disabled-btn')) return;
+    if (recentSoftCheck === '7d') { window.location.href = abandonUrl; return; }
+
+    screen5.style.display = 'none';
     surveyAfterScreener.style.display = 'block';
     window.scrollTo(0, 0);
   });
 
   // MAIN SURVEY
-  const openWebsiteBtn = document.getElementById('openWebsiteBtn');
-  const openNewTabLink = document.getElementById('openNewTabLink');
   const abandonSurveyButton = document.getElementById('abandonSurveyButton');
   const finishSurveyButton = document.getElementById('finishSurveyButton');
 
@@ -617,9 +1046,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const offersCountEl = document.getElementById('offersCount');
   const commentsEl = document.getElementById('comments');
-
-  const targetWebsite = 'https://trkmcl.com/lv87gxq8z3/w40ml11ynm';
-  if (openNewTabLink) openNewTabLink.href = targetWebsite;
 
   const MAX_ATTEMPTS = 3;
   let attemptsUsed = 0;
@@ -652,10 +1078,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const can = window.__ocr_ok === true && feedbackIsComplete();
     setFinishEnabled(can);
   }
-
-  openWebsiteBtn.addEventListener('click', () => {
-    window.open(targetWebsite, '_blank', 'noopener');
-  });
 
   abandonSurveyButton.addEventListener('click', () => window.location.href = abandonUrl);
 
@@ -736,4 +1158,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
+
+
 

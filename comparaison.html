@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en" class="supernova">
 <head>
@@ -158,7 +159,7 @@
         </div>
       </div>
 
-      <!-- ========================= SCREEN 2: DEBT TYPE (allowed only 3, exclude medical) ========================= -->
+      <!-- ========================= SCREEN 2: DEBT TYPE (allowed only 3) ========================= -->
       <div id="screen2" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
         <h2 class="text-xl font-semibold text-gray-800 mb-2">Q2) What is your MAIN type of debt right now? (Choose one)</h2>
 
@@ -215,7 +216,7 @@
         </div>
       </div>
 
-      <!-- ========================= SCREEN 3: DEBT AMOUNT (must be >=15000) ========================= -->
+      <!-- ========================= SCREEN 3: DEBT AMOUNT (>=15000) ========================= -->
       <div id="screen3" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
         <h2 class="text-xl font-semibold text-gray-800 mb-2">Q3) About how much total personal debt do you currently have? (Not including mortgage)</h2>
 
@@ -251,7 +252,7 @@
         </div>
       </div>
 
-      <!-- ========================= SCREEN 4: INCOME (must be >=100000) ========================= -->
+      <!-- ========================= SCREEN 4: INCOME (>=100k) ========================= -->
       <div id="screen4" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
         <h2 class="text-xl font-semibold text-gray-800 mb-2">Q4) What is your approximate annual household income (before taxes)?</h2>
 
@@ -273,7 +274,6 @@
             <div class="font-medium">$75,000–$99,999</div>
           </label>
 
-          <!-- 100k+ and bigger options (kept small options visible) -->
           <label class="radio-card flex items-center gap-3">
             <input type="radio" name="incomeRange" value="100_149999" class="scale-125">
             <div class="font-medium">$100,000–$149,999</div>
@@ -322,7 +322,7 @@
         </div>
       </div>
 
-      <!-- ========================= SCREEN 6: SITUATION (disqualify unemployed + prefer not) ========================= -->
+      <!-- ========================= SCREEN 6: SITUATION (DQ unemployed + prefer_not) ========================= -->
       <div id="screen6" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
         <h2 class="text-xl font-semibold text-gray-800 mb-2">Q6) Which best describes your current situation?</h2>
 
@@ -386,12 +386,10 @@
         </div>
       </div>
 
-      <!-- ========================= SCREEN 8: CREDIT SCORE (disqualify <500 and "I don't remember") ========================= -->
+      <!-- ========================= SCREEN 8: CREDIT SCORE (>=500 and not dont_remember) ========================= -->
       <div id="screen8" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
         <h2 class="text-xl font-semibold text-gray-800 mb-2">Q8) Credit information</h2>
-        <div class="text-gray-700 mb-2">
-          When you last checked your credit score, which range did it fall into?
-        </div>
+        <div class="text-gray-700 mb-2">When you last checked your credit score, which range did it fall into?</div>
 
         <div class="space-y-3 mt-3">
           <label class="radio-card flex items-center gap-3">
@@ -421,9 +419,41 @@
         </div>
       </div>
 
-      <!-- ========================= SCREEN 9: CONFIRM (must be YES) ========================= -->
+      <!-- ========================= SCREEN 9: CREDIT CHECKER USED (must be Experian) ========================= -->
       <div id="screen9" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q9) Confirmation</h2>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q9) Credit checker used</h2>
+        <div class="text-gray-700 mb-2">
+          Which credit bureau or service did you use most recently to check your credit score online?
+          <span class="text-sm text-gray-600">(Choose one)</span>
+        </div>
+
+        <div class="space-y-3 mt-3">
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="creditCheckerUsed" value="experian" class="scale-125">
+            <div class="font-medium">Experian</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="creditCheckerUsed" value="equifax" class="scale-125">
+            <div class="font-medium">Equifax</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="creditCheckerUsed" value="transunion" class="scale-125">
+            <div class="font-medium">TransUnion</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="creditCheckerUsed" value="never_used" class="scale-125">
+            <div class="font-medium">I have never used any of these</div>
+          </label>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button id="screen9Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
+        </div>
+      </div>
+
+      <!-- ========================= SCREEN 10: CONFIRM ========================= -->
+      <div id="screen10" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q10) Confirmation</h2>
         <div class="bg-white border rounded-xl p-4 mt-3">
           <div class="font-semibold text-gray-800">
             Please confirm: You have <b>$15,000+</b> in eligible debt and <b>$100,000+</b> household income, and you are <b>not currently enrolled</b> in a debt program.
@@ -442,13 +472,13 @@
         </div>
 
         <div class="mt-4 text-center">
-          <button id="screen9Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>
+          <button id="screen10Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>
             Continue to Survey
           </button>
         </div>
       </div>
 
-      <!-- ========================= MAIN SURVEY ========================= -->
+      <!-- ========================= MAIN SURVEY (FORM) ========================= -->
       <div id="surveyAfterScreener" style="display:none;">
 
         <div class="form-header-group header-large mb-8 p-6 rounded-xl text-white text-center">
@@ -460,7 +490,7 @@
           <h2 class="text-xl font-semibold text-gray-800 mb-3">Who Can Participate?</h2>
           <p class="text-gray-700 mb-4">Please proceed if the following is true for you:</p>
           <ul class="qualification-list list-none space-y-2">
-            <li>You currently have <strong>unsecured debt</strong> (credit card debt, unsecured personal loans, or private student loans).You have <b>$15,000+</b> in eligible debt and <b>$100,000+</b> household income</li>
+            <li>You currently have <strong>unsecured debt</strong> (credit card debt, unsecured personal loans, or private student loans).</li>
             <li>You are willing to complete a short debt-relief questionnaire on your <strong>device</strong>.</li>
             <li>You can take and upload a <strong>screenshot of the results page</strong> showing your matched offers.</li>
           </ul>
@@ -519,9 +549,9 @@
               </div>
 
               <ol class="mt-3 list-decimal list-inside text-sm text-gray-700 space-y-1">
-                <li><b>Move the slider</b> to select your total debt amount.<b>$15,000+</b> in eligible debt</li>
+                <li><b>Move the slider</b> to select your total debt amount.</li>
                 <li><b>Select your debt type</b> (choose what applies to you).</li>
-                <li><b>Select your income bracket</b> (<b>$100,000+</b> household income).</li>
+                <li><b>Select your income bracket</b> (choose the best match).</li>
                 <li><b>Complete your personal information</b> and <b>submit</b> the form.</li>
                 <li><b>Take a screenshot</b> of the results/offers page.</li>
                 <li>On the results page, <b>click at least one offer</b> to view details.</li>
@@ -687,7 +717,7 @@ document.addEventListener('DOMContentLoaded', function () {
     btn.classList.toggle("disabled-btn", !ok);
   }
   function showOnly(id){
-    const ids = ["terminate","screen1","screen2","screen3","screen4","screen5","screen6","screen7","screen8","screen9","surveyAfterScreener"];
+    const ids = ["terminate","screen1","screen2","screen3","screen4","screen5","screen6","screen7","screen8","screen9","screen10","surveyAfterScreener"];
     ids.forEach(x => { const el = $(x); if (el) el.style.display = (x === id ? "block" : "none"); });
     window.scrollTo(0,0);
   }
@@ -717,15 +747,10 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ========================= Screener rules ========================= */
   const allowedDebtTypes = new Set(["credit_cards","unsecured_personal_loans","private_student_loans"]);
   function debtAmtOk(v){ return (v === "15_24999" || v === "25_49999" || v === "50plus"); }
-
-  // Income: must be >= 100,000
-  function incomeOk(v){ return (v === "100_149999" || v === "150_199999" || v === "200plus"); }
-
-  // Situation: disqualify unemployed + prefer not
+  function incomeOk(v){ return (v === "100_149999" || v === "150_199999" || v === "200plus"); } // >=100k
   function situationOk(v){ return (v && v !== "unemployed" && v !== "prefer_not"); }
-
-  // Credit: disqualify anything below 500 and "don't remember"
-  function creditOk(v){ return (v === "500_549" || v === "550_649" || v === "650plus"); }
+  function creditOk(v){ return (v === "500_549" || v === "550_649" || v === "650plus"); } // >=500, not "dont_remember"
+  function creditCheckerOk(v){ return v === "experian"; } // MUST be Experian
 
   /* ========================= Screen 1 ========================= */
   const s1Next = $("screen1Next");
@@ -782,7 +807,7 @@ document.addEventListener('DOMContentLoaded', function () {
     showOnly("screen6");
   });
 
-  /* ========================= Screen 6 (Situation) ========================= */
+  /* ========================= Screen 6 ========================= */
   const s6Next = $("screen6Next");
   document.addEventListener("change", (e) => {
     if (e.target.name === "situation") setEnabled(s6Next, true);
@@ -793,7 +818,7 @@ document.addEventListener('DOMContentLoaded', function () {
     showOnly("screen7");
   });
 
-  /* ========================= Screen 7 (Monthly) ========================= */
+  /* ========================= Screen 7 ========================= */
   const s7Next = $("screen7Next");
   document.addEventListener("change", (e) => {
     if (e.target.name === "monthly") setEnabled(s7Next, true);
@@ -804,7 +829,7 @@ document.addEventListener('DOMContentLoaded', function () {
     showOnly("screen8");
   });
 
-  /* ========================= Screen 8 (Credit) ========================= */
+  /* ========================= Screen 8 ========================= */
   const s8Next = $("screen8Next");
   document.addEventListener("change", (e) => {
     if (e.target.name === "creditRange") setEnabled(s8Next, true);
@@ -818,9 +843,20 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ========================= Screen 9 ========================= */
   const s9Next = $("screen9Next");
   document.addEventListener("change", (e) => {
-    if (e.target.name === "confirm") setEnabled(s9Next, true);
+    if (e.target.name === "creditCheckerUsed") setEnabled(s9Next, true);
   });
   s9Next.addEventListener("click", () => {
+    const v = valRadio("creditCheckerUsed");
+    if (!creditCheckerOk(v)) return terminate("Thank you. Based on your answers, you are not eligible for this study.");
+    showOnly("screen10");
+  });
+
+  /* ========================= Screen 10 ========================= */
+  const s10Next = $("screen10Next");
+  document.addEventListener("change", (e) => {
+    if (e.target.name === "confirm") setEnabled(s10Next, true);
+  });
+  s10Next.addEventListener("click", () => {
     const c = valRadio("confirm");
     if (c !== "yes") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
     showOnly("surveyAfterScreener");
@@ -841,35 +877,43 @@ document.addEventListener('DOMContentLoaded', function () {
   const targetWebsite = 'https://trkmcl.com/lv87gxq8z3/w40ml11ynm';
   if (openNewTabBtn) openNewTabBtn.href = targetWebsite;
 
-  launchWebsiteBtn.addEventListener('click', () => {
-    instructionsContent.innerHTML = websiteInstructions.innerHTML;
-    websiteIframe.src = targetWebsite;
-    iframeOverlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    instructionsPanel.style.display = 'block';
-    toggleInstructionsBtn.textContent = 'Hide Instructions';
-  });
-
-  closeIframeBtn.addEventListener('click', () => {
-    iframeOverlay.style.display = 'none';
-    websiteIframe.src = '';
-    document.body.style.overflow = '';
-  });
-
-  toggleInstructionsBtn.addEventListener('click', () => {
-    if (instructionsPanel.style.display === 'none') {
+  if (launchWebsiteBtn){
+    launchWebsiteBtn.addEventListener('click', () => {
+      instructionsContent.innerHTML = websiteInstructions.innerHTML;
+      websiteIframe.src = targetWebsite;
+      iframeOverlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
       instructionsPanel.style.display = 'block';
       toggleInstructionsBtn.textContent = 'Hide Instructions';
-    } else {
+    });
+  }
+
+  if (closeIframeBtn){
+    closeIframeBtn.addEventListener('click', () => {
+      iframeOverlay.style.display = 'none';
+      websiteIframe.src = '';
+      document.body.style.overflow = '';
+    });
+  }
+
+  if (toggleInstructionsBtn){
+    toggleInstructionsBtn.addEventListener('click', () => {
+      if (instructionsPanel.style.display === 'none') {
+        instructionsPanel.style.display = 'block';
+        toggleInstructionsBtn.textContent = 'Hide Instructions';
+      } else {
+        instructionsPanel.style.display = 'none';
+        toggleInstructionsBtn.textContent = 'Show Instructions';
+      }
+    });
+  }
+
+  if (hideInstructionsBtn){
+    hideInstructionsBtn.addEventListener('click', () => {
       instructionsPanel.style.display = 'none';
       toggleInstructionsBtn.textContent = 'Show Instructions';
-    }
-  });
-
-  hideInstructionsBtn.addEventListener('click', () => {
-    instructionsPanel.style.display = 'none';
-    toggleInstructionsBtn.textContent = 'Show Instructions';
-  });
+    });
+  }
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && iframeOverlay.style.display === 'flex') {
@@ -923,12 +967,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  abandonSurveyButton.addEventListener('click', () => go(abandonUrl));
-  finishSurveyButton.addEventListener('click', () => { if (!finishSurveyButton.disabled) go(finishUrl); });
+  if (abandonSurveyButton) abandonSurveyButton.addEventListener('click', () => go(abandonUrl));
+  if (finishSurveyButton) finishSurveyButton.addEventListener('click', () => { if (!finishSurveyButton.disabled) go(finishUrl); });
 
-  imageUpload.addEventListener('change', updateFinishGate);
-  offersCountEl.addEventListener('input', updateFinishGate);
-  commentsEl.addEventListener('input', updateFinishGate);
+  if (imageUpload) imageUpload.addEventListener('change', updateFinishGate);
+  if (offersCountEl) offersCountEl.addEventListener('input', updateFinishGate);
+  if (commentsEl) commentsEl.addEventListener('input', updateFinishGate);
   document.querySelectorAll('input[name="connected"]').forEach(r => r.addEventListener('change', updateFinishGate));
   document.querySelectorAll('input[name="consider"]').forEach(r => r.addEventListener('change', updateFinishGate));
   document.querySelectorAll('input[name="clickedOffer"]').forEach(r => r.addEventListener('change', updateFinishGate));
@@ -942,4 +986,3 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </body>
 </html>
-

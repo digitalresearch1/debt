@@ -9,6 +9,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- OCR (client-side) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
   <style>
     body { font-family: 'Inter', sans-serif; }
     .form-all { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
@@ -78,15 +81,16 @@
       position: absolute;
       top: 20px;
       right: 20px;
-      width: 320px;
+      width: 360px;
       background: rgba(255, 255, 255, 0.95);
-      border-radius: 8px;
-      padding: 20px;
+      border-radius: 10px;
+      padding: 18px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       backdrop-filter: blur(10px);
       z-index: 100;
       max-height: 80vh;
       overflow-y: auto;
+      border: 1px solid rgba(226,232,240,0.9);
     }
     .close-btn {
       background: #ef4444;
@@ -127,6 +131,16 @@
       z-index: 101;
     }
     .toggle-instructions-btn:hover { background: #1d4ed8; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
   </style>
 </head>
 
@@ -140,291 +154,32 @@
         <p id="terminateMsg" class="text-red-700"></p>
       </div>
 
-      <!-- ========================= SCREEN 1: HAS DEBT ========================= -->
-      <div id="screen1" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q1) Do you currently have any personal debt?</h2>
-        <div class="space-y-3 mt-3">
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="hasDebt" value="yes" class="scale-125">
-            <div class="font-medium">Yes</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="hasDebt" value="no" class="scale-125">
-            <div class="font-medium">No</div>
-          </label>
-        </div>
-        <div class="mt-4 text-center">
-          <button id="screen1Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
-        </div>
-      </div>
-
-      <!-- ========================= SCREEN 2: DEBT TYPE (allowed only 3, exclude medical) ========================= -->
-      <div id="screen2" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q2) What is your MAIN type of debt right now? (Choose one)</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtTypeMain" value="credit_cards" class="scale-125">
-            <div class="font-medium">Credit card debt</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtTypeMain" value="unsecured_personal_loans" class="scale-125">
-            <div class="font-medium">Unsecured personal loan</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtTypeMain" value="private_student_loans" class="scale-125">
-            <div class="font-medium">Private student loan</div>
-          </label>
-
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtTypeMain" value="medical" class="scale-125">
-            <div class="font-medium">Medical bills</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtTypeMain" value="auto_loan" class="scale-125">
-            <div class="font-medium">Auto loan / car payment</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtTypeMain" value="mortgage" class="scale-125">
-            <div class="font-medium">Mortgage / home loan</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtTypeMain" value="payday" class="scale-125">
-            <div class="font-medium">Payday loan / cash advance</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtTypeMain" value="collections" class="scale-125">
-            <div class="font-medium">Collections</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtTypeMain" value="federal_student" class="scale-125">
-            <div class="font-medium">Federal student loans</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtTypeMain" value="taxes_gov" class="scale-125">
-            <div class="font-medium">Taxes / government debt</div>
-          </label>
-          <label class="radio-card flex items-center gap-3 md:col-span-2">
-            <input type="radio" name="debtTypeMain" value="other" class="scale-125">
-            <div class="font-medium">Other / not listed</div>
-          </label>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen2Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
-        </div>
-      </div>
-
-      <!-- ========================= SCREEN 3: DEBT AMOUNT (must be >=15000) ========================= -->
-      <div id="screen3" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q3) About how much total personal debt do you currently have? (Not including mortgage)</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtAmt" value="under10" class="scale-125">
-            <div class="font-medium">Under $10,000</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtAmt" value="10_14999" class="scale-125">
-            <div class="font-medium">$10,000–$14,999</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtAmt" value="15_24999" class="scale-125">
-            <div class="font-medium">$15,000–$24,999</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="debtAmt" value="25_49999" class="scale-125">
-            <div class="font-medium">$25,000–$49,999</div>
-          </label>
-          <label class="radio-card flex items-center gap-3 md:col-span-2">
-            <input type="radio" name="debtAmt" value="50plus" class="scale-125">
-            <div class="font-medium">$50,000+</div>
-          </label>
-          <label class="radio-card flex items-center gap-3 md:col-span-2">
-            <input type="radio" name="debtAmt" value="not_sure" class="scale-125">
-            <div class="font-medium">Not sure</div>
-          </label>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen3Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
-        </div>
-      </div>
-
-      <!-- ========================= SCREEN 4: INCOME (must be >=50000) ========================= -->
-      <div id="screen4" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q4) What is your approximate annual household income (before taxes)?</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="incomeRange" value="under30" class="scale-125">
-            <div class="font-medium">Under $30,000</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="incomeRange" value="30_49999" class="scale-125">
-            <div class="font-medium">$30,000–$49,999</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="incomeRange" value="50_74999" class="scale-125">
-            <div class="font-medium">$50,000–$74,999</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="incomeRange" value="75_99999" class="scale-125">
-            <div class="font-medium">$75,000–$99,999</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="incomeRange" value="100plus" class="scale-125">
-            <div class="font-medium">$100,000+</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="incomeRange" value="prefer_not" class="scale-125">
-            <div class="font-medium">Prefer not to say</div>
-          </label>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen4Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
-        </div>
-      </div>
-
-      <!-- ========================= SCREEN 5: ENROLLED (must be NO) ========================= -->
-      <div id="screen5" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q5) Are you currently enrolled in any debt relief / debt settlement / debt management program?</h2>
-
-        <div class="space-y-3 mt-3">
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="enrolled" value="no" class="scale-125">
-            <div class="font-medium">No</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="enrolled" value="yes" class="scale-125">
-            <div class="font-medium">Yes</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="enrolled" value="not_sure" class="scale-125">
-            <div class="font-medium">Not sure</div>
-          </label>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen5Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
-        </div>
-      </div>
-
-      <!-- ========================= SCREEN 6: DIFFICULTY (must be YES) ========================= -->
-      <div id="screen6" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q6) Are you currently having difficulty keeping up with your debt payments (or falling behind)?</h2>
-
-        <div class="space-y-3 mt-3">
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="difficulty" value="yes" class="scale-125">
-            <div class="font-medium">Yes</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="difficulty" value="no" class="scale-125">
-            <div class="font-medium">No</div>
-          </label>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen6Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
-        </div>
-      </div>
-
-      <!-- ========================= SCREEN 7: MONTHLY (must be YES) ========================= -->
-      <div id="screen7" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q7) If matched with a debt relief program  that can help reduce your debt but requires a monthly payment, would you be able and willing to make a monthly payment?</h2>
-
-        <div class="space-y-3 mt-3">
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="monthly" value="yes" class="scale-125">
-            <div class="font-medium">Yes</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="monthly" value="no" class="scale-125">
-            <div class="font-medium">No</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="monthly" value="not_sure" class="scale-125">
-            <div class="font-medium">Not sure</div>
-          </label>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen7Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
-        </div>
-      </div>
-
-      <!-- ========================= SCREEN 8: GOAL (must be reduce/resolve) ========================= -->
-      <div id="screen8" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q8) What are you looking for right now? (Choose one)</h2>
-
-        <div class="space-y-3 mt-3">
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="goal" value="reduce" class="scale-125">
-            <div class="font-medium">Reduce or resolve existing debt</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="goal" value="loan" class="scale-125">
-            <div class="font-medium">A consolidation loan / new loan</div>
-          </label>
-          <label class="radio-card flex items-center gap-3">
-            <input type="radio" name="goal" value="browsing" class="scale-125">
-            <div class="font-medium">Just browsing / research only</div>
-          </label>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen8Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
-        </div>
-      </div>
-
-      <!-- ========================= SCREEN 9: CONFIRM (must be YES) ========================= -->
-      <div id="screen9" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q9) Confirmation</h2>
-        <div class="bg-white border rounded-xl p-4 mt-3">
-          <div class="font-semibold text-gray-800">
-            Please confirm: You have <b>$15,000+</b> in eligible debt and <b>$50,000+</b> household income, and you are <b>not currently enrolled</b> in a debt program.
-          </div>
-
-          <div class="space-y-3 mt-4">
-            <label class="radio-card flex items-center gap-3">
-              <input type="radio" name="confirm" value="yes" class="scale-125">
-              <div class="font-medium">Yes</div>
-            </label>
-            <label class="radio-card flex items-center gap-3">
-              <input type="radio" name="confirm" value="no" class="scale-125">
-              <div class="font-medium">No</div>
-            </label>
-          </div>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button id="screen9Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>
-            Continue to Survey
-          </button>
-        </div>
-      </div>
-
-      <!-- ========================= MAIN SURVEY ========================= -->
-      <div id="surveyAfterScreener" style="display:none;">
+      <!-- ========================= SINGLE PAGE ========================= -->
+      <div id="surveyPage">
 
         <div class="form-header-group header-large mb-8 p-6 rounded-xl text-white text-center">
           <h1 class="text-2xl md:text-3xl font-bold">Debt Offer Match Feedback Survey</h1>
           <p class="mt-2 text-base md:text-lg">Help us understand how clear and useful a debt-offer matching experience is.</p>
         </div>
 
+        <!-- Who can participate -->
         <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-6">
           <h2 class="text-xl font-semibold text-gray-800 mb-3">Who Can Participate?</h2>
-          <p class="text-gray-700 mb-4">Please proceed if the following is true for you:</p>
+          <p class="text-gray-700 mb-4">Please proceed only if the following is true for you:</p>
           <ul class="qualification-list list-none space-y-2">
             <li>You currently have <strong>unsecured debt</strong> (credit card debt, unsecured personal loans, or private student loans).</li>
-            <li>You are willing to complete a short debt-relief questionnaire on your <strong>device</strong>.</li>
+            <li>You have <strong>$15,000+</strong> in eligible debt.</li>
+            <li>You have <strong>$30,000+</strong> household income.</li>
+            <li>You are <strong>not currently enrolled</strong> in a debt relief / debt settlement / debt management program.</li>
+            <li>You are willing to complete a short questionnaire on your <strong>device</strong>.</li>
             <li>You can take and upload a <strong>screenshot of the results page</strong> showing your matched offers.</li>
           </ul>
-          <p class="text-xs text-gray-600 mt-2">Note: Some participants may not qualify to continue based on their answers.</p>
+          <p class="text-xs text-gray-600 mt-2">
+            If you do not want to continue, you can click <b>Abandon Survey</b> at any time.
+          </p>
         </div>
 
+        <!-- How to participate -->
         <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
           <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
           <ol class="list-decimal list-inside text-gray-700 space-y-2">
@@ -432,22 +187,29 @@
             <li><strong>Move the debt amount slider</strong> to select your total debt amount.</li>
             <li>Select your <strong>debt type</strong> and your <strong>income bracket</strong> using your real situation.</li>
             <li><strong>Complete the form</strong> and submit until you reach the offers/results page.</li>
-            <li>On the results page, <strong>click at least one offer</strong> to view details (enrollment/calling is <strong>optional</strong>).</li>
+            <li>On the results page, <strong>click at least one offer</strong> to view details (<strong>no obligation to sign up</strong>).</li>
             <li><strong>Take a screenshot</strong> of the results/offers page.</li>
             <li><strong>Close the overlay and return to this survey</strong> to upload your screenshot and answer quick feedback questions.</li>
           </ol>
         </div>
 
+        <!-- Important box (Option A) -->
         <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
-          <h3 class="text-lg font-semibold text-amber-900">Important</h3>
-          <p class="text-gray-700 mt-2">
-            The website you will use is a real third-party service that may match people with potential debt-help offers.
-            We are not the website and we are not the debt companies shown.
-          </p>
+          <h3 class="text-lg font-semibold text-amber-900">Use Real Information</h3>
+          <div class="text-gray-700 mt-2 space-y-2">
+            <p>
+              Please enter your real first name, last name, and current address so the website can verify your identity and display results.
+              This verification is a <b>soft check</b> and <b>does not affect your credit score</b>.
+            </p>
+            <p>
+              <b>No SSN is requested.</b> However, the form may not submit or you may not see results if your identity/credit information cannot be verified.
+            </p>
+
+          </div>
         </div>
 
-        <!-- STEP 1 -->
-        <div class="mt-8">
+        <!-- Step 1 -->
+        <div class="mt-6">
           <h2 class="text-2xl font-bold text-center text-gray-800">
             Step 1: Launch the website and complete the form to view your matched offers
           </h2>
@@ -462,18 +224,33 @@
 
           <div class="mt-4 p-4 bg-white border border-gray-200 rounded-lg">
             <button id="launchWebsiteBtn"
-              class="action-btn w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-center">
+              class="action-btn w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-center"
+              type="button">
               Launch Website
             </button>
 
+            <button id="abandonSurveyButtonTop"
+                    class="action-btn w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-center mt-3 md:mt-0 md:ml-3"
+                    type="button">
+              Abandon Survey
+            </button>
+
+            <!-- Overlay instructions template (hidden) -->
             <div id="websiteInstructions" style="display:none;">
               <div class="font-semibold text-indigo-900 mb-2">Steps to Follow:</div>
 
-              <div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-gray-700">
-                <b>Important: Please use real, accurate information</b><br>
-                We run a <b>soft check; it will not affect your credit score.</b><br>
-                No SSN is required. The check may use details like your <b>full name</b>, <b>address</b>, <b>phone number</b>, and <b>email</b>.
-                Incorrect information may lead to inaccurate results.
+              <!-- ✅ Use Real Information block inside overlay too -->
+              <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg mt-3 text-sm">
+                <h3 class="text-lg font-semibold text-amber-900">Use Real Information</h3>
+                <div class="text-gray-700 mt-2 space-y-2">
+                  <p>
+                    Please enter your real first name, last name, and current address so the website can verify your identity and display results.
+                    This verification is a <b>soft check</b> and <b>does not affect your credit score</b>.
+                  </p>
+                  <p>
+                    <b>No SSN is requested.</b> However, the form may not submit or you may not see results if your identity/credit information cannot be verified.
+                  </p>
+                </div>
               </div>
 
               <ol class="mt-3 list-decimal list-inside text-sm text-gray-700 space-y-1">
@@ -482,19 +259,19 @@
                 <li><b>Select your income bracket</b> (choose the best match).</li>
                 <li><b>Complete your personal information</b> and <b>submit</b> the form.</li>
                 <li><b>Take a screenshot</b> of the results/offers page.</li>
-                <li>On the results page, <b>click at least one offer</b> to view details.</li>
-                <li>If you want to <b>enroll or call</b> any program shown, you may do so — <b>it's optional</b>.</li>
+                <li>On the results page, <b>click at least one offer</b> to view details (<b>no obligation to sign up</b>).</li>
                 <li><b>Close this overlay</b> when done and return to the survey.</li>
               </ol>
             </div>
           </div>
         </div>
 
-        <!-- STEP 2: Upload screenshot (NO OCR) -->
+        <!-- Step 2 -->
         <div class="p-4 bg-orange-50 border border-orange-200 rounded-lg mt-8">
-          <h3 class="text-lg font-semibold text-orange-800">Step 2: Upload Your Results Screenshot</h3>
+          <h3 class="text-lg font-semibold text-orange-800">Step 2: Upload Your Results Screenshot (OCR Verified)</h3>
           <p class="text-gray-700 mt-2">
-            Upload a screenshot of what you saw after submitting the form (the offers/results page).
+            Upload a screenshot of the offers/results page, then click <b>Verify Screenshot</b>.
+            We use OCR (text detection) to confirm it looks like an offers/results page.
           </p>
 
           <div class="mt-4">
@@ -502,17 +279,30 @@
               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"/>
           </div>
 
+          <div class="mt-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+            <button id="btnRunOCR"
+              class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg disabled-btn"
+              type="button" disabled>
+              Verify Screenshot (OCR)
+            </button>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="ocrStatusPill" class="pill bg-slate-100 text-slate-700 border border-slate-200">OCR: not started</span>
+              <span id="ocrProgressPill" class="pill bg-slate-100 text-slate-700 border border-slate-200" style="display:none;">0%</span>
+            </div>
+          </div>
+
           <div id="uploadHint" class="mt-3 text-sm text-slate-700 hidden"></div>
         </div>
 
-        <!-- STEP 3: Feedback -->
+        <!-- Step 3 -->
         <div id="feedbackBlock" class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg mt-8">
           <h3 class="text-lg font-semibold text-emerald-900">Step 3: Quick Feedback</h3>
 
           <div class="mt-4 grid gap-4">
             <div class="bg-white border border-emerald-100 rounded-lg p-4">
               <div class="font-semibold text-gray-800">Did you click at least one offer to view details?</div>
-              <p class="text-xs text-gray-600 mt-1">Please click at least one offer to view details.</p>
+              <p class="text-xs text-gray-600 mt-1">There is <b>no obligation</b> to sign up.</p>
               <div class="mt-3 space-y-2 text-gray-700">
                 <label class="flex items-center gap-2">
                   <input type="radio" name="clickedOffer" value="yes"> Yes (I clicked at least one offer)
@@ -556,14 +346,14 @@
           </div>
 
           <div class="mt-4 text-xs text-emerald-900">
-            ✅ To finish, you must upload a screenshot and answer the required questions.
+            ✅ To finish, you must upload a screenshot, click <b>Verify Screenshot</b> (OCR), and answer the required questions.
           </div>
         </div>
 
         <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mt-8">
           <h3 class="text-lg font-semibold text-yellow-800">❗ Important</h3>
           <p class="text-gray-700 mt-2">
-            To finish, you must upload a results screenshot and complete the short feedback questions.
+            The <b>Finish Survey</b> button will remain locked until your screenshot is verified using OCR.
           </p>
         </div>
 
@@ -581,18 +371,18 @@
           </button>
         </div>
 
-      </div><!-- /surveyAfterScreener -->
+      </div><!-- /surveyPage -->
 
     </div>
   </div>
 
-  <!-- Iframe Overlay -->
+  <!-- ========================= IFRAME OVERLAY ========================= -->
   <div id="iframeOverlay" class="iframe-overlay" style="display:none;">
     <div class="iframe-container">
       <div class="iframe-header">
         <div class="font-semibold text-lg">Debt Matching Website</div>
         <div class="flex items-center gap-2">
-          <a id="openNewTabBtn" href="#" target="_blank" rel="noopener" class="open-tab-btn">Open in new tab</a>
+          <a id="openNewTabOverlayBtn" href="#" target="_blank" rel="noopener" class="open-tab-btn">Open in new tab</a>
           <button id="closeIframeBtn" class="close-btn">Close & Return</button>
         </div>
       </div>
@@ -611,17 +401,13 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  /* ========================= Redirect helper ========================= */
   function go(url){
     try {
       if (window.top && window.top !== window.self) window.top.location.href = url;
       else window.location.href = url;
-    } catch (e) {
-      window.location.href = url;
-    }
+    } catch (e) { window.location.href = url; }
   }
 
-  /* ========================= transaction_id persistence ========================= */
   const urlParams = new URLSearchParams(window.location.search);
   const incomingTid = urlParams.get('transaction_id') || urlParams.get('RID');
   const TID_KEY = 'ps_transaction_id_v1';
@@ -635,206 +421,87 @@ document.addEventListener('DOMContentLoaded', function () {
   const abandonUrl = `https://spectrumsurveys.com/surveydone?st=18&transaction_id=${encodeURIComponent(transactionId)}`;
   const finishUrl  = `https://spectrumsurveys.com/surveydone?st=21&transaction_id=${encodeURIComponent(transactionId)}`;
 
-  /* ========================= Helpers ========================= */
   function $(id){ return document.getElementById(id); }
-  function valRadio(name){
-    return document.querySelector(`input[name="${name}"]:checked`)?.value || null;
-  }
-  function setEnabled(btn, ok){
-    btn.disabled = !ok;
-    btn.classList.toggle("disabled-btn", !ok);
-  }
-  function showOnly(id){
-    const ids = ["terminate","screen1","screen2","screen3","screen4","screen5","screen6","screen7","screen8","screen9","surveyAfterScreener"];
-    ids.forEach(x => { const el = $(x); if (el) el.style.display = (x === id ? "block" : "none"); });
-    window.scrollTo(0,0);
-  }
 
-  function terminate(msg){
-    // Close overlay if open
-    try {
-      const overlay = document.getElementById('iframeOverlay');
-      const iframe = document.getElementById('websiteIframe');
-      if (overlay && overlay.style.display === 'flex') {
-        overlay.style.display = 'none';
-        if (iframe) iframe.src = '';
-        document.body.style.overflow = '';
-      }
-    } catch(e) {}
+  const abandonSurveyButton = $("abandonSurveyButton");
+  const abandonSurveyButtonTop = $("abandonSurveyButtonTop");
+  const finishSurveyButton = $("finishSurveyButton");
 
-    $("terminateMsg").innerHTML =
-      (msg || "Thank you.") +
-      `<div class="mt-3 text-sm">
-         If you are not redirected automatically,
-         <a href="${abandonUrl}" class="text-blue-700 underline font-semibold">click here</a>.
-       </div>`;
-    showOnly("terminate");
-    setTimeout(() => go(abandonUrl), 700);
-  }
-
-  /* ========================= Screener rules ========================= */
-  const allowedDebtTypes = new Set(["credit_cards","unsecured_personal_loans","private_student_loans"]);
-  function debtAmtOk(v){ return (v === "15_24999" || v === "25_49999" || v === "50plus"); }
-  function incomeOk(v){ return (v === "50_74999" || v === "75_99999" || v === "100plus"); }
-
-  /* ========================= Screen 1 ========================= */
-  const s1Next = $("screen1Next");
-  document.addEventListener("change", (e) => {
-    if (e.target.name === "hasDebt") setEnabled(s1Next, true);
-  });
-  s1Next.addEventListener("click", () => {
-    const hasDebt = valRadio("hasDebt");
-    if (hasDebt !== "yes") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
-    showOnly("screen2");
-  });
-
-  /* ========================= Screen 2 ========================= */
-  const s2Next = $("screen2Next");
-  document.addEventListener("change", (e) => {
-    if (e.target.name === "debtTypeMain") setEnabled(s2Next, true);
-  });
-  s2Next.addEventListener("click", () => {
-    const t = valRadio("debtTypeMain");
-    // medical is excluded because only allowed set passes
-    if (!allowedDebtTypes.has(t)) return terminate("Thank you. Based on your answers, you are not eligible for this study.");
-    showOnly("screen3");
-  });
-
-  /* ========================= Screen 3 ========================= */
-  const s3Next = $("screen3Next");
-  document.addEventListener("change", (e) => {
-    if (e.target.name === "debtAmt") setEnabled(s3Next, true);
-  });
-  s3Next.addEventListener("click", () => {
-    const a = valRadio("debtAmt");
-    if (!debtAmtOk(a)) return terminate("Thank you. Based on your answers, you are not eligible for this study.");
-    showOnly("screen4");
-  });
-
-  /* ========================= Screen 4 ========================= */
-  const s4Next = $("screen4Next");
-  document.addEventListener("change", (e) => {
-    if (e.target.name === "incomeRange") setEnabled(s4Next, true);
-  });
-  s4Next.addEventListener("click", () => {
-    const r = valRadio("incomeRange");
-    if (!incomeOk(r)) return terminate("Thank you. Based on your answers, you are not eligible for this study.");
-    showOnly("screen5");
-  });
-
-  /* ========================= Screen 5 ========================= */
-  const s5Next = $("screen5Next");
-  document.addEventListener("change", (e) => {
-    if (e.target.name === "enrolled") setEnabled(s5Next, true);
-  });
-  s5Next.addEventListener("click", () => {
-    const e = valRadio("enrolled");
-    if (e !== "no") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
-    showOnly("screen6");
-  });
-
-  /* ========================= Screen 6 ========================= */
-  const s6Next = $("screen6Next");
-  document.addEventListener("change", (e) => {
-    if (e.target.name === "difficulty") setEnabled(s6Next, true);
-  });
-  s6Next.addEventListener("click", () => {
-    const d = valRadio("difficulty");
-    if (d !== "yes") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
-    showOnly("screen7");
-  });
-
-  /* ========================= Screen 7 ========================= */
-  const s7Next = $("screen7Next");
-  document.addEventListener("change", (e) => {
-    if (e.target.name === "monthly") setEnabled(s7Next, true);
-  });
-  s7Next.addEventListener("click", () => {
-    const m = valRadio("monthly");
-    if (m !== "yes") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
-    showOnly("screen8");
-  });
-
-  /* ========================= Screen 8 ========================= */
-  const s8Next = $("screen8Next");
-  document.addEventListener("change", (e) => {
-    if (e.target.name === "goal") setEnabled(s8Next, true);
-  });
-  s8Next.addEventListener("click", () => {
-    const g = valRadio("goal");
-    if (g !== "reduce") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
-    showOnly("screen9");
-  });
-
-  /* ========================= Screen 9 ========================= */
-  const s9Next = $("screen9Next");
-  document.addEventListener("change", (e) => {
-    if (e.target.name === "confirm") setEnabled(s9Next, true);
-  });
-  s9Next.addEventListener("click", () => {
-    const c = valRadio("confirm");
-    if (c !== "yes") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
-    showOnly("surveyAfterScreener");
-  });
+  abandonSurveyButton?.addEventListener('click', () => go(abandonUrl));
+  abandonSurveyButtonTop?.addEventListener('click', () => go(abandonUrl));
 
   /* ========================= Iframe overlay ========================= */
-  const launchWebsiteBtn = document.getElementById('launchWebsiteBtn');
-  const iframeOverlay = document.getElementById('iframeOverlay');
-  const websiteIframe = document.getElementById('websiteIframe');
-  const closeIframeBtn = document.getElementById('closeIframeBtn');
-  const openNewTabBtn = document.getElementById('openNewTabBtn');
-  const toggleInstructionsBtn = document.getElementById('toggleInstructionsBtn');
-  const instructionsPanel = document.getElementById('instructionsPanel');
-  const instructionsContent = document.getElementById('instructionsContent');
-  const hideInstructionsBtn = document.getElementById('hideInstructionsBtn');
-  const websiteInstructions = document.getElementById('websiteInstructions');
+  const launchWebsiteBtn = $("launchWebsiteBtn");
+  const iframeOverlay = $("iframeOverlay");
+  const websiteIframe = $("websiteIframe");
+  const closeIframeBtn = $("closeIframeBtn");
+  const openNewTabOverlayBtn = $("openNewTabOverlayBtn");
+  const toggleInstructionsBtn = $("toggleInstructionsBtn");
+  const instructionsPanel = $("instructionsPanel");
+  const instructionsContent = $("instructionsContent");
+  const hideInstructionsBtn = $("hideInstructionsBtn");
+  const websiteInstructions = $("websiteInstructions");
 
-  const targetWebsite = 'https://trkmcl.com/lv87gxq8z3/w40ml11ynm';
-  if (openNewTabBtn) openNewTabBtn.href = targetWebsite;
+  // ✅ UPDATED LINK
+  const targetWebsite = "https://trkmcl.com/lv87gxq8z3/p4j7oydq40";
+  if (openNewTabOverlayBtn) openNewTabOverlayBtn.href = targetWebsite;
 
-  launchWebsiteBtn.addEventListener('click', () => {
-    instructionsContent.innerHTML = websiteInstructions.innerHTML;
-    websiteIframe.src = targetWebsite;
-    iframeOverlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    instructionsPanel.style.display = 'block';
-    toggleInstructionsBtn.textContent = 'Hide Instructions';
+  launchWebsiteBtn?.addEventListener("click", () => {
+    if (instructionsContent && websiteInstructions) instructionsContent.innerHTML = websiteInstructions.innerHTML;
+    if (websiteIframe) websiteIframe.src = targetWebsite;
+    if (iframeOverlay) iframeOverlay.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    if (instructionsPanel) instructionsPanel.style.display = "block";
+    if (toggleInstructionsBtn) toggleInstructionsBtn.textContent = "Hide Instructions";
   });
 
-  closeIframeBtn.addEventListener('click', () => {
-    iframeOverlay.style.display = 'none';
-    websiteIframe.src = '';
-    document.body.style.overflow = '';
+  closeIframeBtn?.addEventListener("click", () => {
+    if (iframeOverlay) iframeOverlay.style.display = "none";
+    if (websiteIframe) websiteIframe.src = "";
+    document.body.style.overflow = "";
   });
 
-  toggleInstructionsBtn.addEventListener('click', () => {
-    if (instructionsPanel.style.display === 'none') {
-      instructionsPanel.style.display = 'block';
-      toggleInstructionsBtn.textContent = 'Hide Instructions';
+  toggleInstructionsBtn?.addEventListener("click", () => {
+    if (!instructionsPanel || !toggleInstructionsBtn) return;
+    if (instructionsPanel.style.display === "none") {
+      instructionsPanel.style.display = "block";
+      toggleInstructionsBtn.textContent = "Hide Instructions";
     } else {
-      instructionsPanel.style.display = 'none';
-      toggleInstructionsBtn.textContent = 'Show Instructions';
+      instructionsPanel.style.display = "none";
+      toggleInstructionsBtn.textContent = "Show Instructions";
     }
   });
 
-  hideInstructionsBtn.addEventListener('click', () => {
-    instructionsPanel.style.display = 'none';
-    toggleInstructionsBtn.textContent = 'Show Instructions';
+  hideInstructionsBtn?.addEventListener("click", () => {
+    if (!instructionsPanel || !toggleInstructionsBtn) return;
+    instructionsPanel.style.display = "none";
+    toggleInstructionsBtn.textContent = "Show Instructions";
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && iframeOverlay.style.display === 'flex') {
-      closeIframeBtn.click();
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && iframeOverlay && iframeOverlay.style.display === "flex") {
+      closeIframeBtn?.click();
     }
   });
 
-  /* ========================= Main survey finish gate (NO OCR) ========================= */
-  const abandonSurveyButton = document.getElementById('abandonSurveyButton');
-  const finishSurveyButton = document.getElementById('finishSurveyButton');
-  const imageUpload = document.getElementById('imageUpload');
-  const uploadHint = document.getElementById('uploadHint');
-  const offersCountEl = document.getElementById('offersCount');
-  const commentsEl = document.getElementById('comments');
+  /* ========================= OCR + Finish gate ========================= */
+  const imageUpload = $("imageUpload");
+  const btnRunOCR = $("btnRunOCR");
+  const uploadHint = $("uploadHint");
+
+  const offersCountEl = $("offersCount");
+  const commentsEl = $("comments");
+  const ocrStatusPill = $("ocrStatusPill");
+  const ocrProgressPill = $("ocrProgressPill");
+
+  let ocrPassed = false;
+  let ocrRunning = false;
+
+  function setPill(el, text, cls){
+    if (!el) return;
+    el.className = "pill " + cls;
+    el.textContent = text;
+  }
 
   function setFinishEnabled(enabled){
     finishSurveyButton.disabled = !enabled;
@@ -842,10 +509,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function feedbackIsComplete(){
-    const offersRaw = (offersCountEl.value || '').trim();
+    const offersRaw = (offersCountEl.value || "").trim();
     const offersNum = Number(offersRaw);
     const offersOk =
-      offersRaw !== '' &&
+      offersRaw !== "" &&
       Number.isFinite(offersNum) &&
       Number.isInteger(offersNum) &&
       offersNum >= 0;
@@ -853,41 +520,126 @@ document.addEventListener('DOMContentLoaded', function () {
     const connected = document.querySelector('input[name="connected"]:checked');
     const consider = document.querySelector('input[name="consider"]:checked');
     const clickedOffer = document.querySelector('input[name="clickedOffer"]:checked');
-    const clickedOk = clickedOffer && clickedOffer.value === 'yes';
+    const clickedOk = clickedOffer && clickedOffer.value === "yes";
+
     const hasShot = imageUpload && imageUpload.files && imageUpload.files.length > 0;
 
-    return offersOk && !!connected && !!consider && clickedOk && hasShot;
+    return offersOk && !!connected && !!consider && clickedOk && hasShot && ocrPassed && !ocrRunning;
   }
 
   function updateFinishGate(){
     const ok = feedbackIsComplete();
     setFinishEnabled(ok);
 
-    if (uploadHint) {
-      if (!imageUpload.files || imageUpload.files.length === 0) {
-        uploadHint.textContent = "Please upload your results screenshot to continue.";
-        uploadHint.classList.remove("hidden");
-      } else {
-        uploadHint.classList.add("hidden");
-        uploadHint.textContent = "";
-      }
+    if (!uploadHint) return;
+
+    const hasFile = imageUpload && imageUpload.files && imageUpload.files.length > 0;
+
+    if (!hasFile) {
+      uploadHint.innerHTML = "Please upload your results screenshot to continue.";
+      uploadHint.classList.remove("hidden");
+    } else if (ocrRunning) {
+      uploadHint.innerHTML = "Running OCR verification… please wait.";
+      uploadHint.classList.remove("hidden");
+    } else if (!ocrPassed) {
+      uploadHint.innerHTML = "Please click <b>Verify Screenshot</b>. If it fails, upload a clearer screenshot of the offers/results page and try again.";
+      uploadHint.classList.remove("hidden");
+    } else {
+      uploadHint.classList.add("hidden");
+      uploadHint.textContent = "";
     }
   }
 
-  abandonSurveyButton.addEventListener('click', () => go(abandonUrl));
-  finishSurveyButton.addEventListener('click', () => { if (!finishSurveyButton.disabled) go(finishUrl); });
+  async function runOcrOnFile(file){
+    ocrPassed = false;
+    ocrRunning = true;
 
-  imageUpload.addEventListener('change', updateFinishGate);
-  offersCountEl.addEventListener('input', updateFinishGate);
-  commentsEl.addEventListener('input', updateFinishGate);
-  document.querySelectorAll('input[name="connected"]').forEach(r => r.addEventListener('change', updateFinishGate));
-  document.querySelectorAll('input[name="consider"]').forEach(r => r.addEventListener('change', updateFinishGate));
-  document.querySelectorAll('input[name="clickedOffer"]').forEach(r => r.addEventListener('change', updateFinishGate));
+    setPill(ocrStatusPill, "OCR: running", "bg-blue-100 text-blue-700 border border-blue-200");
+    if (ocrProgressPill) {
+      ocrProgressPill.style.display = "inline-flex";
+      setPill(ocrProgressPill, "0%", "bg-slate-100 text-slate-700 border border-slate-200");
+    }
+    updateFinishGate();
 
+    try {
+      const result = await Tesseract.recognize(file, "eng", {
+        logger: (m) => {
+          if (!ocrProgressPill) return;
+          if (m && m.status === "recognizing text" && typeof m.progress === "number") {
+            const pct = Math.round(m.progress * 100);
+            setPill(ocrProgressPill, `${pct}%`, "bg-slate-100 text-slate-700 border border-slate-200");
+          }
+        }
+      });
+
+      const text = (result?.data?.text || "").toLowerCase();
+
+      const keywords = [
+        "offer","offers","result","results","matched","match","recommended","recommendation",
+        "partner","partners","program","programs","details","view","your match"
+      ];
+      const hit = keywords.some(k => text.includes(k));
+
+      ocrPassed = !!hit;
+      ocrRunning = false;
+
+      if (ocrProgressPill) ocrProgressPill.style.display = "none";
+
+      if (ocrPassed) {
+        setPill(ocrStatusPill, "OCR: verified ✅", "bg-emerald-100 text-emerald-800 border border-emerald-200");
+      } else {
+        setPill(ocrStatusPill, "OCR: not verified ❌", "bg-red-100 text-red-800 border border-red-200");
+      }
+
+      updateFinishGate();
+    } catch (err) {
+      ocrPassed = false;
+      ocrRunning = false;
+      if (ocrProgressPill) ocrProgressPill.style.display = "none";
+      setPill(ocrStatusPill, "OCR: error ❌", "bg-red-100 text-red-800 border border-red-200");
+      updateFinishGate();
+    } finally {
+      if (btnRunOCR) btnRunOCR.disabled = !(imageUpload && imageUpload.files && imageUpload.files[0]);
+    }
+  }
+
+  imageUpload?.addEventListener("change", () => {
+    const file = imageUpload.files && imageUpload.files[0];
+    ocrPassed = false;
+    ocrRunning = false;
+    setPill(ocrStatusPill, "OCR: not started", "bg-slate-100 text-slate-700 border border-slate-200");
+    if (ocrProgressPill) ocrProgressPill.style.display = "none";
+    if (btnRunOCR) btnRunOCR.disabled = !file;
+    updateFinishGate();
+  });
+
+  btnRunOCR?.addEventListener("click", () => {
+    const file = imageUpload && imageUpload.files && imageUpload.files[0];
+    if (!file) return;
+    runOcrOnFile(file);
+  });
+
+  offersCountEl?.addEventListener("input", updateFinishGate);
+  commentsEl?.addEventListener("input", updateFinishGate);
+  document.querySelectorAll('input[name="connected"]').forEach(r => r.addEventListener("change", updateFinishGate));
+  document.querySelectorAll('input[name="consider"]').forEach(r => r.addEventListener("change", updateFinishGate));
+  document.querySelectorAll('input[name="clickedOffer"]').forEach(r => r.addEventListener("change", updateFinishGate));
+
+  if (btnRunOCR) btnRunOCR.disabled = true;
   setFinishEnabled(false);
+  updateFinishGate();
 
-  /* Start */
-  showOnly("screen1");
+  finishSurveyButton?.addEventListener("click", (e) => {
+    if (finishSurveyButton.disabled) {
+      e.preventDefault();
+      if (uploadHint) {
+        uploadHint.classList.remove("hidden");
+        uploadHint.innerHTML = "Finish is locked. Please verify your screenshot (OCR) and complete the required questions.";
+      }
+    } else {
+      go(finishUrl);
+    }
+  });
 });
 </script>
 

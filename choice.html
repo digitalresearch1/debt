@@ -1,827 +1,1412 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home Warranty Savings Check | Example Landing Page</title>
-  <meta name="description" content="Colorful example landing page for a home warranty interest + eligibility check flow." />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choice Home Warranty | America's #1 Home Protection Provider</title>
+  <!-- Font Awesome 6 Pro -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts - Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg1:#0b1020;
-      --bg2:#111a33;
-      --card:#0f1630cc;
-      --white:#ffffff;
-      --muted:#cfe0ffcc;
-      --muted2:#d8e2ff99;
-      --line:#ffffff1a;
-
-      --g1:#7c3aed; /* purple */
-      --g2:#22c55e; /* green */
-      --g3:#06b6d4; /* cyan */
-      --g4:#f59e0b; /* amber */
-      --g5:#ef4444; /* red */
-      --g6:#3b82f6; /* blue */
-
-      --shadow: 0 20px 60px rgba(0,0,0,.45);
-      --shadow2: 0 10px 30px rgba(0,0,0,.35);
-      --radius: 22px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--white);
-      background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,.35), transparent 60%),
-        radial-gradient(1000px 500px at 90% 20%, rgba(6,182,212,.28), transparent 60%),
-        radial-gradient(1000px 500px at 70% 90%, rgba(34,197,94,.22), transparent 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-      overflow-x:hidden;
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0a2540;
+      line-height: 1.6;
+      overflow-x: hidden;
     }
 
-    a{color:inherit}
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:24px 18px 70px;
+    html {
+      scroll-behavior: smooth;
     }
 
-    /* Top bar */
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:14px 16px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border-radius:16px;
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      display: inline-block;
+      background: linear-gradient(135deg, #f7b731 0%, #f39c12 100%);
+      color: #0a2540;
+      font-weight: 700;
+      font-size: 1.25rem;
+      padding: 18px 42px;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 20px 30px -10px rgba(243, 156, 18, 0.3);
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary i {
+      margin-right: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 25px 35px -8px rgba(243, 156, 18, 0.4);
+      background: linear-gradient(135deg, #f8b528 0%, #e68a2e 100%);
+    }
+
+    .btn-primary:hover i {
+      transform: translateX(5px);
+    }
+
+    .btn-secondary {
+      display: inline-block;
+      background: transparent;
+      color: #0a2540;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 15px 35px;
+      border-radius: 50px;
+      text-decoration: none;
+      border: 2px solid #0a2540;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #0a2540;
+      color: white;
+    }
+
+    /* Navigation */
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
-      box-shadow: var(--shadow2);
-      position:sticky;
-      top:12px;
-      z-index:50;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      padding: 16px 0;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:220px;
-    }
-    .logo{
-      width:40px;height:40px;border-radius:14px;
-      background:
-        conic-gradient(from 240deg, var(--g2), var(--g3), var(--g6), var(--g1), var(--g4), var(--g2));
-      box-shadow: 0 10px 20px rgba(0,0,0,.35);
-      position:relative;
-    }
-    .logo:after{
-      content:"";
-      position:absolute; inset:9px;
-      border-radius:10px;
-      background:rgba(10,16,32,.6);
-      border:1px solid rgba(255,255,255,.18);
-    }
-    .brand h1{
-      font-size:14px;
-      margin:0;
-      letter-spacing:.2px;
-      line-height:1.15;
-    }
-    .brand p{
-      margin:0;
-      font-size:12px;
-      color:var(--muted2);
-      line-height:1.2;
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .badgeRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .badge{
-      font-size:12px;
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(255,255,255,.06);
-      display:flex;
-      align-items:center;
-      gap:8px;
-      white-space:nowrap;
-    }
-    .dot{
-      width:9px;height:9px;border-radius:999px;
-      background: var(--g2);
-      box-shadow: 0 0 0 6px rgba(34,197,94,.12);
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    /* Hero */
-    .hero{
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:20px;
-      margin-top:18px;
-      align-items:stretch;
-    }
-    @media (max-width: 920px){
-      .hero{grid-template-columns:1fr}
-      .brand{min-width:auto}
-      .badgeRow{justify-content:flex-start}
-      .topbar{position:relative; top:0}
+    .logo i {
+      font-size: 2rem;
+      color: #f39c12;
     }
 
-    .heroLeft, .heroRight{
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
-      box-shadow: var(--shadow);
+    .logo span {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0a2540;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #0a2540;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: #f39c12;
+    }
+
+    .nav-cta {
+      background: #f39c12;
+      color: #0a2540 !important;
+      padding: 10px 25px;
+      border-radius: 50px;
+      font-weight: 700 !important;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(145deg, #0a2540 0%, #1a3b5c 100%);
+      color: white;
+      padding: 80px 0 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path d="M20 20 L80 20 L80 80 L20 80 Z" fill="none" stroke="white" stroke-width="2"/><circle cx="50" cy="50" r="15" fill="none" stroke="white" stroke-width="2"/></svg>') repeat;
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-badge {
+      background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
-      overflow:hidden;
-      position:relative;
-    }
-    .heroLeft{
-      padding:26px 26px 22px;
-    }
-    .heroLeft:before{
-      content:"";
-      position:absolute;
-      width:640px;height:640px;
-      left:-260px; top:-360px;
-      background:radial-gradient(circle, rgba(124,58,237,.28), transparent 60%);
-      transform: rotate(10deg);
-      pointer-events:none;
-    }
-    .heroLeft:after{
-      content:"";
-      position:absolute;
-      width:520px;height:520px;
-      right:-280px; bottom:-320px;
-      background:radial-gradient(circle, rgba(6,182,212,.22), transparent 55%);
-      pointer-events:none;
+      display: inline-block;
+      padding: 10px 25px;
+      border-radius: 50px;
+      font-weight: 600;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .kicker{
-      display:inline-flex;
-      gap:10px;
-      align-items:center;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(255,255,255,.06);
-      font-size:12px;
-      color:var(--muted);
-      position:relative;
-      z-index:2;
-    }
-    .spark{
-      width:10px;height:10px;border-radius:3px;
-      background: linear-gradient(135deg, var(--g4), var(--g5));
-      box-shadow: 0 0 0 6px rgba(245,158,11,.10);
-    }
-    .headline{
-      font-size:42px;
-      line-height:1.05;
-      margin:14px 0 10px;
-      letter-spacing:-.8px;
-      position:relative;
-      z-index:2;
-    }
-    @media (max-width: 520px){
-      .headline{font-size:34px}
-    }
-    .subhead{
-      font-size:15px;
-      color:var(--muted);
-      line-height:1.6;
-      margin:0 0 18px;
-      position:relative;
-      z-index:2;
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 25px;
+      line-height: 1.2;
     }
 
-    .featureGrid{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap:12px;
-      position:relative;
-      z-index:2;
-    }
-    @media (max-width: 720px){
-      .featureGrid{grid-template-columns:1fr}
-    }
-    .pill{
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      border-radius:18px;
-      padding:14px 14px;
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-    }
-    .icon{
-      width:38px;height:38px;border-radius:14px;
-      background:linear-gradient(135deg, rgba(59,130,246,.9), rgba(124,58,237,.85));
-      box-shadow: 0 10px 18px rgba(0,0,0,.25);
-      flex:0 0 auto;
-      display:grid;place-items:center;
-      border:1px solid rgba(255,255,255,.16);
-    }
-    .icon svg{width:20px;height:20px}
-    .pill h3{
-      margin:0;
-      font-size:14px;
-      letter-spacing:.1px;
-    }
-    .pill p{
-      margin:4px 0 0;
-      font-size:12.5px;
-      color:var(--muted2);
-      line-height:1.45;
+    .hero h1 span {
+      color: #f39c12;
+      display: block;
+      font-size: 4rem;
     }
 
-    /* Right card: form */
-    .heroRight{
-      padding:20px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
+    .hero-features {
+      margin: 30px 0 40px;
     }
 
-    .cardHeader{
-      padding:16px 16px 14px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.14);
-      background:
-        radial-gradient(600px 200px at 30% 0%, rgba(34,197,94,.22), transparent 55%),
-        radial-gradient(600px 240px at 100% 30%, rgba(245,158,11,.18), transparent 55%),
-        rgba(255,255,255,.05);
-    }
-    .cardHeader h2{
-      margin:0;
-      font-size:18px;
-      letter-spacing:-.2px;
-    }
-    .cardHeader p{
-      margin:6px 0 0;
-      font-size:13px;
-      color:var(--muted);
-      line-height:1.45;
+    .hero-feature {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
     }
 
-    form{
-      padding:14px;
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:18px;
-      background:rgba(255,255,255,.04);
-      display:grid;
-      gap:12px;
-    }
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-    @media (max-width: 520px){
-      .row{grid-template-columns:1fr}
-    }
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin:0 0 6px;
-    }
-    input, select{
-      width:100%;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(10,16,32,.55);
-      color:var(--white);
-      outline:none;
-    }
-    input::placeholder{color:rgba(220,231,255,.55)}
-    input:focus, select:focus{
-      border-color: rgba(6,182,212,.55);
-      box-shadow: 0 0 0 4px rgba(6,182,212,.12);
+    .hero-feature i {
+      color: #f39c12;
+      font-size: 1.5rem;
     }
 
-    .cta{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:center;
-      padding:13px 14px;
-      border-radius:16px;
-      border:0;
-      cursor:pointer;
-      font-weight:700;
-      color:#06101f;
-      background: linear-gradient(135deg, #22c55e, #06b6d4, #3b82f6);
-      box-shadow: 0 16px 30px rgba(0,0,0,.35);
-      transition: transform .12s ease, filter .12s ease;
-    }
-    .cta:hover{transform: translateY(-1px); filter:saturate(1.1)}
-    .cta:active{transform: translateY(1px)}
-    .cta small{
-      font-weight:600;
-      opacity:.85;
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 40px;
     }
 
-    .micro{
-      font-size:11.5px;
-      color:rgba(220,231,255,.72);
-      line-height:1.45;
-    }
-    .micro a{
-      color:rgba(220,231,255,.92);
-      text-decoration:underline;
-      text-underline-offset:2px;
+    .hero-stat {
+      text-align: center;
     }
 
-    /* Sections */
-    .section{
-      margin-top:20px;
-      padding:22px;
-      border-radius: var(--radius);
-      border:1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      box-shadow: var(--shadow2);
+    .hero-stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #f39c12;
+    }
+
+    .hero-stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .hero-image {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 30px;
+      padding: 30px;
       backdrop-filter: blur(10px);
-    }
-    .section h2{
-      margin:0 0 10px;
-      font-size:20px;
-      letter-spacing:-.2px;
-    }
-    .section p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.65;
-      font-size:14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .cards{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap:12px;
+    .offer-badge {
+      display: inline-block;
+      background: #f39c12;
+      color: #0a2540;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-weight: 700;
+      margin-bottom: 20px;
     }
-    @media (max-width: 860px){
-      .cards{grid-template-columns:1fr}
+
+    /* Trust Bar */
+    .trust-bar {
+      background: white;
+      padding: 40px 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     }
-    .miniCard{
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:18px;
-      background: rgba(255,255,255,.04);
-      padding:16px;
-      position:relative;
-      overflow:hidden;
+
+    .trust-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 30px;
     }
-    .miniCard:before{
-      content:"";
-      position:absolute;
-      width:280px;height:280px;
-      right:-120px; top:-160px;
-      background: radial-gradient(circle, rgba(124,58,237,.18), transparent 60%);
-      pointer-events:none;
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
-    .miniCard h3{
-      margin:0 0 6px;
-      font-size:15px;
-      position:relative;
-      z-index:1;
+
+    .trust-item i {
+      font-size: 2.5rem;
+      color: #f39c12;
     }
-    .miniCard p{
-      margin:0;
-      font-size:13px;
-      color:var(--muted2);
-      line-height:1.55;
-      position:relative;
-      z-index:1;
+
+    .trust-item h4 {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+
+    .trust-item p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    /* Section Headers */
+    .section-header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 60px;
+    }
+
+    .section-header h2 {
+      font-size: 2.8rem;
+      color: #0a2540;
+      margin-bottom: 20px;
+    }
+
+    .section-header p {
+      font-size: 1.2rem;
+      color: #5a6b7c;
+    }
+
+    .section-header .highlight {
+      color: #f39c12;
+      font-weight: 700;
+      position: relative;
+    }
+
+    .section-header .highlight::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #f39c12;
+      border-radius: 3px;
+    }
+
+    /* What is a Home Warranty */
+    .what-is-section {
+      padding: 80px 0;
+      background: white;
+    }
+
+    .what-is-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .what-is-content h3 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #0a2540;
+    }
+
+    .what-is-content p {
+      color: #5a6b7c;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+    }
+
+    .what-is-list {
+      list-style: none;
+      margin: 30px 0;
+    }
+
+    .what-is-list li {
+      padding: 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 1px solid #eef2f6;
+    }
+
+    .what-is-list li i {
+      color: #f39c12;
+      font-size: 1.3rem;
+    }
+
+    .what-is-image {
+      background: linear-gradient(145deg, #f8fafc 0%, #e9f0f7 100%);
+      border-radius: 30px;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .what-is-image i {
+      font-size: 8rem;
+      color: #f39c12;
+      margin-bottom: 20px;
+    }
+
+    .coverage-circle {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .coverage-circle span {
+      background: white;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Coverage Categories */
+    .coverage-section {
+      padding: 80px 0;
+      background: #f8fafc;
+    }
+
+    .coverage-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px;
+    }
+
+    .coverage-item {
+      background: white;
+      padding: 35px 25px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+      transition: all 0.3s ease;
+    }
+
+    .coverage-item:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #f39c12;
+    }
+
+    .coverage-item i {
+      font-size: 3rem;
+      color: #f39c12;
+      margin-bottom: 20px;
+    }
+
+    .coverage-item h4 {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+    }
+
+    .coverage-item p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    /* Benefits Section */
+    .benefits-section {
+      padding: 80px 0;
+      background: white;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .benefit-card {
+      background: #f8fafc;
+      padding: 40px 30px;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .benefit-card:hover {
+      transform: translateY(-10px);
+      background: #0a2540;
+      color: white;
+    }
+
+    .benefit-card:hover .benefit-icon {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .benefit-card:hover p {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .benefit-icon {
+      width: 80px;
+      height: 80px;
+      background: #fef5e7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 25px;
+      transition: all 0.3s ease;
+    }
+
+    .benefit-icon i {
+      font-size: 2.5rem;
+      color: #f39c12;
+    }
+
+    .benefit-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+    }
+
+    .benefit-card p {
+      color: #666;
+      transition: color 0.3s ease;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      padding: 60px 0;
+      background: linear-gradient(145deg, #0a2540 0%, #1a3b5c 100%);
+      color: white;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 30px;
+      text-align: center;
+    }
+
+    .stat-card {
+      padding: 30px;
+    }
+
+    .stat-card i {
+      font-size: 3rem;
+      color: #f39c12;
+      margin-bottom: 20px;
+    }
+
+    .stat-card .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .stat-card .stat-label {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    /* How It Works */
+    .how-it-works {
+      padding: 80px 0;
+      background: white;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+      margin-top: 50px;
+    }
+
+    .step-card {
+      text-align: center;
+      position: relative;
+      padding: 0 20px;
+    }
+
+    .step-number {
+      width: 70px;
+      height: 70px;
+      background: #f39c12;
+      color: #0a2540;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 0 auto 25px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .step-card::after {
+      content: '';
+      position: absolute;
+      top: 35px;
+      left: 60%;
+      width: 80%;
+      height: 2px;
+      background: linear-gradient(90deg, #f39c12, transparent);
+      z-index: 1;
+    }
+
+    .step-card:last-child::after {
+      display: none;
+    }
+
+    .step-card h4 {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+    }
+
+    .step-card p {
+      color: #666;
+    }
+
+    /* Testimonials */
+    .testimonials-section {
+      padding: 80px 0;
+      background: #f8fafc;
+    }
+
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .testimonial-card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .testimonial-stars {
+      color: #f39c12;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .testimonial-text {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      color: #0a2540;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .author-avatar {
+      width: 50px;
+      height: 50px;
+      background: #f39c12;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #0a2540;
+    }
+
+    .author-info h4 {
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+
+    .author-info p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      padding: 80px 0;
+      background: white;
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
+
+    .faq-item {
+      padding: 30px;
+      background: #f8fafc;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .faq-item:hover {
+      transform: translateX(10px);
+      background: #fef5e7;
+    }
+
+    .faq-item h4 {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .faq-item h4 i {
+      color: #f39c12;
+    }
+
+    .faq-item p {
+      color: #666;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      padding: 100px 0;
+      background: linear-gradient(135deg, #f39c12 0%, #f7b731 100%);
+      text-align: center;
+    }
+
+    .cta-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .cta-content h2 {
+      font-size: 3.5rem;
+      color: #0a2540;
+      margin-bottom: 20px;
+    }
+
+    .cta-content p {
+      font-size: 1.3rem;
+      color: #0a2540;
+      opacity: 0.9;
+      margin-bottom: 40px;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: #0a2540;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding: 22px 60px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 3px solid #0a2540;
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.3);
+    }
+
+    .cta-button:hover {
+      background: transparent;
+      color: #0a2540;
+      transform: translateY(-3px);
+    }
+
+    .cta-button i {
+      margin-right: 10px;
+    }
+
+    .cta-phone {
+      margin-top: 30px;
+      font-size: 1.3rem;
+      color: #0a2540;
+      font-weight: 600;
+    }
+
+    .cta-phone i {
+      margin-right: 10px;
     }
 
     /* Footer */
-    footer{
-      margin-top:18px;
-      color:rgba(220,231,255,.65);
-      font-size:12px;
-      line-height:1.6;
-      padding:18px 6px 0;
-      text-align:center;
+    .footer {
+      background: #0a2540;
+      color: white;
+      padding: 60px 0 30px;
     }
 
-    .divider{
-      height:1px;
-      background:rgba(255,255,255,.12);
-      margin:14px 0;
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 50px;
     }
 
-    /* Modal */
-    .modalBackdrop{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,.65);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      z-index:1000;
+    .footer-about h3 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .modal{
-      width:min(720px, 100%);
-      border-radius: 22px;
-      border:1px solid rgba(255,255,255,.14);
-      background: linear-gradient(180deg, rgba(17,26,51,.98), rgba(11,16,32,.98));
-      box-shadow: var(--shadow);
-      padding:18px;
+
+    .footer-about p {
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.6;
+      margin-bottom: 20px;
     }
-    .modalHeader{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
-      padding:10px 10px 0;
+
+    .footer-social {
+      display: flex;
+      gap: 15px;
     }
-    .modalHeader h3{margin:0; font-size:18px}
-    .closeBtn{
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.06);
-      color:var(--white);
-      border-radius: 12px;
-      padding:10px 12px;
-      cursor:pointer;
+
+    .footer-social a {
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
     }
-    .modalBody{
-      padding:10px;
-      color:rgba(220,231,255,.78);
-      line-height:1.6;
-      font-size:13px;
+
+    .footer-social a:hover {
+      background: #f39c12;
+      transform: translateY(-3px);
     }
-    .hl{
-      display:inline-block;
-      padding:2px 8px;
-      border-radius:999px;
-      background: rgba(6,182,212,.16);
-      border:1px solid rgba(6,182,212,.25);
-      color: rgba(220,231,255,.92);
-      font-size:12px;
-      margin:0 4px;
+
+    .footer-links h4 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      color: #f39c12;
+    }
+
+    .footer-links ul {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 12px;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: #f39c12;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 30px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
+    }
+
+    .affiliate-badge {
+      background: rgba(255, 255, 255, 0.1);
+      display: inline-block;
+      padding: 10px 25px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-grid,
+      .what-is-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .coverage-grid,
+      .benefits-grid,
+      .testimonial-grid,
+      .steps-grid,
+      .stats-grid,
+      .faq-grid,
+      .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .coverage-grid,
+      .benefits-grid,
+      .testimonial-grid,
+      .steps-grid,
+      .stats-grid,
+      .faq-grid,
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .hero h1 span {
+        font-size: 3rem;
+      }
+      
+      .section-header h2 {
+        font-size: 2rem;
+      }
+      
+      .steps-grid .step-card::after {
+        display: none;
+      }
     }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <div class="topbar" role="banner">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <div>
-          <h1>Home Warranty Interest Check</h1>
-          <p>Colorful landing example • affiliate/publisher demo</p>
-        </div>
-      </div>
 
-      <div class="badgeRow" aria-label="Trust badges">
-        <div class="badge"><span class="dot" aria-hidden="true"></span>Secure form</div>
-        <div class="badge"><span class="dot" style="background:var(--g3); box-shadow:0 0 0 6px rgba(6,182,212,.10)" aria-hidden="true"></span>Quick eligibility</div>
-        <div class="badge"><span class="dot" style="background:var(--g4); box-shadow:0 0 0 6px rgba(245,158,11,.10)" aria-hidden="true"></span>No obligation</div>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <div class="logo">
+        <i class="fas fa-shield-alt"></i>
+        <span>Choice Home Warranty</span>
+      </div>
+      <div class="nav-links">
+        <a href="#what-is">What is a Home Warranty?</a>
+        <a href="#coverage">Coverage</a>
+        <a href="#benefits">Benefits</a>
+        <a href="#testimonials">Reviews</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://www.choicehomewarranty.com" target="_blank" rel="nofollow sponsored" class="nav-cta"><i class="fas fa-external-link-alt"></i> Visit Official Site</a>
       </div>
     </div>
+  </nav>
 
-    <section class="hero" aria-label="Hero section">
-      <div class="heroLeft">
-        <div class="kicker">
-          <span class="spark" aria-hidden="true"></span>
-          <strong>Example landing page</strong> — built to show partners your funnel style
-        </div>
-
-        <h2 class="headline">
-          Protect Your Home Systems & Appliances
-          <span style="display:block; font-weight:800; background:linear-gradient(135deg, #22c55e, #06b6d4, #3b82f6, #7c3aed);
-            -webkit-background-clip:text; background-clip:text; color:transparent;">
-            Get matched to a plan that fits.
-          </span>
-        </h2>
-
-        <p class="subhead">
-          Use this page as a <strong>visual example</strong> for an affiliate manager: bright, modern, informative,
-          and designed to pre-qualify homeowners before sending them to an advertiser’s approved destination.
-        </p>
-
-        <div class="featureGrid" aria-label="Key benefits">
-          <div class="pill">
-            <div class="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M4 12l3 3 6-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M20 7v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2Z" stroke="white" stroke-width="2" opacity=".55"/>
-              </svg>
-            </div>
-            <div>
-              <h3>Fast homeowner screening</h3>
-              <p>Simple questions to identify likely homeowners and coverage interest.</p>
-            </div>
-          </div>
-
-          <div class="pill">
-            <div class="icon" style="background:linear-gradient(135deg, rgba(34,197,94,.95), rgba(6,182,212,.85));" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M9 12l2 2 4-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div>
-              <h3>Compliance-friendly layout</h3>
-              <p>Clear disclaimers, opt-in language, and brand-safe positioning.</p>
-            </div>
-          </div>
-
-          <div class="pill">
-            <div class="icon" style="background:linear-gradient(135deg, rgba(245,158,11,.95), rgba(239,68,68,.85));" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M3 12h18" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                <path d="M12 3v18" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".6"/>
-                <path d="M6 6l12 12" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".35"/>
-              </svg>
-            </div>
-            <div>
-              <h3>Easy to swap offers</h3>
-              <p>Replace CTA link + copy for any advertiser (CHW, etc.).</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <aside class="heroRight" aria-label="Lead form panel">
-        <div class="cardHeader">
-          <h2>Check Your Options (Example)</h2>
-          <p>
-            Answer a few questions to see if you may qualify for a home warranty plan match.
-            <strong>This is a demo</strong> — connect your real tracking and destination link.
-          </p>
-        </div>
-
-        <form id="leadForm" novalidate>
-          <div class="row">
-            <div>
-              <label for="first">First name</label>
-              <input id="first" name="first" placeholder="e.g., Jordan" autocomplete="given-name" required />
-            </div>
-            <div>
-              <label for="last">Last name</label>
-              <input id="last" name="last" placeholder="e.g., Taylor" autocomplete="family-name" required />
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required />
-            </div>
-            <div>
-              <label for="phone">Phone</label>
-              <input id="phone" name="phone" type="tel" placeholder="(555) 123-4567" autocomplete="tel" required />
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label for="zip">ZIP code</label>
-              <input id="zip" name="zip" inputmode="numeric" placeholder="e.g., 10001" maxlength="10" required />
-            </div>
-            <div>
-              <label for="homeowner">Are you a homeowner?</label>
-              <select id="homeowner" name="homeowner" required>
-                <option value="" selected disabled>Select one</option>
-                <option>Yes</option>
-                <option>No</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label for="interest">What do you want covered?</label>
-              <select id="interest" name="interest" required>
-                <option value="" selected disabled>Select one</option>
-                <option>Systems (HVAC, electrical, plumbing)</option>
-                <option>Appliances (fridge, oven, washer/dryer)</option>
-                <option>Both systems + appliances</option>
-                <option>Not sure yet</option>
-              </select>
-            </div>
-            <div>
-              <label for="timeline">When are you looking to enroll?</label>
-              <select id="timeline" name="timeline" required>
-                <option value="" selected disabled>Select one</option>
-                <option>Now / ASAP</option>
-                <option>Within 30 days</option>
-                <option>1–3 months</option>
-                <option>Just researching</option>
-              </select>
-            </div>
-          </div>
-
-          <button class="cta" type="submit">
-            Show My Options <small>(demo)</small>
-          </button>
-
-          <div class="micro">
-            By clicking “Show My Options,” you agree to be contacted about home warranty options.
-            <br />
-            <a href="#" id="openDisclosures">See important disclosures</a>
-          </div>
-        </form>
-
-        <div class="micro">
-          <strong>Affiliate note:</strong> Replace the button action with your advertiser’s
-          approved URL and tracking (postback/pixel/call tracking) as required by the program.
-        </div>
-      </aside>
-    </section>
-
-    <section class="section" aria-label="How it works">
-      <h2>How This Example Flow Works</h2>
-      <p>
-        This landing page is built to look bright and professional while keeping the journey simple:
-        pre-qualify homeowners → confirm interest → send to an approved partner destination.
-        It’s designed as an “example funnel page” to show an affiliate manager how you present offers.
-      </p>
-
-      <div class="cards" aria-label="Process cards">
-        <div class="miniCard">
-          <h3>1) Quick questions</h3>
-          <p>
-            Ask homeowner status, ZIP, and coverage interest. This improves quality and intent before handoff.
-          </p>
-        </div>
-        <div class="miniCard">
-          <h3>2) Transparent intent</h3>
-          <p>
-            Clear disclosure that the user may be contacted about home warranty options (opt-in style).
-          </p>
-        </div>
-        <div class="miniCard">
-          <h3>3) Partner handoff</h3>
-          <p>
-            Submit lead to your CRM or redirect to the advertiser’s approved URL with tracking parameters.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" aria-label="Trust and FAQ">
-      <h2>FAQ + Trust Signals (Example)</h2>
-      <p>
-        Add short answers that reduce friction. Keep claims conservative: avoid guarantees, exact pricing promises,
-        or statements that imply affiliation unless you are authorized.
-      </p>
-
-      <div class="cards" aria-label="FAQ cards">
-        <div class="miniCard">
-          <h3>Is this a purchase?</h3>
-          <p>
-            No. This page is an interest/eligibility check example. The final enrollment happens on the provider’s
-            official pages.
-          </p>
-        </div>
-        <div class="miniCard">
-          <h3>What information is used?</h3>
-          <p>
-            Basic contact details + homeownership and coverage interest to match you with relevant options.
-          </p>
-        </div>
-        <div class="miniCard">
-          <h3>Why do you ask for ZIP?</h3>
-          <p>
-            Availability and plan details can vary by location. ZIP helps route to the right provider pages.
-          </p>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <p class="micro" style="text-align:left; margin:0;">
-        <strong>Compliance reminder:</strong> If you use “survey-style” flows, keep messaging transparent and avoid
-        implying the survey is sponsored by any brand unless you have explicit permission. Use approved creatives,
-        approved landing pages, and required disclosures for each program.
-      </p>
-    </section>
-
-    <footer>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-grid">
       <div>
-        <strong>Example Disclosure:</strong> This page is a demo/portfolio sample for an affiliate/publisher.
-        It is not the official website of any provider. Offers and availability may vary by location.
-      </div>
-      <div style="margin-top:8px;">
-        © <span id="yr"></span> Example Landing • Replace with your business name •
-        <a href="#" id="openDisclosures2">Disclosures</a>
-      </div>
-    </footer>
-  </div>
-
-  <!-- Modal -->
-  <div class="modalBackdrop" id="modalBackdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modalHeader">
-        <div>
-          <h3 id="modalTitle">Important Disclosures (Example)</h3>
-          <div class="micro" style="margin-top:6px;">
-            Use these to keep the landing page partner-safe.
+        <div class="hero-badge">
+          <i class="fas fa-star"></i> America's #1 Home Warranty Provider
+        </div>
+        <h1>
+          Protect Your Home & <span>Save Thousands</span>
+        </h1>
+        <p style="font-size: 1.3rem; margin-bottom: 30px; opacity: 0.9;">Join over 2.4 million homeowners who trust Choice Home Warranty to protect their homes from unexpected breakdowns.</p>
+        
+        <div class="hero-features">
+          <div class="hero-feature">
+            <i class="fas fa-check-circle"></i>
+            <span>24/7 emergency repairs & service</span>
+          </div>
+          <div class="hero-feature">
+            <i class="fas fa-check-circle"></i>
+            <span>25,000+ pre-screened contractors nationwide</span>
+          </div>
+          <div class="hero-feature">
+            <i class="fas fa-check-circle"></i>
+            <span>First month FREE with annual plan</span>
           </div>
         </div>
-        <button class="closeBtn" id="closeModal" type="button">Close</button>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-number">8M+</div>
+            <div class="hero-stat-label">Service Requests</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-number">2.4M+</div>
+            <div class="hero-stat-label">Homes Covered</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-number">25K+</div>
+            <div class="hero-stat-label">Network Contractors</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 40px;">
+          <a href="https://www.choicehomewarranty.com" target="_blank" rel="nofollow sponsored" class="btn-primary"><i class="fas fa-external-link-alt"></i> Get Your Free Quote</a>
+          <a href="#what-is" class="btn-secondary" style="margin-left: 20px; color: white; border-color: white;">Learn More</a>
+        </div>
       </div>
-      <div class="modalBody">
-        <p>
-          <span class="hl">Not the official provider site</span>
-          This landing page is an example/portfolio page and does not represent an official provider website.
-        </p>
-        <p>
-          <span class="hl">Opt-in contact</span>
-          By submitting information, users may be contacted about home warranty options by phone/email/text as permitted.
-        </p>
-        <p>
-          <span class="hl">No guarantees</span>
-          Coverage, pricing, eligibility, and availability vary and are determined by the provider.
-        </p>
-        <p>
-          <span class="hl">Affiliate disclosure</span>
-          The publisher may receive compensation if a user completes an action with a provider.
-        </p>
+      
+      <div class="hero-image">
+        <div class="offer-badge"><i class="fas fa-gift"></i> Limited Time: First Month FREE</div>
+        <i class="fas fa-home" style="font-size: 5rem; color: #f39c12; margin-bottom: 20px;"></i>
+        <h3 style="color: white; font-size: 1.8rem;">Comprehensive Protection</h3>
+        <p style="color: rgba(255,255,255,0.7); margin: 20px 0;">HVAC • Electrical • Plumbing • Appliances • And More</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+          <span style="background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 50px;"><i class="fas fa-wrench"></i> AC & Heating</span>
+          <span style="background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 50px;"><i class="fas fa-plug"></i> Electrical</span>
+          <span style="background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 50px;"><i class="fas fa-tint"></i> Plumbing</span>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <script>
-    // Demo-only behavior: show a confirmation modal instead of actually submitting.
-    const form = document.getElementById('leadForm');
-    const yr = document.getElementById('yr');
-    yr.textContent = new Date().getFullYear();
+  <!-- Trust Bar -->
+  <section class="trust-bar">
+    <div class="container trust-grid">
+      <div class="trust-item">
+        <i class="fas fa-trophy"></i>
+        <div>
+          <h4>#1 Rated</h4>
+          <p>Reviews.com 2024</p>
+        </div>
+      </div>
+      <div class="trust-item">
+        <i class="fas fa-clock"></i>
+        <div>
+          <h4>24/7 Support</h4>
+          <p>Live agents always available</p>
+        </div>
+      </div>
+      <div class="trust-item">
+        <i class="fas fa-dollar-sign"></i>
+        <div>
+          <h4>Best Value</h4>
+          <p>Lowest prices guaranteed</p>
+        </div>
+      </div>
+      <div class="trust-item">
+        <i class="fas fa-shield"></i>
+        <div>
+          <h4>Licensed & Bonded</h4>
+          <p>Fully insured contractors</p>
+        </div>
+      </div>
+      <div class="trust-item">
+        <i class="fas fa-star"></i>
+        <div>
+          <h4>4.7★ Rating</h4>
+          <p>Thousands of reviews</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    const openDisclosures = document.getElementById('openDisclosures');
-    const openDisclosures2 = document.getElementById('openDisclosures2');
-    const closeModal = document.getElementById('closeModal');
+  <!-- What is a Home Warranty -->
+  <section id="what-is" class="what-is-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>What is a <span class="highlight">Home Warranty?</span></h2>
+        <p>Understanding how home warranties protect your biggest investment</p>
+      </div>
 
-    function showModal(){
-      modalBackdrop.style.display = 'flex';
-      modalBackdrop.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-    function hideModal(){
-      modalBackdrop.style.display = 'none';
-      modalBackdrop.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
+      <div class="what-is-grid">
+        <div class="what-is-content">
+          <h3>Peace of Mind for Your Home</h3>
+          <p>A home warranty is a service contract that covers the repair or replacement of major home systems and appliances that break down over time due to normal wear and tear.</p>
+          <p>Unlike homeowners insurance, which covers damage from external events like fires or storms, a home warranty protects you from the unexpected breakdowns that happen every day.</p>
+          
+          <ul class="what-is-list">
+            <li><i class="fas fa-check-circle"></i> Covers breakdowns from normal wear and tear</li>
+            <li><i class="fas fa-check-circle"></i> One simple service fee covers the repair</li>
+            <li><i class="fas fa-check-circle"></i> Access to vetted, licensed contractors</li>
+            <li><i class="fas fa-check-circle"></i> Protects your budget from surprise expenses</li>
+            <li><i class="fas fa-check-circle"></i> Increases home value for resale</li>
+          </ul>
 
-    openDisclosures.addEventListener('click', (e)=>{ e.preventDefault(); showModal(); });
-    openDisclosures2.addEventListener('click', (e)=>{ e.preventDefault(); showModal(); });
-    closeModal.addEventListener('click', hideModal);
-    modalBackdrop.addEventListener('click', (e)=>{ if(e.target === modalBackdrop) hideModal(); });
+          <a href="https://www.choicehomewarranty.com" target="_blank" rel="nofollow sponsored" class="btn-primary" style="margin-top: 20px;"><i class="fas fa-external-link-alt"></i> Learn More on Official Site</a>
+        </div>
 
-    function validEmail(email){
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-    function validPhone(phone){
-      const digits = phone.replace(/\D/g,'');
-      return digits.length >= 10;
-    }
-    function validZip(zip){
-      const digits = zip.replace(/\D/g,'');
-      return digits.length >= 5;
-    }
+        <div class="what-is-image">
+          <i class="fas fa-shield-alt"></i>
+          <h3 style="color: #0a2540; margin-bottom: 20px;">What's Typically Covered?</h3>
+          <div class="coverage-circle">
+            <span>HVAC</span>
+            <span>Plumbing</span>
+            <span>Electrical</span>
+            <span>Water Heater</span>
+            <span>Kitchen Appliances</span>
+            <span>Washer/Dryer</span>
+            <span>Refrigerator</span>
+            <span>Garage Door</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    form.addEventListener('submit', (e)=>{
-      e.preventDefault();
+  <!-- Coverage Categories -->
+  <section id="coverage" class="coverage-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>What's <span class="highlight">Covered</span></h2>
+        <p>Choice Home Warranty offers comprehensive protection for your home's most important systems and appliances</p>
+      </div>
 
-      const data = Object.fromEntries(new FormData(form).entries());
+      <div class="coverage-grid">
+        <div class="coverage-item">
+          <i class="fas fa-wind"></i>
+          <h4>HVAC Systems</h4>
+          <p>Heating, cooling, ductwork, thermostats, and attic fans</p>
+        </div>
+        <div class="coverage-item">
+          <i class="fas fa-bolt"></i>
+          <h4>Electrical</h4>
+          <p>Wiring, panels, switches, outlets, and ceiling fans</p>
+        </div>
+        <div class="coverage-item">
+          <i class="fas fa-water"></i>
+          <h4>Plumbing</h4>
+          <p>Pipes, fixtures, water heaters, stoppage, and toilets</p>
+        </div>
+        <div class="coverage-item">
+          <i class="fas fa-oven"></i>
+          <h4>Kitchen Appliances</h4>
+          <p>Oven, cooktop, range, dishwasher, built-in microwave</p>
+        </div>
+        <div class="coverage-item">
+          <i class="fas fa-snowflake"></i>
+          <h4>Refrigerator</h4>
+          <p>Built-in and stand-alone units</p>
+        </div>
+        <div class="coverage-item">
+          <i class="fas fa-tshirt"></i>
+          <h4>Washer & Dryer</h4>
+          <p>Both stackable and side-by-side units</p>
+        </div>
+        <div class="coverage-item">
+          <i class="fas fa-car"></i>
+          <h4>Garage Door</h4>
+          <p>Openers and door mechanisms</p>
+        </div>
+        <div class="coverage-item">
+          <i class="fas fa-tint"></i>
+          <h4>Optional Add-ons</h4>
+          <p>Pool, spa, septic, well pump, roof leaks, and more</p>
+        </div>
+      </div>
 
-      // Very light validation (demo)
-      const errors = [];
-      if(!data.first) errors.push("First name");
-      if(!data.last) errors.push("Last name");
-      if(!validEmail(data.email || "")) errors.push("Valid email");
-      if(!validPhone(data.phone || "")) errors.push("Valid phone");
-      if(!validZip(data.zip || "")) errors.push("Valid ZIP");
-      if(!data.homeowner) errors.push("Homeowner selection");
-      if(!data.interest) errors.push("Coverage interest");
-      if(!data.timeline) errors.push("Timeline");
+      <div style="text-align: center; margin-top: 50px;">
+        <a href="https://www.choicehomewarranty.com" target="_blank" rel="nofollow sponsored" class="btn-primary"><i class="fas fa-external-link-alt"></i> See Full Coverage Details</a>
+      </div>
+    </div>
+  </section>
 
-      if(errors.length){
-        alert("Please check: " + errors.join(", "));
-        return;
-      }
+  <!-- Benefits Section -->
+  <section id="benefits" class="benefits-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Why Choose <span class="highlight">Choice Home Warranty</span></h2>
+        <p>The benefits of protecting your home with America's leading warranty provider</p>
+      </div>
 
-      // Replace the below with real integration:
-      // - POST to your endpoint/CRM
-      // - then redirect to advertiser approved link with tracking
-      //
-      // Example redirect:
-      // window.location.href = "https://YOUR_ADVERTISER_APPROVED_URL?subid=...";
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <h3>Save Money</h3>
+          <p>Avoid unexpected repair costs that can run into thousands. One low service fee covers the entire repair or replacement.</p>
+        </div>
 
-      showModal();
-    });
-  </script>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-heart"></i>
+          </div>
+          <h3>Peace of Mind</h3>
+          <p>Sleep better knowing your home's essential systems are protected 24/7/365 against breakdowns from normal wear and tear.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h3>24/7 Service</h3>
+          <p>Our call centers are always open. Report a claim anytime, day or night, and we'll dispatch a qualified pro immediately.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-sliders-h"></i>
+          </div>
+          <h3>Flexible Coverage</h3>
+          <p>Choose the coverage that fits your needs. Add protection for pools, septic systems, well pumps, and more.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-truck"></i>
+          </div>
+          <h3>Vetted Contractors</h3>
+          <p>Access our network of 25,000+ licensed, insured, and background-checked professionals.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3>Home Value</h3>
+          <p>Homes with warranties sell for 3% more and 80% of buyers prefer a home with a warranty.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <i class="fas fa-home"></i>
+          <div class="stat-number">2.4M+</div>
+          <div class="stat-label">Homes Protected</div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-wrench"></i>
+          <div class="stat-number">8M+</div>
+          <div class="stat-label">Repairs Completed</div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-truck"></i>
+          <div class="stat-number">25K+</div>
+          <div class="stat-label">Network Contractors</div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-star"></i>
+          <div class="stat-number">4.7★</div>
+          <div class="stat-label">Average Rating</div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-calendar"></i>
+          <div class="stat-number">15+</div>
+          <div class="stat-label">Years of Service</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2>How It <span class="highlight">Works</span></h2>
+        <p>Getting covered is quick and easy. Here's the simple 4-step process.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h4>Sign Up Online</h4>
+          <p>Quick 5-minute application on the official Choice website. First month FREE with annual plan.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h4>30-Day Wait Period</h4>
+          <p>Standard 30-day waiting period before coverage begins (except for pre-existing conditions).</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h4>Report a Claim</h4>
+          <p>24/7 online or by phone. We'll assign a local, vetted contractor from our network.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h4>We Fix It</h4>
+          <p>Pay just the service fee. We handle the rest, including replacement if needed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section id="testimonials" class="testimonials-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>What Customers <span class="highlight">Say</span></h2>
+        <p>Join over 2.4 million satisfied homeowners who trust Choice Home Warranty</p>
+      </div>
+
+      <div class="testimonial-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"My AC went out in July. I called at 8 PM, and a technician was at my door by 10 AM the next day. Total cost? Just my $75 service fee. Amazing service!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">ML</div>
+            <div class="author-info">
+              <h4>Michael L.</h4>
+              <p>Phoenix, AZ • Homeowner for 2 years</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"I was skeptical about home warranties, but when my refrigerator died, Choice saved me $1,200. They replaced it with no hassle. Worth every penny."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">SR</div>
+            <div class="author-info">
+              <h4>Sarah R.</h4>
+              <p>Atlanta, GA • Homeowner for 3 years</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"As a realtor, I recommend Choice to all my clients. It gives buyers confidence and sellers peace of mind. Their claims process is seamless."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">JD</div>
+            <div class="author-info">
+              <h4>Jennifer D.</h4>
+              <p>Real Estate Broker • 15+ years</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="faq-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Frequently Asked <span class="highlight">Questions</span></h2>
+        <p>Everything you need to know about home warranties and Choice coverage</p>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4><i class="fas fa-question-circle"></i> What's the difference between a home warranty and homeowners insurance?</h4>
+          <p>Homeowners insurance covers damage from external events like fires, storms, and theft. A home warranty covers breakdowns from normal wear and tear of your home's systems and appliances.</p>
+        </div>
+        <div class="faq-item">
+          <h4><i class="fas fa-question-circle"></i> How quickly can I use my coverage?</h4>
+          <p>There's a standard 30-day waiting period, but coverage begins immediately for pre-existing conditions! Claims can be filed 24/7 online or by phone.</p>
+        </div>
+        <div class="faq-item">
+          <h4><i class="fas fa-question-circle"></i> Do I get to choose my contractor?</h4>
+          <p>Choice assigns one of their 25,000+ pre-screened, licensed contractors. However, you can request a specific provider, and they'll vet them for inclusion in their network.</p>
+        </div>
+        <div class="faq-item">
+          <h4><i class="fas fa-question-circle"></i> What's not covered?</h4>
+          <p>Pre-existing conditions, improper installation, code violations, and cosmetic damage. See the full policy on the Choice website for complete details and exclusions.</p>
+        </div>
+        <div class="faq-item">
+          <h4><i class="fas fa-question-circle"></i> Can I cancel if I'm not satisfied?</h4>
+          <p>Yes! Choice offers a 30-day money-back guarantee. If you're not completely satisfied within the first month, they'll refund your full purchase price.</p>
+        </div>
+        <div class="faq-item">
+          <h4><i class="fas fa-question-circle"></i> Do you cover older homes?</h4>
+          <p>Absolutely! Choice covers homes of any age. In fact, older homes often benefit most from a warranty due to aging systems and appliances.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Ready to Protect Your Home?</h2>
+        <p>Visit the official Choice Home Warranty website to get your free quote and take advantage of the first month FREE offer.</p>
+        <a href="https://www.choicehomewarranty.com" target="_blank" rel="nofollow sponsored" class="cta-button"><i class="fas fa-external-link-alt"></i> Visit Official Website</a>
+        <div class="cta-phone">
+          <i class="fas fa-phone-alt"></i> Or call 1-888-531-5403
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <h3><i class="fas fa-shield-alt" style="color: #f39c12;"></i> Choice Home Warranty</h3>
+          <p>Protecting American homes since 2008. We're committed to providing reliable, affordable home protection with exceptional customer service.</p>
+          <div class="footer-social">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#what-is">What is a Home Warranty?</a></li>
+            <li><a href="#coverage">Coverage Details</a></li>
+            <li><a href="#benefits">Benefits</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#testimonials">Customer Reviews</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="https://www.choicehomewarranty.com" target="_blank" rel="nofollow sponsored">Official Website</a></li>
+            <li><a href="https://www.choicehomewarranty.com" target="_blank" rel="nofollow sponsored">Get a Quote</a></li>
+            <li><a href="https://www.choicehomewarranty.com" target="_blank" rel="nofollow sponsored">Sample Contract</a></li>
+            <li><a href="https://www.choicehomewarranty.com" target="_blank" rel="nofollow sponsored">Terms & Conditions</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Contact</h4>
+          <ul>
+            <li><i class="fas fa-phone"></i> 1-888-531-5403</li>
+            <li><i class="fas fa-globe"></i> www.choicehomewarranty.com</li>
+            <li><i class="fas fa-clock"></i> 24/7 Support Available</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="affiliate-badge">
+          <i class="fas fa-info-circle"></i> Important Affiliate Disclosure: I am an independent affiliate for Choice Home Warranty. If you purchase through my links, I may earn a commission at no additional cost to you.
+        </div>
+        <p style="margin-top: 20px;">*First Month Free available with purchase of any Single Payment home warranty plan. CHW offers service contracts which are not warranties. See policy on official website for specifics on response times, limits of liability, and exclusions. CHW reserves the right to offer cash back in lieu of repair or replacement in the amount of CHW's actual cost (which at times may be less than retail) to repair or replace any covered system, component or appliance. In California, CHW branded service contracts are issued and offered by Home Service Club of California, Inc. ("HSCCA") and sold exclusively by Home Service Club of California Insurance Services, Inc.</p>
+        <p style="margin-top: 20px;">© 2025 Choice Home Warranty Affiliate Page. All rights reserved. This site is not the official Choice Home Warranty website.</p>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

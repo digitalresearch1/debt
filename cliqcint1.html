@@ -26,6 +26,15 @@
       margin-bottom: 8px;
     }
 
+    .radio-card {
+      border: 1px solid rgb(226 232 240);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .radio-card:hover { background: rgb(248 250 252); }
+
     .progress-outer {
       width: 100%;
       height: 10px;
@@ -53,20 +62,223 @@
         <p id="terminateMsg" class="text-red-700"></p>
       </div>
 
-      <!-- ========================= MAIN SURVEY (single page) ========================= -->
-      <div id="surveyPage">
+      <!-- ========================= SCREENER ========================= -->
+      <div id="screen1" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q1) Do you currently have any personal debt?</h2>
+        <div class="space-y-3 mt-3">
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="hasDebt" value="yes" class="scale-125">
+            <div class="font-medium">Yes</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="hasDebt" value="no" class="scale-125">
+            <div class="font-medium">No</div>
+          </label>
+        </div>
+        <div class="mt-4 text-center">
+          <button id="screen1Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
+        </div>
+      </div>
+
+      <div id="screen2" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q2) What is your MAIN type of debt right now? (Choose one)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtTypeMain" value="credit_cards" class="scale-125">
+            <div class="font-medium">Credit card debt</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtTypeMain" value="unsecured_personal_loans" class="scale-125">
+            <div class="font-medium">Unsecured personal loan</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtTypeMain" value="medical" class="scale-125">
+            <div class="font-medium">Medical bills</div>
+          </label>
+
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtTypeMain" value="private_student_loans" class="scale-125">
+            <div class="font-medium">Private student loan</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtTypeMain" value="auto_loan" class="scale-125">
+            <div class="font-medium">Auto loan / car payment</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtTypeMain" value="mortgage" class="scale-125">
+            <div class="font-medium">Mortgage / home loan</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtTypeMain" value="payday" class="scale-125">
+            <div class="font-medium">Payday loan / cash advance</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtTypeMain" value="collections" class="scale-125">
+            <div class="font-medium">Collections</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtTypeMain" value="federal_student" class="scale-125">
+            <div class="font-medium">Federal student loans</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtTypeMain" value="taxes_gov" class="scale-125">
+            <div class="font-medium">Taxes / government debt</div>
+          </label>
+          <label class="radio-card flex items-center gap-3 md:col-span-2">
+            <input type="radio" name="debtTypeMain" value="other" class="scale-125">
+            <div class="font-medium">Other / not listed</div>
+          </label>
+        </div>
+        <div class="mt-4 text-center">
+          <button id="screen2Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
+        </div>
+      </div>
+
+      <div id="screen3" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q3) About how much total personal debt do you currently have? (Not including mortgage)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtAmt" value="under10" class="scale-125">
+            <div class="font-medium">Under $10,000</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtAmt" value="10_14999" class="scale-125">
+            <div class="font-medium">$10,000–$14,999</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtAmt" value="15_24999" class="scale-125">
+            <div class="font-medium">$15,000–$24,999</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="debtAmt" value="25_49999" class="scale-125">
+            <div class="font-medium">$25,000–$49,999</div>
+          </label>
+          <label class="radio-card flex items-center gap-3 md:col-span-2">
+            <input type="radio" name="debtAmt" value="50plus" class="scale-125">
+            <div class="font-medium">$50,000+</div>
+          </label>
+          <label class="radio-card flex items-center gap-3 md:col-span-2">
+            <input type="radio" name="debtAmt" value="not_sure" class="scale-125">
+            <div class="font-medium">Not sure</div>
+          </label>
+        </div>
+        <div class="mt-4 text-center">
+          <button id="screen3Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
+        </div>
+      </div>
+
+      <div id="screen4" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q4) What is your approximate annual household income (before taxes)?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="incomeRange" value="under30" class="scale-125">
+            <div class="font-medium">Under $30,000</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="incomeRange" value="30_49999" class="scale-125">
+            <div class="font-medium">$30,000–$49,999</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="incomeRange" value="50_74999" class="scale-125">
+            <div class="font-medium">$50,000–$74,999</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="incomeRange" value="75_99999" class="scale-125">
+            <div class="font-medium">$75,000–$99,999</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="incomeRange" value="100plus" class="scale-125">
+            <div class="font-medium">$100,000+</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="incomeRange" value="prefer_not" class="scale-125">
+            <div class="font-medium">Prefer not to say</div>
+          </label>
+        </div>
+        <div class="mt-4 text-center">
+          <button id="screen4Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
+        </div>
+      </div>
+
+      <div id="screen5" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q5) Are you currently enrolled in any debt relief / debt settlement / debt management program?</h2>
+        <div class="space-y-3 mt-3">
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="enrolled" value="no" class="scale-125">
+            <div class="font-medium">No</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="enrolled" value="yes" class="scale-125">
+            <div class="font-medium">Yes</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="enrolled" value="not_sure" class="scale-125">
+            <div class="font-medium">Not sure</div>
+          </label>
+        </div>
+        <div class="mt-4 text-center">
+          <button id="screen5Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
+        </div>
+      </div>
+
+      <div id="screen7" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q6) If matched with a debt relief program that can help reduce your debt but requires a monthly payment, would you be able and willing to make a monthly payment?</h2>
+        <div class="space-y-3 mt-3">
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="monthly" value="yes" class="scale-125">
+            <div class="font-medium">Yes</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="monthly" value="no" class="scale-125">
+            <div class="font-medium">No</div>
+          </label>
+          <label class="radio-card flex items-center gap-3">
+            <input type="radio" name="monthly" value="not_sure" class="scale-125">
+            <div class="font-medium">Not sure</div>
+          </label>
+        </div>
+        <div class="mt-4 text-center">
+          <button id="screen7Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>Next</button>
+        </div>
+      </div>
+
+      <div id="screen9" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Q7) Confirmation</h2>
+        <div class="bg-white border rounded-xl p-4 mt-3">
+          <div class="font-semibold text-gray-800">
+            Please confirm: You have <b>$15,000+</b> in eligible debt and <b>$30,000+</b> household income, and you are <b>not currently enrolled</b> in a debt program.
+          </div>
+          <div class="space-y-3 mt-4">
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="confirm" value="yes" class="scale-125">
+              <div class="font-medium">Yes</div>
+            </label>
+            <label class="radio-card flex items-center gap-3">
+              <input type="radio" name="confirm" value="no" class="scale-125">
+              <div class="font-medium">No</div>
+            </label>
+          </div>
+        </div>
+        <div class="mt-4 text-center">
+          <button id="screen9Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>
+            Continue to Survey
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================= MAIN SURVEY ========================= -->
+      <div id="surveyPage" style="display:none;">
 
         <div class="form-header-group header-large mb-8 p-6 rounded-xl text-white text-center">
           <h1 class="text-2xl md:text-3xl font-bold">Debt Offer Match Feedback Survey</h1>
           <p class="mt-2 text-base md:text-lg">Help us understand how clear and useful a debt-offer matching experience is.</p>
         </div>
 
-        <!-- Who can participate (no screener) -->
         <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-6">
           <h2 class="text-xl font-semibold text-gray-800 mb-3">Who Can Participate?</h2>
           <p class="text-gray-700 mb-4">Please proceed only if the following is true for you:</p>
           <ul class="qualification-list list-none space-y-2">
-            <li>You currently have <strong>unsecured debt</strong> (e.g., credit card debt, unsecured personal loans, or private student loans).</li>
+            <li>You currently have <strong>unsecured debt</strong> such as <strong>credit card debt</strong>, <strong>medical bills</strong>, or <strong>unsecured personal loans</strong>.</li>
             <li>You have <strong>$15,000+</strong> in eligible debt.</li>
             <li>You have <strong>$30,000+</strong> household income.</li>
             <li>You are <strong>not currently enrolled</strong> in a debt relief / debt settlement / debt management program.</li>
@@ -78,7 +290,6 @@
           </p>
         </div>
 
-        <!-- How to participate (UPDATED + click at least one offer + no obligation) -->
         <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
           <h2 class="text-xl font-semibold text-blue-800 mb-3">How To Participate</h2>
 
@@ -103,7 +314,6 @@
           </div>
         </div>
 
-        <!-- Important box (Option A wording) -->
         <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
           <h3 class="text-lg font-semibold text-amber-900">Use Real Information</h3>
           <div class="text-gray-700 mt-2 space-y-2">
@@ -114,11 +324,9 @@
             <p>
               <b>No SSN is requested.</b> However, the form may not submit or you may not see results if your identity/credit information cannot be verified.
             </p>
-       
           </div>
         </div>
 
-        <!-- Step 1: Open link in new tab (no iframe) -->
         <div class="mt-6 p-4 bg-white border border-gray-200 rounded-lg">
           <h2 class="text-xl font-bold text-gray-800">Step 1: Complete the secure form</h2>
           <p class="text-gray-700 mt-2">
@@ -146,7 +354,6 @@
           </div>
         </div>
 
-        <!-- Step 2: Upload + OCR Verify -->
         <div class="p-4 bg-orange-50 border border-orange-200 rounded-lg mt-8">
           <h3 class="text-lg font-semibold text-orange-800">Step 2: Upload Your Confirmation Screenshot (OCR Verified)</h3>
           <p class="text-gray-700 mt-2">
@@ -178,7 +385,6 @@
           <div id="continueMsg" class="hidden mt-3 text-sm font-semibold text-red-700"></div>
         </div>
 
-        <!-- Step 3: Quick feedback (UPDATED: must click at least one offer) -->
         <div id="feedbackBlock" class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg mt-8">
           <h3 class="text-lg font-semibold text-emerald-900">Step 3: Quick Feedback</h3>
 
@@ -288,6 +494,113 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function $(id){ return document.getElementById(id); }
 
+  function valRadio(name){
+    return document.querySelector(`input[name="${name}"]:checked`)?.value || null;
+  }
+
+  function setEnabled(btn, ok){
+    if (!btn) return;
+    btn.disabled = !ok;
+    btn.classList.toggle("disabled-btn", !ok);
+  }
+
+  function showOnly(id){
+    const ids = ["terminate","screen1","screen2","screen3","screen4","screen5","screen7","screen9","surveyPage"];
+    ids.forEach(x => {
+      const el = $(x);
+      if (el) el.style.display = (x === id ? "block" : "none");
+    });
+    window.scrollTo(0,0);
+  }
+
+  function terminate(msg){
+    $("terminateMsg").innerHTML =
+      (msg || "Thank you.") +
+      `<div class="mt-3 text-sm">
+         If you are not redirected automatically,
+         <a href="${abandonUrl}" class="text-blue-700 underline font-semibold">click here</a>.
+       </div>`;
+    showOnly("terminate");
+    setTimeout(() => go(abandonUrl), 700);
+  }
+
+  /* ========================= Screener rules ========================= */
+  const allowedDebtTypes = new Set([
+    "credit_cards",
+    "medical",
+    "unsecured_personal_loans"
+  ]);
+
+  function debtAmtOk(v){
+    return (v === "15_24999" || v === "25_49999" || v === "50plus");
+  }
+
+  function incomeOk(v){
+    return (v === "30_49999" || v === "50_74999" || v === "75_99999" || v === "100plus");
+  }
+
+  /* ========================= Screener flow ========================= */
+  const s1Next = $("screen1Next");
+  const s2Next = $("screen2Next");
+  const s3Next = $("screen3Next");
+  const s4Next = $("screen4Next");
+  const s5Next = $("screen5Next");
+  const s7Next = $("screen7Next");
+  const s9Next = $("screen9Next");
+
+  document.addEventListener("change", (e) => {
+    if (e.target.name === "hasDebt") setEnabled(s1Next, true);
+    if (e.target.name === "debtTypeMain") setEnabled(s2Next, true);
+    if (e.target.name === "debtAmt") setEnabled(s3Next, true);
+    if (e.target.name === "incomeRange") setEnabled(s4Next, true);
+    if (e.target.name === "enrolled") setEnabled(s5Next, true);
+    if (e.target.name === "monthly") setEnabled(s7Next, true);
+    if (e.target.name === "confirm") setEnabled(s9Next, true);
+  });
+
+  s1Next?.addEventListener("click", () => {
+    const hasDebt = valRadio("hasDebt");
+    if (hasDebt !== "yes") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
+    showOnly("screen2");
+  });
+
+  s2Next?.addEventListener("click", () => {
+    const t = valRadio("debtTypeMain");
+    if (!allowedDebtTypes.has(t)) return terminate("Thank you. Based on your answers, you are not eligible for this study.");
+    showOnly("screen3");
+  });
+
+  s3Next?.addEventListener("click", () => {
+    const a = valRadio("debtAmt");
+    if (!debtAmtOk(a)) return terminate("Thank you. Based on your answers, you are not eligible for this study.");
+    showOnly("screen4");
+  });
+
+  s4Next?.addEventListener("click", () => {
+    const r = valRadio("incomeRange");
+    if (!incomeOk(r)) return terminate("Thank you. Based on your answers, you are not eligible for this study.");
+    showOnly("screen5");
+  });
+
+  s5Next?.addEventListener("click", () => {
+    const eVal = valRadio("enrolled");
+    if (eVal !== "no") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
+    showOnly("screen7");
+  });
+
+  s7Next?.addEventListener("click", () => {
+    const m = valRadio("monthly");
+    if (m !== "yes") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
+    showOnly("screen9");
+  });
+
+  s9Next?.addEventListener("click", () => {
+    const c = valRadio("confirm");
+    if (c !== "yes") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
+    showOnly("surveyPage");
+  });
+
+  /* ========================= Survey buttons ========================= */
   const abandonSurveyButton = $("abandonSurveyButton");
   const abandonSurveyButtonTop = $("abandonSurveyButtonTop");
   const finishSurveyButton = $("finishSurveyButton");
@@ -353,7 +666,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ========================= OCR gate ========================= */
   const REQUIRED_KEYWORDS = [
-    "thank you","thanks","submitted","submission","confirmation","completed","success","we received","Here is a great provider to help you","Your Offer Is Ready"
+    "thank you","thanks","submitted","submission","confirmation","completed","success","we received","here is a great provider to help you","your offer is ready"
   ];
 
   const proofFile = $("proofFile");
@@ -386,7 +699,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const h = Math.round(img.height * scale);
 
     const canvas = document.createElement("canvas");
-    canvas.width = w; canvas.height = h;
+    canvas.width = w;
+    canvas.height = h;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     ctx.drawImage(img, 0, 0, w, h);
     URL.revokeObjectURL(url);
@@ -479,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       btnRunOCR.disabled = false;
       updateFinishGate();
-    }catch(e){
+    } catch(e){
       setOCRProgress(0);
       ocrPassed = false;
       if (ocrStatus){
@@ -498,6 +812,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  /* Start on screener */
+  showOnly("screen1");
 });
 </script>
 

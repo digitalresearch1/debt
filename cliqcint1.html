@@ -261,43 +261,8 @@
         </div>
         <div class="mt-4 text-center">
           <button id="screen9Next" class="action-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg disabled-btn" type="button" disabled>
-            Continue
-          </button>
-        </div>
-      </div>
-
-      <!-- ========================= FACEBOOK STEP ========================= -->
-      <div id="screenFb" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-6" style="display:none;">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Watch the Facebook Video</h2>
-        <p class="text-gray-700 mb-4">
-          Please open the Facebook post below, watch the video, then come back here to continue the survey.
-        </p>
-
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <p class="text-sm text-blue-900">
-            The continue button will unlock after the Facebook link is clicked.
-          </p>
-        </div>
-
-        <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
-          <a id="facebookPostBtn"
-             href="https://www.facebook.com/share/v/17CYnsWogW/"
-             target="_blank"
-             rel="noopener"
-             class="action-btn text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
-            Open Facebook Video
-          </a>
-
-          <button id="fbContinueBtn"
-                  class="action-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg disabled-btn"
-                  type="button"
-                  disabled>
             Continue to Survey
           </button>
-        </div>
-
-        <div class="mt-4 text-sm text-gray-600">
-          After opening the Facebook post, return here and continue.
         </div>
       </div>
 
@@ -371,7 +336,7 @@
 
           <div class="mt-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center">
             <a id="startNowBtn"
-               href="https://trkmcl.com/wy8odpg43k/xwndpp7qne"
+               href="https://trkmcl.com/wy8odpg43k/p98vjj0e83"
                target="_blank" rel="noopener"
                class="action-btn text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
               Open Secure Form (New Tab)
@@ -540,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function showOnly(id){
-    const ids = ["terminate","screen1","screen2","screen3","screen4","screen5","screen7","screen9","screenFb","surveyPage"];
+    const ids = ["terminate","screen1","screen2","screen3","screen4","screen5","screen7","screen9","surveyPage"];
     ids.forEach(x => {
       const el = $(x);
       if (el) el.style.display = (x === id ? "block" : "none");
@@ -632,29 +597,6 @@ document.addEventListener('DOMContentLoaded', function () {
   s9Next?.addEventListener("click", () => {
     const c = valRadio("confirm");
     if (c !== "yes") return terminate("Thank you. Based on your answers, you are not eligible for this study.");
-    showOnly("screenFb");
-  });
-
-  /* ========================= Facebook gate ========================= */
-  let facebookClicked = false;
-  const facebookPostBtn = $("facebookPostBtn");
-  const fbContinueBtn = $("fbContinueBtn");
-
-  try {
-    if (sessionStorage.getItem("facebook_clicked") === "1") {
-      facebookClicked = true;
-      setEnabled(fbContinueBtn, true);
-    }
-  } catch (e) {}
-
-  facebookPostBtn?.addEventListener("click", () => {
-    facebookClicked = true;
-    setEnabled(fbContinueBtn, true);
-    try { sessionStorage.setItem("facebook_clicked", "1"); } catch (e) {}
-  });
-
-  fbContinueBtn?.addEventListener("click", () => {
-    if (!facebookClicked) return;
     showOnly("surveyPage");
   });
 

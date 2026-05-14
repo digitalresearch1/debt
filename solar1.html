@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Solar Freedom | Go Green & Save 70% on Energy Bills</title>
+    <!-- Google Fonts & Simple CSS Reset -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #f9fbfd 0%, #f0f4f8 100%);
+            color: #1a2c3e;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* buttons & CTA */
+        .btn {
+            display: inline-block;
+            background: #ffb347;
+            background: linear-gradient(95deg, #f9a826 0%, #ffbc3c 100%);
+            color: #1e2a2f;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 14px 36px;
+            border-radius: 60px;
+            text-decoration: none;
+            box-shadow: 0 10px 20px -5px rgba(249, 168, 38, 0.3);
+            transition: all 0.25s ease;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            letter-spacing: -0.2px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(95deg, #ff9f1a 0%, #ffb347 100%);
+            box-shadow: 0 18px 28px -8px rgba(249, 168, 38, 0.4);
+        }
+
+        .btn-large {
+            font-size: 1.3rem;
+            padding: 16px 42px;
+        }
+
+        /* Header nav (simple) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1f6e43, #0e4b2f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: #f9a826;
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+        }
+
+        .badge {
+            background: rgba(31, 110, 67, 0.1);
+            backdrop-filter: blur(4px);
+            padding: 8px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1f6e43;
+        }
+
+        /* Hero */
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            padding: 40px 0 60px 0;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero-badge {
+            background: #e6f4ea;
+            color: #0f5c39;
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            color: #0a2b22;
+        }
+
+        .hero-content h1 span {
+            color: #f9a826;
+            border-bottom: 3px solid #ffc107;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 25px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-number {
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: #1f6e43;
+        }
+
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            width: 480px;
+            filter: drop-shadow(0 20px 25px -12px rgba(0,0,0,0.15));
+        }
+
+        /* section styles */
+        .section {
+            padding: 70px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-sub {
+            text-align: center;
+            max-width: 650px;
+            margin: 0 auto 50px auto;
+            color: #4a5b6b;
+            font-size: 1.15rem;
+        }
+
+        .cards-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 32px;
+            padding: 32px 26px;
+            flex: 1;
+            min-width: 240px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 40px -14px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .savings-box {
+            background: #1f2e3a;
+            color: white;
+            border-radius: 48px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 32px 44px;
+            margin: 30px 0;
+            gap: 24px;
+            background: linear-gradient(115deg, #1e3a2f 0%, #0c2b21 100%);
+        }
+
+        .savings-text h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .savings-text p {
+            margin-top: 8px;
+            opacity: 0.85;
+        }
+
+        /* testimonial */
+        .testimonial {
+            background: #ffffffd9;
+            border-radius: 36px;
+            padding: 30px 36px;
+            margin-top: 40px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.02);
+            border: 1px solid #eef2f5;
+        }
+
+        .testimonial p {
+            font-size: 1.2rem;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .author {
+            margin-top: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* CTA final */
+        .cta-section {
+            background: linear-gradient(105deg, #ffb34720, #ffda8a30), #ffe6c7;
+            border-radius: 48px;
+            padding: 60px 40px;
+            text-align: center;
+            margin: 20px 0 50px;
+        }
+
+        .cta-section h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .price-strike {
+            font-size: 1.4rem;
+            text-decoration: line-through;
+            color: #5c6e7e;
+            margin-right: 12px;
+        }
+
+        .price-offer {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1f6e43;
+        }
+
+        .limited {
+            background: #e03a3e20;
+            color: #bc3900;
+            border-radius: 80px;
+            display: inline-block;
+            padding: 8px 24px;
+            font-weight: 700;
+            margin: 20px 0 12px;
+        }
+
+        /* QUALIFIER BANNER - new */
+        .qualifier-bar {
+            background: #1f2a3e;
+            background: linear-gradient(98deg, #132f2a 0%, #1a443c 100%);
+            border-radius: 80px;
+            padding: 14px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 28px;
+            margin: 16px 0 24px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .qualifier-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,240,0.1);
+            padding: 5px 14px;
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+        }
+        .disclaimer-box {
+            background: #ffffffcc;
+            backdrop-filter: blur(8px);
+            border-left: 5px solid #ffaa33;
+            padding: 18px 24px;
+            border-radius: 24px;
+            font-size: 0.75rem;
+            color: #2c3e40;
+            margin: 20px 0 20px;
+            line-height: 1.5;
+        }
+        .disclaimer-box strong {
+            color: #b45400;
+        }
+        footer {
+            border-top: 1px solid #e2e8f0;
+            padding: 40px 0 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #5f6f7e;
+        }
+        .support-hours {
+            background: #eef2f0;
+            border-radius: 28px;
+            padding: 12px 20px;
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        @media (max-width: 800px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero-content h1 {
+                font-size: 2.4rem;
+            }
+            .hero-stats {
+                justify-content: center;
+            }
+            .section-title {
+                font-size: 1.9rem;
+            }
+            .cta-section h2 {
+                font-size: 1.7rem;
+            }
+            .savings-box {
+                flex-direction: column;
+                text-align: center;
+            }
+            .btn-large {
+                font-size: 1.1rem;
+                padding: 14px 28px;
+            }
+            .qualifier-bar {
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- simple navigation -->
+    <div class="navbar">
+        <div class="logo">Solar<span>Elevate</span></div>
+        <div class="badge">⭐ Trusted Affiliate Partner • 4.98/5 Rating</div>
+    </div>
+
+    <!-- Qualifiers & Targeting Info Redesign (US Nationwide, credit score, income, property type) -->
+    <div class="qualifier-bar">
+        <div class="qualifier-item">🇺🇸 US Nationwide</div>
+        <div class="qualifier-item">🏠 Single-Family Homeowners</div>
+        <div class="qualifier-item">💰 Income $5k+/mo</div>
+        <div class="qualifier-item">📈 Credit 650+</div>
+        <div class="qualifier-item">🧑‍💻 21+ Only</div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">⚡ LIMITED OFFER: 70% ENERGY SAVINGS</div>
+            <h1>Switch to Solar & <span>Slash Your Bills</span> by Up to $2,400/Year</h1>
+            <p style="font-size: 1.15rem; color: #2c4758;">Zero upfront cost options + federal tax credits. Join thousands of homeowners who are going green and saving big.</p>
+            <div class="hero-stats">
+                <div class="stat"><span class="stat-number">30%</span> <span>Tax Credit</span></div>
+                <div class="stat"><span class="stat-number">25y</span> <span>Warranty</span></div>
+                <div class="stat"><span class="stat-number">$0</span> <span>Down Available</span></div>
+            </div>
+            <!-- primary affiliate CTA -->
+            <a href="#" class="btn btn-large" id="primaryCta">💰 Claim My Solar Savings Now →</a>
+            <p style="margin-top: 18px; font-size: 0.8rem;">✔️ No obligation • 2-min eligibility check • 24/7 lead support (EST)</p>
+        </div>
+        <div class="hero-image">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23fef7e0' rx='30'/%3E%3Cpath fill='%23318a5c' d='M100 150 L200 100 L300 150 L200 200 Z' opacity='0.2'/%3E%3Crect x='170' y='190' width='60' height='40' fill='%23333' rx='4'/%3E%3Cpath fill='%23ffb347' d='M190 210 L210 210 L210 230 L190 230 Z'/%3E%3Crect x='120' y='130' width='40' height='30' fill='%233f8f6b' rx='6'/%3E%3Crect x='240' y='130' width='40' height='30' fill='%233f8f6b' rx='6'/%3E%3Crect x='180' y='120' width='40' height='30' fill='%233f8f6b' rx='6'/%3E%3Ccircle cx='200' cy='245' r='15' fill='%238bc34a'/%3E%3Ctext x='140' y='280' font-size='14' fill='%23555' font-weight='bold'%3E☀️ Solar for all%3C/text%3E%3C/svg%3E"
+                 alt="Solar panel illustration">
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="section">
+        <div class="section-title">Why Go Solar With Our Offer?</div>
+        <div class="section-sub">Exclusive affiliate deal: premium panels, unbeatable savings & full support</div>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon">💰</div>
+                <h3>0% Down Financing</h3>
+                <p>No large upfront investment. Start saving from day one with flexible payment plans that fit your budget.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🌞</div>
+                <h3>26% Federal Tax Credit</h3>
+                <p>Claim massive tax incentives on your new solar system — plus state rebates where available.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <h3>Energy Independence</h3>
+                <p>Protect yourself from rising utility rates. Generate clean energy and reduce carbon footprint.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔧</div>
+                <h3>25-Year Warranty</h3>
+                <p>Premium Tier-1 panels with guaranteed performance and professional installation included.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Savings Highlight + interactive counter vibe -->
+    <div class="savings-box">
+        <div class="savings-text">
+            <h3>🔋 Typical homeowner saves <span style="color:#ffd966;">$1,500+ yearly</span></h3>
+            <p>After solar installation, average electric bill drops 70% — and with net metering, you might even earn credits!</p>
+        </div>
+        <div>
+            <a href="#" class="btn" id="midCta">Check Eligibility →</a>
+        </div>
+    </div>
+
+    <!-- How it works + testimonial -->
+    <div class="section" style="padding-top: 20px;">
+        <div class="section-title">How It Works (3 Easy Steps)</div>
+        <div class="cards-grid" style="margin-bottom: 30px;">
+            <div class="card" style="text-align: center;">
+                <div class="card-icon">📋</div>
+                <h3>1. Quick Quote</h3>
+                <p>Fill out our 2-minute form to see your personalized solar savings estimate.</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div class="card-icon">🏡</div>
+                <h3>2. Free Consultation</h3>
+                <p>Local expert reviews your roof & energy needs, no pressure, just data.</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div class="card-icon">✅</div>
+                <h3>3. Install & Save</h3>
+                <p>Professional installation, permits handled, and you start saving immediately.</p>
+            </div>
+        </div>
+
+        <!-- real social proof testimonial -->
+        <div class="testimonial">
+            <p>“Our electric bill dropped from $320/month to just $45! The affiliate process was seamless, and the solar team handled everything. Best decision we ever made.” </p>
+            <div class="author">
+                <span>⭐ ⭐ ⭐ ⭐ ⭐</span> 
+                <strong>— Linda R., California</strong> <span style="font-size: 0.8rem;">(Saving $3,200/year)</span>
+            </div>
+        </div>
+        <div class="testimonial" style="margin-top: 16px;">
+            <p>“I was skeptical about the tax credit, but my affiliate advisor walked me through it. I got 30% back on my system. Highly recommend this offer!”</p>
+            <div class="author"><span>⭐ ⭐ ⭐ ⭐ ⭐</span> <strong>— Marcus T., Texas</strong></div>
+        </div>
+    </div>
+
+    <!-- exclusive affiliate bonus + final CTA -->
+    <div class="cta-section">
+        <div class="limited">🔥 LIMITED TIME AFFILIATE BONUS 🔥</div>
+        <h2>Get an Extra <span style="color:#e67e22;">$500 Cash Back</span> <br> When You Switch Through This Link</h2>
+        <p style="font-size: 1.2rem; margin: 20px 0;">Plus: Free smart home energy monitor included ($299 value)</p>
+        <div style="margin: 20px 0;">
+            <span class="price-strike">Regular installation $18,000+</span>
+            <span class="price-offer">After incentives: ~$8,200*</span>
+        </div>
+        <a href="#" class="btn btn-large" id="finalCta" style="font-size: 1.35rem;">⚡ Yes! Reserve My Free Solar Quote →</a>
+        <p style="margin-top: 28px; font-size: 0.8rem;">*Average after federal tax credit & local rebates. Actual savings vary. Zero obligation.</p>
+        <div style="margin-top: 18px; font-size: 0.8rem; background: white; width: fit-content; margin-left: auto; margin-right: auto; padding: 6px 20px; border-radius: 60px;">🔒 Your info is safe & never shared</div>
+    </div>
+
+    <!-- *** NEW SECTION: Lead hours, qualifiers in detail, Disclaimers *** -->
+    <div class="disclaimer-box">
+        <strong>📞 Lead Service & Availability:</strong> 24/7 support — Time Zone: EST. Our partner network connects homeowners nationwide (US only). <br><br>
+        ✅ <strong>Qualification Criteria (must meet all):</strong> <br>
+        • Age: 21 years or older • Homeownership: Single-family unit (no condos/duplexes unless approved) • Monthly household income ≥ $5,000 • Minimum credit score: 650+ <br>
+        • Looking for new solar installation services (not repairs or existing solar upgrades).<br><br>
+        🕒 <strong>Preferred Contact Hours:</strong> Monday – Sunday: 7:00 AM – 12:00 AM EST. Our solar specialists will reach out during these windows to ensure fast connection.<br><br>
+        <strong>⚠️ IMPORTANT DISCLAIMER:</strong> This site is a free service to assist homeowners in connecting with local service providers. All contractors/providers are independent and this site does not warrant or guarantee any work performed. It is the responsibility of the homeowner to verify that the hired contractor furnishes the necessary license and insurance required for the work being performed. All persons depicted in a photo or video are actors or models and not contractors listed on this site.
+    </div>
+
+    <!-- Additional hour badge and trust signal -->
+    <div style="text-align: center; margin: 10px 0 15px;">
+        <span class="support-hours">⭐ 24/7 Lead Intake • EST Hours • Real-time qualification ⭐</span>
+    </div>
+
+    <footer>
+        <p>© 2025 SolarElevate Affiliate Program — This is an independent affiliate offer. Partnering with top-rated solar providers nationwide. </p>
+        <p style="margin-top: 12px;">📞 Nationwide Support (24/7) | <a href="#" style="color:#1f6e43;">Privacy Policy</a> | <a href="#" style="color:#1f6e43;">Terms of Service</a> | *Estimated savings based on average usage, actual results may vary.</p>
+        <p style="margin-top: 10px;">✨ As an affiliate, we earn from qualifying purchases. This helps us keep providing free solar insights.</p>
+        <p style="margin-top: 10px; font-size:0.7rem;"><strong>Disclosure:</strong> This website is a lead generation & matching service. All contractors are independent. License & insurance verification is customer's responsibility. Models shown are for illustrative purposes.</p>
+    </footer>
+</div>
+
+<!-- Interactive Script for Affiliate Links & Lead Simulation -->
+<script>
+    (function() {
+        // Replace with your actual affiliate offer URL
+        const affiliateOfferUrl = "https://www.youraffiliatelink.com/solar-offer?ref=affiliate123";  // <-- REPLACE with real affiliate link
+
+        // Helper function for affiliate click tracking & redirection
+        function handleAffiliateClick(event) {
+            event.preventDefault();
+            // Optional: Add lead tracking / GA Event
+            console.log("Affiliate Solar Lead Clicked — qualifying homeowner (21+, 650+ credit, income $5k+, USA)");
+            // Show a gentle confirmation with the qualifier emphasis (increases lead quality)
+            const userConfirmed = confirm("✅ IMPORTANT: This offer is for US homeowners (21+, single-family, monthly income $5k+, credit 650+). Do you meet these criteria? Click OK to proceed to the official partner form.");
+            if (userConfirmed) {
+                // For better lead quality: track custom event (optional pixel). Redirect to affiliate partner page.
+                window.open(affiliateOfferUrl, '_blank');
+                // For main redirect (self) use below:
+                // window.location.href = affiliateOfferUrl;
+            } else {
+                // Show friendly message if they don't meet criteria
+                alert("No problem! Our offer is designed for qualifying homeowners. If you meet the criteria, please check again. Thank you for visiting.");
+            }
+        }
+
+        // Bind to all primary CTA buttons (IDs: primaryCta, midCta, finalCta)
+        const ctaButtons = ['primaryCta', 'midCta', 'finalCta'];
+        ctaButtons.forEach(id => {
+            const btn = document.getElementById(id);
+            if(btn) {
+                btn.addEventListener('click', handleAffiliateClick);
+                btn.setAttribute('href', 'javascript:void(0);');
+            }
+        });
+
+        // Additionally catch any other .btn that might be in the page (like secondary but they are already same class)
+        const extraButtons = document.querySelectorAll('.btn');
+        extraButtons.forEach(btn => {
+            if(!ctaButtons.includes(btn.id)) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    handleAffiliateClick(e);
+                });
+                btn.setAttribute('href', 'javascript:void(0);');
+            }
+        });
+        
+        // Also ensure that the disclaimer box or qualifier-bar can be tracked - no additional action needed
+        // Demo console ready
+        console.log("Solar Landing Page Loaded — Targeting: US, 21+, 650 credit, $5k income, SFH, New installations, Leads 24/7 EST");
+    })();
+</script>
+
+<!-- Additional microdata / structured data could be added for local business but not necessary -->
+</body>
+</html>

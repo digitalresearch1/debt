@@ -329,50 +329,58 @@
             backdrop-filter: blur(2px);
         }
 
-        /* ========== FIXED & ENLARGED DISCLAIMER STYLES ========== */
+        /* ========== ENLARGED DISCLAIMER SECTION (MAJOR SIZE INCREASE) ========== */
         .disclaimer-box {
-            background: #fff8ed;
-            border-left: 8px solid #cc7b00;
-            border-radius: 24px;
-            padding: 28px 32px;
-            margin: 30px 0 25px;
-            line-height: 1.55;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            background: #fff8f0;
+            border-left: 12px solid #cc5500;
+            border-right: 1px solid #ffe0b3;
+            border-radius: 32px;
+            padding: 32px 36px;
+            margin: 40px 0 30px;
+            line-height: 1.6;
+            box-shadow: 0 12px 28px -10px rgba(0,0,0,0.12);
         }
         .disclaimer-box strong {
             color: #b45400;
-            font-size: 1.2rem;
-            display: block;
-            margin-bottom: 12px;
         }
-        .disclaimer-text-large {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: #2c3e2f;
-            margin-bottom: 16px;
-            line-height: 1.6;
+        /* making the main disclaimer text LARGER */
+        .disclaimer-main-text {
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: #2c3e2a;
+            line-height: 1.55;
+            margin-top: 12px;
         }
-        .disclaimer-text-large u {
+        .disclaimer-main-text u {
             text-decoration-thickness: 2px;
         }
-        .disclaimer-subnote {
-            font-size: 0.95rem;
-            color: #5a6e5e;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px dashed #e2cba4;
+        .disclaimer-warning {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #c0392b;
+            background: #fff0e0;
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            letter-spacing: -0.3px;
         }
-        /* responsive disclaimer */
-        @media (max-width: 680px) {
-            .disclaimer-text-large {
-                font-size: 0.95rem;
-            }
-            .disclaimer-box {
-                padding: 20px 18px;
-            }
-            .disclaimer-box strong {
-                font-size: 1rem;
-            }
+        .disclaimer-subsection {
+            font-size: 1.1rem;
+            margin: 14px 0;
+            padding-left: 12px;
+            border-left: 3px solid #ffaa33;
+        }
+        .disclaimer-box p {
+            margin-bottom: 14px;
+            font-size: 1.1rem;
+        }
+        .disclaimer-highlight {
+            background: #fff1d6;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
         }
 
         footer {
@@ -418,6 +426,12 @@
             .qualifier-bar {
                 gap: 12px;
             }
+            .disclaimer-main-text {
+                font-size: 1.1rem;
+            }
+            .disclaimer-warning {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
@@ -430,7 +444,7 @@
         <div class="badge">⭐ Trusted Affiliate Partner • 4.98/5 Rating</div>
     </div>
 
-    <!-- Qualifiers & Targeting Info (US Nationwide, credit score, income, property type) -->
+    <!-- Qualifiers & Targeting Info -->
     <div class="qualifier-bar">
         <div class="qualifier-item">🇺🇸 US Nationwide</div>
         <div class="qualifier-item">🏠 Single-Family Homeowners</div>
@@ -450,7 +464,6 @@
                 <div class="stat"><span class="stat-number">25y</span> <span>Warranty</span></div>
                 <div class="stat"><span class="stat-number">$0</span> <span>Down Available</span></div>
             </div>
-            <!-- primary affiliate CTA -->
             <a href="#" class="btn btn-large" id="primaryCta">💰 Claim My Solar Savings Now →</a>
             <p style="margin-top: 18px; font-size: 0.8rem;">✔️ No obligation • 2-min eligibility check • 24/7 lead support (EST)</p>
         </div>
@@ -465,73 +478,29 @@
         <div class="section-title">Why Go Solar With Our Offer?</div>
         <div class="section-sub">Exclusive affiliate deal: premium panels, unbeatable savings & full support</div>
         <div class="cards-grid">
-            <div class="card">
-                <div class="card-icon">💰</div>
-                <h3>0% Down Financing</h3>
-                <p>No large upfront investment. Start saving from day one with flexible payment plans that fit your budget.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🌞</div>
-                <h3>26% Federal Tax Credit</h3>
-                <p>Claim massive tax incentives on your new solar system — plus state rebates where available.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">⚡</div>
-                <h3>Energy Independence</h3>
-                <p>Protect yourself from rising utility rates. Generate clean energy and reduce carbon footprint.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🔧</div>
-                <h3>25-Year Warranty</h3>
-                <p>Premium Tier-1 panels with guaranteed performance and professional installation included.</p>
-            </div>
+            <div class="card"><div class="card-icon">💰</div><h3>0% Down Financing</h3><p>No large upfront investment. Start saving from day one with flexible payment plans.</p></div>
+            <div class="card"><div class="card-icon">🌞</div><h3>26% Federal Tax Credit</h3><p>Claim massive tax incentives on your new solar system — plus state rebates.</p></div>
+            <div class="card"><div class="card-icon">⚡</div><h3>Energy Independence</h3><p>Protect yourself from rising utility rates. Generate clean energy.</p></div>
+            <div class="card"><div class="card-icon">🔧</div><h3>25-Year Warranty</h3><p>Premium Tier-1 panels with guaranteed performance and professional installation.</p></div>
         </div>
     </div>
 
-    <!-- Savings Highlight + interactive counter vibe -->
+    <!-- Savings Highlight -->
     <div class="savings-box">
-        <div class="savings-text">
-            <h3>🔋 Typical homeowner saves <span style="color:#ffd966;">$1,500+ yearly</span></h3>
-            <p>After solar installation, average electric bill drops 70% — and with net metering, you might even earn credits!</p>
-        </div>
-        <div>
-            <a href="#" class="btn" id="midCta">Check Eligibility →</a>
-        </div>
+        <div class="savings-text"><h3>🔋 Typical homeowner saves <span style="color:#ffd966;">$1,500+ yearly</span></h3><p>After solar installation, average electric bill drops 70% — net metering credits possible.</p></div>
+        <div><a href="#" class="btn" id="midCta">Check Eligibility →</a></div>
     </div>
 
     <!-- How it works + testimonial -->
     <div class="section" style="padding-top: 20px;">
         <div class="section-title">How It Works (3 Easy Steps)</div>
         <div class="cards-grid" style="margin-bottom: 30px;">
-            <div class="card" style="text-align: center;">
-                <div class="card-icon">📋</div>
-                <h3>1. Quick Quote</h3>
-                <p>Fill out our 2-minute form to see your personalized solar savings estimate.</p>
-            </div>
-            <div class="card" style="text-align: center;">
-                <div class="card-icon">🏡</div>
-                <h3>2. Free Consultation</h3>
-                <p>Local expert reviews your roof & energy needs, no pressure, just data.</p>
-            </div>
-            <div class="card" style="text-align: center;">
-                <div class="card-icon">✅</div>
-                <h3>3. Install & Save</h3>
-                <p>Professional installation, permits handled, and you start saving immediately.</p>
-            </div>
+            <div class="card" style="text-align: center;"><div class="card-icon">📋</div><h3>1. Quick Quote</h3><p>Fill out our 2-minute form to see your personalized solar savings estimate.</p></div>
+            <div class="card" style="text-align: center;"><div class="card-icon">🏡</div><h3>2. Free Consultation</h3><p>Local expert reviews your roof & energy needs, no pressure, just data.</p></div>
+            <div class="card" style="text-align: center;"><div class="card-icon">✅</div><h3>3. Install & Save</h3><p>Professional installation, permits handled, and you start saving immediately.</p></div>
         </div>
-
-        <!-- real social proof testimonial -->
-        <div class="testimonial">
-            <p>“Our electric bill dropped from $320/month to just $45! The affiliate process was seamless, and the solar team handled everything. Best decision we ever made.” </p>
-            <div class="author">
-                <span>⭐ ⭐ ⭐ ⭐ ⭐</span> 
-                <strong>— Linda R., California</strong> <span style="font-size: 0.8rem;">(Saving $3,200/year)</span>
-            </div>
-        </div>
-        <div class="testimonial" style="margin-top: 16px;">
-            <p>“I was skeptical about the tax credit, but my affiliate advisor walked me through it. I got 30% back on my system. Highly recommend this offer!”</p>
-            <div class="author"><span>⭐ ⭐ ⭐ ⭐ ⭐</span> <strong>— Marcus T., Texas</strong></div>
-        </div>
+        <div class="testimonial"><p>“Our electric bill dropped from $320/month to just $45! The affiliate process was seamless, and the solar team handled everything.”</p><div class="author"><span>⭐ ⭐ ⭐ ⭐ ⭐</span> <strong>— Linda R., California</strong> <span style="font-size: 0.8rem;">(Saving $3,200/year)</span></div></div>
+        <div class="testimonial" style="margin-top: 16px;"><p>“I was skeptical about the tax credit, but my affiliate advisor walked me through it. I got 30% back on my system.”</p><div class="author"><span>⭐ ⭐ ⭐ ⭐ ⭐</span> <strong>— Marcus T., Texas</strong></div></div>
     </div>
 
     <!-- exclusive affiliate bonus + final CTA -->
@@ -539,30 +508,40 @@
         <div class="limited">🔥 LIMITED TIME AFFILIATE BONUS 🔥</div>
         <h2>Get an Extra <span style="color:#e67e22;">$500 Cash Back</span> <br> When You Switch Through This Link</h2>
         <p style="font-size: 1.2rem; margin: 20px 0;">Plus: Free smart home energy monitor included ($299 value)</p>
-        <div style="margin: 20px 0;">
-            <span class="price-strike">Regular installation $18,000+</span>
-            <span class="price-offer">After incentives: ~$8,200*</span>
-        </div>
+        <div style="margin: 20px 0;"><span class="price-strike">Regular installation $18,000+</span> <span class="price-offer">After incentives: ~$8,200*</span></div>
         <a href="#" class="btn btn-large" id="finalCta" style="font-size: 1.35rem;">⚡ Yes! Reserve My Free Solar Quote →</a>
         <p style="margin-top: 28px; font-size: 0.8rem;">*Average after federal tax credit & local rebates. Actual savings vary. Zero obligation.</p>
         <div style="margin-top: 18px; font-size: 0.8rem; background: white; width: fit-content; margin-left: auto; margin-right: auto; padding: 6px 20px; border-radius: 60px;">🔒 Your info is safe & never shared</div>
     </div>
 
-    <!-- ========== FIXED & ENLARGED DISCLAIMER SECTION ========== -->
+    <!-- ========== ENLARGED & HIGHLIGHTED DISCLAIMER SECTION ========== -->
     <div class="disclaimer-box">
-        <strong>⚠️ IMPORTANT DISCLAIMER — PLEASE READ CAREFULLY ⚠️</strong>
-        <div class="disclaimer-text-large">
-            This site is a <u>free service</u> to assist homeowners in connecting with local service providers. 
-            All contractors/providers are independent and <strong>this site does not warrant or guarantee any work performed</strong>. 
+        <div class="disclaimer-warning">⚠️ IMPORTANT DISCLAIMER — PLEASE READ CAREFULLY ⚠️</div>
+        
+        <div class="disclaimer-main-text">
+            <strong>🔹 This site is a free service to assist homeowners in connecting with local service providers.</strong> 
+            All contractors/providers are independent and 
+            <u>this site does not warrant or guarantee any work performed</u>. 
             It is the <strong>responsibility of the homeowner</strong> to verify that the hired contractor furnishes the necessary 
             <strong>license and insurance</strong> required for the work being performed. 
-            <strong>All persons depicted in a photo or video are actors or models and not contractors listed on this site.</strong>
+            All persons depicted in a photo or video are <strong>actors or models</strong> and not contractors listed on this site.
         </div>
-        <div class="disclaimer-subnote">
-            📞 <strong>Lead Service & Availability:</strong> 24/7 support — Time Zone: EST. Nationwide US only.<br>
-            ✅ <strong>Qualification criteria (must meet all):</strong> Age 21+ • Single-family homeowner • Monthly income $5k+ • Credit score 650+ • Looking for NEW solar installation (not repairs/upgrades).<br>
-            🕒 <strong>Preferred contact hours:</strong> Monday – Sunday, 7:00 AM – 12:00 AM EST.
+
+        <div class="disclaimer-subsection">
+            📞 <strong>Lead Service & Availability:</strong> 24/7 support — Time Zone: EST. Our partner network connects homeowners nationwide (US only).
         </div>
+        <div class="disclaimer-subsection">
+            ✅ <strong>Qualification Criteria (must meet all):</strong><br>
+            • Age: 21 years or older • Homeownership: Single-family unit (no condos/duplexes unless approved) • Monthly household income ≥ $5,000 • Minimum credit score: 650+ <br>
+            • Looking for new solar installation services (not repairs or existing solar upgrades).
+        </div>
+        <div class="disclaimer-subsection">
+            🕒 <strong>Preferred Contact Hours:</strong> Monday – Sunday: 7:00 AM – 12:00 AM EST. Our solar specialists will reach out during these windows to ensure fast connection.
+        </div>
+        
+        <p style="margin-top: 20px; font-size: 1rem; background: #fff0e0; padding: 12px 18px; border-radius: 20px; text-align: center;">
+            <strong>⚠️ By using this service, you acknowledge that you have read and understood this disclaimer.</strong>
+        </p>
     </div>
 
     <!-- Additional hour badge and trust signal -->
@@ -581,7 +560,7 @@
 <!-- Interactive Script for Affiliate Links & Lead Simulation -->
 <script>
     (function() {
-        // REPLACE WITH YOUR ACTUAL AFFILIATE OFFER URL
+        // Replace with your actual affiliate offer URL
         const affiliateOfferUrl = "https://www.youraffiliatelink.com/solar-offer?ref=affiliate123";  // <-- REPLACE with real affiliate link
 
         function handleAffiliateClick(event) {
@@ -615,8 +594,9 @@
             }
         });
         
-        console.log("Solar Landing Page Loaded — Enhanced Disclaimer with larger text & full compliance.");
+        console.log("Solar Landing Page Loaded — ENLARGED DISCLAIMER ACTIVE — Targeting: US, 21+, 650 credit, $5k income, SFH, New installations, Leads 24/7 EST");
     })();
 </script>
+
 </body>
 </html>

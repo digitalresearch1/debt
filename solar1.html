@@ -303,7 +303,7 @@
             margin: 20px 0 12px;
         }
 
-        /* QUALIFIER BANNER - new */
+        /* QUALIFIER BANNER */
         .qualifier-bar {
             background: #1f2a3e;
             background: linear-gradient(98deg, #132f2a 0%, #1a443c 100%);
@@ -328,20 +328,53 @@
             border-radius: 60px;
             backdrop-filter: blur(2px);
         }
+
+        /* ========== FIXED & ENLARGED DISCLAIMER STYLES ========== */
         .disclaimer-box {
-            background: #ffffffcc;
-            backdrop-filter: blur(8px);
-            border-left: 5px solid #ffaa33;
-            padding: 18px 24px;
+            background: #fff8ed;
+            border-left: 8px solid #cc7b00;
             border-radius: 24px;
-            font-size: 0.75rem;
-            color: #2c3e40;
-            margin: 20px 0 20px;
-            line-height: 1.5;
+            padding: 28px 32px;
+            margin: 30px 0 25px;
+            line-height: 1.55;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
         }
         .disclaimer-box strong {
             color: #b45400;
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 12px;
         }
+        .disclaimer-text-large {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2c3e2f;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+        .disclaimer-text-large u {
+            text-decoration-thickness: 2px;
+        }
+        .disclaimer-subnote {
+            font-size: 0.95rem;
+            color: #5a6e5e;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #e2cba4;
+        }
+        /* responsive disclaimer */
+        @media (max-width: 680px) {
+            .disclaimer-text-large {
+                font-size: 0.95rem;
+            }
+            .disclaimer-box {
+                padding: 20px 18px;
+            }
+            .disclaimer-box strong {
+                font-size: 1rem;
+            }
+        }
+
         footer {
             border-top: 1px solid #e2e8f0;
             padding: 40px 0 30px;
@@ -397,7 +430,7 @@
         <div class="badge">⭐ Trusted Affiliate Partner • 4.98/5 Rating</div>
     </div>
 
-    <!-- Qualifiers & Targeting Info Redesign (US Nationwide, credit score, income, property type) -->
+    <!-- Qualifiers & Targeting Info (US Nationwide, credit score, income, property type) -->
     <div class="qualifier-bar">
         <div class="qualifier-item">🇺🇸 US Nationwide</div>
         <div class="qualifier-item">🏠 Single-Family Homeowners</div>
@@ -515,14 +548,21 @@
         <div style="margin-top: 18px; font-size: 0.8rem; background: white; width: fit-content; margin-left: auto; margin-right: auto; padding: 6px 20px; border-radius: 60px;">🔒 Your info is safe & never shared</div>
     </div>
 
-    <!-- *** NEW SECTION: Lead hours, qualifiers in detail, Disclaimers *** -->
+    <!-- ========== FIXED & ENLARGED DISCLAIMER SECTION ========== -->
     <div class="disclaimer-box">
-        <strong>📞 Lead Service & Availability:</strong> 24/7 support — Time Zone: EST. Our partner network connects homeowners nationwide (US only). <br><br>
-        ✅ <strong>Qualification Criteria (must meet all):</strong> <br>
-        • Age: 21 years or older • Homeownership: Single-family unit (no condos/duplexes unless approved) • Monthly household income ≥ $5,000 • Minimum credit score: 650+ <br>
-        • Looking for new solar installation services (not repairs or existing solar upgrades).<br><br>
-        🕒 <strong>Preferred Contact Hours:</strong> Monday – Sunday: 7:00 AM – 12:00 AM EST. Our solar specialists will reach out during these windows to ensure fast connection.<br><br>
-        <strong>⚠️ IMPORTANT DISCLAIMER:</strong> This site is a free service to assist homeowners in connecting with local service providers. All contractors/providers are independent and this site does not warrant or guarantee any work performed. It is the responsibility of the homeowner to verify that the hired contractor furnishes the necessary license and insurance required for the work being performed. All persons depicted in a photo or video are actors or models and not contractors listed on this site.
+        <strong>⚠️ IMPORTANT DISCLAIMER — PLEASE READ CAREFULLY ⚠️</strong>
+        <div class="disclaimer-text-large">
+            This site is a <u>free service</u> to assist homeowners in connecting with local service providers. 
+            All contractors/providers are independent and <strong>this site does not warrant or guarantee any work performed</strong>. 
+            It is the <strong>responsibility of the homeowner</strong> to verify that the hired contractor furnishes the necessary 
+            <strong>license and insurance</strong> required for the work being performed. 
+            <strong>All persons depicted in a photo or video are actors or models and not contractors listed on this site.</strong>
+        </div>
+        <div class="disclaimer-subnote">
+            📞 <strong>Lead Service & Availability:</strong> 24/7 support — Time Zone: EST. Nationwide US only.<br>
+            ✅ <strong>Qualification criteria (must meet all):</strong> Age 21+ • Single-family homeowner • Monthly income $5k+ • Credit score 650+ • Looking for NEW solar installation (not repairs/upgrades).<br>
+            🕒 <strong>Preferred contact hours:</strong> Monday – Sunday, 7:00 AM – 12:00 AM EST.
+        </div>
     </div>
 
     <!-- Additional hour badge and trust signal -->
@@ -541,28 +581,20 @@
 <!-- Interactive Script for Affiliate Links & Lead Simulation -->
 <script>
     (function() {
-        // Replace with your actual affiliate offer URL
+        // REPLACE WITH YOUR ACTUAL AFFILIATE OFFER URL
         const affiliateOfferUrl = "https://www.youraffiliatelink.com/solar-offer?ref=affiliate123";  // <-- REPLACE with real affiliate link
 
-        // Helper function for affiliate click tracking & redirection
         function handleAffiliateClick(event) {
             event.preventDefault();
-            // Optional: Add lead tracking / GA Event
             console.log("Affiliate Solar Lead Clicked — qualifying homeowner (21+, 650+ credit, income $5k+, USA)");
-            // Show a gentle confirmation with the qualifier emphasis (increases lead quality)
             const userConfirmed = confirm("✅ IMPORTANT: This offer is for US homeowners (21+, single-family, monthly income $5k+, credit 650+). Do you meet these criteria? Click OK to proceed to the official partner form.");
             if (userConfirmed) {
-                // For better lead quality: track custom event (optional pixel). Redirect to affiliate partner page.
                 window.open(affiliateOfferUrl, '_blank');
-                // For main redirect (self) use below:
-                // window.location.href = affiliateOfferUrl;
             } else {
-                // Show friendly message if they don't meet criteria
                 alert("No problem! Our offer is designed for qualifying homeowners. If you meet the criteria, please check again. Thank you for visiting.");
             }
         }
 
-        // Bind to all primary CTA buttons (IDs: primaryCta, midCta, finalCta)
         const ctaButtons = ['primaryCta', 'midCta', 'finalCta'];
         ctaButtons.forEach(id => {
             const btn = document.getElementById(id);
@@ -572,7 +604,6 @@
             }
         });
 
-        // Additionally catch any other .btn that might be in the page (like secondary but they are already same class)
         const extraButtons = document.querySelectorAll('.btn');
         extraButtons.forEach(btn => {
             if(!ctaButtons.includes(btn.id)) {
@@ -584,12 +615,8 @@
             }
         });
         
-        // Also ensure that the disclaimer box or qualifier-bar can be tracked - no additional action needed
-        // Demo console ready
-        console.log("Solar Landing Page Loaded — Targeting: US, 21+, 650 credit, $5k income, SFH, New installations, Leads 24/7 EST");
+        console.log("Solar Landing Page Loaded — Enhanced Disclaimer with larger text & full compliance.");
     })();
 </script>
-
-<!-- Additional microdata / structured data could be added for local business but not necessary -->
 </body>
 </html>

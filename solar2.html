@@ -275,6 +275,31 @@
             color: #567a6e;
         }
 
+        /* disclaimer-box styles for the enhanced disclaimer section */
+        .disclaimer-box {
+            background: #fffaf2;
+            border-radius: 32px;
+            padding: 28px 32px;
+            margin: 36px 0 24px;
+            border: 1px solid #ffe1b3;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.04);
+        }
+        .disclaimer-subsection {
+            background: #ffffffd9;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            border-radius: 28px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #2b3b2c;
+            border-left: 6px solid #f5a623;
+            font-weight: 500;
+        }
+        .disclaimer-subsection strong {
+            color: #b45f06;
+            font-size: 1.05rem;
+        }
+
         @media (max-width: 780px) {
             .hero-left h1 {
                 font-size: 2.3rem;
@@ -291,6 +316,12 @@
             }
             .savings-cta h3 {
                 font-size: 1.4rem;
+            }
+            .disclaimer-box {
+                padding: 20px;
+            }
+            .disclaimer-subsection {
+                padding: 14px 16px;
             }
         }
     </style>
@@ -371,9 +402,8 @@
         <div class="hours-bar" style="margin-top: 24px; display: inline-block; background:#f0e5d8;">⏰ 24/7 Lead Support • EST Hours • Mon-Sun 7am-12am</div>
     </div>
 
-  <!-- ========== ENLARGED & HIGHLIGHTED DISCLAIMER SECTION ========== -->
+    <!-- ENLARGED DISCLAIMER SECTION - No Popup, just transparent info -->
     <div class="disclaimer-box">
-
         <div class="disclaimer-subsection">
             📞 <strong>Lead Service & Availability:</strong> 24/7 support — Time Zone: EST. Our partner network connects homeowners nationwide (US only).
         </div>
@@ -386,7 +416,7 @@
             🕒 <strong>Preferred Contact Hours:</strong> Monday – Sunday: 7:00 AM – 12:00 AM EST. Our solar specialists will reach out during these windows to ensure fast connection.
         </div>
         
-        <p style="margin-top: 20px; font-size: 1rem; background: #fff0e0; padding: 12px 18px; border-radius: 20px; text-align: center;">
+        <p style="margin-top: 24px; font-size: 1rem; background: #fff0e0; padding: 12px 18px; border-radius: 20px; text-align: center; font-weight: 500;">
             <strong>⚠️ By using this service, you acknowledge that you have read and understood this disclaimer.</strong>
         </p>
     </div>
@@ -401,19 +431,17 @@
 
 <script>
     (function() {
-        // Replace with your actual affiliate URL
+        // Direct redirect URL (no popup or confirmation)
         const AFFILIATE_URL = "https://home-solar-savings-2026.netlify.app/";
 
+        // Function to handle click: simply open the affiliate URL in a new tab
         function handleAffiliateClick(e) {
             e.preventDefault();
-            const confirmMsg = "⚡ QUALIFICATION CHECK ⚡\n\nYou must meet ALL:\n\n✅ US Homeowner\n✅ Single-family home\n✅ Monthly income $5k+\n✅ Credit score 650+\n✅ Age 21+\n✅ Looking for NEW solar installation\n\nDo you meet these criteria? Click OK to proceed.";
-            if (confirm(confirmMsg)) {
-                window.open(AFFILIATE_URL, '_blank');
-            } else {
-                alert("No problem! This offer is only for qualifying homeowners. Check again if you meet the criteria.");
-            }
+            // Direct navigation without any popup, alert, or confirmation dialog.
+            window.open(AFFILIATE_URL, '_blank');
         }
 
+        // Attach to main buttons
         const btns = ['mainCta', 'midCta', 'finalCta'];
         btns.forEach(id => {
             const el = document.getElementById(id);
@@ -422,11 +450,20 @@
                 el.setAttribute('href', 'javascript:void(0);');
             }
         });
-        // any extra .btn
+        
+        // Also bind any other button with class 'btn' that may not have IDs (such as if needed)
         document.querySelectorAll('.btn').forEach(btn => {
-            if(!btns.includes(btn.id)) {
+            // Avoid double binding for the specific id-buttons if they appear twice (safe)
+            if(!btns.includes(btn.id) && !btn.hasAttribute('data-listener-attached')) {
                 btn.addEventListener('click', handleAffiliateClick);
                 btn.setAttribute('href', 'javascript:void(0);');
+                btn.setAttribute('data-listener-attached', 'true');
+            } else if (btns.includes(btn.id)) {
+                // already bound, skip duplicate.
+            } else if (!btn.hasAttribute('data-listener-attached')) {
+                btn.addEventListener('click', handleAffiliateClick);
+                btn.setAttribute('href', 'javascript:void(0);');
+                btn.setAttribute('data-listener-attached', 'true');
             }
         });
     })();

@@ -54,6 +54,19 @@
             padding: 18px 48px;
         }
 
+        /* call button specific style */
+        .btn-call {
+            background: linear-gradient(105deg, #2e7d64 0%, #1f9a7a 100%);
+            box-shadow: 0 12px 20px -8px rgba(31, 154, 122, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn-call:hover {
+            background: linear-gradient(105deg, #1f9a7a 0%, #2e7d64 100%);
+            box-shadow: 0 20px 28px -10px rgba(31, 154, 122, 0.5);
+        }
+
         /* navbar */
         .navbar {
             display: flex;
@@ -300,6 +313,16 @@
             font-size: 1.05rem;
         }
 
+        /* dual CTA row */
+        .cta-dual {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 780px) {
             .hero-left h1 {
                 font-size: 2.3rem;
@@ -322,6 +345,10 @@
             }
             .disclaimer-subsection {
                 padding: 14px 16px;
+            }
+            .cta-dual {
+                flex-direction: column;
+                align-items: center;
             }
         }
     </style>
@@ -354,8 +381,12 @@
                 <div class="bonus-item">🎁 $500 Cash Back*</div>
                 <div class="bonus-item">🔋 Free Energy Monitor</div>
             </div>
-            <a href="#" class="btn btn-large" id="mainCta">☀️ Check My Eligibility →</a>
-            <p style="margin-top: 16px; font-size: 0.8rem;">✔️ 2-min quote • No obligation • 24/7 support EST</p>
+            <!-- Dual CTA: original eligibility check + phone number call button -->
+            <div class="cta-dual">
+                <a href="#" class="btn btn-large" id="mainCta">☀️ Check My Eligibility →</a>
+                <a href="tel:+18885551234" class="btn btn-large btn-call" id="callCtaHero">📞 Call Now: (888) 555-1234</a>
+            </div>
+            <p style="margin-top: 16px; font-size: 0.8rem;">✔️ 2-min quote • No obligation • 24/7 support EST • Speak to a live solar expert</p>
         </div>
         <div class="hero-right">
             <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 320'%3E%3Crect width='400' height='320' fill='%23eef6f0' rx='40'/%3E%3Cpath fill='%23318a5c' d='M90 160 L200 100 L310 160 L200 220 Z' opacity='0.3'/%3E%3Crect x='170' y='200' width='60' height='45' fill='%232d2d2d' rx='6'/%3E%3Cpath fill='%23ffb347' d='M190 222 L210 222 L210 242 L190 242 Z'/%3E%3Crect x='120' y='140' width='45' height='35' fill='%233f8f6b' rx='8'/%3E%3Crect x='235' y='140' width='45' height='35' fill='%233f8f6b' rx='8'/%3E%3Ccircle cx='200' cy='270' r='18' fill='%238bc34a'/%3E%3Ctext x='130' y='300' font-size='14' fill='%23336644' font-weight='bold'%3E☀️ 25-yr warranty%3C/text%3E%3C/svg%3E" alt="Solar panel illustration">
@@ -372,10 +403,13 @@
         </div>
     </div>
 
-    <!-- savings + CTA -->
+    <!-- savings + CTA with dual actions -->
     <div class="savings-cta">
         <div><h3>🔋 $0 down + $500 bonus for qualified homeowners</h3><p style="margin-top: 8px;">Credit 650+ / $5k+ monthly income / single-family home</p></div>
-        <div><a href="#" class="btn" id="midCta" style="background:#f5a623; color:#1e2a2f;">Claim Bonus →</a></div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="#" class="btn" id="midCta" style="background:#f5a623; color:#1e2a2f;">Claim Bonus →</a>
+            <a href="tel:+18885551234" class="btn btn-call" style="background:#2e7d64; color:white;">📞 Call (888) 555-1234</a>
+        </div>
     </div>
 
     <!-- 3 step process + testimonial -->
@@ -389,23 +423,34 @@
         <div class="testimonial">
             <p>“With 680 credit score, I qualified for $0 down. My bill dropped from $380 to $55. The $500 bonus was real!”</p>
             <div style="margin-top: 16px; font-weight: 700;">⭐ ⭐ ⭐ ⭐ ⭐ — David M., Florida</div>
+            <div style="margin-top: 12px;"><a href="tel:+18885551234" style="color:#1f6e43; font-weight:700;">📞 Call to see if you qualify too →</a></div>
         </div>
     </div>
 
-    <!-- final CTA block -->
+    <!-- final CTA block with enhanced phone & web buttons -->
     <div style="background: #fff2e0; border-radius: 48px; padding: 48px 32px; text-align: center; margin: 20px 0 30px;">
         <div style="background:#e03a3e20; display: inline-block; padding: 6px 24px; border-radius: 40px; font-weight:800; margin-bottom: 16px;">🔥 EXCLUSIVE AFFILIATE BONUS 🔥</div>
         <h2 style="font-size: 2rem; font-weight: 800;">Extra $500 Cash Back + Free Energy Monitor</h2>
         <p style="margin: 20px auto; max-width: 600px;">For homeowners who meet the criteria: 21+, single-family, $5k+/mo, credit 650+</p>
-        <a href="#" class="btn btn-large" id="finalCta" style="font-size: 1.4rem;">⚡ Yes, I want my free quote →</a>
-        <p style="margin-top: 24px; font-size: 0.75rem;">*$500 bonus applied after installation. See terms.</p>
-        <div class="hours-bar" style="margin-top: 24px; display: inline-block; background:#f0e5d8;">⏰ 24/7 Lead Support • EST Hours • Mon-Sun 7am-12am</div>
+        <div class="cta-dual" style="justify-content: center;">
+            <a href="#" class="btn btn-large" id="finalCta" style="font-size: 1.4rem;">⚡ Yes, I want my free quote →</a>
+            <a href="tel:+18885551234" class="btn btn-large btn-call" style="font-size: 1.4rem; background: linear-gradient(105deg, #2e7d64, #1f9a7a);">📞 Call a Solar Expert</a>
+        </div>
+        <p style="margin-top: 24px; font-size: 0.75rem;">*$500 bonus applied after installation. See terms. Live support 7 days a week.</p>
+        <div class="hours-bar" style="margin-top: 24px; display: inline-block; background:#f0e5d8;">⏰ 24/7 Lead Support • EST Hours • Mon-Sun 7am-12am • Direct Line: (888) 555-1234</div>
+    </div>
+
+    <!-- dedicated CALL TO ACTION PHONE NUMBER SECTION: Prominent click to call block -->
+    <div style="background: #1e3a33; border-radius: 48px; padding: 32px 24px; margin: 20px 0 30px; text-align: center; box-shadow: 0 12px 24px rgba(0,0,0,0.1);">
+        <div style="color: #ffefc0; font-size: 1.2rem; margin-bottom: 12px;">📞 Have questions? Speak to a real person now</div>
+        <a href="tel:+18885551234" style="font-size: 2.2rem; font-weight: 900; color: #ffbc3c; text-decoration: none; letter-spacing: -0.01em; display: inline-block; background: #0f2f28; padding: 16px 32px; border-radius: 60px; transition: 0.2s;">📞 (888) 555-1234</a>
+        <p style="color: #cbdcd6; margin-top: 16px;">Our solar specialists are waiting — verify your eligibility in 5 minutes over the phone.</p>
     </div>
 
     <!-- ENLARGED DISCLAIMER SECTION - No Popup, just transparent info -->
     <div class="disclaimer-box">
         <div class="disclaimer-subsection">
-            📞 <strong>Lead Service & Availability:</strong> 24/7 support — Time Zone: EST. Our partner network connects homeowners nationwide (US only).
+            📞 <strong>Lead Service & Availability:</strong> 24/7 support — Time Zone: EST. Our partner network connects homeowners nationwide (US only). <strong>DID Phone Number: (888) 555-1234</strong> – direct contact for solar experts.
         </div>
         <div class="disclaimer-subsection">
             ✅ <strong>Qualification Criteria (must meet all):</strong><br>
@@ -413,7 +458,7 @@
             • Looking for new solar installation services (not repairs or existing solar upgrades).
         </div>
         <div class="disclaimer-subsection">
-            🕒 <strong>Preferred Contact Hours:</strong> Monday – Sunday: 7:00 AM – 12:00 AM EST. Our solar specialists will reach out during these windows to ensure fast connection.
+            🕒 <strong>Preferred Contact Hours:</strong> Monday – Sunday: 7:00 AM – 12:00 AM EST. Our solar specialists will reach out during these windows to ensure fast connection. Alternatively, you can reach us directly at the DID number listed above.
         </div>
         
         <p style="margin-top: 24px; font-size: 1rem; background: #fff0e0; padding: 12px 18px; border-radius: 20px; text-align: center; font-weight: 500;">
@@ -423,7 +468,7 @@
 
     <footer>
         <p>© 2025 SolarBoost Affiliate Program — Independent matching service. All rights reserved.</p>
-        <p style="margin-top: 12px;">📞 24/7 Nationwide Helpline | <a href="#" style="color:#1f6e43;">Privacy</a> | <a href="#" style="color:#1f6e43;">Terms</a></p>
+        <p style="margin-top: 12px;">📞 24/7 Nationwide Helpline: <a href="tel:+18885551234" style="color:#1f6e43; font-weight:700;">(888) 555-1234</a> | <a href="#" style="color:#1f6e43;">Privacy</a> | <a href="#" style="color:#1f6e43;">Terms</a></p>
         <p style="margin-top: 10px;">As an affiliate, we may earn a commission when you use our links.</p>
         <p style="margin-top: 10px; font-size:0.7rem;"><strong>Disclosure:This site is a free service to assist homeowners in connecting with local service providers. All contractors/providers are independent and this site does not warrant or guarantee any work performed. It is the responsibility of the homeowner to verify that the hired contractor furnishes the necessary license and insurance required for the work being performed. All persons depicted in a photo or video are actors or models and not contractors listed on this site.| <a href="#" style="color:#1f6e43;">Terms of Service</a> | *Estimated savings based on average usage, actual results may vary. </strong> </p>
     </footer>
@@ -441,7 +486,7 @@
             window.open(AFFILIATE_URL, '_blank');
         }
 
-        // Attach to main buttons
+        // Attach to main buttons that lead to the affiliate form (eligibility check & claim bonus)
         const btns = ['mainCta', 'midCta', 'finalCta'];
         btns.forEach(id => {
             const el = document.getElementById(id);
@@ -451,21 +496,36 @@
             }
         });
         
-        // Also bind any other button with class 'btn' that may not have IDs (such as if needed)
+        // Also bind any other button with class 'btn' that may not have IDs (e.g., generic .btn that links to affiliate)
+        // But we must avoid overriding the phone buttons (they have href="tel:..." already). So we only target buttons that don't have 'tel:' in href.
         document.querySelectorAll('.btn').forEach(btn => {
-            // Avoid double binding for the specific id-buttons if they appear twice (safe)
+            // if button has href attribute containing 'tel', skip because it's a call button.
+            if(btn.getAttribute('href') && btn.getAttribute('href').startsWith('tel:')) {
+                return;
+            }
+            // avoid double binding for the specific id-buttons if they appear twice (safe)
             if(!btns.includes(btn.id) && !btn.hasAttribute('data-listener-attached')) {
-                btn.addEventListener('click', handleAffiliateClick);
-                btn.setAttribute('href', 'javascript:void(0);');
-                btn.setAttribute('data-listener-attached', 'true');
+                // Make sure it's not a call CTA.
+                if(!btn.classList.contains('btn-call') && (!btn.getAttribute('href') || !btn.getAttribute('href').startsWith('tel'))) {
+                    btn.addEventListener('click', handleAffiliateClick);
+                    btn.setAttribute('href', 'javascript:void(0);');
+                    btn.setAttribute('data-listener-attached', 'true');
+                } else if (btn.classList.contains('btn-call')) {
+                    // btn-call is phone specific, ensure it stays functional, no override.
+                    // Already has valid tel: link, keep.
+                }
             } else if (btns.includes(btn.id)) {
                 // already bound, skip duplicate.
-            } else if (!btn.hasAttribute('data-listener-attached')) {
+            } else if (!btn.hasAttribute('data-listener-attached') && !btn.classList.contains('btn-call')) {
                 btn.addEventListener('click', handleAffiliateClick);
                 btn.setAttribute('href', 'javascript:void(0);');
                 btn.setAttribute('data-listener-attached', 'true');
             }
         });
+
+        // For safety, ensure all phone anchor tags with href="tel:+18885551234" remain clickable and no interference.
+        // Also, we can add an explicit click handler to track calls if needed (just optional, but no interference).
+        console.log("SolarBoost: Call buttons active with DID (888) 555-1234, affiliate redirects ready.");
     })();
 </script>
 </body>

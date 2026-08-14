@@ -1,451 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>NexaSolar | $0 Down • 70% Savings • $500 Bonus</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: #f9fafb;
-            color: #0a1c1f;
-            line-height: 1.4;
-        }
-
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 28px;
-        }
-
-        /* button styles */
-        .btn {
-            display: inline-block;
-            background: #0f3b2c;
-            color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
-            padding: 14px 36px;
-            border-radius: 50px;
-            text-decoration: none;
-            transition: all 0.25s;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            box-shadow: 0 8px 20px -6px rgba(15, 59, 44, 0.3);
-        }
-
-        .btn-primary {
-            background: #0f3b2c;
-        }
-        .btn-primary:hover {
-            background: #1c5e46;
-            transform: translateY(-2px);
-            box-shadow: 0 14px 26px -8px rgba(15, 59, 44, 0.4);
-        }
-        .btn-accent {
-            background: #f4a261;
-            color: #1e2a2a;
-            box-shadow: 0 8px 18px -6px rgba(244, 162, 97, 0.4);
-        }
-        .btn-accent:hover {
-            background: #e76f51;
-            transform: translateY(-2px);
-        }
-        .btn-large {
-            font-size: 1.3rem;
-            padding: 16px 44px;
-        }
-
-        /* navbar */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 24px 0;
-            flex-wrap: wrap;
-            gap: 20px;
-            border-bottom: 1px solid #e2ede8;
-        }
-        .logo {
-            font-size: 1.9rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            background: linear-gradient(115deg, #0f3b2c, #2a9d8f);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .trust-badge {
-            background: #eef2f0;
-            padding: 8px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        /* qualifier pills */
-        .qualifier-flex {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 16px;
-            margin: 28px 0 32px;
-        }
-        .pill {
-            background: #eef2f0;
-            padding: 8px 22px;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: #0f3b2c;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* hero grid */
-        .hero-grid {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 50px;
-            padding: 20px 0 60px;
-        }
-        .hero-left {
-            flex: 1.2;
-        }
-        .hero-left .tag {
-            background: #2a9d8f20;
-            color: #1e6b5e;
-            display: inline-block;
-            padding: 6px 18px;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            margin-bottom: 20px;
-        }
-        .hero-left h1 {
-            font-size: 3.4rem;
-            font-weight: 800;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-            margin-bottom: 20px;
-        }
-        .hero-left h1 span {
-            color: #e76f51;
-            border-bottom: 3px solid #f4a261;
-        }
-        .hero-stats {
-            display: flex;
-            gap: 30px;
-            margin: 28px 0;
-        }
-        .stat-block {
-            background: white;
-            padding: 8px 20px;
-            border-radius: 60px;
-            font-weight: 700;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-        }
-        .hero-right {
-            flex: 1;
-            text-align: center;
-            background: #eef3ef;
-            border-radius: 48px;
-            padding: 20px;
-        }
-        .hero-right img {
-            max-width: 100%;
-            width: 380px;
-        }
-
-        /* section titles */
-        .section-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .section-sub {
-            text-align: center;
-            max-width: 680px;
-            margin: 0 auto 50px;
-            color: #4a6a5e;
-        }
-
-        /* benefit cards */
-        .benefit-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 28px;
-            justify-content: center;
-        }
-        .benefit-card {
-            background: white;
-            border-radius: 32px;
-            padding: 32px 28px;
-            flex: 1;
-            min-width: 220px;
-            text-align: center;
-            transition: 0.2s;
-            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.06);
-            border: 1px solid #eaf2ef;
-        }
-        .benefit-card:hover {
-            transform: translateY(-5px);
-        }
-
-        /* savings banner */
-        .savings-banner {
-            background: #0f3b2c;
-            border-radius: 48px;
-            padding: 40px 48px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            margin: 40px 0;
-            color: white;
-        }
-        .savings-banner h3 {
-            font-size: 1.8rem;
-            font-weight: 800;
-        }
-
-        /* steps */
-        .steps-wrap {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin: 40px 0;
-        }
-        .step {
-            background: white;
-            border-radius: 32px;
-            padding: 28px;
-            flex: 1;
-            text-align: center;
-        }
-
-        /* testimonial cards */
-        .testimonial-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin: 40px 0;
-        }
-        .testi {
-            background: #ffffffdb;
-            border-radius: 28px;
-            padding: 28px 32px;
-            flex: 1;
-            border-left: 6px solid #f4a261;
-        }
-
-        /* final cta panel */
-        .final-cta-panel {
-            background: linear-gradient(115deg, #ffe6d5, #ffefdf);
-            border-radius: 56px;
-            padding: 56px 48px;
-            text-align: center;
-            margin: 40px 0;
-        }
-
-        /* ENLARGED DISCLAIMER (new design, bigger) */
-        .legal-disclaimer {
-            background: #fff7ed;
-            border-radius: 36px;
-            padding: 36px 42px;
-            margin: 40px 0 32px;
-            border: 1px solid #ffe0b5;
-            box-shadow: 0 15px 30px -12px rgba(0,0,0,0.05);
-        }
-        .disclaimer-head {
-            font-size: 1.65rem;
-            font-weight: 800;
-            color: #bc3900;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .disclaimer-body {
-            font-size: 1.3rem;
-            line-height: 1.55;
-            font-weight: 500;
-            color: #2d3a2f;
-            margin-bottom: 24px;
-        }
-        .disclaimer-body strong {
-            color: #c55a00;
-        }
-        .disclaimer-details {
-            font-size: 1.05rem;
-            padding-left: 20px;
-            border-left: 4px solid #f4a261;
-            margin-top: 20px;
-        }
-        .small-note {
-            font-size: 0.9rem;
-            color: #5f6c64;
-        }
-
-        footer {
-            border-top: 1px solid #dee8e3;
-            padding: 40px 0 30px;
-            text-align: center;
-            font-size: 0.8rem;
-        }
-        @media (max-width: 780px) {
-            .hero-left h1 { font-size: 2.3rem; }
-            .section-title { font-size: 1.8rem; }
-            .disclaimer-body { font-size: 1.05rem; }
-            .disclaimer-head { font-size: 1.3rem; }
-            .legal-disclaimer { padding: 24px 20px; }
-            .btn-large { font-size: 1.1rem; padding: 14px 28px; }
-            .savings-banner h3 { font-size: 1.4rem; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solar Homeowner Qualification Research Study</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+body{font-family:Inter,sans-serif;background:radial-gradient(circle at top,#1e293b 0,#020617 75%);min-height:100vh}
+.shell{background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(15,23,42,.28)}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px}
+.btn{background:linear-gradient(135deg,#eab308,#ca8a04);color:#fff}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+.progress-bar{height:10px;border-radius:999px;background:#e5e7eb;overflow:hidden}
+.progress-bar>div{height:100%;width:0;background:linear-gradient(135deg,#eab308,#ca8a04);transition:.2s}
+.hidden{display:none!important}
+.qwrap{max-width:720px;margin:0 auto}
+.qtext{font-size:1.05rem;color:#0f172a;font-weight:600}
+.opt{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid #e5e7eb;border-radius:14px;cursor:pointer}
+.opt:hover{background:#f8fafc}
+.opt input{width:18px;height:18px}
+.notice{border-radius:14px;border:1px solid;padding:12px 14px}
+.notice-amber{background:#fffbeb;border-color:#fde68a;color:#92400e}
+.notice-emerald{background:#ecfdf5;border-color:#6ee7b7;color:#065f46}
+</style>
 </head>
-<body>
+<body class="p-4 md:p-8 flex items-center justify-center">
+<main class="shell w-full max-w-5xl p-4 md:p-8 lg:p-10">
 
-<div class="container">
-    <!-- navigation -->
-    <div class="navbar">
-        <div class="logo">☀️ Nexa<span style="color:#e76f51;">Solar</span></div>
-        <div class="trust-badge">⭐ 4.98/5 • 2,400+ homeowners</div>
-    </div>
-
-    <!-- qualifiers row (requirements) -->
-    <div class="qualifier-flex">
-        <div class="pill">🇺🇸 US Nationwide</div>
-        <div class="pill">🏡 Single-Family Homeowners</div>
-        <div class="pill">💰 Income $5k+/mo</div>
-        <div class="pill">📈 Credit 650+</div>
-        <div class="pill">🧑‍💻 21+ Only</div>
-    </div>
-
-    <!-- hero section -->
-    <div class="hero-grid">
-        <div class="hero-left">
-            <div class="tag">⚡ LIMITED TIME: $500 BONUS + FREE MONITOR</div>
-            <h1>Slash your bill by <span>70%</span><br>$0 down solar for qualified homeowners</h1>
-            <p style="font-size: 1.1rem; color: #2c5a4a;">Credit 650+? $5k+ monthly income? You likely qualify for massive savings + federal tax credit.</p>
-            <div class="hero-stats">
-                <div class="stat-block">✅ 30% Tax Credit</div>
-                <div class="stat-block">✅ 25-Year Warranty</div>
-                <div class="stat-block">✅ $0 Down</div>
-            </div>
-            <a href="#" class="btn btn-primary btn-large" id="primaryCta">💰 Check My Eligibility →</a>
-            <p style="margin-top: 18px; font-size: 0.75rem;">✔️ No obligation • 2-min estimate • 24/7 EST support</p>
-        </div>
-        <div class="hero-right">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 320'%3E%3Crect width='400' height='320' fill='%23eef3ef' rx='40'/%3E%3Cpath fill='%232a9d8f' d='M90 160 L200 100 L310 160 L200 220 Z' opacity='0.2'/%3E%3Crect x='165' y='195' width='70' height='45' fill='%232c3e2f' rx='8'/%3E%3Cpath fill='%23f4a261' d='M185 216 L215 216 L215 236 L185 236 Z'/%3E%3Crect x='120' y='138' width='46' height='36' fill='%233f8f6b' rx='8'/%3E%3Crect x='234' y='138' width='46' height='36' fill='%233f8f6b' rx='8'/%3E%3Ccircle cx='200' cy='275' r='18' fill='%23e9c46a'/%3E%3Ctext x='140' y='305' font-size='13' fill='%232d6a4e' font-weight='bold'%3E☀️ 25-yr warranty%3C/text%3E%3C/svg%3E" alt="Solar house">
-        </div>
-    </div>
-
-    <!-- benefits -->
-    <div style="padding: 40px 0 30px;">
-        <div class="section-title">Why homeowners are switching</div>
-        <div class="section-sub">Exclusive affiliate offer: premium panels, unbeatable savings, full support</div>
-        <div class="benefit-grid">
-            <div class="benefit-card"><div style="font-size: 2.5rem;">💰</div><h3 style="margin: 12px 0;">0% Down</h3><p>No upfront cost, start saving from day one.</p></div>
-            <div class="benefit-card"><div style="font-size: 2.5rem;">🌿</div><h3 style="margin: 12px 0;">26% Tax Credit</h3><p>Federal incentive + state rebates.</p></div>
-            <div class="benefit-card"><div style="font-size: 2.5rem;">⚡</div><h3 style="margin: 12px 0;">Energy Independence</h3><p>Protect against rising utility rates.</p></div>
-            <div class="benefit-card"><div style="font-size: 2.5rem;">🔧</div><h3 style="margin: 12px 0;">25-Year Warranty</h3><p>Tier-1 panels, pro installation.</p></div>
-        </div>
-    </div>
-
-    <!-- savings banner -->
-    <div class="savings-banner">
-        <div><h3>🔋 Homeowners save $1,500+ / year</h3><p style="opacity:0.9;">70% avg bill reduction + net metering benefits</p></div>
-        <div><a href="#" class="btn btn-accent" id="midCta">See if you qualify →</a></div>
-    </div>
-
-    <!-- steps + testimonial -->
-    <div class="section-title">Get solar in 3 simple steps</div>
-    <div class="steps-wrap">
-        <div class="step"><div style="font-size: 2rem;">📋</div><h3>1. Quick check</h3><p>2-min form – see your personalized savings.</p></div>
-        <div class="step"><div style="font-size: 2rem;">🏠</div><h3>2. Free consult</h3><p>Local expert reviews roof & energy needs.</p></div>
-        <div class="step"><div style="font-size: 2rem;">✅</div><h3>3. Install & save</h3><p>Pro install, permits handled, start saving.</p></div>
-    </div>
-    <div class="testimonial-grid">
-        <div class="testi"><p style="font-size:1.1rem;">“$380 → $55 after solar. Credit 680, $0 down. The $500 bonus was real!”</p><div class="author" style="margin-top: 16px; font-weight:700;">⭐ ⭐ ⭐ ⭐ ⭐ — David M., Florida</div></div>
-        <div class="testi"><p style="font-size:1.1rem;">“Tax credit covered 30%, my bill dropped 70%. Best home decision.”</p><div class="author" style="margin-top: 16px; font-weight:700;">⭐ ⭐ ⭐ ⭐ ⭐ — Patricia K., Texas</div></div>
-    </div>
-
-    <!-- final cta -->
-    <div class="final-cta-panel">
-        <div style="background:#e76f5120; display:inline-block; padding:6px 28px; border-radius:40px; font-weight:800;">🔥 AFFILIATE EXCLUSIVE BONUS 🔥</div>
-        <h2 style="font-size:2rem; margin: 20px 0;">Extra $500 Cash Back + Free Energy Monitor</h2>
-        <p style="font-size:1.1rem;">For homeowners who meet criteria: 21+, single-family, income $5k+, credit 650+</p>
-        <div style="margin: 28px 0;"><span style="text-decoration:line-through; color:#6c7a74;">Regular $18k+</span> <strong style="font-size:1.8rem; color:#0f3b2c;">After incentives ~$8,200*</strong></div>
-        <a href="#" class="btn btn-primary btn-large" id="finalCta" style="background:#e76f51;">⚡ Claim My $500 Bonus →</a>
-        <p class="small-note" style="margin-top: 20px;">*After federal tax credit & local rebates • Zero obligation</p>
-        <div style="background:white; width:fit-content; margin:20px auto 0; padding:6px 22px; border-radius:60px;">🔒 24/7 Lead Support • EST hours</div>
-    </div>
-
-    <!-- =============== ENLARGED DISCLAIMER - BIGGER THAN BEFORE =============== -->
-    <div class="legal-disclaimer">
-       <div class="disclaimer-head">
-            ⚠️ IMPORTANT DISCLAIMER — PLEASE READ CAREFULLY
-        </div>
-        <div class="disclaimer-details">
-            <p>📞 <strong>Lead Service & Availability:</strong> 24/7 support — Time Zone: EST. US nationwide.</p>
-            <p>✅ <strong>Qualification Criteria (must meet all):</strong> Age 21+ • Single-family homeowner • Monthly income ≥ $5,000 • Credit score 650+ • Looking for NEW solar installation.</p>
-            <p>🕒 <strong>Preferred Contact Hours:</strong> Monday – Sunday: 7:00 AM – 12:00 AM EST.</p>
-        </div>
-        <p style="margin-top: 28px; background:#f3e9d2; padding: 12px 18px; border-radius: 28px; text-align: center; font-weight:600;">⚠️ By using this service, you acknowledge that you have read and understood this disclaimer.</p>
-    </div>
-
-    <footer>
-        <p>© 2025 SolarElevate Affiliate Program — This is an independent affiliate offer. Partnering with top-rated solar providers nationwide. </p>
-        <p style="margin-top: 12px;">📞 Nationwide Support (24/7) | <a href="#" style="color:#1f6e43;">Privacy Policy</a> </p>
-        <p style="margin-top: 10px;">✨ As an affiliate, we earn from qualifying purchases. This helps us keep providing free solar insights.</p>
-        <p style="margin-top: 10px; font-size:0.7rem;"><strong>Disclosure:This site is a free service to assist homeowners in connecting with local service providers. All contractors/providers are independent and this site does not warrant or guarantee any work performed. It is the responsibility of the homeowner to verify that the hired contractor furnishes the necessary license and insurance required for the work being performed. All persons depicted in a photo or video are actors or models and not contractors listed on this site.| <a href="#" style="color:#1f6e43;">Terms of Service</a> | *Estimated savings based on average usage, actual results may vary. </strong> </p>
-    </footer>
-   
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  
+  <div class="text-slate-600 text-xs md:text-sm"><span class="font-semibold">Estimated:</span> 4–5 minutes</div>
 </div>
 
+<div class="mb-6">
+  <div class="flex items-center justify-end text-xs font-semibold text-slate-600 mb-2">
+    <span id="progressLabel">1 / 16</span>
+  </div>
+  <div class="progress-bar"><div id="progressFill"></div></div>
+</div>
+
+<!-- PAGE 1 -->
+<section id="p1" class="card p-5 md:p-7 qwrap">
+<div class="qtext">Do you own the home where you currently live?</div>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q1" value="owner"><span>Yes, I own the home I live in</span></label>
+<label class="opt"><input type="radio" name="q1" value="rent"><span>No, I rent or lease the home</span></label>
+<label class="opt"><input type="radio" name="q1" value="live_with_owner"><span>I live with someone who owns the home</span></label>
+<label class="opt"><input type="radio" name="q1" value="purchasing"><span>I am currently purchasing the home</span></label>
+<label class="opt"><input type="radio" name="q1" value="other"><span>Other</span></label>
+</div><button id="p1Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 2 -->
+<section id="p2" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">What type of home do you own?</div>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q2" value="single_family"><span>Single-family detached home</span></label>
+<label class="opt"><input type="radio" name="q2" value="townhome"><span>Townhome</span></label>
+<label class="opt"><input type="radio" name="q2" value="condo"><span>Condo</span></label>
+<label class="opt"><input type="radio" name="q2" value="multi_family"><span>Duplex / Triplex / Multi-family</span></label>
+<label class="opt"><input type="radio" name="q2" value="manufactured"><span>Manufactured / Mobile home</span></label>
+<label class="opt"><input type="radio" name="q2" value="other"><span>Other</span></label>
+</div><button id="p2Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 3 -->
+<section id="p3" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">Who is primarily responsible for making decisions about improvements to this home?</div>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q3" value="primary"><span>I am the primary decision-maker</span></label>
+<label class="opt"><input type="radio" name="q3" value="shared"><span>I share decisions with my spouse or partner</span></label>
+<label class="opt"><input type="radio" name="q3" value="someone_else"><span>Someone else makes those decisions</span></label>
+<label class="opt"><input type="radio" name="q3" value="not_involved"><span>I'm not involved in home improvement decisions</span></label>
+</div><button id="p3Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 4 -->
+<section id="p4" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">How long have you owned your current home?</div>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q4" value="under_1"><span>Less than 1 year</span></label>
+<label class="opt"><input type="radio" name="q4" value="1_2"><span>1–2 years</span></label>
+<label class="opt"><input type="radio" name="q4" value="3_5"><span>3–5 years</span></label>
+<label class="opt"><input type="radio" name="q4" value="6_10"><span>6–10 years</span></label>
+<label class="opt"><input type="radio" name="q4" value="over_10"><span>More than 10 years</span></label>
+</div><button id="p4Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 5 -->
+<section id="p5" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">What is your age range?</div><p class="text-xs text-slate-500 mt-1">Used for market research and audience analysis.</p>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q5" value="under_35"><span>Under 35</span></label>
+<label class="opt"><input type="radio" name="q5" value="35_44"><span>35–44</span></label>
+<label class="opt"><input type="radio" name="q5" value="45_54"><span>45–54</span></label>
+<label class="opt"><input type="radio" name="q5" value="55_64"><span>55–64</span></label>
+<label class="opt"><input type="radio" name="q5" value="65_plus"><span>65+</span></label>
+</div><button id="p5Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 6 -->
+<section id="p6" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">Do you already have solar panels installed on your home?</div>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q6" value="no"><span>No, I do not have solar</span></label>
+<label class="opt"><input type="radio" name="q6" value="yes"><span>Yes, I already have solar</span></label>
+</div><button id="p6Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 7 -->
+<section id="p7" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">Are you currently responsible for paying the electricity bill for this home?</div>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q7" value="yes"><span>Yes, I pay the electricity bill</span></label>
+<label class="opt"><input type="radio" name="q7" value="shared"><span>I share responsibility for the bill</span></label>
+<label class="opt"><input type="radio" name="q7" value="someone_else"><span>Someone else pays the bill</span></label>
+<label class="opt"><input type="radio" name="q7" value="unsure"><span>I'm not sure</span></label>
+</div><button id="p7Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 8 -->
+<section id="p8" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">What is your average monthly electricity bill?</div>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q8" value="under_100"><span>Under $100 / month</span></label>
+<label class="opt"><input type="radio" name="q8" value="100_200"><span>$100–$200 / month</span></label>
+<label class="opt"><input type="radio" name="q8" value="201_350"><span>$201–$350 / month</span></label>
+<label class="opt"><input type="radio" name="q8" value="over_350"><span>$350+ / month</span></label>
+</div><button id="p8Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 9 -->
+<section id="p9" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">How much tree shade or obstruction does your roof receive?</div>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q9" value="no_shade"><span>No Shade (Full Direct Sunlight)</span></label>
+<label class="opt"><input type="radio" name="q9" value="low_shade"><span>Low Shade (Partial Sunlight)</span></label>
+<label class="opt"><input type="radio" name="q9" value="heavy_shade"><span>Heavy Shade (Dense trees / full obstruction)</span></label>
+</div><button id="p9Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 10 -->
+<section id="p10" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">Is your credit score estimated to be 650 or above?</div><p class="text-xs text-slate-500 mt-1"></p>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q10" value="above_650"><span>Yes (650+)</span></label>
+<label class="opt"><input type="radio" name="q10" value="below_650"><span>No (Under 650)</span></label>
+</div><button id="p10Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 11 -->
+<section id="p11" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">What is your primary motivation for considering solar energy?</div>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q11" value="bills"><span>Lower monthly utility expenses</span></label>
+<label class="opt"><input type="radio" name="q11" value="backup"><span>Outage & battery backup protection</span></label>
+<label class="opt"><input type="radio" name="q11" value="eco"><span>Environmental impact</span></label>
+<label class="opt"><input type="radio" name="q11" value="value"><span>Increase home property value</span></label>
+</div><button id="p11Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 12 -->
+<section id="p12" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">How quickly would you like to reduce your home electric costs?</div>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q12" value="asap"><span>Immediately (1–30 days)</span></label>
+<label class="opt"><input type="radio" name="q12" value="1_3_months"><span>Within 1 to 3 months</span></label>
+<label class="opt"><input type="radio" name="q12" value="researching"><span>Just collecting research</span></label>
+</div><button id="p12Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 13 -->
+<section id="p13" class="card p-5 md:p-7 qwrap hidden">
+<div class="qtext">If a solar option could potentially reduce your electricity costs, how interested would you be in reviewing your options?</div>
+<p class="text-xs text-slate-500 mt-1"></p>
+<div class="mt-4 space-y-3">
+<label class="opt"><input type="radio" name="q13" value="very_interested"><span>Very interested — I'd like to review options now</span></label>
+<label class="opt"><input type="radio" name="q13" value="somewhat_interested"><span>Somewhat interested — I'd like to learn more</span></label>
+<label class="opt"><input type="radio" name="q13" value="researching"><span>Not sure — I'm just researching</span></label>
+<label class="opt"><input type="radio" name="q13" value="not_interested"><span>Not interested</span></label>
+</div><button id="p13Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+</section>
+
+<!-- PAGE 14 -->
+<section id="p14" class="card p-5 md:p-7 hidden">
+<div class="text-slate-900 text-xl md:text-2xl font-semibold">Participate in the Solar Study</div>
+<div class="mt-3 text-slate-700 text-sm md:text-base space-y-3">
+<p>Thank you for participating in this market research study. Based on your responses, your home meets the criteria to evaluate custom solar options.</p>
+<p>As part of this research, we connect participants with <strong>SolarNet</strong> to compare localized quotes, equipment configurations, and installation estimates.</p>
+<div class="notice notice-amber"><div class="font-semibold">What happens next?</div><div class="text-sm mt-1">On the next page, launch the SolarNet portal and submit your street address and contact details. Providing accurate property and identity information ensures local technicians can build a precise quote for your home.</div></div>
+</div>
+<div class="mt-4 flex items-center gap-3">
+<input id="consentCheck" type="checkbox" class="w-5 h-5">
+<label for="consentCheck" class="text-sm text-slate-800">I understand this is a research study and agree to request my custom solar estimate on SolarNet.</label>
+</div>
+<div class="mt-5 flex flex-wrap gap-3">
+<button id="p14Next" class="btn px-5 py-3 rounded-xl font-semibold w-full md:w-auto" disabled>Continue to SolarNet Portal</button>
+<button id="p14Exit" class="danger px-5 py-3 rounded-xl font-semibold w-full md:w-auto">I don't want to continue</button>
+</div>
+</section>
+
+<!-- PAGE 15 -->
+<section id="p15" class="card p-5 md:p-7 hidden">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+<div class="text-slate-900 text-lg md:text-xl font-semibold">Launch SolarNet Portal</div>
+<button id="p15ExitTop" class="danger px-4 py-2 rounded-xl font-semibold text-sm">Exit</button>
+</div>
+<div class="notice notice-amber mb-5"><div class="font-semibold">Step 1: Complete Your Details on SolarNet</div><div class="text-sm mt-1">Click the button below to go to the SolarNet website. Once you are on SolarNet, click <strong>Check My Eligibility</strong> or <strong>Get My Estimate</strong> to start your solar quote.</div></div>
+<div class="mb-6">
+<a id="partnerPortalBtn" href="https://solarnet.online/" target="_blank" rel="noopener" class="btn px-6 py-4 rounded-xl font-bold text-center block w-full text-lg shadow-lg">☀️ Check My Eligibility</a>
+</div>
+<div id="activePortalInstructions" class="notice notice-emerald mb-5 hidden">
+<div class="font-semibold">Step 2: Come Back to This Survey</div>
+<div class="text-sm mt-1">
+After you click <strong>Check My Eligibility</strong> or <strong>Get My Estimate</strong> on SolarNet and complete your solar quote, take a screenshot of the confirmation page.
+<strong>Then come back to this survey</strong>, upload your screenshot below, and click <strong>Verify Screenshot</strong> to finish.
+</div>
+</div>
+</div>
+<div class="border border-slate-200 rounded-2xl p-4 bg-white">
+<div class="font-semibold text-slate-900">Upload Confirmation Screenshot</div>
+<input id="proofFile" type="file" accept="image/*" class="mt-3 block w-full text-sm">
+<button id="btnRunOCR" class="btn w-full px-4 py-3 rounded-xl font-semibold mt-3" disabled>Verify Screenshot</button>
+<div class="mt-3"><div class="progress-bar"><div id="ocrProgressFill"></div></div>
+<div id="ocrStatus" class="mt-2 text-xs md:text-sm text-slate-600">Upload a screenshot after completing the SolarNet form.</div></div>
+</div>
+<div class="mt-5 flex flex-wrap gap-3">
+<button id="p15Next" class="btn px-5 py-3 rounded-xl font-semibold w-full md:w-auto" disabled>Continue</button>
+<button id="p15Exit" class="danger px-5 py-3 rounded-xl font-semibold w-full md:w-auto">Cancel</button>
+</div>
+</section>
+
+<!-- PAGE 16 -->
+<section id="p16" class="card p-5 md:p-7 hidden">
+  <div class="text-slate-900 text-lg md:text-xl font-semibold text-center">Complete Your Details</div>
+  <div class="mt-5 flex justify-center"><iframe width="540" height="305"
+src="https://52bcaf92.sibforms.com/v2/serve/MUIFAO5vlejSCs-rWtk8_hSGgyILb9Oi-aOLbS_zI5_FjrtRovBWkBZlGVuoCXxEbmOMZMrdo0ZllgcfYtt7jPnKOHgyHT2TYdf3Q-xFXArnK8ikp21kPr7-iXsfMeK4CtD4cAPf2oHHMJLw5OtgVzgyKMt0hXTJ3UiMJVGUXzHbWENuGdgb7j-x2xeZ6iW5f9ix4gocwCjOBdct"
+frameborder="0" scrolling="auto" allowfullscreen
+style="display:block;margin:0 auto;max-width:100%;border:0;" title="Email form"></iframe></div>
+  <div class="mt-5 text-center">
+    <p class="text-xs text-slate-500 mb-4">Please complete the form above to finish.</p>
+    <button id="finishBtn" class="btn px-6 py-3 rounded-xl font-semibold w-full md:w-auto">Finish</button>
+  </div>
+  <div class="mt-4 flex justify-center">
+    <button id="p16Exit" class="danger px-5 py-3 rounded-xl font-semibold">Exit</button>
+  </div>
+</section>
+
+</main>
+
 <script>
-    (function() {
-        // Replace with your actual affiliate offer URL
-        const AFFILIATE_URL = "https://home-solar-savings-2026.netlify.app/";
+const params=new URLSearchParams(location.search);
+const transactionId=params.get('transaction_id')||params.get('RID')||('tx_'+Date.now());
+const completionUrl='https://spectrumsurveys.com/surveydone?st=21&transaction_id='+encodeURIComponent(transactionId);
+const terminationUrl='https://spectrumsurveys.com/surveydone?st=18&transaction_id='+encodeURIComponent(transactionId);
+const pages=[...Array(16)].map((_,i)=>'p'+(i+1));
 
-        function handleAffiliateClick(event) {
-            event.preventDefault();
-            const confirmMsg = "🔆 QUALIFICATION CHECK\n\nYou must meet ALL:\n✅ US Homeowner\n✅ Single-family home\n✅ Monthly income $5k+\n✅ Credit score 650+\n✅ Age 21+\n✅ Looking for NEW solar installation\n\nDo you meet these criteria? Click OK to proceed.";
-            if (confirm(confirmMsg)) {
-                window.open(AFFILIATE_URL, '_blank');
-            } else {
-                alert("No problem! This offer is only for qualifying homeowners. Check again if you meet the criteria.");
-            }
-        }
+function disqualifyNow(){location.href=terminationUrl}
+function showPage(i){
+ pages.forEach((id,n)=>document.getElementById(id)?.classList.toggle('hidden',n!==i));
+ document.getElementById('progressFill').style.width=Math.round((i+1)/pages.length*100)+'%';
+ document.getElementById('progressLabel').textContent=(i+1)+' / '+pages.length;
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function enable(q,b){
+ document.querySelectorAll('input[name="'+q+'"]').forEach(x=>x.addEventListener('change',()=>document.getElementById(b).disabled=false));
+}
+for(let i=1;i<=13;i++)enable('q'+i,'p'+i+'Next');
 
-        const btns = ['primaryCta', 'midCta', 'finalCta'];
-        btns.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.addEventListener('click', handleAffiliateClick);
-                el.setAttribute('href', 'javascript:void(0);');
-            }
-        });
+p1Next.onclick=()=>{if(document.querySelector('[name=q1]:checked')?.value!=='owner')return disqualifyNow();showPage(1)};
+p2Next.onclick=()=>{if(document.querySelector('[name=q2]:checked')?.value!=='single_family')return disqualifyNow();showPage(2)};
+p3Next.onclick=()=>{let v=document.querySelector('[name=q3]:checked')?.value;if(v!=='primary'&&v!=='shared')return disqualifyNow();showPage(3)};
+p4Next.onclick=()=>{let v=document.querySelector('[name=q4]:checked')?.value;if(v==='under_1'||v==='1_2')return disqualifyNow();showPage(4)};
+p5Next.onclick=()=>showPage(5);
+p6Next.onclick=()=>{if(document.querySelector('[name=q6]:checked')?.value==='yes')return disqualifyNow();showPage(6)};
+p7Next.onclick=()=>{let v=document.querySelector('[name=q7]:checked')?.value;if(v!=='yes'&&v!=='shared')return disqualifyNow();showPage(7)};
+p8Next.onclick=()=>{if(document.querySelector('[name=q8]:checked')?.value==='under_100')return disqualifyNow();showPage(8)};
+p9Next.onclick=()=>{if(document.querySelector('[name=q9]:checked')?.value==='heavy_shade')return disqualifyNow();showPage(9)};
+p10Next.onclick=()=>{if(document.querySelector('[name=q10]:checked')?.value!=='above_650')return disqualifyNow();showPage(10)};
+p11Next.onclick=()=>showPage(11);
+p12Next.onclick=()=>{let v=document.querySelector('[name=q12]:checked')?.value;if(v==='1_3_months'||v==='researching')return disqualifyNow();showPage(12)};
+p13Next.onclick=()=>{let v=document.querySelector('[name=q13]:checked')?.value;if(v==='researching'||v==='not_interested')return disqualifyNow();showPage(13)};
 
-        document.querySelectorAll('.btn').forEach(btn => {
-            if(!btns.includes(btn.id)) {
-                btn.addEventListener('click', handleAffiliateClick);
-                btn.setAttribute('href', 'javascript:void(0);');
-            }
-        });
-    })();
+consentCheck.onchange=()=>p14Next.disabled=!consentCheck.checked;
+p14Exit.onclick=disqualifyNow;
+p14Next.onclick=()=>{if(consentCheck.checked)showPage(14)};
+
+partnerPortalBtn.onclick=()=>activePortalInstructions.classList.remove('hidden');
+
+const keywords=['thank you','thanks','submitted','submission','confirmation','completed','success','received','your request','solar quote'];
+proofFile.onchange=()=>{btnRunOCR.disabled=!proofFile.files[0];p15Next.disabled=true;ocrStatus.textContent=proofFile.files[0]?'Ready to verify.':'Upload a screenshot to begin.'};
+
+btnRunOCR.onclick=async()=>{
+ if(!proofFile.files[0])return;
+ btnRunOCR.disabled=true;p15Next.disabled=true;ocrStatus.textContent='Scanning screenshot...';ocrProgressFill.style.width='10%';
+ try{
+  const r=await Tesseract.recognize(proofFile.files[0],'eng',{logger:m=>{if(m.status==='recognizing text')ocrProgressFill.style.width=Math.round(m.progress*100)+'%'}});
+  const text=(r.data.text||'').toLowerCase();
+  if(keywords.some(k=>text.includes(k))){ocrStatus.textContent='Verified! Click Continue below.';p15Next.disabled=false}
+  else ocrStatus.textContent='Verification failed. Please upload a clear screenshot of the confirmation page.';
+ }catch(e){ocrStatus.textContent='OCR error — please try uploading again.'}
+ btnRunOCR.disabled=false;
+};
+p15Next.onclick=()=>showPage(15);
+p15ExitTop.onclick=disqualifyNow;p15Exit.onclick=disqualifyNow;
+
+emailConfirmForm.onsubmit=e=>{
+ e.preventDefault();
+ if(userEmail.value.trim()&&optInCheck.checked){submitEmailBtn.textContent='Submitted ✓';submitEmailBtn.disabled=true;finishBtn.disabled=false}
+};
+p16Exit.onclick=disqualifyNow;
+finishBtn.onclick=()=>location.href=completionUrl;
+
+document.getElementById('p16Exit')?.addEventListener('click', disqualifyNow);
+document.getElementById('finishBtn')?.addEventListener('click', () => {
+  window.location.href = completionUrl;
+});
+
+showPage(0);
 </script>
 </body>
 </html>

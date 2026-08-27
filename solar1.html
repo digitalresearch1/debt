@@ -233,7 +233,7 @@
     </div>
   </section>
 
-  <!-- PAGE 14: Strict 5-Min Duration Check (Max 3 Attempts) -->
+  <!-- PAGE 14: Server-Validated Call Status (No Button Click Tracking) -->
   <section id="p14" class="card p-5 md:p-7 hidden">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <div class="text-slate-900 text-lg md:text-xl font-semibold">Make Your Solar Consultation Call</div>
@@ -257,7 +257,7 @@
     <div class="border border-slate-200 rounded-2xl p-5 bg-white text-center">
       <div class="font-semibold text-slate-900 mb-1">Live Call Verification</div>
       <p id="callStatusText" class="text-sm text-amber-700 font-medium">
-        ⏳ Waiting for your call... (Attempt 1 of 3). Stay on the line for at least 5 minutes.
+        ⏳ Waiting for your call... Stay on the line for at least 5 minutes.
       </p>
       <div class="progress-bar mt-4"><div id="callCheckBar" class="w-full animate-pulse"></div></div>
     </div>
@@ -363,7 +363,7 @@
   document.getElementById('p13ExitTop').onclick = disqualifyNow;
   document.getElementById('p13Exit').onclick = disqualifyNow;
 
-  // Page 14 Polling Logic (Strict 300s Check + 3 Failed Attempts Limit)
+  // Page 14 Server Polling Logic (Strict 300s Check + 3 Failed Attempts Limit)
   let checkInterval = null;
   let failedAttempts = 0;
   let lastProcessedTimestamp = 0;
@@ -406,10 +406,13 @@
                 setTimeout(() => { disqualifyNow(); }, 2500);
               } else {
                 statusText.className = 'text-sm text-amber-700 font-bold';
-                statusText.textContent = `⚠️ Attempt ${failedAttempts}/3 failed (${Math.floor(duration / 60)}m ${duration % 60}s). Call must be at least 5 minutes. Please redial.`;
+                statusText.textContent = `⚠️ Call attempt ${failedAttempts}/3 failed (${Math.floor(duration / 60)}m ${duration % 60}s). Call must be at least 5 minutes. Please redial.`;
               }
             }
           }
+        } else {
+          statusText.className = 'text-sm text-amber-700 font-medium';
+          statusText.textContent = `⏳ Waiting for your call... Stay on the line for at least 5 minutes.`;
         }
       } catch (err) {
         console.error('Polling error:', err);

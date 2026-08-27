@@ -1,326 +1,447 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html lang="en" class="supernova">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Solar Homeowner Qualification Research Study</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<style>
-body{font-family:Inter,sans-serif;background:radial-gradient(circle at top,#1e293b 0,#020617 75%);min-height:100vh}
-.shell{background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(15,23,42,.28)}
-.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px}
-.btn{background:linear-gradient(135deg,#eab308,#ca8a04);color:#fff}
-.btn:disabled{opacity:.55;cursor:not-allowed}
-.danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
-.progress-bar{height:10px;border-radius:999px;background:#e5e7eb;overflow:hidden}
-.progress-bar>div{height:100%;width:0;background:linear-gradient(135deg,#eab308,#ca8a04);transition:.2s}
-.hidden{display:none!important}
-.qwrap{max-width:720px;margin:0 auto}
-.qtext{font-size:1.05rem;color:#0f172a;font-weight:600}
-.opt{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid #e5e7eb;border-radius:14px;cursor:pointer}
-.opt:hover{background:#f8fafc}
-.opt input{width:18px;height:18px}
-.notice{border-radius:14px;border:1px solid;padding:12px 14px}
-.notice-amber{background:#fffbeb;border-color:#fde68a;color:#92400e}
-.notice-emerald{background:#ecfdf5;border-color:#6ee7b7;color:#065f46}
-</style>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
+  <meta name="HandheldFriendly" content="true">
+  <title>Solar Feasibility Research Study</title>
+
+  <!-- Fonts + Tailwind CDN -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top, #1e293b 0, #020617 75%); min-height: 100vh; }
+    .shell { background: #fff; border-radius: 24px; box-shadow: 0 24px 60px rgba(15, 23, 42, .28); }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 18px; }
+    .btn { background: linear-gradient(135deg, #eab308, #ca8a04); color: #fff; transition: .2s ease; }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 16px 35px rgba(202, 138, 4, .35); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+    .danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; transition: .2s ease; }
+    .danger:hover { transform: translateY(-1px); box-shadow: 0 18px 40px rgba(220, 38, 38, .35); }
+    .notice { border-radius: 14px; border: 1px solid; padding: 12px 14px; }
+    .notice-amber { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+    .progress-bar { height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+    .progress-bar > div { height: 100%; width: 0%; background: linear-gradient(135deg, #eab308, #ca8a04); transition: width .15s ease; }
+    .iframe-shell { border-radius: 16px; overflow: hidden; border: 1px solid #e5e7eb; background: #fff; height: 70vh; min-height: 550px; }
+    @media (min-width: 768px) { .iframe-shell { height: 650px; min-height: 650px; } }
+    .iframe-shell iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .hidden { display: none !important; }
+    .qwrap { max-width: 720px; margin: 0 auto; }
+    .qtext { font-size: 1.05rem; color: #0f172a; font-weight: 600; }
+    .opt { display: flex; gap: 10px; align-items: center; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 14px; cursor: pointer; transition: .12s ease; }
+    .opt:hover { background: #f8fafc; }
+    .opt input { width: 18px; height: 18px; }
+  </style>
 </head>
+
 <body class="p-4 md:p-8 flex items-center justify-center">
 <main class="shell w-full max-w-5xl p-4 md:p-8 lg:p-10">
 
-<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-  
-  <div class="text-slate-600 text-xs md:text-sm"><span class="font-semibold">Estimated:</span> 4–5 minutes</div>
-</div>
-
-<div class="mb-6">
-  <div class="flex items-center justify-end text-xs font-semibold text-slate-600 mb-2">
-    <span id="progressLabel">1 / 16</span>
+  <!-- TOP STRIP -->
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div class="inline-flex items-center gap-2 bg-white/10 text-white px-4 py-2 rounded-full text-xs md:text-sm backdrop-blur">
+      <span>☀️</span><span>SolarNet Market Research Study</span>
+    </div>
+    <div class="text-white/80 text-xs md:text-sm">
+      <span class="font-semibold text-white">Estimated:</span> 4–5 minutes
+    </div>
   </div>
-  <div class="progress-bar"><div id="progressFill"></div></div>
-</div>
 
-<!-- PAGE 1 -->
-<section id="p1" class="card p-5 md:p-7 qwrap">
-<div class="qtext">Do you own the home where you currently live?</div>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q1" value="owner"><span>Yes, I own the home I live in</span></label>
-<label class="opt"><input type="radio" name="q1" value="rent"><span>No, I rent or lease the home</span></label>
-<label class="opt"><input type="radio" name="q1" value="live_with_owner"><span>I live with someone who owns the home</span></label>
-<label class="opt"><input type="radio" name="q1" value="purchasing"><span>I am currently purchasing the home</span></label>
-<label class="opt"><input type="radio" name="q1" value="other"><span>Other</span></label>
-</div><button id="p1Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 2 -->
-<section id="p2" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">What type of home do you own?</div>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q2" value="single_family"><span>Single-family detached home</span></label>
-<label class="opt"><input type="radio" name="q2" value="townhome"><span>Townhome</span></label>
-<label class="opt"><input type="radio" name="q2" value="condo"><span>Condo</span></label>
-<label class="opt"><input type="radio" name="q2" value="multi_family"><span>Duplex / Triplex / Multi-family</span></label>
-<label class="opt"><input type="radio" name="q2" value="manufactured"><span>Manufactured / Mobile home</span></label>
-<label class="opt"><input type="radio" name="q2" value="other"><span>Other</span></label>
-</div><button id="p2Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 3 -->
-<section id="p3" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">Who is primarily responsible for making decisions about improvements to this home?</div>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q3" value="primary"><span>I am the primary decision-maker</span></label>
-<label class="opt"><input type="radio" name="q3" value="shared"><span>I share decisions with my spouse or partner</span></label>
-<label class="opt"><input type="radio" name="q3" value="someone_else"><span>Someone else makes those decisions</span></label>
-<label class="opt"><input type="radio" name="q3" value="not_involved"><span>I'm not involved in home improvement decisions</span></label>
-</div><button id="p3Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 4 -->
-<section id="p4" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">How long have you owned your current home?</div>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q4" value="under_1"><span>Less than 1 year</span></label>
-<label class="opt"><input type="radio" name="q4" value="1_2"><span>1–2 years</span></label>
-<label class="opt"><input type="radio" name="q4" value="3_5"><span>3–5 years</span></label>
-<label class="opt"><input type="radio" name="q4" value="6_10"><span>6–10 years</span></label>
-<label class="opt"><input type="radio" name="q4" value="over_10"><span>More than 10 years</span></label>
-</div><button id="p4Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 5 -->
-<section id="p5" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">What is your age range?</div><p class="text-xs text-slate-500 mt-1">Used for market research and audience analysis.</p>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q5" value="under_35"><span>Under 35</span></label>
-<label class="opt"><input type="radio" name="q5" value="35_44"><span>35–44</span></label>
-<label class="opt"><input type="radio" name="q5" value="45_54"><span>45–54</span></label>
-<label class="opt"><input type="radio" name="q5" value="55_64"><span>55–64</span></label>
-<label class="opt"><input type="radio" name="q5" value="65_plus"><span>65+</span></label>
-</div><button id="p5Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 6 -->
-<section id="p6" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">Do you already have solar panels installed on your home?</div>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q6" value="no"><span>No, I do not have solar</span></label>
-<label class="opt"><input type="radio" name="q6" value="yes"><span>Yes, I already have solar</span></label>
-</div><button id="p6Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 7 -->
-<section id="p7" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">Are you currently responsible for paying the electricity bill for this home?</div>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q7" value="yes"><span>Yes, I pay the electricity bill</span></label>
-<label class="opt"><input type="radio" name="q7" value="shared"><span>I share responsibility for the bill</span></label>
-<label class="opt"><input type="radio" name="q7" value="someone_else"><span>Someone else pays the bill</span></label>
-<label class="opt"><input type="radio" name="q7" value="unsure"><span>I'm not sure</span></label>
-</div><button id="p7Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 8 -->
-<section id="p8" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">What is your average monthly electricity bill?</div>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q8" value="under_100"><span>Under $100 / month</span></label>
-<label class="opt"><input type="radio" name="q8" value="100_200"><span>$100–$200 / month</span></label>
-<label class="opt"><input type="radio" name="q8" value="201_350"><span>$201–$350 / month</span></label>
-<label class="opt"><input type="radio" name="q8" value="over_350"><span>$350+ / month</span></label>
-</div><button id="p8Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 9 -->
-<section id="p9" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">How much tree shade or obstruction does your roof receive?</div>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q9" value="no_shade"><span>No Shade (Full Direct Sunlight)</span></label>
-<label class="opt"><input type="radio" name="q9" value="low_shade"><span>Low Shade (Partial Sunlight)</span></label>
-<label class="opt"><input type="radio" name="q9" value="heavy_shade"><span>Heavy Shade (Dense trees / full obstruction)</span></label>
-</div><button id="p9Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 10 -->
-<section id="p10" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">Is your credit score estimated to be 650 or above?</div><p class="text-xs text-slate-500 mt-1"></p>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q10" value="above_650"><span>Yes (650+)</span></label>
-<label class="opt"><input type="radio" name="q10" value="below_650"><span>No (Under 650)</span></label>
-</div><button id="p10Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 11 -->
-<section id="p11" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">What is your primary motivation for considering solar energy?</div>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q11" value="bills"><span>Lower monthly utility expenses</span></label>
-<label class="opt"><input type="radio" name="q11" value="backup"><span>Outage & battery backup protection</span></label>
-<label class="opt"><input type="radio" name="q11" value="eco"><span>Environmental impact</span></label>
-<label class="opt"><input type="radio" name="q11" value="value"><span>Increase home property value</span></label>
-</div><button id="p11Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 12 -->
-<section id="p12" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">How quickly would you like to reduce your home electric costs?</div>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q12" value="asap"><span>Immediately (1–30 days)</span></label>
-<label class="opt"><input type="radio" name="q12" value="1_3_months"><span>Within 1 to 3 months</span></label>
-<label class="opt"><input type="radio" name="q12" value="researching"><span>Just collecting research</span></label>
-</div><button id="p12Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 13 -->
-<section id="p13" class="card p-5 md:p-7 qwrap hidden">
-<div class="qtext">If a solar option could potentially reduce your electricity costs, how interested would you be in reviewing your options?</div>
-<p class="text-xs text-slate-500 mt-1"></p>
-<div class="mt-4 space-y-3">
-<label class="opt"><input type="radio" name="q13" value="very_interested"><span>Very interested — I'd like to review options now</span></label>
-<label class="opt"><input type="radio" name="q13" value="somewhat_interested"><span>Somewhat interested — I'd like to learn more</span></label>
-<label class="opt"><input type="radio" name="q13" value="researching"><span>Not sure — I'm just researching</span></label>
-<label class="opt"><input type="radio" name="q13" value="not_interested"><span>Not interested</span></label>
-</div><button id="p13Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
-</section>
-
-<!-- PAGE 14 -->
-<section id="p14" class="card p-5 md:p-7 hidden">
-<div class="text-slate-900 text-xl md:text-2xl font-semibold">Participate in the Solar Study</div>
-<div class="mt-3 text-slate-700 text-sm md:text-base space-y-3">
-<p>Thank you for participating in this market research study. Based on your responses, your home meets the criteria to evaluate custom solar options.</p>
-<p>As part of this research, we connect participants with <strong>SolarNet</strong> to compare localized quotes, equipment configurations, and installation estimates.</p>
-<div class="notice notice-amber"><div class="font-semibold">What happens next?</div><div class="text-sm mt-1">On the next page, launch the SolarNet portal and submit your street address and contact details. Providing accurate property and identity information ensures local technicians can build a precise quote for your home.</div></div>
-</div>
-<div class="mt-4 flex items-center gap-3">
-<input id="consentCheck" type="checkbox" class="w-5 h-5">
-<label for="consentCheck" class="text-sm text-slate-800">I understand this is a research study and agree to request my custom solar estimate on SolarNet.</label>
-</div>
-<div class="mt-5 flex flex-wrap gap-3">
-<button id="p14Next" class="btn px-5 py-3 rounded-xl font-semibold w-full md:w-auto" disabled>Continue to SolarNet Portal</button>
-<button id="p14Exit" class="danger px-5 py-3 rounded-xl font-semibold w-full md:w-auto">I don't want to continue</button>
-</div>
-</section>
-
-<!-- PAGE 15 -->
-<section id="p15" class="card p-5 md:p-7 hidden">
-<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-<div class="text-slate-900 text-lg md:text-xl font-semibold">Launch SolarNet Portal</div>
-<button id="p15ExitTop" class="danger px-4 py-2 rounded-xl font-semibold text-sm">Exit</button>
-</div>
-<div class="notice notice-amber mb-5"><div class="font-semibold">Step 1: Complete Your Details on SolarNet</div><div class="text-sm mt-1">Click the button below to go to the SolarNet website. Once you are on SolarNet, click <strong>Check My Eligibility</strong> or <strong>Get My Estimate</strong> to start your solar quote.</div></div>
-<div class="mb-6">
-<a id="partnerPortalBtn" href="https://solarnet.online/" target="_blank" rel="noopener" class="btn px-6 py-4 rounded-xl font-bold text-center block w-full text-lg shadow-lg">☀️ Check My Eligibility</a>
-</div>
-<div id="activePortalInstructions" class="notice notice-emerald mb-5 hidden">
-<div class="font-semibold">Step 2: Come Back to This Survey</div>
-<div class="text-sm mt-1">
-After you click <strong>Check My Eligibility</strong> or <strong>Get My Estimate</strong> on SolarNet and complete your solar quote, take a screenshot of the confirmation page.
-<strong>Then come back to this survey</strong>, upload your screenshot below, and click <strong>Verify Screenshot</strong> to finish.
-</div>
-</div>
-</div>
-<div class="border border-slate-200 rounded-2xl p-4 bg-white">
-<div class="font-semibold text-slate-900">Upload Confirmation Screenshot</div>
-<input id="proofFile" type="file" accept="image/*" class="mt-3 block w-full text-sm">
-<button id="btnRunOCR" class="btn w-full px-4 py-3 rounded-xl font-semibold mt-3" disabled>Verify Screenshot</button>
-<div class="mt-3"><div class="progress-bar"><div id="ocrProgressFill"></div></div>
-<div id="ocrStatus" class="mt-2 text-xs md:text-sm text-slate-600">Upload a screenshot after completing the SolarNet form.</div></div>
-</div>
-<div class="mt-5 flex flex-wrap gap-3">
-<button id="p15Next" class="btn px-5 py-3 rounded-xl font-semibold w-full md:w-auto" disabled>Continue</button>
-<button id="p15Exit" class="danger px-5 py-3 rounded-xl font-semibold w-full md:w-auto">Cancel</button>
-</div>
-</section>
-
-<!-- PAGE 16 -->
-<section id="p16" class="card p-5 md:p-7 hidden">
-  <div class="text-slate-900 text-lg md:text-xl font-semibold text-center">Complete Your Details</div>
-  <div class="mt-5 flex justify-center"><iframe width="540" height="305"
-src="https://52bcaf92.sibforms.com/v2/serve/MUIFAO5vlejSCs-rWtk8_hSGgyILb9Oi-aOLbS_zI5_FjrtRovBWkBZlGVuoCXxEbmOMZMrdo0ZllgcfYtt7jPnKOHgyHT2TYdf3Q-xFXArnK8ikp21kPr7-iXsfMeK4CtD4cAPf2oHHMJLw5OtgVzgyKMt0hXTJ3UiMJVGUXzHbWENuGdgb7j-x2xeZ6iW5f9ix4gocwCjOBdct"
-frameborder="0" scrolling="auto" allowfullscreen
-style="display:block;margin:0 auto;max-width:100%;border:0;" title="Email form"></iframe></div>
-  <div class="mt-5 text-center">
-    <p class="text-xs text-slate-500 mb-4">Please complete the form above to finish.</p>
-    <button id="finishBtn" class="btn px-6 py-3 rounded-xl font-semibold w-full md:w-auto">Finish</button>
+  <!-- PROGRESS -->
+  <div class="mb-6">
+    <div class="flex items-center justify-between text-xs font-semibold text-white/80 mb-2">
+      <span id="progressLabel">1 / 15</span>
+      <span id="progressHint">Qualification</span>
+    </div>
+    <div class="progress-bar"><div id="progressFill"></div></div>
   </div>
-  <div class="mt-4 flex justify-center">
-    <button id="p16Exit" class="danger px-5 py-3 rounded-xl font-semibold">Exit</button>
-  </div>
-</section>
+
+  <!-- PAGE 1 -->
+  <section id="p1" class="card p-5 md:p-7 qwrap">
+    <div class="qtext">Do you own the home where you currently live?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q1" value="owner"><span>Yes, I own the home I live in</span></label>
+      <label class="opt"><input type="radio" name="q1" value="rent"><span>No, I rent or lease the home</span></label>
+      <label class="opt"><input type="radio" name="q1" value="live_with_owner"><span>I live with someone who owns the home</span></label>
+      <label class="opt"><input type="radio" name="q1" value="purchasing"><span>I am currently purchasing the home</span></label>
+      <label class="opt"><input type="radio" name="q1" value="other"><span>Other</span></label>
+    </div>
+    <button id="p1Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 2 -->
+  <section id="p2" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">What type of home do you own?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q2" value="single_family"><span>Single-family detached home</span></label>
+      <label class="opt"><input type="radio" name="q2" value="townhome"><span>Townhome</span></label>
+      <label class="opt"><input type="radio" name="q2" value="condo"><span>Condo</span></label>
+      <label class="opt"><input type="radio" name="q2" value="multi_family"><span>Duplex / Triplex / Multi-family</span></label>
+      <label class="opt"><input type="radio" name="q2" value="manufactured"><span>Manufactured / Mobile home</span></label>
+      <label class="opt"><input type="radio" name="q2" value="other"><span>Other</span></label>
+    </div>
+    <button id="p2Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 3 -->
+  <section id="p3" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">Who is primarily responsible for making decisions about improvements to this home?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q3" value="primary"><span>I am the primary decision-maker</span></label>
+      <label class="opt"><input type="radio" name="q3" value="shared"><span>I share decisions with my spouse or partner</span></label>
+      <label class="opt"><input type="radio" name="q3" value="someone_else"><span>Someone else makes those decisions</span></label>
+      <label class="opt"><input type="radio" name="q3" value="not_involved"><span>I'm not involved in home improvement decisions</span></label>
+    </div>
+    <button id="p3Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 4 -->
+  <section id="p4" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">How long have you owned your current home?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q4" value="under_1"><span>Less than 1 year</span></label>
+      <label class="opt"><input type="radio" name="q4" value="1_2"><span>1–2 years</span></label>
+      <label class="opt"><input type="radio" name="q4" value="3_5"><span>3–5 years</span></label>
+      <label class="opt"><input type="radio" name="q4" value="6_10"><span>6–10 years</span></label>
+      <label class="opt"><input type="radio" name="q4" value="over_10"><span>More than 10 years</span></label>
+    </div>
+    <button id="p4Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 5 -->
+  <section id="p5" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">What is your age range?</div>
+    <p class="text-xs text-slate-500 mt-1">Used for market research and audience analysis.</p>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q5" value="under_35"><span>Under 35</span></label>
+      <label class="opt"><input type="radio" name="q5" value="35_44"><span>35–44</span></label>
+      <label class="opt"><input type="radio" name="q5" value="45_54"><span>45–54</span></label>
+      <label class="opt"><input type="radio" name="q5" value="55_64"><span>55–64</span></label>
+      <label class="opt"><input type="radio" name="q5" value="65_plus"><span>65+</span></label>
+    </div>
+    <button id="p5Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 6 -->
+  <section id="p6" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">Do you already have solar panels installed on your home?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q6" value="no"><span>No, I do not have solar</span></label>
+      <label class="opt"><input type="radio" name="q6" value="yes"><span>Yes, I already have solar</span></label>
+    </div>
+    <button id="p6Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 7 -->
+  <section id="p7" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">Are you currently responsible for paying the electricity bill for this home?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q7" value="yes"><span>Yes, I pay the electricity bill</span></label>
+      <label class="opt"><input type="radio" name="q7" value="shared"><span>I share responsibility for the bill</span></label>
+      <label class="opt"><input type="radio" name="q7" value="someone_else"><span>Someone else pays the bill</span></label>
+      <label class="opt"><input type="radio" name="q7" value="unsure"><span>I'm not sure</span></label>
+    </div>
+    <button id="p7Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 8 -->
+  <section id="p8" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">What is your average monthly electricity bill?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q8" value="under_100"><span>Under $100 / month</span></label>
+      <label class="opt"><input type="radio" name="q8" value="100_200"><span>$100–$200 / month</span></label>
+      <label class="opt"><input type="radio" name="q8" value="201_350"><span>$201–$350 / month</span></label>
+      <label class="opt"><input type="radio" name="q8" value="over_350"><span>$350+ / month</span></label>
+    </div>
+    <button id="p8Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 9 -->
+  <section id="p9" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">How much tree shade or obstruction does your roof receive?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q9" value="no_shade"><span>No Shade (Full Direct Sunlight)</span></label>
+      <label class="opt"><input type="radio" name="q9" value="low_shade"><span>Low Shade (Partial Sunlight)</span></label>
+      <label class="opt"><input type="radio" name="q9" value="heavy_shade"><span>Heavy Shade (Dense trees / full obstruction)</span></label>
+    </div>
+    <button id="p9Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 10 -->
+  <section id="p10" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">What is your primary motivation for considering solar energy?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q10" value="bills"><span>Lower monthly utility expenses</span></label>
+      <label class="opt"><input type="radio" name="q10" value="backup"><span>Outage & battery backup protection</span></label>
+      <label class="opt"><input type="radio" name="q10" value="eco"><span>Environmental impact</span></label>
+      <label class="opt"><input type="radio" name="q10" value="value"><span>Increase home property value</span></label>
+    </div>
+    <button id="p10Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 11 -->
+  <section id="p11" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">How quickly would you like to reduce your home electric costs?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q11" value="asap"><span>Immediately (1–30 days)</span></label>
+      <label class="opt"><input type="radio" name="q11" value="1_3_months"><span>Within 1 to 3 months</span></label>
+      <label class="opt"><input type="radio" name="q11" value="researching"><span>Just collecting research</span></label>
+    </div>
+    <button id="p11Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 12 -->
+  <section id="p12" class="card p-5 md:p-7 qwrap hidden">
+    <div class="qtext">If a solar option could potentially reduce your electricity costs, how interested would you be in reviewing your options?</div>
+    <div class="mt-4 space-y-3">
+      <label class="opt"><input type="radio" name="q12" value="very_interested"><span>Very interested — I'd like to review options now</span></label>
+      <label class="opt"><input type="radio" name="q12" value="somewhat_interested"><span>Somewhat interested — I'd like to learn more</span></label>
+      <label class="opt"><input type="radio" name="q12" value="researching"><span>Not sure — I'm just researching</span></label>
+      <label class="opt"><input type="radio" name="q12" value="not_interested"><span>Not interested</span></label>
+    </div>
+    <button id="p12Next" class="btn mt-5 px-5 py-3 rounded-xl font-semibold w-full" disabled>Continue</button>
+  </section>
+
+  <!-- PAGE 13: SolarNet Iframe -->
+  <section id="p13" class="card p-5 md:p-7 hidden">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="text-slate-900 text-lg md:text-xl font-semibold">Explore SolarNet Eligibility</div>
+      <button id="p13ExitTop" class="danger px-4 py-2 rounded-xl font-semibold text-sm">Exit</button>
+    </div>
+
+    <div class="notice notice-amber mb-4">
+      <div class="font-bold text-amber-900 flex items-center gap-2">
+        <span>📢</span><span>Important Notice for Study Completion:</span>
+      </div>
+      <p class="text-sm mt-1 text-amber-800">
+        You are qualified for this research study! To complete your participation and claim credit, the final step requires a <strong>brief 5-minute phone consultation</strong> call to our toll-free SolarNet number on the next page.
+      </p>
+    </div>
+
+    <div class="text-xs text-slate-500 mb-3 font-medium">
+      Review the SolarNet site details below, then click below to proceed to the call verification step.
+    </div>
+
+    <div class="iframe-shell" id="iframeShell">
+      <iframe id="solarNetIframe" src="https://solarnet.online/" loading="lazy"></iframe>
+    </div>
+
+    <div class="mt-5 flex flex-wrap gap-3">
+      <button id="p13Next" class="btn px-5 py-3 rounded-xl font-semibold w-full md:w-auto">Continue to Phone Consultation (5-Min Call)</button>
+      <button id="p13Exit" class="danger px-5 py-3 rounded-xl font-semibold w-full md:w-auto">Exit</button>
+    </div>
+  </section>
+
+  <!-- PAGE 14: Strict 5-Min Duration Check (Max 3 Attempts) -->
+  <section id="p14" class="card p-5 md:p-7 hidden">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="text-slate-900 text-lg md:text-xl font-semibold">Make Your Solar Consultation Call</div>
+      <button id="p14ExitTop" class="danger px-4 py-2 rounded-xl font-semibold text-sm">Exit</button>
+    </div>
+
+    <div class="text-center my-4 p-6 bg-gradient-to-r from-emerald-50 to-amber-50 border border-emerald-200 rounded-xl">
+      <div class="inline-block bg-emerald-100 text-emerald-800 font-semibold text-xs px-3 py-1 rounded-full mb-2">
+        Free Toll-Free Consultation Line
+      </div>
+      <h3 class="text-xl md:text-2xl font-bold text-slate-800">📞 Make Your 5-Minute Call Now</h3>
+      <p class="text-sm text-slate-600 mt-1 mb-4">
+        Call the official <strong>SolarNet</strong> toll-free hotline at <strong>(844) 213-5016</strong>. Keep the call active for at least 5 minutes.
+      </p>
+      <a href="tel:+18442135016" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition transform hover:scale-105">
+        📱 Call Toll-Free (844) 213-5016
+      </a>
+    </div>
+
+    <!-- Live Status Box -->
+    <div class="border border-slate-200 rounded-2xl p-5 bg-white text-center">
+      <div class="font-semibold text-slate-900 mb-1">Live Call Verification</div>
+      <p id="callStatusText" class="text-sm text-amber-700 font-medium">
+        ⏳ Waiting for your call... (Attempt 1 of 3). Stay on the line for at least 5 minutes.
+      </p>
+      <div class="progress-bar mt-4"><div id="callCheckBar" class="w-full animate-pulse"></div></div>
+    </div>
+
+    <div class="mt-5 flex flex-wrap gap-3">
+      <button id="p14Next" class="btn px-5 py-3 rounded-xl font-semibold w-full md:w-auto" disabled>Continue</button>
+      <button id="p14Exit" class="danger px-5 py-3 rounded-xl font-semibold w-full md:w-auto">Cancel</button>
+    </div>
+  </section>
+
+  <!-- PAGE 15: Final Email Submit -->
+  <section id="p15" class="card p-5 md:p-7 hidden">
+    <div class="text-slate-900 text-lg md:text-xl font-semibold text-center">Complete Your Entry</div>
+    <p class="text-slate-600 text-sm text-center mt-1">Enter your email address to record your research completion.</p>
+
+    <div class="mt-5 max-w-lg mx-auto">
+      <form id="emailConfirmForm" class="space-y-4">
+        <div class="text-left">
+          <label class="block font-bold text-sm text-slate-800 mb-1" for="userEmail">Email Address</label>
+          <input class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none" 
+                 type="email" id="userEmail" placeholder="you@example.com" required />
+        </div>
+
+        <div class="text-left">
+          <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
+            <input type="checkbox" id="optInCheck" class="mt-1 w-4 h-4 rounded" required />
+            <span>I agree to receive research study follow-ups and survey confirmations.</span>
+          </label>
+        </div>
+
+        <button id="submitEmailBtn" type="submit" class="btn w-full py-3 rounded-full font-bold">
+          Submit & Record Participation
+        </button>
+      </form>
+    </div>
+
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+      <button id="finishBtn" class="btn px-6 py-3 rounded-xl font-semibold w-full md:w-auto" disabled>Finish & Complete</button>
+      <button id="p15Exit" class="danger px-6 py-3 rounded-xl font-semibold w-full md:w-auto">Exit</button>
+    </div>
+  </section>
 
 </main>
 
 <script>
-const params=new URLSearchParams(location.search);
-const transactionId=params.get('transaction_id')||params.get('RID')||('tx_'+Date.now());
-const completionUrl='https://spectrumsurveys.com/surveydone?st=21&transaction_id='+encodeURIComponent(transactionId);
-const terminationUrl='https://spectrumsurveys.com/surveydone?st=18&transaction_id='+encodeURIComponent(transactionId);
-const pages=[...Array(16)].map((_,i)=>'p'+(i+1));
+  // PureSpectrum Parameter Extract
+  const params = new URLSearchParams(window.location.search);
+  const transactionId = params.get('transaction_id') || params.get('RID') || ('tx_' + Date.now());
+  const terminationUrl = 'https://spectrumsurveys.com/surveydone?st=18&transaction_id=' + encodeURIComponent(transactionId);
+  const workerFinishUrl = 'https://marketcall1.kayembakasongo.workers.dev/finish?transaction_id=' + encodeURIComponent(transactionId);
 
-function disqualifyNow(){location.href=terminationUrl}
-function showPage(i){
- pages.forEach((id,n)=>document.getElementById(id)?.classList.toggle('hidden',n!==i));
- document.getElementById('progressFill').style.width=Math.round((i+1)/pages.length*100)+'%';
- document.getElementById('progressLabel').textContent=(i+1)+' / '+pages.length;
- window.scrollTo({top:0,behavior:'smooth'});
-}
-function enable(q,b){
- document.querySelectorAll('input[name="'+q+'"]').forEach(x=>x.addEventListener('change',()=>document.getElementById(b).disabled=false));
-}
-for(let i=1;i<=13;i++)enable('q'+i,'p'+i+'Next');
+  function disqualifyNow() { 
+    window.location.href = terminationUrl; 
+  }
 
-p1Next.onclick=()=>{if(document.querySelector('[name=q1]:checked')?.value!=='owner')return disqualifyNow();showPage(1)};
-p2Next.onclick=()=>{if(document.querySelector('[name=q2]:checked')?.value!=='single_family')return disqualifyNow();showPage(2)};
-p3Next.onclick=()=>{let v=document.querySelector('[name=q3]:checked')?.value;if(v!=='primary'&&v!=='shared')return disqualifyNow();showPage(3)};
-p4Next.onclick=()=>{let v=document.querySelector('[name=q4]:checked')?.value;if(v==='under_1'||v==='1_2')return disqualifyNow();showPage(4)};
-p5Next.onclick=()=>showPage(5);
-p6Next.onclick=()=>{if(document.querySelector('[name=q6]:checked')?.value==='yes')return disqualifyNow();showPage(6)};
-p7Next.onclick=()=>{let v=document.querySelector('[name=q7]:checked')?.value;if(v!=='yes'&&v!=='shared')return disqualifyNow();showPage(7)};
-p8Next.onclick=()=>{if(document.querySelector('[name=q8]:checked')?.value==='under_100')return disqualifyNow();showPage(8)};
-p9Next.onclick=()=>{if(document.querySelector('[name=q9]:checked')?.value==='heavy_shade')return disqualifyNow();showPage(9)};
-p10Next.onclick=()=>{if(document.querySelector('[name=q10]:checked')?.value!=='above_650')return disqualifyNow();showPage(10)};
-p11Next.onclick=()=>showPage(11);
-p12Next.onclick=()=>{let v=document.querySelector('[name=q12]:checked')?.value;if(v==='1_3_months'||v==='researching')return disqualifyNow();showPage(12)};
-p13Next.onclick=()=>{let v=document.querySelector('[name=q13]:checked')?.value;if(v==='researching'||v==='not_interested')return disqualifyNow();showPage(13)};
+  // Navigation Setup
+  const pages = [...Array(15)].map((_, i) => 'p' + (i + 1));
+  let currentPageIdx = 0;
 
-consentCheck.onchange=()=>p14Next.disabled=!consentCheck.checked;
-p14Exit.onclick=disqualifyNow;
-p14Next.onclick=()=>{if(consentCheck.checked)showPage(14)};
+  function showPage(i) {
+    currentPageIdx = i;
+    pages.forEach((id, n) => document.getElementById(id)?.classList.toggle('hidden', n !== i));
+    document.getElementById('progressFill').style.width = Math.round((i + 1) / pages.length * 100) + '%';
+    document.getElementById('progressLabel').textContent = (i + 1) + ' / ' + pages.length;
+    
+    if (i === 13) {
+      startCallStatusPolling();
+    } else if (checkInterval) {
+      clearInterval(checkInterval);
+    }
 
-partnerPortalBtn.onclick=()=>activePortalInstructions.classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
-const keywords=['thank you','thanks','submitted','submission','confirmation','completed','success','received','your request','solar quote'];
-proofFile.onchange=()=>{btnRunOCR.disabled=!proofFile.files[0];p15Next.disabled=true;ocrStatus.textContent=proofFile.files[0]?'Ready to verify.':'Upload a screenshot to begin.'};
+  function enableRadioBinding(qName, btnId) {
+    document.querySelectorAll(`input[name="${qName}"]`).forEach(radio => {
+      radio.addEventListener('change', () => {
+        const btn = document.getElementById(btnId);
+        if (btn) btn.disabled = false;
+      });
+    });
+  }
 
-btnRunOCR.onclick=async()=>{
- if(!proofFile.files[0])return;
- btnRunOCR.disabled=true;p15Next.disabled=true;ocrStatus.textContent='Scanning screenshot...';ocrProgressFill.style.width='10%';
- try{
-  const r=await Tesseract.recognize(proofFile.files[0],'eng',{logger:m=>{if(m.status==='recognizing text')ocrProgressFill.style.width=Math.round(m.progress*100)+'%'}});
-  const text=(r.data.text||'').toLowerCase();
-  if(keywords.some(k=>text.includes(k))){ocrStatus.textContent='Verified! Click Continue below.';p15Next.disabled=false}
-  else ocrStatus.textContent='Verification failed. Please upload a clear screenshot of the confirmation page.';
- }catch(e){ocrStatus.textContent='OCR error — please try uploading again.'}
- btnRunOCR.disabled=false;
-};
-p15Next.onclick=()=>showPage(15);
-p15ExitTop.onclick=disqualifyNow;p15Exit.onclick=disqualifyNow;
+  for (let i = 1; i <= 12; i++) {
+    enableRadioBinding('q' + i, 'p' + i + 'Next');
+  }
 
-emailConfirmForm.onsubmit=e=>{
- e.preventDefault();
- if(userEmail.value.trim()&&optInCheck.checked){submitEmailBtn.textContent='Submitted ✓';submitEmailBtn.disabled=true;finishBtn.disabled=false}
-};
-p16Exit.onclick=disqualifyNow;
-finishBtn.onclick=()=>location.href=completionUrl;
+  // Screening Checks
+  document.getElementById('p1Next').onclick  = () => { if (document.querySelector('[name=q1]:checked')?.value !== 'owner') return disqualifyNow(); showPage(1); };
+  document.getElementById('p2Next').onclick  = () => { if (document.querySelector('[name=q2]:checked')?.value !== 'single_family') return disqualifyNow(); showPage(2); };
+  document.getElementById('p3Next').onclick  = () => { let v = document.querySelector('[name=q3]:checked')?.value; if (v !== 'primary' && v !== 'shared') return disqualifyNow(); showPage(3); };
+  document.getElementById('p4Next').onclick  = () => { let v = document.querySelector('[name=q4]:checked')?.value; if (v === 'under_1' || v === '1_2') return disqualifyNow(); showPage(4); };
+  document.getElementById('p5Next').onclick  = () => showPage(5);
+  document.getElementById('p6Next').onclick  = () => { if (document.querySelector('[name=q6]:checked')?.value === 'yes') return disqualifyNow(); showPage(6); };
+  document.getElementById('p7Next').onclick  = () => { let v = document.querySelector('[name=q7]:checked')?.value; if (v !== 'yes' && v !== 'shared') return disqualifyNow(); showPage(7); };
+  document.getElementById('p8Next').onclick  = () => { if (document.querySelector('[name=q8]:checked')?.value === 'under_100') return disqualifyNow(); showPage(8); };
+  document.getElementById('p9Next').onclick  = () => { if (document.querySelector('[name=q9]:checked')?.value === 'heavy_shade') return disqualifyNow(); showPage(9); };
+  document.getElementById('p10Next').onclick = () => showPage(10);
+  document.getElementById('p11Next').onclick = () => { let v = document.querySelector('[name=q11]:checked')?.value; if (v === '1_3_months' || v === 'researching') return disqualifyNow(); showPage(11); };
+  document.getElementById('p12Next').onclick = () => { let v = document.querySelector('[name=q12]:checked')?.value; if (v === 'researching' || v === 'not_interested') return disqualifyNow(); showPage(12); };
 
-document.getElementById('p16Exit')?.addEventListener('click', disqualifyNow);
-document.getElementById('finishBtn')?.addEventListener('click', () => {
-  window.location.href = completionUrl;
-});
+  document.getElementById('p13Next').onclick = () => showPage(13);
+  document.getElementById('p13ExitTop').onclick = disqualifyNow;
+  document.getElementById('p13Exit').onclick = disqualifyNow;
 
-showPage(0);
+  // Page 14 Polling Logic (Strict 300s Check + 3 Failed Attempts Limit)
+  let checkInterval = null;
+  let failedAttempts = 0;
+  let lastProcessedTimestamp = 0;
+
+  function startCallStatusPolling() {
+    if (checkInterval) clearInterval(checkInterval);
+
+    const statusText = document.getElementById('callStatusText');
+    const p14NextBtn = document.getElementById('p14Next');
+
+    checkInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`https://marketcall1.kayembakasongo.workers.dev/debug?transaction_id=${encodeURIComponent(transactionId)}`);
+        const data = await response.json();
+        const record = data.record;
+
+        if (record) {
+          const isNewCall = record.updatedAt && (new Date(record.updatedAt).getTime() > lastProcessedTimestamp);
+
+          if (isNewCall) {
+            lastProcessedTimestamp = new Date(record.updatedAt).getTime();
+            const duration = record.duration || 0;
+
+            // STRICT DURATION CHECK: Minimum 300 seconds (5 minutes)
+            if (duration >= 300) {
+              clearInterval(checkInterval);
+              statusText.className = 'text-sm text-emerald-600 font-bold';
+              statusText.textContent = `✅ Call Verified! Duration: ${Math.floor(duration / 60)}m ${duration % 60}s. Click Continue.`;
+              p14NextBtn.disabled = false;
+              return;
+            }
+
+            if (duration < 300) {
+              failedAttempts++;
+
+              if (failedAttempts >= 3) {
+                clearInterval(checkInterval);
+                statusText.className = 'text-sm text-red-600 font-bold';
+                statusText.textContent = '❌ Maximum attempts reached (3/3). Call duration was under 5 minutes. Disqualifying...';
+                setTimeout(() => { disqualifyNow(); }, 2500);
+              } else {
+                statusText.className = 'text-sm text-amber-700 font-bold';
+                statusText.textContent = `⚠️ Attempt ${failedAttempts}/3 failed (${Math.floor(duration / 60)}m ${duration % 60}s). Call must be at least 5 minutes. Please redial.`;
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+    }, 4000);
+  }
+
+  document.getElementById('p14Next').onclick = () => showPage(14);
+  document.getElementById('p14ExitTop').onclick = disqualifyNow;
+  document.getElementById('p14Exit').onclick = disqualifyNow;
+
+  // Page 15 Final Submit
+  const emailConfirmForm = document.getElementById('emailConfirmForm');
+  const finishBtn = document.getElementById('finishBtn');
+
+  emailConfirmForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const userEmail = document.getElementById('userEmail')?.value.trim();
+    const optInCheck = document.getElementById('optInCheck')?.checked;
+
+    if (userEmail && optInCheck) {
+      document.getElementById('submitEmailBtn').textContent = 'Submitted ✓';
+      document.getElementById('submitEmailBtn').disabled = true;
+      finishBtn.disabled = false;
+    }
+  });
+
+  document.getElementById('p15Exit').onclick = disqualifyNow;
+  finishBtn.onclick = () => { window.location.href = workerFinishUrl; };
+
+  // Init
+  showPage(0);
 </script>
 </body>
 </html>

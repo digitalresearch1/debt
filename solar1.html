@@ -1,397 +1,530 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Solar options · Quick survey</title>
-<style>
-:root{font-family:system-ui,-apple-system,sans-serif;color:#132b34;background:#f3f7f6;line-height:1.6}
-*{box-sizing:border-box}
-body{margin:0}
-header,main,footer{max-width:760px;margin:auto;padding:24px}
-header{display:flex;justify-content:space-between;align-items:center}
-header b{font-size:19px}
-header span{font-size:13px;color:#48605e}
-h1{font-size:clamp(28px,5vw,40px);line-height:1.2;letter-spacing:-1px;margin:10px 0}
-p{margin:12px 0}
-.eyebrow{color:#087b60;font-size:12px;font-weight:800;letter-spacing:2px}
-.intro{margin-bottom:24px}
-.muted,footer{font-size:14px;color:#48605e}
-.card{background:white;border:1px solid #d9e6e1;border-radius:20px;padding:24px;box-shadow:0 10px 35px #153b2910}
-.bubble{background:#eef5f2;border-radius:14px 14px 14px 3px;padding:16px;margin:12px 0;max-width:95%}
-.answer{background:#0b745b;color:white;border-radius:14px 14px 3px 14px;margin:12px 0 12px auto;padding:10px 16px;width:fit-content;max-width:90%}
-.options{display:grid;gap:10px;margin-top:20px}
-button,.call{font:inherit;font-weight:650;cursor:pointer;border:1px solid #b7cec5;background:white;color:#154639;border-radius:10px;padding:12px 16px;text-decoration:none;text-align:center;min-height:48px}
-button:hover{background:#eaf5ef}
-button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #db9b1b;outline-offset:3px}
-button:disabled{opacity:.5;cursor:not-allowed}
-.primary,.call{background:#087b60;color:white;border-color:#087b60}
-.primary:hover,.call:hover{background:#08634e}
-.call{display:block;font-size:20px;margin:20px 0}
-.secondary{font-size:14px;background:transparent;margin-top:16px}
-label{display:block;font-weight:600;margin-top:16px}
-input,textarea{font:inherit;width:100%;padding:12px;border:1px solid #b7cec5;border-radius:8px;margin:7px 0}
-input[type=checkbox]{width:auto;margin-right:8px}
-.status{padding:12px;background:#fff7db;border-radius:9px;font-size:14px;margin:15px 0}
-.success{background:#e0f5e8}
-progress{width:100%;height:7px;accent-color:#087b60}
-.hidden{display:none!important}
-.row{display:flex;gap:12px;flex-wrap:wrap}
-.row>*{flex:1}
-footer details{margin:12px 0}
-summary{cursor:pointer}
-#question:focus{outline:none}
-#chatScroll{max-height:76dvh;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scroll-padding:20px}
-#question{scroll-margin-top:20px}
-@media(max-width:480px){header,main,footer{padding:18px}.card{padding:18px}header span{max-width:100px;text-align:right}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Explore solar options for your home</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f3f7f6;
+      color: #17332e;
+      font: 16px/1.5 system-ui, Arial, sans-serif;
+    }
+    main { max-width: 680px; margin: auto; padding: 24px 16px 60px; }
+    h1 { font-size: clamp(29px, 6vw, 42px); line-height: 1.15; }
+    .muted { color: #536862; font-size: 14px; }
+    .card {
+      background: white;
+      border: 1px solid #dce7e2;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 30px #143d3010;
+    }
+    #chat {
+      max-height: 75vh;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    .bubble, .answer {
+      padding: 13px 16px;
+      margin: 12px 0;
+      border-radius: 15px;
+      max-width: 95%;
+    }
+    .bubble { background: #edf5f0; }
+    .answer {
+      background: #087b60;
+      color: white;
+      width: fit-content;
+      margin-left: auto;
+    }
+    #options { display: grid; gap: 10px; margin: 18px 0; }
+    button, .call {
+      display: block;
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 15px;
+      border: 1px solid #a9c8bb;
+      border-radius: 10px;
+      background: white;
+      color: #154639;
+      font: inherit;
+      font-weight: 650;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    button:hover { background: #edf5f0; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .call, .primary {
+      background: #087b60;
+      border-color: #087b60;
+      color: white;
+    }
+    .call { font-size: 20px; margin: 18px 0; }
+    label { display: block; margin-top: 15px; font-weight: 600; }
+    input[type="tel"], textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border: 1px solid #a9c8bb;
+      border-radius: 9px;
+      font: inherit;
+    }
+    input[type="checkbox"] { margin-right: 8px; }
+    .notice {
+      padding: 12px;
+      margin: 15px 0;
+      border-radius: 9px;
+      background: #fff4d3;
+    }
+    .hidden { display: none !important; }
+    progress { width: 100%; accent-color: #087b60; }
+    :focus-visible { outline: 3px solid #e0a129; outline-offset: 2px; }
+  </style>
 </head>
+
 <body>
-<header><b>☀ Solar options</b><span>Quick guided survey</span></header>
 <main>
-<div class="intro">
-  <div class="eyebrow">YOUR HOME. YOUR OPTIONS.</div>
+  <p>☀️ Solar options</p>
   <h1>Considering solar for your home?</h1>
-  <p>Answer four short questions, then choose whether to speak with a solar representative about your home, available options, and estimated costs.</p>
-  <p class="muted">This is a solar sales referral survey, not a government or utility program. The phone call is with a representative who may discuss purchasing solar. Savings and suitability are not guaranteed.</p>
-</div>
+  <p>Answer four short questions about your home. If solar may be a fit, you can call to discuss installation options and estimated costs.</p>
+  <p class="muted">This is not a government or utility program. Suitability and savings are not guaranteed.</p>
 
-<p id="progressText" class="muted">Getting started</p>
-<progress id="progress" value="0" max="100" aria-label="Survey progress"></progress>
+  <p id="progressText" class="muted">Getting started</p>
+  <progress id="progress" value="0" max="100"></progress>
 
-<section class="card" id="chatScroll" aria-label="Guided survey" tabindex="0">
-  <div id="history" aria-label="Your previous answers"></div>
-  <div id="question" tabindex="-1"></div>
-  <div id="controls"></div>
+  <section id="chat" class="card" aria-label="Solar questions">
+    <div id="history"></div>
+    <div id="question" class="bubble"></div>
+    <div id="options"></div>
 
-  <div id="callPanel" class="hidden">
-    <p>Discuss your home's suitability, available options, and estimated costs. Calling is your choice; you can leave at any time.</p>
-    <a class="call" href="tel:+18442135016" id="callButton">Call (844) 213-5016</a>
-    <p class="muted">On a computer? Dial the number from your phone, then return here. Tapping the button does not confirm a connection.</p>
-    <div id="callStatus" class="status" role="status" aria-live="polite">No call has been verified yet.</div>
-    <button id="checkStatus">Check call status</button>
+    <div id="callPanel" class="hidden">
+      <p>Speak with a solar representative about your home's suitability, available options, and estimated costs.</p>
 
-    <form id="verifyForm">
-      <label for="phone">Number you used to call (US)</label>
-      <input id="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="24" placeholder="(202) 555-0123" required>
-      <label class="muted"><input id="phoneConsent" type="checkbox" required>I agree to send this number to the call-verification service to match my call.</label>
-      <button id="verifyButton" type="submit">Match my call</button>
-    </form>
+      <a class="call" href="tel:+18442135016" id="callButton">
+        Call (844) 213-5016
+      </a>
 
-    <div class="row">
-      <button id="continueCall" class="primary" disabled>Continue after verification</button>
-      <button id="failedCall">I couldn't reach anyone</button>
+      <p class="muted">
+        On a computer? Dial the number from your phone, then return here.
+        Enter the number you called from so we can look for your call.
+      </p>
+
+      <p id="callStatus" class="notice" role="status">
+        No call has been verified yet.
+      </p>
+
+      <button id="checkStatus" type="button">Check call status</button>
+
+      <form id="verifyForm">
+        <label for="phone">Number you used to call (US)</label>
+        <input id="phone" type="tel" inputmode="tel"
+               placeholder="(202) 555-0123" required>
+
+        <label class="muted">
+          <input id="phoneConsent" type="checkbox" required>
+          I agree to send this number to the call verification service to match my call.
+        </label>
+
+        <button id="verifyButton" type="submit">Match my call</button>
+      </form>
+
+      <button id="continueCall" class="primary" type="button" disabled>
+        Continue after verification
+      </button>
+      <button id="failedCall" type="button">
+        I couldn't reach anyone
+      </button>
     </div>
-  </div>
 
-  <div id="feedbackPanel" class="hidden">
-    <label for="comments">Anything else you'd like to share? (Optional)</label>
-    <textarea id="comments" maxlength="2000" rows="3" placeholder="Please do not include sensitive personal information."></textarea>
-    <p class="muted">Your answers and participant ID will be sent to the survey service when you submit. No reward or credit is promised by this page.</p>
-    <button id="submit" class="primary">Submit feedback</button>
-    <p id="submitStatus" role="status" aria-live="polite"></p>
-  </div>
+    <div id="feedbackPanel" class="hidden">
+      <label for="comments">Anything else you'd like to share? (Optional)</label>
+      <textarea id="comments" rows="3" maxlength="2000"
+                placeholder="Please do not include sensitive personal information."></textarea>
+      <button id="submit" class="primary" type="button">Submit feedback</button>
+      <p id="submitStatus" role="status"></p>
+    </div>
+  </section>
 
-  <button id="back" class="secondary hidden">Back / change answer</button>
-  <button id="exit" class="secondary">Leave survey</button>
-</section>
+  <p class="muted">
+    Calling shares your caller information with the phone service and representative.
+    Entering your number above sends it to the call verification service.
+  </p>
 </main>
-
-<footer>
-  <details>
-    <summary>About this survey and your information</summary>
-    <p>This scripted survey is automated. Answers stay in this page until submission; reloading clears them. If you use “Match my call,” the number and participant ID are sent to the verification service used by this survey. Calling shares your caller information with the phone service and representative. This page does not grant permission for separate marketing messages.</p>
-    <p>A participant ID from your survey invitation is needed for call matching and submission. Your survey provider controls any participation-credit terms.</p>
-  </details>
-</footer>
 
 <script>
 'use strict';
 
-const CONFIG={
-  workerBase:'https://marketcall1.kayembakasongo.workers.dev',
-  feedbackUrl:'https://marketcall1.kayembakasongo.workers.dev/feedback'
-};
-const $=id=>document.getElementById(id);
-const params=new URLSearchParams(location.search);
-const transactionId=(params.get('transaction_id')||params.get('RID')||'').trim();
+const WORKER = 'https://marketcall1.kayembakasongo.workers.dev';
+const $ = id => document.getElementById(id);
+const query = new URLSearchParams(location.search);
+const transactionId = (
+  query.get('transaction_id') || query.get('RID') || ''
+).trim();
 
-const questions=[
-  {key:'homeowner',text:'Do you own a single-family home?',choices:['Yes','No'],pass:v=>v==='Yes'},
-  {key:'sunlight',text:'How much direct sunlight does your roof receive?',choices:['Sunlight for most of the day','Some shade','Not sure'],pass:()=>true},
-  {key:'bill',text:'What is your average monthly electricity bill?',choices:['$100 or less','More than $100','Not sure'],pass:v=>v==='More than $100'},
-  {key:'interest',text:'Are you considering installing solar panels?',choices:['Yes, I am considering solar','I only want to complete a survey','No'],pass:v=>v==='Yes, I am considering solar'}
+const questions = [
+  {
+    key: 'homeowner',
+    text: 'Do you own a single-family home?',
+    choices: ['Yes', 'No'],
+    passes: answer => answer === 'Yes'
+  },
+  {
+    key: 'sunlight',
+    text: 'How much direct sunlight does your roof receive?',
+    choices: ['Sunlight for most of the day', 'Some shade', 'Not sure'],
+    passes: () => true
+  },
+  {
+    key: 'bill',
+    text: 'What is your average monthly electricity bill?',
+    choices: ['$100 or less', 'More than $100', 'Not sure'],
+    passes: answer => answer === 'More than $100'
+  },
+  {
+    key: 'interest',
+    text: 'Are you considering installing solar panels?',
+    choices: [
+      'Yes, I am considering solar',
+      'I am just gathering information',
+      'No'
+    ],
+    passes: answer => answer === 'Yes, I am considering solar'
+  }
 ];
 
-let answers={},step=0,stage='intro',verified=false,callOutcome='',timer=null,busy=false,requestBusy=false,submissionId='',submissionPayload='';
+let answers = {};
+let step = 0;
+let stage = 'start';
+let verified = false;
+let callOutcome = '';
+let busy = false;
+let submissionId = '';
 
-function normalizePhone(raw){
-  let d=raw.replace(/\D/g,'');
-  if(d.length===11&&d[0]==='1')d=d.slice(1);
-  return /^[2-9]\d{2}[2-9]\d{6}$/.test(d)?'+1'+d:null;
+function screenOut() {
+  const url = new URL('https://spectrumsurveys.com/surveydone');
+  url.searchParams.set('st', '18');
+  if (transactionId) {
+    url.searchParams.set('transaction_id', transactionId);
+  }
+  location.assign(url.href);
 }
-function isVerified(data){return data&&data.status==='verified';}
-function stopPolling(){clearTimeout(timer);timer=null;}
-function setProgress(n,text){$('progress').value=n;$('progressText').textContent=text;}
-function scrollToQuestion(){
-  requestAnimationFrame(()=>{
-    $('question').focus({preventScroll:true});
-    $('chatScroll').scrollTo({
-      top:$('question').offsetTop-$('chatScroll').offsetTop-20,
-      behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'
-    });
+
+function setProgress(value, text) {
+  $('progress').value = value;
+  $('progressText').textContent = text;
+}
+
+function scrollChat() {
+  requestAnimationFrame(() => {
+    $('chat').scrollTop = $('chat').scrollHeight;
   });
 }
-function say(text){$('question').textContent=text;$('question').className='bubble';scrollToQuestion();}
-function buttons(options){
-  $('controls').replaceChildren();
-  $('controls').className='options';
-  for(const [label,fn] of options){
-    const b=document.createElement('button');
-    b.textContent=label;
-    b.onclick=fn;
-    $('controls').append(b);
-  }
+
+function say(text) {
+  $('question').textContent = text;
+  scrollChat();
 }
-function history(){
-  $('history').replaceChildren();
-  questions.slice(0,step).forEach(q=>{
-    if(!answers[q.key])return;
-    for(const [text,cls] of [[q.text,'bubble'],[answers[q.key],'answer']]){
-      const e=document.createElement('div');
-      e.textContent=text;
-      e.className=cls;
-      $('history').append(e);
-    }
+
+function showOptions(items) {
+  $('options').replaceChildren();
+  items.forEach(([label, action]) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = label;
+    button.addEventListener('click', action);
+    $('options').append(button);
   });
+  scrollChat();
 }
-function hidePanels(){
-  stopPolling();
-  $('callPanel').classList.add('hidden');
-  $('feedbackPanel').classList.add('hidden');
-  $('controls').replaceChildren();
+
+function addHistory(question, answer) {
+  const prompt = document.createElement('div');
+  prompt.className = 'bubble';
+  prompt.textContent = question;
+
+  const response = document.createElement('div');
+  response.className = 'answer';
+  response.textContent = answer;
+
+  $('history').append(prompt, response);
 }
-function ask(){
-  hidePanels();
-  stage='questions';
-  history();
-  $('back').classList.toggle('hidden',step===0);
-  setProgress(step*12,'Question '+(step+1)+' of 4');
-  const q=questions[step];
-  say(q.text);
-  buttons(q.choices.map(v=>[v,()=>{
-    answers[q.key]=v;
-    if(!q.pass(v)){
-      stage='screenout';
-      say('Thank you. This particular solar call survey does not match your answers. You can change your answer or leave the survey.');
-      buttons([['Change my answer',ask]]);
-      return;
-    }
-    step++;
-    step<questions.length?ask():showCall();
-  }]));
-}
-function status(text,ok=false){
-  $('callStatus').textContent=text;
-  $('callStatus').classList.toggle('success',ok);
-}
-function markVerified(){
-  verified=true;
-  stopPolling();
-  $('continueCall').disabled=false;
-  status('Your call has been verified. You can continue to feedback.',true);
-}
-async function request(url,options={}){
-  const controller=new AbortController();
-  const timeout=setTimeout(()=>controller.abort(),12000);
-  try{
-    const r=await fetch(url,{...options,signal:controller.signal,cache:'no-store'});
-    if(!r.ok)throw Error('Request failed');
-    return await r.json();
-  }finally{clearTimeout(timeout);}
-}
-async function check(){
-  if(requestBusy||verified||stage!=='call')return;
-  if(!transactionId){
-    status('Your invitation is missing its participant ID. Return to your original survey invitation to enable call matching.');
-    return;
-  }
-  requestBusy=true;
-  try{
-    const data=await request(CONFIG.workerBase+'/debug?transaction_id='+encodeURIComponent(transactionId));
-    if(stage!=='call')return;
-    if(isVerified(data))markVerified();
-    else status('A qualifying call has not been confirmed yet. You can try again or match the number you used.');
-  }catch{
-    if(stage==='call')status('We could not check your call right now. Please retry. Your call has not been marked verified.');
-  }finally{requestBusy=false;}
-}
-function showCall(){
-  hidePanels();
-  stage='call';
-  history();
-  $('back').classList.remove('hidden');
-  setProgress(50,'Your next step · Solar call');
-  say('Would you like to speak with a solar representative?');
-  $('callPanel').classList.remove('hidden');
-  $('continueCall').disabled=!verified;
-  if(!transactionId)status('Call matching needs the participant ID from your original survey invitation.');
-}
-function feedback(outcome){
-  hidePanels();
-  stage='feedback';
-  callOutcome=outcome;
-  $('back').classList.add('hidden');
-  setProgress(75,'Tell us about your experience');
-  if(outcome==='connected'){
-    say('How clearly did the representative explain your solar options?');
-    buttons(['Very clearly','Somewhat clearly','Not clearly','Options were not discussed'].map(v=>[v,()=>{
-      answers.clarity=v;
-      finishQuestions();
-    }]));
-  }else{
-    say('What happened when you tried to call?');
-    buttons(['No answer / busy','Left a voicemail','Call disconnected','I did not call'].map(v=>[v,()=>{
-      answers.connection=v;
-      delete answers.clarity;
-      finishQuestions();
-    }]));
-  }
-}
-function finishQuestions(){
-  buttons([]);
-  say('Thank you. You can add a comment before submitting.');
-  $('feedbackPanel').classList.remove('hidden');
-  buttons([
-    ['Change feedback',()=>feedback(callOutcome)],
-    ['Return to call',showCall]
-  ]);
-}
-async function submit(){
-  if(busy||stage!=='feedback')return;
-  if(callOutcome==='connected'&&!verified){
-    $('submitStatus').textContent='Please verify your call before submitting connected-call feedback.';
-    return;
-  }
-  if(!transactionId){
-    $('submitStatus').textContent='The participant ID is missing. Please reopen your original survey invitation.';
-    return;
-  }
-  if(!CONFIG.feedbackUrl){
-    $('submitStatus').textContent='Feedback submission is not available yet. Your answers have not been sent. Please contact the survey provider.';
-    return;
-  }
-  if(callOutcome==='connected'?!answers.clarity:!answers.connection){
-    $('submitStatus').textContent='Please answer the feedback question first.';
-    return;
-  }
-  busy=true;
-  $('submit').disabled=true;
-  $('submitStatus').textContent='Saving your feedback…';
-  try{
-    const fingerprint=JSON.stringify({answers,callOutcome,comments:$('comments').value.trim()});
-    if(!submissionId||submissionPayload!==fingerprint){
-      submissionId=crypto.randomUUID();
-      submissionPayload=fingerprint;
-    }
-    const result=await request(CONFIG.feedbackUrl,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        transaction_id:transactionId,
-        answers,
-        call_outcome:callOutcome,
-        comments:$('comments').value.trim(),
-        submission_id:submissionId
-      })
-    });
-    if(result.saved!==true||result.submission_id!==submissionId)throw Error('No save confirmation');
-    hidePanels();
-    stage='complete';
-    $('back').classList.add('hidden');
-    say('Thank you. Your feedback has been saved.');
-    setProgress(100,'Feedback submitted');
-    if(result.finish_url){
-      const destination=new URL(result.finish_url);
-      if(destination.origin===new URL(CONFIG.workerBase).origin&&destination.pathname==='/finish'){
-        buttons([['Return to survey provider',()=>{location.href=destination.href;}]]);
+
+function showQuestion() {
+  stage = 'questions';
+  setProgress(step * 12, `Question ${step + 1} of 4`);
+
+  const item = questions[step];
+  say(item.text);
+
+  showOptions(item.choices.map(choice => [
+    choice,
+    () => {
+      // Lock the buttons as soon as an answer is selected.
+      showOptions([]);
+      answers[item.key] = choice;
+
+      if (!item.passes(choice)) {
+        screenOut();
+        return;
+      }
+
+      addHistory(item.text, choice);
+      step++;
+
+      if (step < questions.length) {
+        showQuestion();
+      } else {
+        showCall();
       }
     }
-  }catch{
-    $('submitStatus').textContent='We could not confirm that your feedback was saved. Your answers are still here; please retry.';
-  }finally{
-    busy=false;
-    $('submit').disabled=false;
+  ]));
+}
+
+function callStatus(message) {
+  $('callStatus').textContent = message;
+}
+
+function showCall() {
+  stage = 'call';
+  setProgress(50, 'Solar call');
+  say('Would you like to speak with a solar representative?');
+  showOptions([]);
+  $('callPanel').classList.remove('hidden');
+
+  if (!transactionId) {
+    callStatus(
+      'Your invitation is missing its participant ID. Reopen your original link to enable call matching.'
+    );
+  }
+  scrollChat();
+}
+
+function markVerified() {
+  verified = true;
+  $('continueCall').disabled = false;
+  callStatus('Your call has been verified. You can continue.');
+}
+
+async function api(path, options = {}) {
+  const response = await fetch(WORKER + path, {
+    ...options,
+    cache: 'no-store'
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || 'Request failed');
+  }
+  return data;
+}
+
+async function checkStatus() {
+  if (busy || stage !== 'call' || verified) return;
+
+  if (!transactionId) {
+    callStatus('Reopen your original invitation link to enable call matching.');
+    return;
+  }
+
+  busy = true;
+  callStatus('Checking your call...');
+
+  try {
+    const data = await api(
+      '/status?transaction_id=' + encodeURIComponent(transactionId)
+    );
+
+    if (data.status === 'verified') {
+      markVerified();
+    } else {
+      callStatus(
+        'No qualifying call is linked yet. If you called from another phone, enter that number below.'
+      );
+    }
+  } catch {
+    callStatus('Could not check your call right now. Please try again.');
+  } finally {
+    busy = false;
   }
 }
-$('verifyForm').onsubmit=async e=>{
-  e.preventDefault();
-  if(requestBusy||stage!=='call')return;
-  const phone=normalizePhone($('phone').value);
-  if(!phone){status('Enter a valid 10-digit US phone number, optionally with +1.');return;}
-  if(!transactionId){status('Please reopen your survey invitation; its participant ID is missing.');return;}
-  if(!$('phoneConsent').checked){status('Please agree to call matching before sending your number.');return;}
-  requestBusy=true;
-  $('verifyButton').disabled=true;
-  status('Checking your call record…');
-  try{
-    const data=await request(CONFIG.workerBase+'/verify-phone',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({transaction_id:transactionId,phone})
+
+function normalizePhone(value) {
+  let digits = value.replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) {
+    digits = digits.slice(1);
+  }
+  return /^[2-9]\d{2}[2-9]\d{6}$/.test(digits)
+    ? '+1' + digits
+    : null;
+}
+
+$('verifyForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (busy || stage !== 'call') return;
+
+  const phone = normalizePhone($('phone').value);
+  if (!phone) {
+    callStatus('Enter a valid 10-digit US phone number.');
+    return;
+  }
+  if (!transactionId) {
+    callStatus('Your participant ID is missing. Reopen your original link.');
+    return;
+  }
+  if (!$('phoneConsent').checked) return;
+
+  busy = true;
+  $('verifyButton').disabled = true;
+  callStatus('Looking for your call...');
+
+  try {
+    const data = await api('/verify-phone', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        transaction_id: transactionId,
+        phone
+      })
     });
-    if(stage==='call'){
-      if(isVerified(data)){markVerified();$('phone').value='';}
-      else status('No qualifying call was confirmed for that number yet. Please retry later.');
+
+    if (data.status === 'verified') {
+      markVerified();
+      $('phone').value = '';
+    } else {
+      callStatus(
+        'No qualifying call was found for that number yet. Please try again shortly.'
+      );
     }
-  }catch{
-    if(stage==='call')status('Call matching is unavailable right now. Please retry.');
-  }finally{
-    requestBusy=false;
-    $('verifyButton').disabled=false;
+  } catch {
+    callStatus('Call matching is unavailable right now. Please try again.');
+  } finally {
+    busy = false;
+    $('verifyButton').disabled = false;
   }
-};
-$('checkStatus').onclick=check;
-$('callButton').onclick=()=>{
-  if(!verified)status('Your phone may open the dialer. After your call, return here to check its status.');
-  stopPolling();
-  let tries=0;
-  async function poll(){
-    await check();
-    if(stage==='call'&&!verified&&++tries<30)timer=setTimeout(poll,10000);
+});
+
+function showFeedback(outcome) {
+  stage = 'feedback';
+  callOutcome = outcome;
+  $('callPanel').classList.add('hidden');
+  setProgress(75, 'Your experience');
+
+  if (outcome === 'connected') {
+    say('How clearly did the representative explain your solar options?');
+    showOptions([
+      'Very clearly',
+      'Somewhat clearly',
+      'Not clearly',
+      'Options were not discussed'
+    ].map(answer => [
+      answer,
+      () => {
+        answers.clarity = answer;
+        showOptions([]);
+        showFeedbackForm();
+      }
+    ]));
+  } else {
+    say('What happened when you tried to call?');
+    showOptions([
+      'No answer / busy',
+      'Left a voicemail',
+      'Call disconnected',
+      'I did not call'
+    ].map(answer => [
+      answer,
+      () => {
+        answers.connection = answer;
+        showOptions([]);
+        showFeedbackForm();
+      }
+    ]));
   }
-  if(transactionId)timer=setTimeout(poll,10000);
-};
-$('continueCall').onclick=()=>{if(verified)feedback('connected');};
-$('failedCall').onclick=()=>feedback('not_connected');
-$('submit').onclick=submit;
-$('back').onclick=()=>{
-  if(stage==='call'){
-    step=3;
-    verified=false;
-    $('continueCall').disabled=true;
-  }else step=Math.max(0,step-1);
-  questions.slice(step).forEach(q=>delete answers[q.key]);
-  delete answers.clarity;
-  delete answers.connection;
-  ask();
-};
-$('exit').onclick=()=>{
-  if(!confirm('Leave this survey? Unsubmitted answers will be cleared.'))return;
-  hidePanels();
-  stage='exited';
-  answers={};
-  $('history').replaceChildren();
-  $('phone').value='';
-  $('comments').value='';
-  $('back').classList.add('hidden');
-  $('exit').classList.add('hidden');
-  say('You have left the survey. You can close this page and return to your survey provider.');
-  setProgress(0,'Survey closed');
-};
+}
+
+function showFeedbackForm() {
+  say('Thank you. You can add an optional comment before submitting.');
+  $('feedbackPanel').classList.remove('hidden');
+  scrollChat();
+}
+
+$('submit').addEventListener('click', async () => {
+  if (busy || stage !== 'feedback') return;
+
+  if (!transactionId) {
+    $('submitStatus').textContent =
+      'Your participant ID is missing. Reopen your original link.';
+    return;
+  }
+
+  if (callOutcome === 'connected' && !verified) {
+    $('submitStatus').textContent =
+      'Your call needs to be verified before submitting.';
+    return;
+  }
+
+  busy = true;
+  $('submit').disabled = true;
+  $('submitStatus').textContent = 'Saving your feedback...';
+
+  if (!submissionId) submissionId = crypto.randomUUID();
+
+  try {
+    const saved = await api('/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        transaction_id: transactionId,
+        submission_id: submissionId,
+        answers,
+        call_outcome: callOutcome,
+        comments: $('comments').value.trim()
+      })
+    });
+
+    if (saved.saved !== true || !saved.finish_url) {
+      throw new Error('Feedback was not confirmed');
+    }
+
+    const finishUrl = new URL(saved.finish_url);
+    if (
+      finishUrl.origin !== new URL(WORKER).origin ||
+      finishUrl.pathname !== '/finish'
+    ) {
+      throw new Error('Invalid finish URL');
+    }
+
+    stage = 'complete';
+    $('feedbackPanel').classList.add('hidden');
+    setProgress(100, 'Feedback submitted');
+    say('Thank you. Your feedback was saved.');
+    showOptions([[
+      'Finish',
+      () => location.assign(finishUrl.href)
+    ]]);
+  } catch {
+    $('submitStatus').textContent =
+      'We could not confirm your feedback was saved. Please try again.';
+  } finally {
+    busy = false;
+    $('submit').disabled = false;
+  }
+});
+
+$('checkStatus').addEventListener('click', checkStatus);
+$('continueCall').addEventListener('click', () => {
+  if (verified) showFeedback('connected');
+});
+$('failedCall').addEventListener('click', () => {
+  showFeedback('not_connected');
+});
+
 say('Let’s start with your home. Choose the answer that best describes your situation.');
-buttons([['Start the survey',ask]]);
+showOptions([['Get started', showQuestion]]);
 </script>
 </body>
 </html>
